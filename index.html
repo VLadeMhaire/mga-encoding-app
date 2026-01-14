@@ -16,6 +16,9 @@
             --header-bg: linear-gradient(135deg, rgba(0, 30, 20, 0.9) 0%, rgba(0, 40, 25, 0.95) 100%);
             --text-color: #e0f7e9;
             --text-secondary: #80ffd4;
+            --sidebar-bg: rgba(0, 20, 15, 0.98);
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
         }
         
         * {
@@ -43,6 +46,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: margin-left 0.3s ease;
+        }
+        
+        body.sidebar-expanded {
+            margin-left: var(--sidebar-width);
         }
         
         body::before {
@@ -66,6 +74,207 @@
             min-height: calc(100vh - clamp(20px, 4vw, 40px));
             width: 100%;
             align-items: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            box-shadow: 0 0 clamp(25px, 3vw, 40px) rgba(0, 0, 0, 0.7), 
+                        0 0 clamp(15px, 2vw, 25px) rgba(0, 255, 157, 0.2);
+            border-right: 2px solid rgba(0, 255, 157, 0.3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            transform: translateX(-100%);
+        }
+        
+        .sidebar.sidebar-expanded {
+            transform: translateX(0);
+        }
+        
+        .sidebar-header {
+            padding: clamp(20px, 2.5vw, 30px) clamp(15px, 2vw, 25px);
+            border-bottom: 1px solid rgba(0, 255, 157, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 30, 20, 0.8);
+        }
+        
+        .sidebar-title {
+            font-size: clamp(1rem, 1.5vw, 1.25rem);
+            color: var(--primary-color);
+            font-weight: 700;
+            text-shadow: 0 0 clamp(8px, 1.2vw, 12px) rgba(0, 255, 157, 0.5);
+            white-space: nowrap;
+        }
+        
+        .sidebar-toggle {
+            background: rgba(0, 255, 157, 0.2);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            color: var(--primary-color);
+            width: clamp(35px, 3vw, 45px);
+            height: clamp(35px, 3vw, 45px);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: clamp(1rem, 1.5vw, 1.25rem);
+        }
+        
+        .sidebar-toggle:hover {
+            background: rgba(0, 255, 157, 0.3);
+            transform: rotate(180deg);
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: clamp(15px, 2vw, 20px) 0;
+        }
+        
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(5px, 0.8vw, 10px);
+            padding: 0 clamp(10px, 1.5vw, 15px);
+        }
+        
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: clamp(12px, 1.5vw, 15px);
+            padding: clamp(12px, 1.5vw, 16px) clamp(15px, 2vw, 20px);
+            background: rgba(0, 30, 20, 0.6);
+            border: 1px solid rgba(0, 255, 157, 0.1);
+            border-radius: 10px;
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-btn:hover {
+            background: rgba(0, 40, 25, 0.8);
+            border-color: rgba(0, 255, 157, 0.3);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.2);
+        }
+        
+        .sidebar-btn.active {
+            background: rgba(0, 255, 157, 0.15);
+            border-color: rgba(0, 255, 157, 0.5);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+        
+        .sidebar-btn i {
+            font-size: clamp(1rem, 1.5vw, 1.25rem);
+            color: var(--primary-color);
+            width: clamp(20px, 2.5vw, 25px);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-btn:hover i {
+            transform: scale(1.2);
+            text-shadow: 0 0 clamp(8px, 1.2vw, 12px) rgba(0, 255, 157, 0.8);
+        }
+        
+        .sidebar-btn-text {
+            font-size: clamp(0.85rem, 1.2vw, 1rem);
+            font-weight: 500;
+            white-space: nowrap;
+            color: #a7ffeb;
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(0, 255, 157, 0.2);
+            margin: clamp(15px, 2vw, 20px) clamp(10px, 1.5vw, 15px);
+        }
+        
+        .sidebar-footer {
+            padding: clamp(15px, 2vw, 20px);
+            border-top: 1px solid rgba(0, 255, 157, 0.2);
+            text-align: center;
+            font-size: clamp(0.75rem, 1vw, 0.85rem);
+            color: #80cbc4;
+            background: rgba(0, 20, 15, 0.8);
+        }
+        
+        /* Sidebar collapsed state */
+        .sidebar-collapsed .sidebar-btn-text {
+            display: none;
+        }
+        
+        .sidebar-collapsed .sidebar-title {
+            display: none;
+        }
+        
+        .sidebar-collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar-collapsed .sidebar-btn {
+            justify-content: center;
+            padding: clamp(12px, 1.5vw, 16px);
+        }
+        
+        .sidebar-collapsed .sidebar-toggle i {
+            transform: rotate(180deg);
+        }
+        
+        .sidebar-collapsed .sidebar-header {
+            justify-content: center;
+            padding: 15px;
+        }
+        
+        /* Floating Toggle Button */
+        .floating-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: clamp(45px, 4vw, 60px);
+            height: clamp(45px, 4vw, 60px);
+            background: var(--sidebar-bg);
+            border: 2px solid rgba(0, 255, 157, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 157, 0.2);
+        }
+        
+        .floating-toggle:hover {
+            background: rgba(0, 255, 157, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .floating-toggle i {
+            font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .floating-toggle:hover i {
+            transform: rotate(180deg);
         }
         
         /* Header Styles */
@@ -81,6 +290,7 @@
             position: relative;
             overflow: hidden;
             width: 100%;
+            transition: all 0.3s ease;
         }
         
         header::before {
@@ -172,6 +382,7 @@
             flex-direction: column;
             width: 100%;
             align-items: center;
+            transition: all 0.3s ease;
         }
         
         /* Fixed 3x3 Grid Container */
@@ -393,6 +604,10 @@
             .button-description {
                 -webkit-line-clamp: 2;
             }
+            
+            .sidebar {
+                width: 250px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -409,6 +624,17 @@
             
             .button-title {
                 font-size: clamp(0.75rem, 2.5vw, 1rem);
+            }
+            
+            .sidebar {
+                width: 240px;
+            }
+            
+            .floating-toggle {
+                left: 10px;
+                top: 10px;
+                width: 50px;
+                height: 50px;
             }
         }
         
@@ -428,6 +654,21 @@
             .button-icon {
                 font-size: 1.5rem;
             }
+            
+            .sidebar {
+                width: 220px;
+            }
+            
+            .floating-toggle {
+                width: 45px;
+                height: 45px;
+                left: 5px;
+                top: 5px;
+            }
+            
+            body.sidebar-expanded {
+                margin-left: 220px;
+            }
         }
         
         /* Landscape orientation for mobile */
@@ -441,6 +682,15 @@
             
             .button-description {
                 display: none;
+            }
+            
+            .sidebar {
+                width: 200px;
+            }
+            
+            .floating-toggle {
+                width: 40px;
+                height: 40px;
             }
         }
         
@@ -475,6 +725,11 @@
             
             .kiosk-button:hover {
                 transform: none;
+            }
+            
+            .sidebar,
+            .floating-toggle {
+                display: none;
             }
         }
         
@@ -522,6 +777,66 @@
     </style>
 </head>
 <body>
+    <!-- Floating Toggle Button -->
+    <div class="floating-toggle" id="floatingToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Navigation</h2>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content">
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-btn active">
+                    <i class="fas fa-home"></i>
+                    <span class="sidebar-btn-text">Dashboard</span>
+                </a>
+                
+                <div class="sidebar-divider"></div>
+                
+                <a href="tax_facts.html" class="sidebar-btn">
+                    <i class="fas fa-book"></i>
+                    <span class="sidebar-btn-text">Tax Facts</span>
+                </a>
+                
+                <a href="tax_calculator.html" class="sidebar-btn">
+                    <i class="fas fa-calculator"></i>
+                    <span class="sidebar-btn-text">Tax Calculator</span>
+                </a>
+                
+                <!-- System Settings option has been removed -->
+                
+                <div class="sidebar-divider"></div>
+                
+                <a href="#" class="sidebar-btn" id="quickGuideBtn">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="sidebar-btn-text">Quick Guide</span>
+                </a>
+                
+                <a href="#" class="sidebar-btn" id="helpBtn">
+                    <i class="fas fa-life-ring"></i>
+                    <span class="sidebar-btn-text">Help & Support</span>
+                </a>
+                
+                <a href="#" class="sidebar-btn" id="printBtn">
+                    <i class="fas fa-print"></i>
+                    <span class="sidebar-btn-text">Print Report</span>
+                </a>
+            </nav>
+        </div>
+        
+        <div class="sidebar-footer">
+            <p>MGAA VAT System v2.0</p>
+            <p>© 2026 All Rights Reserved</p>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <div class="logo-container">
@@ -677,6 +992,29 @@
             const logoImage = document.getElementById('logoImage');
             const gridContainer = document.getElementById('gridContainer');
             const statusText = document.getElementById('statusText');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const floatingToggle = document.getElementById('floatingToggle');
+            const body = document.body;
+            
+            // Sidebar state management
+            let isSidebarExpanded = false;
+            
+            function toggleSidebar() {
+                isSidebarExpanded = !isSidebarExpanded;
+                
+                if (isSidebarExpanded) {
+                    sidebar.classList.add('sidebar-expanded');
+                    body.classList.add('sidebar-expanded');
+                } else {
+                    sidebar.classList.remove('sidebar-expanded');
+                    body.classList.remove('sidebar-expanded');
+                }
+            }
+            
+            // Toggle sidebar
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            floatingToggle.addEventListener('click', toggleSidebar);
             
             // Logo loading with fallback
             if (logoImage) {
@@ -741,13 +1079,13 @@
                 
                 // Handle extreme zoom levels
                 if (zoomLevel < 50) {
-                    document.body.classList.add('extreme-zoom-out');
-                    document.body.classList.remove('extreme-zoom-in');
+                    body.classList.add('extreme-zoom-out');
+                    body.classList.remove('extreme-zoom-in');
                 } else if (zoomLevel > 150) {
-                    document.body.classList.add('extreme-zoom-in');
-                    document.body.classList.remove('extreme-zoom-out');
+                    body.classList.add('extreme-zoom-in');
+                    body.classList.remove('extreme-zoom-out');
                 } else {
-                    document.body.classList.remove('extreme-zoom-out', 'extreme-zoom-in');
+                    body.classList.remove('extreme-zoom-out', 'extreme-zoom-in');
                 }
                 
                 // Adjust grid gap for zoom levels
@@ -865,8 +1203,60 @@
             if (buttons.length > 0) {
                 buttons[0].focus();
             }
+            
+            // Sidebar button functionality
+            const sidebarButtons = document.querySelectorAll('.sidebar-btn');
+            sidebarButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (this.id && !this.href) {
+                        e.preventDefault();
+                        const buttonId = this.id;
+                        
+                        switch(buttonId) {
+                            case 'quickGuideBtn':
+                                alert('Quick Guide:\n\n1. Dashboard: Main interface with 9 tracking modules\n2. Tax Facts: Comprehensive Philippine tax education\n3. Tax Calculator: Calculate various tax scenarios\n4. Use the sidebar navigation for quick access');
+                                break;
+                            case 'helpBtn':
+                                alert('Help & Support:\n\nFor assistance, please contact:\n📧 support@mgaa-vat.com\n📞 (02) 1234-5678\n\nAvailable: Mon-Fri, 9AM-6PM');
+                                break;
+                            case 'printBtn':
+                                window.print();
+                                break;
+                        }
+                        
+                        // Remove active class from all buttons
+                        sidebarButtons.forEach(btn => btn.classList.remove('active'));
+                        // Add active class to clicked button
+                        this.classList.add('active');
+                        
+                        // Auto-remove active class after 2 seconds
+                        setTimeout(() => {
+                            this.classList.remove('active');
+                        }, 2000);
+                    }
+                });
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && isSidebarExpanded) {
+                    if (!sidebar.contains(e.target) && !floatingToggle.contains(e.target)) {
+                        toggleSidebar();
+                    }
+                }
+            });
+            
+            // Initialize sidebar state based on screen size
+            function initSidebarState() {
+                if (window.innerWidth > 1024) {
+                    isSidebarExpanded = true;
+                    sidebar.classList.add('sidebar-expanded');
+                    body.classList.add('sidebar-expanded');
+                }
+            }
+            
+            initSidebarState();
         });
     </script>
 </body>
-
 </html>
