@@ -1,0 +1,957 @@
+// Initialize the table with one empty row
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date for report
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('reportDate').value = today;
+    
+    // Try to load the logo
+    loadLogo();
+    
+    // Load saved company info if exists
+    loadCompanyInfo();
+    
+    // Initialize table
+    addNewRow();
+    updateRowCount();
+    updateTotals();
+    updateSummaryRow();
+    
+    // Add event listeners for company info to save automatically
+    document.querySelectorAll('.company-info-section input').forEach(input => {
+        input.addEventListener('input', saveCompanyInfo);
+        input.addEventListener('change', saveCompanyInfo);
+    });
+    
+    // Format company TIN input
+    const companyTIN = document.getElementById('companyTIN');
+    companyTIN.addEventListener('input', function(e) {
+        formatTIN(e.target);
+    });
+    
+    // Clear company info button
+    document.getElementById('clearInfoBtn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all company information?')) {
+            clearCompanyInfo();
+        }
+    });
+    
+    // Add subtle background animation
+    createBackgroundEffects();
+    
+    // Add row button
+    document.getElementById('addRowBtn').addEventListener('click', function() {
+        addNewRow();
+        updateRowCount();
+        updateTotals();
+        updateSummaryRow();
+    });
+    
+    // Export to Excel button
+    document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+    
+    // Clear all data button
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all table data? This cannot be undone.')) {
+            clearAllData();
+        }
+    });
+});
+
+// Function to create subtle background effects
+function createBackgroundEffects() {
+    const container = document.querySelector('.container');
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                // Container style changed
+            }
+        });
+    });
+    
+    observer.observe(container, { attributes: true });
+}
+
+// Function to load logo
+function loadLogo() {
+    const logoPlaceholder = document.getElementById('logoPlaceholder');
+    
+    // Try to load from local file
+    const logoUrl = 'MGAALogo.jpg';
+    const img = new Image();
+    
+    img.onload = function() {
+        logoPlaceholder.innerHTML = '';
+        logoPlaceholder.appendChild(img);
+        // Add neon effect to logo
+        img.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 157, 0.7))';
+    };
+    
+    img.onerror = function() {
+        // If logo not found, keep the placeholder text
+        console.log('Logo not found at ' + logoUrl + ', using placeholder');
+        logoPlaceholder.style.textShadow = '0 0 10px rgba(0, 255, 157, 0.7)';
+    };
+    
+    img.src = logoUrl;
+}
+
+// Save company info to localStorage
+function saveCompanyInfo() {
+    const companyInfo = {
+        name: document.getElementById('companyName').value,
+        tin: document.getElementById('companyTIN').value,
+        address: document.getElementById('companyAddress').value,
+        business: document.getElementById('lineOfBusiness').value,
+        telephone: document.getElementById('telephone').value,
+        date: document.getElementById('reportDate').value,
+        employee: document.getElementById('authorizedEmployee').value,
+        email: document.getElementById('email').value
+    };
+    localStorage.setItem('vatableSalesCompanyInfo', JSON.stringify(companyInfo));
+}
+
+// Load company info from localStorage
+function loadCompanyInfo() {
+    const savedInfo = localStorage.getItem('vatableSalesCompanyInfo');
+    if (savedInfo) {
+        const companyInfo = JSON.parse(savedInfo);
+        document.getElementById('companyName').value = companyInfo.name || '';
+        document.getElementById('companyTIN').value = companyInfo.tin || '';
+        document.getElementById('companyAddress').value = companyInfo.address || '';
+        document.getElementById('lineOfBusiness').value = companyInfo.business || '';
+        document.getElementById('telephone').value = companyInfo.telephone || '';
+        document.getElementById('reportDate').value = companyInfo.date || new Date().toISOString().split('T')[0];
+        document.getElementById('authorizedEmployee').value = companyInfo.employee || '';
+        document.getElementById('email').value = companyInfo.email || '';
+    }
+}
+
+// Clear company info
+function clearCompanyInfo() {
+    document.getElementById('companyName').value = '';
+    document.getElementById('companyTIN').value = '';
+    document.getElementById('companyAddress').value = '';
+    document.getElementById('lineOfBusiness').value = '';
+    document.getElementById('telephone').value = '';
+    document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('authorizedEmployee').value = '';
+    document.getElementById('email').value = '';
+    localStorage.removeItem('vatableSalesCompanyInfo');
+}
+
+// Function to add a new row
+function addNewRow() {
+    const tableBody = document.getElementById('tableBody');
+    const rowCount = tableBody.children.length + 1;
+    const rowId = 'row_' + Date.now() + '_' + rowCount;
+    
+    const row = document.createElement('tr');
+    row.id = rowId;
+    
+    // Set current date as default
+    const today = new Date().toISOString().split('T')[0];
+    
+    row.innerHTML = `
+        <td>
+            <input type="date" value="${today}" class="editable date-input">
+        </td>
+        <td>
+            <input type="text" class="editable invoice-number" placeholder="INV-001">
+        </td>
+        <td>
+            <select class="editable invoice-type">
+                <option value="">Select</option>
+                <option value="Cash">Cash</option>
+                <option value="Charge">Charge</option>
+                <option value="Billing">Billing</option>
+                <option value="Service">Service</option>
+            </select>
+        </td>
+        <td>
+            <select class="editable payment-mode">
+                <option value="">Select</option>
+                <option value="Cash">Cash</option>
+                <option value="Charge">Charge</option>
+            </select>
+        </td>
+        <td>
+            <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+            <div class="validation-message">TIN must be 12 digits</div>
+        </td>
+        <td>
+            <input type="text" class="editable customer-name" placeholder="Customer name">
+        </td>
+        <td>
+            <input type="text" class="editable address" placeholder="Customer address">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable gross-sales" placeholder="0.00">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable exempt-sales" placeholder="0.00">
+        </td>
+        <td>
+            <select class="editable sales-type">
+                <option value="">Select</option>
+                <option value="Private">Private</option>
+                <option value="Government">Government</option>
+            </select>
+        </td>
+        <td>
+            <div class="uneditable net-sales">0.00</div>
+        </td>
+        <td>
+            <div class="uneditable output-tax">0.00</div>
+        </td>
+        <td>
+            <select class="editable withholding-rate">
+                <option value="0">0%</option>
+                <option value="0.01">1%</option>
+                <option value="0.02">2%</option>
+                <option value="0.05">5%</option>
+            </select>
+        </td>
+        <td>
+            <div class="uneditable withholding-amount">0.00</div>
+        </td>
+        <td>
+            <input type="text" class="editable remarks" placeholder="Enter remarks">
+        </td>
+        <td>
+            <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    tableBody.appendChild(row);
+    
+    // Add event listeners to the new row
+    const editableInputs = row.querySelectorAll('.editable');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        });
+        
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        });
+    });
+    
+    // Special handling for TIN input
+    const tinInput = row.querySelector('.tin-number');
+    tinInput.addEventListener('input', function(e) {
+        formatTIN(e.target);
+    });
+    
+    tinInput.addEventListener('blur', function(e) {
+        validateTIN(e.target);
+    });
+    
+    // Add neon effect to new row inputs on focus
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+        });
+    });
+}
+
+// Function to delete a row
+function deleteRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row && confirm('Are you sure you want to delete this row?')) {
+        // Add fade out effect
+        row.style.transition = 'all 0.3s ease';
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+            row.remove();
+            updateRowCount();
+            updateTotals();
+            updateSummaryRow();
+        }, 300);
+    }
+}
+
+// Function to clear all data
+function clearAllData() {
+    const tableBody = document.getElementById('tableBody');
+    tableBody.innerHTML = '';
+    addNewRow();
+    updateRowCount();
+    updateTotals();
+    updateSummaryRow();
+}
+
+// Function to update calculations for a row
+function updateCalculations(row) {
+    const grossSales = parseFloat(row.querySelector('.gross-sales').value) || 0;
+    const withholdingRate = parseFloat(row.querySelector('.withholding-rate').value) || 0;
+    
+    // Calculate net sales: Gross Sales / 1.12
+    const netSales = grossSales / 1.12;
+    row.querySelector('.net-sales').textContent = netSales.toFixed(2);
+    
+    // Calculate output tax: Net Sales * 0.12
+    const outputTax = netSales * 0.12;
+    row.querySelector('.output-tax').textContent = outputTax.toFixed(2);
+    
+    // Calculate withholding amount: Net Sales * Withholding Tax Rate
+    const withholdingAmount = netSales * withholdingRate;
+    row.querySelector('.withholding-amount').textContent = withholdingAmount.toFixed(2);
+}
+
+// Function to format TIN input
+function formatTIN(input) {
+    // Remove all non-digit characters
+    let value = input.value.replace(/\D/g, '');
+    
+    // Limit to 12 digits
+    if (value.length > 12) {
+        value = value.substring(0, 12);
+    }
+    
+    // Add dashes after every 3 digits
+    if (value.length > 9) {
+        value = value.substring(0, 9) + '-' + value.substring(9);
+    }
+    if (value.length > 6) {
+        value = value.substring(0, 6) + '-' + value.substring(6);
+    }
+    if (value.length > 3) {
+        value = value.substring(0, 3) + '-' + value.substring(3);
+    }
+    
+    input.value = value;
+}
+
+// Function to validate TIN input
+function validateTIN(input) {
+    const value = input.value.replace(/\D/g, '');
+    const validationMessage = input.nextElementSibling;
+    
+    if (value.length === 12) {
+        validationMessage.style.display = 'none';
+        input.style.borderColor = '#00ff9d';
+        input.style.boxShadow = '0 0 5px rgba(0, 255, 157, 0.5), inset 0 0 10px rgba(0, 255, 157, 0.1)';
+    } else if (value.length > 0) {
+        validationMessage.style.display = 'block';
+        input.style.borderColor = '#ff6666';
+        input.style.boxShadow = '0 0 5px rgba(255, 102, 102, 0.5), inset 0 0 10px rgba(255, 102, 102, 0.1)';
+    } else {
+        validationMessage.style.display = 'none';
+        input.style.borderColor = 'rgba(0, 255, 157, 0.3)';
+        input.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+    }
+}
+
+// Function to update row count
+function updateRowCount() {
+    const tableBody = document.getElementById('tableBody');
+    const rowCount = tableBody.children.length;
+    document.getElementById('rowCount').textContent = rowCount;
+}
+
+// Function to update totals
+function updateTotals() {
+    let totalGrossSales = 0;
+    let totalExemptSales = 0;
+    let totalNetSales = 0;
+    let totalOutputTax = 0;
+    let totalWithholding = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        const grossSales = parseFloat(row.querySelector('.gross-sales').value) || 0;
+        const exemptSales = parseFloat(row.querySelector('.exempt-sales').value) || 0;
+        const netSales = parseFloat(row.querySelector('.net-sales').textContent) || 0;
+        const outputTax = parseFloat(row.querySelector('.output-tax').textContent) || 0;
+        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount').textContent) || 0;
+        
+        totalGrossSales += grossSales;
+        totalExemptSales += exemptSales;
+        totalNetSales += netSales;
+        totalOutputTax += outputTax;
+        totalWithholding += withholdingAmount;
+    });
+    
+    document.getElementById('totalGrossSales').textContent = totalGrossSales.toFixed(2);
+    document.getElementById('totalExemptSales').textContent = totalExemptSales.toFixed(2);
+    document.getElementById('totalNetSales').textContent = totalNetSales.toFixed(2);
+    document.getElementById('totalOutputTax').textContent = totalOutputTax.toFixed(2);
+    document.getElementById('totalWithholding').textContent = totalWithholding.toFixed(2);
+}
+
+// Function to update summary row
+function updateSummaryRow() {
+    let totalGrossSales = 0;
+    let totalExemptSales = 0;
+    let totalNetSales = 0;
+    let totalOutputTax = 0;
+    let totalWithholding = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        const grossSales = parseFloat(row.querySelector('.gross-sales').value) || 0;
+        const exemptSales = parseFloat(row.querySelector('.exempt-sales').value) || 0;
+        const netSales = parseFloat(row.querySelector('.net-sales').textContent) || 0;
+        const outputTax = parseFloat(row.querySelector('.output-tax').textContent) || 0;
+        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount').textContent) || 0;
+        
+        totalGrossSales += grossSales;
+        totalExemptSales += exemptSales;
+        totalNetSales += netSales;
+        totalOutputTax += outputTax;
+        totalWithholding += withholdingAmount;
+    });
+    
+    const summaryRow = document.getElementById('summaryRow');
+    summaryRow.innerHTML = `
+        <tr class="summary-row">
+            <td colspan="7" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
+            <td class="uneditable">${totalGrossSales.toFixed(2)}</td>
+            <td class="uneditable">${totalExemptSales.toFixed(2)}</td>
+            <td>-</td>
+            <td class="uneditable">${totalNetSales.toFixed(2)}</td>
+            <td class="uneditable">${totalOutputTax.toFixed(2)}</td>
+            <td>-</td>
+            <td class="uneditable">${totalWithholding.toFixed(2)}</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    `;
+}
+
+// Function to export to Excel (XLS format) with improved design
+function exportToExcel() {
+    // Validate required company info
+    const companyName = document.getElementById('companyName').value.trim();
+    const companyTIN = document.getElementById('companyTIN').value.trim();
+    const companyAddress = document.getElementById('companyAddress').value.trim();
+    const lineOfBusiness = document.getElementById('lineOfBusiness').value.trim();
+    const authorizedEmployee = document.getElementById('authorizedEmployee').value.trim();
+    
+    if (!companyName || !companyTIN || !companyAddress || !lineOfBusiness || !authorizedEmployee) {
+        alert('Please fill in all required company information fields (marked with *) before exporting.');
+        return;
+    }
+    
+    // Create HTML content for Excel with professional styling
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    const formattedTime = today.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute:'2-digit', 
+        hour12: true 
+    });
+    
+    // Calculate totals for the report
+    const totalGrossSales = parseFloat(document.getElementById('totalGrossSales').textContent) || 0;
+    const totalExemptSales = parseFloat(document.getElementById('totalExemptSales').textContent) || 0;
+    const totalNetSales = parseFloat(document.getElementById('totalNetSales').textContent) || 0;
+    const totalOutputTax = parseFloat(document.getElementById('totalOutputTax').textContent) || 0;
+    const totalWithholding = parseFloat(document.getElementById('totalWithholding').textContent) || 0;
+    
+    let htmlContent = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta charset="UTF-8">
+            <!--[if gte mso 9]>
+            <xml>
+                <x:ExcelWorkbook>
+                    <x:ExcelWorksheets>
+                        <x:ExcelWorksheet>
+                            <x:Name>Vatable Sales Report</x:Name>
+                            <x:WorksheetOptions>
+                                <x:DisplayGridlines/>
+                                <x:Print>
+                                    <x:ValidPrinterInfo/>
+                                    <x:PaperSizeIndex>9</x:PaperSizeIndex>
+                                    <x:HorizontalResolution>600</x:HorizontalResolution>
+                                    <x:VerticalResolution>600</x:VerticalResolution>
+                                    <x:FitToPage>1</x:FitToPage>
+                                    <x:FitWidth>1</x:FitWidth>
+                                    <x:FitHeight>100</x:FitHeight>
+                                </x:Print>
+                                <x:Selected/>
+                                <x:ProtectContents>False</x:ProtectContents>
+                                <x:ProtectObjects>False</x:ProtectObjects>
+                                <x:ProtectScenarios>False</x:ProtectScenarios>
+                                <x:FreezePanes/>
+                                <x:FrozenNoSplit/>
+                                <x:SplitHorizontal>6</x:SplitHorizontal>
+                                <x:TopRowBottomPane>6</x:TopRowBottomPane>
+                                <x:ActivePane>2</x:ActivePane>
+                                <x:Panes>
+                                    <x:Pane>
+                                        <x:Number>3</x:Number>
+                                    </x:Pane>
+                                    <x:Pane>
+                                        <x:Number>2</x:Number>
+                                        <x:ActiveRow>0</x:ActiveRow>
+                                        <x:ActiveCol>5</x:ActiveCol>
+                                    </x:Pane>
+                                </x:Panes>
+                            </x:WorksheetOptions>
+                        </x:ExcelWorksheet>
+                    </x:ExcelWorksheets>
+                    <x:WindowHeight>9000</x:WindowHeight>
+                    <x:WindowWidth>15360</x:WindowWidth>
+                    <x:WindowTopX>0</x:WindowTopX>
+                    <x:WindowTopY>0</x:WindowTopY>
+                    <x:ProtectStructure>False</x:ProtectStructure>
+                    <x:ProtectWindows>False</x:ProtectWindows>
+                </x:ExcelWorkbook>
+            </xml>
+            <![endif]-->
+            <style>
+                * {
+                    font-family: 'Calibri', 'Arial', sans-serif;
+                    mso-font-charset: 0;
+                }
+                
+                body {
+                    margin: 20px;
+                }
+                
+                .report-title {
+                    font-size: 24pt;
+                    font-weight: bold;
+                    color: #006837;
+                    text-align: center;
+                    margin-bottom: 10px;
+                    border-bottom: 3px solid #00cc7a;
+                    padding-bottom: 10px;
+                }
+                
+                .company-header {
+                    background-color: #f0f9f5;
+                    border: 2px solid #00cc7a;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    border-radius: 8px;
+                }
+                
+                .company-info-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                
+                .company-info-table td {
+                    padding: 5px 10px;
+                    vertical-align: top;
+                }
+                
+                .company-label {
+                    font-weight: bold;
+                    color: #006837;
+                    width: 180px;
+                    white-space: nowrap;
+                }
+                
+                .company-value {
+                    color: #333333;
+                }
+                
+                .data-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                    font-size: 10pt;
+                }
+                
+                .data-table th {
+                    background-color: #006837;
+                    color: white;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 10px 6px;
+                    border: 1px solid #004d26;
+                    white-space: nowrap;
+                    vertical-align: middle;
+                }
+                
+                .data-table td {
+                    padding: 8px 6px;
+                    border: 1px solid #cccccc;
+                    vertical-align: middle;
+                }
+                
+                .text-left {
+                    text-align: left;
+                }
+                
+                .text-center {
+                    text-align: center;
+                }
+                
+                .text-right {
+                    text-align: right;
+                }
+                
+                .currency {
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    text-align: right;
+                    white-space: nowrap;
+                }
+                
+                .numeric {
+                    text-align: right;
+                    mso-number-format: "#,##0.00";
+                }
+                
+                .date-cell {
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                
+                .summary-row {
+                    background-color: #fff2cc;
+                    font-weight: bold;
+                }
+                
+                .summary-row td {
+                    border-top: 2px solid #ff9900;
+                    border-bottom: 2px solid #ff9900;
+                }
+                
+                .section-title {
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: #006837;
+                    margin-top: 25px;
+                    margin-bottom: 10px;
+                    padding-bottom: 5px;
+                    border-bottom: 1px solid #00cc7a;
+                }
+                
+                .totals-section {
+                    margin-top: 25px;
+                    background-color: #f0f9f5;
+                    border: 1px solid #00cc7a;
+                    padding: 15px;
+                    border-radius: 8px;
+                }
+                
+                .totals-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                
+                .totals-table td {
+                    padding: 8px 15px;
+                    border: none;
+                }
+                
+                .total-label {
+                    font-weight: bold;
+                    color: #006837;
+                    text-align: right;
+                    width: 60%;
+                }
+                
+                .total-value {
+                    font-weight: bold;
+                    color: #333333;
+                    text-align: right;
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    border-bottom: 1px dotted #cccccc;
+                }
+                
+                .footer {
+                    margin-top: 30px;
+                    padding-top: 15px;
+                    border-top: 1px solid #cccccc;
+                    color: #666666;
+                    font-size: 9pt;
+                    text-align: center;
+                }
+                
+                .highlight {
+                    background-color: #e6f7f0;
+                }
+                
+                /* Column widths */
+                .col-date { width: 80px; }
+                .col-invoice { width: 100px; }
+                .col-type { width: 80px; }
+                .col-payment { width: 90px; }
+                .col-tin { width: 130px; }
+                .col-customer { width: 150px; }
+                .col-address { width: 170px; }
+                .col-amount { width: 100px; }
+                .col-sales-type { width: 90px; }
+                .col-tax { width: 90px; }
+                .col-rate { width: 90px; }
+                .col-remarks { width: 120px; }
+            </style>
+            <title>Vatable Sales Report - ${formattedDate}</title>
+        </head>
+        <body>
+            <div class="report-title">VATABLE SALES DATA REPORT</div>
+            
+            <div class="company-header">
+                <table class="company-info-table">
+                    <tr>
+                        <td class="company-label">Company Name:</td>
+                        <td class="company-value">${companyName}</td>
+                        <td class="company-label">TIN Number:</td>
+                        <td class="company-value">${companyTIN}</td>
+                    </tr>
+                    <tr>
+                        <td class="company-label">Address:</td>
+                        <td class="company-value">${companyAddress}</td>
+                        <td class="company-label">Line of Business:</td>
+                        <td class="company-value">${lineOfBusiness}</td>
+                    </tr>
+                    <tr>
+                        <td class="company-label">Telephone:</td>
+                        <td class="company-value">${document.getElementById('telephone').value.trim() || 'N/A'}</td>
+                        <td class="company-label">Report Date:</td>
+                        <td class="company-value">${document.getElementById('reportDate').value}</td>
+                    </tr>
+                    <tr>
+                        <td class="company-label">Authorized Employee:</td>
+                        <td class="company-value">${authorizedEmployee}</td>
+                        <td class="company-label">Email:</td>
+                        <td class="company-value">${document.getElementById('email').value.trim() || 'N/A'}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="section-title">Sales Transactions</div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-date">Date</th>
+                        <th class="col-invoice">Invoice Number</th>
+                        <th class="col-type">Invoice Type</th>
+                        <th class="col-payment">Mode of Payment</th>
+                        <th class="col-tin">TIN Number</th>
+                        <th class="col-customer">Customer Name</th>
+                        <th class="col-address">Address</th>
+                        <th class="col-amount">Gross Sales</th>
+                        <th class="col-amount">Exempt Sales</th>
+                        <th class="col-sales-type">Sales Type</th>
+                        <th class="col-amount">Net Sales</th>
+                        <th class="col-tax">Output Tax</th>
+                        <th class="col-rate">W/Tax Rate</th>
+                        <th class="col-amount">W/Tax Amount</th>
+                        <th class="col-remarks">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Add data rows
+    const rows = document.querySelectorAll('#tableBody tr');
+    let rowNumber = 1;
+    
+    rows.forEach(row => {
+        // Date
+        const dateInput = row.querySelector('.date-input');
+        const dateValue = dateInput ? dateInput.value : '';
+        
+        // Invoice Number
+        const invoiceInput = row.querySelector('.invoice-number');
+        const invoiceValue = invoiceInput ? invoiceInput.value : '';
+        
+        // Invoice Type
+        const invoiceTypeSelect = row.querySelector('.invoice-type');
+        const invoiceTypeValue = invoiceTypeSelect ? invoiceTypeSelect.value : '';
+        
+        // Mode of Payment
+        const paymentModeSelect = row.querySelector('.payment-mode');
+        const paymentModeValue = paymentModeSelect ? paymentModeSelect.value : '';
+        
+        // TIN Number
+        const tinInput = row.querySelector('.tin-number');
+        const tinValue = tinInput ? tinInput.value : '';
+        
+        // Customer Name
+        const customerInput = row.querySelector('.customer-name');
+        const customerValue = customerInput ? customerInput.value : '';
+        
+        // Address
+        const addressInput = row.querySelector('.address');
+        const addressValue = addressInput ? addressInput.value : '';
+        
+        // Gross Sales
+        const grossSalesInput = row.querySelector('.gross-sales');
+        const grossSalesValue = grossSalesInput ? parseFloat(grossSalesInput.value) || 0 : 0;
+        
+        // Exempt Sales
+        const exemptSalesInput = row.querySelector('.exempt-sales');
+        const exemptSalesValue = exemptSalesInput ? parseFloat(exemptSalesInput.value) || 0 : 0;
+        
+        // Sales Type
+        const salesTypeSelect = row.querySelector('.sales-type');
+        const salesTypeValue = salesTypeSelect ? salesTypeSelect.value : '';
+        
+        // Net Sales
+        const netSalesDiv = row.querySelector('.net-sales');
+        const netSalesValue = netSalesDiv ? parseFloat(netSalesDiv.textContent) || 0 : 0;
+        
+        // Output Tax
+        const outputTaxDiv = row.querySelector('.output-tax');
+        const outputTaxValue = outputTaxDiv ? parseFloat(outputTaxDiv.textContent) || 0 : 0;
+        
+        // Withholding Tax Rate
+        const withholdingRateSelect = row.querySelector('.withholding-rate');
+        let rateValue = '0%';
+        if (withholdingRateSelect) {
+            const rate = parseFloat(withholdingRateSelect.value) || 0;
+            rateValue = (rate * 100) + '%';
+        }
+        
+        // Withholding Amount
+        const withholdingAmountDiv = row.querySelector('.withholding-amount');
+        const withholdingAmountValue = withholdingAmountDiv ? parseFloat(withholdingAmountDiv.textContent) || 0 : 0;
+        
+        // Remarks
+        const remarksInput = row.querySelector('.remarks');
+        const remarksValue = remarksInput ? remarksInput.value : '';
+        
+        // Alternate row background for readability
+        const rowClass = rowNumber % 2 === 0 ? 'highlight' : '';
+        
+        htmlContent += `
+            <tr class="${rowClass}">
+                <td class="date-cell">${dateValue}</td>
+                <td class="text-left">${invoiceValue}</td>
+                <td class="text-center">${invoiceTypeValue}</td>
+                <td class="text-center">${paymentModeValue}</td>
+                <td class="text-center">${tinValue}</td>
+                <td class="text-left">${customerValue}</td>
+                <td class="text-left">${addressValue}</td>
+                <td class="currency numeric">${grossSalesValue.toFixed(2)}</td>
+                <td class="currency numeric">${exemptSalesValue.toFixed(2)}</td>
+                <td class="text-center">${salesTypeValue}</td>
+                <td class="currency numeric">${netSalesValue.toFixed(2)}</td>
+                <td class="currency numeric">${outputTaxValue.toFixed(2)}</td>
+                <td class="text-center">${rateValue}</td>
+                <td class="currency numeric">${withholdingAmountValue.toFixed(2)}</td>
+                <td class="text-left">${remarksValue}</td>
+            </tr>
+        `;
+        
+        rowNumber++;
+    });
+    
+    // Add summary row
+    htmlContent += `
+                </tbody>
+                <tfoot>
+                    <tr class="summary-row">
+                        <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:</td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalGrossSales.toFixed(2)}</td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalExemptSales.toFixed(2)}</td>
+                        <td>-</td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalNetSales.toFixed(2)}</td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalOutputTax.toFixed(2)}</td>
+                        <td>-</td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalWithholding.toFixed(2)}</td>
+                        <td>-</td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="totals-section">
+                <div class="section-title">Financial Summary</div>
+                <table class="totals-table">
+                    <tr>
+                        <td class="total-label">Total Vatable Gross Sales:</td>
+                        <td class="total-value">₱ ${totalGrossSales.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Exempt Sales:</td>
+                        <td class="total-value">₱ ${totalExemptSales.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Net Sales:</td>
+                        <td class="total-value">₱ ${totalNetSales.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Output Tax (12%):</td>
+                        <td class="total-value">₱ ${totalOutputTax.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Withholding Tax:</td>
+                        <td class="total-value">₱ ${totalWithholding.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label" style="border-top: 1px solid #00cc7a; padding-top: 10px;">Net Amount Receivable:</td>
+                        <td class="total-value" style="border-top: 1px solid #00cc7a; padding-top: 10px; font-size: 11pt; color: #006837;">
+                            ₱ ${(totalNetSales - totalWithholding).toFixed(2)}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="footer">
+                <p>Report generated on ${formattedDate} at ${formattedTime}</p>
+                <p>Authorized by: ${authorizedEmployee} | Prepared by: Vatable Sales Data Tracker System</p>
+                <p>This is a computer-generated report. No signature is required.</p>
+                <p>© ${new Date().getFullYear()} Vatable Sales Data Tracker - Professional VAT-Compliant Sales Tracking System</p>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    // Create download link for XLS file
+    const blob = new Blob([htmlContent], {type: 'application/vnd.ms-excel'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const fileName = `Vatable_Sales_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 100);
+    
+    // Show success message
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Color-coded sections\n• Financial summary\n• Readable column widths\n• Print-ready layout`);
+}
+
+// Add event listeners to existing rows (if any)
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('editable')) {
+        const row = e.target.closest('tr');
+        if (row) {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        }
+    }
+});
+
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('editable')) {
+        const row = e.target.closest('tr');
+        if (row) {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        }
+    }
+});

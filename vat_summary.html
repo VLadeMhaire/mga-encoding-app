@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAT Summary Report</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-placeholder" id="logoPlaceholder">
+                    <!-- Logo will be loaded here -->
+                    <div>MGAALogo.jpg</div>
+                </div>
+            </div>
+            <div class="header-text">
+                <h1><i class="fas fa-chart-pie"></i> VAT Summary Report</h1>
+                <p>Comprehensive VAT Financial Summary and Analysis</p>
+            </div>
+        </header>
+        
+        <div class="company-info-section">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-building"></i> Company Information
+            </h3>
+            <div class="company-info-grid">
+                <div class="info-group">
+                    <label for="companyName">Company Name *</label>
+                    <input type="text" id="companyName" placeholder="Enter company name">
+                </div>
+                <div class="info-group">
+                    <label for="companyTIN">Company TIN Number *</label>
+                    <input type="text" id="companyTIN" placeholder="000-000-000-000" class="tin-input" maxlength="15">
+                </div>
+                <div class="info-group">
+                    <label for="companyAddress">Company Address *</label>
+                    <input type="text" id="companyAddress" placeholder="Enter company address">
+                </div>
+                <div class="info-group">
+                    <label for="lineOfBusiness">Line of Business *</label>
+                    <input type="text" id="lineOfBusiness" placeholder="Enter line of business">
+                </div>
+                <div class="info-group">
+                    <label for="telephone">Telephone Number</label>
+                    <input type="tel" id="telephone" placeholder="Enter telephone number">
+                </div>
+                <div class="info-group">
+                    <label for="reportDate">Report Date</label>
+                    <input type="date" id="reportDate">
+                </div>
+                <div class="info-group">
+                    <label for="authorizedEmployee">Authorized Employee *</label>
+                    <input type="text" id="authorizedEmployee" placeholder="Enter authorized employee name">
+                </div>
+                <div class="info-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter email address">
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-success" id="exportBtn">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+            <button class="btn btn-primary" id="generateReportBtn">
+                <i class="fas fa-sync-alt"></i> Generate Summary
+            </button>
+            <button class="btn btn-warning" id="clearInfoBtn">
+                <i class="fas fa-eraser"></i> Clear Company Info
+            </button>
+            <div style="margin-left: auto; font-size: 15px; font-weight: 500; color: #00ff9d; text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-calendar-alt"></i> Reporting Period: <span id="reportPeriod"></span>
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <!-- VAT SUMMARY SECTION -->
+            <div class="summary-section">
+                <h3 style="color: #00ff9d; margin: 20px 0; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                    <i class="fas fa-calculator"></i> VAT Summary
+                </h3>
+                <table id="vatSummaryTable">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Vatable Sales</th>
+                            <th>Non-Vatable Sales</th>
+                            <th>Total Sales</th>
+                            <th>Vatable Purchases</th>
+                            <th>Non-Vatable Purchases</th>
+                            <th>Total Purchases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="summary-label">Gross Amount</td>
+                            <td><div class="summary-value" id="vatableSalesGross">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatableSalesGross">0.00</div></td>
+                            <td><div class="summary-value" id="totalSalesGross">0.00</div></td>
+                            <td><div class="summary-value" id="vatablePurchasesGross">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatablePurchasesGross">0.00</div></td>
+                            <td><div class="summary-value" id="totalPurchasesGross">0.00</div></td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">Net Amount</td>
+                            <td><div class="summary-value" id="vatableSalesNet">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatableSalesNet">0.00</div></td>
+                            <td><div class="summary-value" id="totalSalesNet">0.00</div></td>
+                            <td><div class="summary-value" id="vatablePurchasesNet">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatablePurchasesNet">0.00</div></td>
+                            <td><div class="summary-value" id="totalPurchasesNet">0.00</div></td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">VAT Amount (12%)</td>
+                            <td><div class="summary-value" id="vatableSalesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatableSalesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="totalSalesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="vatablePurchasesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatablePurchasesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="totalPurchasesVAT">0.00</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- EXPENSES SUMMARY SECTION -->
+            <div class="summary-section">
+                <h3 style="color: #00ff9d; margin: 20px 0; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                    <i class="fas fa-money-bill-wave"></i> Expenses Summary
+                </h3>
+                <table id="expensesSummaryTable">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Vatable Expenses</th>
+                            <th>Non-Vatable Expenses</th>
+                            <th>Total Expenses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="summary-label">Gross Amount</td>
+                            <td><div class="summary-value" id="vatableExpensesGross">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatableExpensesGross">0.00</div></td>
+                            <td><div class="summary-value" id="totalExpensesGross">0.00</div></td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">Net Amount</td>
+                            <td><div class="summary-value" id="vatableExpensesNet">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatableExpensesNet">0.00</div></td>
+                            <td><div class="summary-value" id="totalExpensesNet">0.00</div></td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">VAT Amount (12%)</td>
+                            <td><div class="summary-value" id="vatableExpensesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatableExpensesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="totalExpensesVAT">0.00</div></td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">Withholding Tax</td>
+                            <td><div class="summary-value" id="vatableExpensesWHT">0.00</div></td>
+                            <td><div class="summary-value" id="nonVatableExpensesWHT">0.00</div></td>
+                            <td><div class="summary-value" id="totalExpensesWHT">0.00</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- CAPEX & OTHER TRANSACTIONS -->
+            <div class="summary-section">
+                <h3 style="color: #00ff9d; margin: 20px 0; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                    <i class="fas fa-building"></i> Capital Expenditures & Other Transactions
+                </h3>
+                <table id="otherTransactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Transaction Type</th>
+                            <th>Gross Amount</th>
+                            <th>Net Amount</th>
+                            <th>VAT Amount</th>
+                            <th>Withholding Tax</th>
+                            <th>Net Payable/Receivable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="summary-label">Capital Expenditures (CAPEX)</td>
+                            <td><div class="summary-value" id="capexGross">0.00</div></td>
+                            <td><div class="summary-value" id="capexNet">0.00</div></td>
+                            <td><div class="summary-value" id="capexVAT">0.00</div></td>
+                            <td><div class="summary-value" id="capexWHT">0.00</div></td>
+                            <td><div class="summary-value" id="capexNetPayable">0.00</div></td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">Taxes & Licenses</td>
+                            <td><div class="summary-value" id="taxesGross">0.00</div></td>
+                            <td><div class="summary-value" id="taxesNet">0.00</div></td>
+                            <td><div class="summary-value" id="taxesVAT">0.00</div></td>
+                            <td><div class="summary-value" id="taxesWHT">0.00</div></td>
+                            <td><div class="summary-value" id="taxesNetPayable">0.00</div></td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">Purchase Returns</td>
+                            <td><div class="summary-value" id="returnsGross">0.00</div></td>
+                            <td><div class="summary-value" id="returnsNet">0.00</div></td>
+                            <td><div class="summary-value" id="returnsVAT">0.00</div></td>
+                            <td><div class="summary-value" id="returnsWHT">0.00</div></td>
+                            <td><div class="summary-value" id="returnsNetReceivable">0.00</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- VAT PAYABLE SUMMARY -->
+            <div class="summary-section" style="background: rgba(0, 40, 30, 0.8); border-radius: 10px; padding: 20px; margin-top: 30px; border: 2px solid #00ff9d;">
+                <h3 style="color: #00ff9d; margin: 0 0 20px 0; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5); text-align: center;">
+                    <i class="fas fa-file-invoice-dollar"></i> VAT PAYABLE SUMMARY
+                </h3>
+                <table id="vatPayableTable" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: rgba(0, 60, 40, 0.9);">
+                            <th style="padding: 15px; text-align: left; border-bottom: 2px solid #00ff9d;">Description</th>
+                            <th style="padding: 15px; text-align: right; border-bottom: 2px solid #00ff9d;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px 15px; font-weight: 600; color: #a7ffeb;">Total Output Tax (VAT on Sales)</td>
+                            <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #00ff9d;">₱ <span id="totalOutputTax">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 15px; font-weight: 600; color: #a7ffeb;">Total Input Tax (VAT on Purchases)</td>
+                            <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #00ff9d;">₱ <span id="totalInputTax">0.00</span></td>
+                        </tr>
+                        <tr style="border-top: 2px solid #00ff9d; border-bottom: 2px solid #00ff9d;">
+                            <td style="padding: 15px; font-weight: 700; color: #a7ffeb; font-size: 16px;">VAT Payable/(Refundable)</td>
+                            <td style="padding: 15px; text-align: right; font-weight: 700; color: #00ff9d; font-size: 16px;">₱ <span id="vatPayable">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 15px; font-weight: 600; color: #a7ffeb;">Total Withholding Tax on Sales</td>
+                            <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #00ff9d;">₱ <span id="totalWHTonSales">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 15px; font-weight: 600; color: #a7ffeb;">Total Withholding Tax on Purchases</td>
+                            <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #00ff9d;">₱ <span id="totalWHTonPurchases">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 15px; font-weight: 600; color: #a7ffeb;">Total Withholding Tax on Expenses</td>
+                            <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #00ff9d;">₱ <span id="totalWHTonExpenses">0.00</span></td>
+                        </tr>
+                        <tr style="border-top: 2px solid #00ff9d;">
+                            <td style="padding: 15px; font-weight: 700; color: #a7ffeb; font-size: 16px;">Total Net Withholding Tax</td>
+                            <td style="padding: 15px; text-align: right; font-weight: 700; color: #00ff9d; font-size: 16px;">₱ <span id="totalNetWHT">0.00</span></td>
+                        </tr>
+                        <tr style="background: rgba(0, 60, 40, 0.7);">
+                            <td style="padding: 15px; font-weight: 800; color: #ffffff; font-size: 18px;">GRAND TOTAL VAT LIABILITY</td>
+                            <td style="padding: 15px; text-align: right; font-weight: 800; color: #00ff9d; font-size: 18px; text-shadow: 0 0 10px rgba(0, 255, 157, 0.7);">₱ <span id="grandTotalVAT">0.00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- KEY FINANCIAL INDICATORS -->
+        <div class="stats" style="background: linear-gradient(135deg, rgba(0, 40, 30, 0.9) 0%, rgba(0, 60, 40, 0.95) 100%);">
+            <div class="stat-item" style="background: rgba(0, 25, 20, 0.8);">
+                <span class="stat-label">Total Gross Revenue</span>
+                <span class="stat-value">₱ <span id="totalGrossRevenue">0.00</span></span>
+            </div>
+            <div class="stat-item" style="background: rgba(0, 25, 20, 0.8);">
+                <span class="stat-label">Total Net Revenue</span>
+                <span class="stat-value">₱ <span id="totalNetRevenue">0.00</span></span>
+            </div>
+            <div class="stat-item" style="background: rgba(0, 25, 20, 0.8);">
+                <span class="stat-label">Total Expenses</span>
+                <span class="stat-value">₱ <span id="totalExpensesAmount">0.00</span></span>
+            </div>
+            <div class="stat-item" style="background: rgba(0, 25, 20, 0.8);">
+                <span class="stat-label">Gross Profit</span>
+                <span class="stat-value">₱ <span id="grossProfit">0.00</span></span>
+            </div>
+            <div class="stat-item" style="background: rgba(0, 25, 20, 0.8); border: 2px solid #00ff9d;">
+                <span class="stat-label">Net Profit Before Tax</span>
+                <span class="stat-value">₱ <span id="netProfitBeforeTax">0.00</span></span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 VAT Summary Report | Comprehensive VAT Financial Analysis System</p>
+        </div>
+    </div>
+
+    <script src="vat_summary_script.js"></script>
+</body>
+</html>

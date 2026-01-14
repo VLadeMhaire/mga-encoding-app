@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Non-Vatable Expenses Data Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-placeholder" id="logoPlaceholder">
+                    <!-- Logo will be loaded here -->
+                    <div>MGAALogo.jpg</div>
+                </div>
+            </div>
+            <div class="header-text">
+                <h1><i class="fas fa-money-bill-wave"></i> Non-Vatable Expenses Data Tracker</h1>
+                <p>Professional Expenses Tracking for Non-VAT Transactions</p>
+            </div>
+
+            <div class="header-right">
+    <a href="index.html" class="back-to-dashboard-btn">
+        <i class="fas fa-home"></i> Back to Dashboard
+    </a>
+</div>
+
+        </header>
+        
+        <div class="company-info-section">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-building"></i> Company Information
+            </h3>
+            <div class="company-info-grid">
+                <div class="info-group">
+                    <label for="companyName">Company Name *</label>
+                    <input type="text" id="companyName" placeholder="Enter company name">
+                </div>
+                <div class="info-group">
+                    <label for="companyTIN">Company TIN Number *</label>
+                    <input type="text" id="companyTIN" placeholder="000-000-000-000" class="tin-input" maxlength="15">
+                </div>
+                <div class="info-group">
+                    <label for="companyAddress">Company Address *</label>
+                    <input type="text" id="companyAddress" placeholder="Enter company address">
+                </div>
+                <div class="info-group">
+                    <label for="lineOfBusiness">Line of Business *</label>
+                    <input type="text" id="lineOfBusiness" placeholder="Enter line of business">
+                </div>
+                <div class="info-group">
+                    <label for="telephone">Telephone Number</label>
+                    <input type="tel" id="telephone" placeholder="Enter telephone number">
+                </div>
+                <div class="info-group">
+                    <label for="reportDate">Report Date</label>
+                    <input type="date" id="reportDate">
+                </div>
+                <div class="info-group">
+                    <label for="authorizedEmployee">Authorized Employee *</label>
+                    <input type="text" id="authorizedEmployee" placeholder="Enter authorized employee name">
+                </div>
+                <div class="info-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter email address">
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="addRowBtn">
+                <i class="fas fa-plus-circle"></i> Add New Row
+            </button>
+            <button class="btn btn-success" id="exportBtn">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+            <button class="btn btn-info" id="clearBtn">
+                <i class="fas fa-trash-alt"></i> Clear Table Data
+            </button>
+            <button class="btn btn-warning" id="clearInfoBtn">
+                <i class="fas fa-eraser"></i> Clear Company Info
+            </button>
+            <div style="margin-left: auto; font-size: 15px; font-weight: 500; color: #00ff9d; text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-list-alt"></i> <span id="rowCount">0</span> Rows
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="nonVatableExpensesTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice Number</th>
+                        <th>Invoice Type</th>
+                        <th>Transaction Type</th>
+                        <th>12-digit TIN Number</th>
+                        <th>Particulars/Supplier Name</th>
+                        <th>Address</th>
+                        <th>Gross Amount</th>
+                        <th>Nature of Expense</th>
+                        <th>Withholding Tax Rate</th>
+                        <th>Withholding Tax</th>
+                        <th>Gross - Withholding Tax</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows will be added here dynamically -->
+                </tbody>
+                <tfoot id="summaryRow">
+                    <!-- Summary row will be added here dynamically -->
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="tally-section">
+    <h3 style="color: #00ff9d; margin-bottom: 15px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+        <i class="fas fa-calculator"></i> Expense Category Tally
+    </h3>
+    <div class="tally-grid" id="expenseTally">
+        <!-- Tally items will be dynamically added here -->
+    </div>
+</div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Total Gross Amount</span>
+                <span class="stat-value">₱ <span id="totalGrossAmount">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Withholding Tax</span>
+                <span class="stat-value">₱ <span id="totalWithholdingTax">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Net Amount Payable</span>
+                <span class="stat-value">₱ <span id="netPayable">0.00</span></span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 Non-Vatable Expenses Data Tracker | Professional Non-VAT Expenses Tracking System</p>
+        </div>
+    </div>
+
+    <script src="non_vat_expenses_script.js"></script>
+</body>
+</html>
