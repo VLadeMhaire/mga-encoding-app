@@ -908,3 +908,163 @@ header {
         padding: 12px;
     }
 }
+
+/* Tally Sections Styles */
+.tally-section {
+    padding: 20px 30px;
+    background: rgba(0, 25, 20, 0.7);
+    border-top: 1px solid rgba(0, 255, 157, 0.2);
+    border-bottom: 1px solid rgba(0, 255, 157, 0.2);
+    flex-shrink: 0;
+    box-shadow: 0 5px 15px rgba(0, 20, 15, 0.5);
+}
+
+.tally-section h3 {
+    color: #00ff9d;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.tally-section h3 i {
+    font-size: 20px;
+}
+
+.tally-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.tally-item {
+    background: rgba(5, 20, 15, 0.8);
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    border-radius: 10px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.tally-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 255, 157, 0.3);
+    border-color: rgba(0, 255, 157, 0.4);
+}
+
+.tally-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #00ff9d, #00b36b);
+    border-radius: 10px 10px 0 0;
+}
+
+.tally-category {
+    font-size: 14px;
+    font-weight: 600;
+    color: #80ffd4;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 0 0 5px rgba(0, 255, 157, 0.3);
+}
+
+.tally-category i {
+    font-size: 14px;
+    color: #00ff9d;
+}
+
+.tally-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.tally-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #00ff9d;
+    text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
+}
+
+.tally-count {
+    font-size: 12px;
+    color: #80cbc4;
+    background: rgba(0, 40, 30, 0.5);
+    padding: 4px 12px;
+    border-radius: 15px;
+    border: 1px solid rgba(0, 255, 157, 0.2);
+}
+
+.tally-rate {
+    font-size: 12px;
+    color: #00ff9d;
+    background: rgba(0, 255, 157, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-top: 10px;
+    display: inline-block;
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    align-self: flex-start;
+}
+
+/* Total tally item */
+.tally-total {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(0, 40, 25, 0.9) 0%, rgba(0, 60, 35, 0.85) 100%);
+    border: 2px solid #00ff9d;
+}
+
+.tally-total .tally-amount {
+    font-size: 24px;
+    text-shadow: 0 0 12px rgba(0, 255, 157, 0.7);
+}
+
+.tally-total .tally-category {
+    font-size: 16px;
+}
+
+/* Responsive adjustments for tally section */
+@media (max-width: 1200px) {
+    .tally-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .tally-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tally-section {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tally-section h3 {
+        font-size: 16px;
+    }
+    
+    .tally-item {
+        padding: 15px;
+    }
+    
+    .tally-amount {
+        font-size: 18px;
+    }
+}
