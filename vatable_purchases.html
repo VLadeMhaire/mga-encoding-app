@@ -140,13 +140,102 @@
                 <span class="stat-value">₱ <span id="netPayable">0.00</span></span>
             </div>
         </div>
+
+                <!-- Tally Sections -->
+        <div class="tally-section">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-calculator"></i> Payment & Withholding Tax Tally
+            </h3>
+            
+            <div class="tally-grid">
+                <!-- Payment Mode Tally -->
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-money-bill-wave"></i> Total Cash Purchases
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalCashAmount">0.00</span></span>
+                        <span class="tally-count" id="cashCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="cashPercentage">0% of total</span>
+                </div>
+                
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-credit-card"></i> Total Charge Purchases
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalChargeAmount">0.00</span></span>
+                        <span class="tally-count" id="chargeCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="chargePercentage">0% of total</span>
+                </div>
+                
+                <!-- Withholding Tax Rate Tally -->
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-percentage"></i> 1% Withholding Tax
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalOnePercent">0.00</span></span>
+                        <span class="tally-count" id="onePercentCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate">Rate: 1%</span>
+                </div>
+                
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-percentage"></i> 2% Withholding Tax
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalTwoPercent">0.00</span></span>
+                        <span class="tally-count" id="twoPercentCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate">Rate: 2%</span>
+                </div>
+                
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-percentage"></i> 5% Withholding Tax
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalFivePercent">0.00</span></span>
+                        <span class="tally-count" id="fivePercentCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate">Rate: 5%</span>
+                </div>
+                
+                <!-- Zero Percent Tally -->
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-percentage"></i> 0% Withholding Tax
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalZeroPercent">0.00</span></span>
+                        <span class="tally-count" id="zeroPercentCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate">Rate: 0%</span>
+                </div>
+                
+                <!-- Summary Tally -->
+                <div class="tally-item tally-total">
+                    <div class="tally-category">
+                        <i class="fas fa-chart-pie"></i> Payment & Tax Distribution Summary
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount" id="totalTallyAmount">₱ 0.00</span>
+                        <span class="tally-count" id="totalTallyCount">0 total transactions</span>
+                    </div>
+                    <span class="tally-rate">Total Withholding: ₱ <span id="totalWithholdingTally">0.00</span></span>
+                </div>
+            </div>
+        </div>
         
         <div class="footer">
-            <p>© 2026 Vatable Purchases Data Tracker | Professional VAT-Compliant Purchases Tracking System</p>
+            <p>© 2025 Vatable Purchases Data Tracker | Professional VAT-Compliant Purchases Tracking System</p>
         </div>
     </div>
 
     <script src="vatable_purchases_script.js"></script>
 </body>
-
 </html>
