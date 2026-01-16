@@ -141,6 +141,73 @@
                 <span class="stat-value">₱ <span id="totalWithholding">0.00</span></span>
             </div>
         </div>
+
+        <!-- Tally Sections -->
+        <div class="tally-section">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-calculator"></i> Payment & Customer Type Tally
+            </h3>
+            
+            <div class="tally-grid">
+                <!-- Payment Mode Tally -->
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-money-bill-wave"></i> Total Cash Transactions
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalCashAmount">0.00</span></span>
+                        <span class="tally-count" id="cashCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="cashPercentage">0% of total</span>
+                </div>
+                
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-credit-card"></i> Total Charge Transactions
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalChargeAmount">0.00</span></span>
+                        <span class="tally-count" id="chargeCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="chargePercentage">0% of total</span>
+                </div>
+                
+                <!-- Customer Type Tally -->
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-user-tie"></i> Private Sector Sales
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalPrivateAmount">0.00</span></span>
+                        <span class="tally-count" id="privateCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="privatePercentage">0% of total</span>
+                </div>
+                
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-landmark"></i> Government Sector Sales
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalGovernmentAmount">0.00</span></span>
+                        <span class="tally-count" id="governmentCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="governmentPercentage">0% of total</span>
+                </div>
+                
+                <!-- Summary Tally -->
+                <div class="tally-item tally-total">
+                    <div class="tally-category">
+                        <i class="fas fa-chart-pie"></i> Payment Distribution Summary
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount" id="totalTallyAmount">₱ 0.00</span>
+                        <span class="tally-count" id="totalTallyCount">0 total transactions</span>
+                    </div>
+                    <span class="tally-rate">Total Net Sales: ₱ <span id="totalNetSalesTally">0.00</span></span>
+                </div>
+            </div>
+        </div>
         
         <div class="footer">
             <p>© 2026 Non-Vatable Sales Data Tracker | Professional Non-VAT Sales Tracking System</p>
@@ -149,5 +216,4 @@
 
     <script src="non_vat_script.js"></script>
 </body>
-
 </html>
