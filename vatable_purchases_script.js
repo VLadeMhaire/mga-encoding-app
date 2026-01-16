@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', function() {
             clearAllData();
         }
     });
+    
+    // Initialize tally sections
+    updateTallySections();
 });
 
 // Function to create subtle background effects
@@ -231,12 +234,14 @@ function addNewRow() {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         });
         
         input.addEventListener('change', function() {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         });
     });
     
@@ -261,6 +266,8 @@ function addNewRow() {
             this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
         });
     });
+    
+    updateTallySections();
 }
 
 // Function to delete a row
@@ -277,6 +284,7 @@ function deleteRow(rowId) {
             updateRowCount();
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         }, 300);
     }
 }
@@ -289,6 +297,7 @@ function clearAllData() {
     updateRowCount();
     updateTotals();
     updateSummaryRow();
+    updateTallySections();
 }
 
 // Function to update calculations for a row
@@ -311,6 +320,8 @@ function updateCalculations(row) {
     // Calculate Gross Amount minus Withholding Tax
     const grossMinusWithholding = grossPurchases - withholdingAmount;
     row.querySelector('.gross-minus-withholding').textContent = grossMinusWithholding.toFixed(2);
+    
+    updateTallySections();
 }
 
 // Function to format TIN input
@@ -435,6 +446,89 @@ function updateSummaryRow() {
     `;
 }
 
+// Function to update tally sections
+function updateTallySections() {
+    let totalCashAmount = 0;
+    let totalChargeAmount = 0;
+    let totalOnePercent = 0;
+    let totalTwoPercent = 0;
+    let totalFivePercent = 0;
+    let totalZeroPercent = 0;
+    
+    let cashCount = 0;
+    let chargeCount = 0;
+    let onePercentCount = 0;
+    let twoPercentCount = 0;
+    let fivePercentCount = 0;
+    let zeroPercentCount = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    
+    rows.forEach(row => {
+        const paymentMode = row.querySelector('.payment-mode').value;
+        const withholdingRate = parseFloat(row.querySelector('.withholding-rate').value) || 0;
+        const netPurchases = parseFloat(row.querySelector('.net-purchases').textContent) || 0;
+        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount').textContent) || 0;
+        
+        // Count by payment mode
+        if (paymentMode === 'Cash') {
+            totalCashAmount += netPurchases;
+            cashCount++;
+        } else if (paymentMode === 'Charge') {
+            totalChargeAmount += netPurchases;
+            chargeCount++;
+        }
+        
+        // Count by withholding tax rate
+        if (withholdingRate === 0.01) { // 1%
+            totalOnePercent += withholdingAmount;
+            onePercentCount++;
+        } else if (withholdingRate === 0.02) { // 2%
+            totalTwoPercent += withholdingAmount;
+            twoPercentCount++;
+        } else if (withholdingRate === 0.05) { // 5%
+            totalFivePercent += withholdingAmount;
+            fivePercentCount++;
+        } else if (withholdingRate === 0) { // 0%
+            totalZeroPercent += netPurchases; // Use net purchases for 0% rate
+            zeroPercentCount++;
+        }
+    });
+    
+    // Update DOM elements
+    document.getElementById('totalCashAmount').textContent = totalCashAmount.toFixed(2);
+    document.getElementById('totalChargeAmount').textContent = totalChargeAmount.toFixed(2);
+    document.getElementById('totalOnePercent').textContent = totalOnePercent.toFixed(2);
+    document.getElementById('totalTwoPercent').textContent = totalTwoPercent.toFixed(2);
+    document.getElementById('totalFivePercent').textContent = totalFivePercent.toFixed(2);
+    document.getElementById('totalZeroPercent').textContent = totalZeroPercent.toFixed(2);
+    
+    document.getElementById('cashCount').textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`;
+    document.getElementById('chargeCount').textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`;
+    document.getElementById('onePercentCount').textContent = `${onePercentCount} transaction${onePercentCount !== 1 ? 's' : ''}`;
+    document.getElementById('twoPercentCount').textContent = `${twoPercentCount} transaction${twoPercentCount !== 1 ? 's' : ''}`;
+    document.getElementById('fivePercentCount').textContent = `${fivePercentCount} transaction${fivePercentCount !== 1 ? 's' : ''}`;
+    document.getElementById('zeroPercentCount').textContent = `${zeroPercentCount} transaction${zeroPercentCount !== 1 ? 's' : ''}`;
+    
+    // Calculate percentages
+    const totalTallyAmount = totalCashAmount + totalChargeAmount;
+    const totalTransactions = rows.length;
+    
+    const cashPercentage = totalTallyAmount > 0 ? ((totalCashAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+    const chargePercentage = totalTallyAmount > 0 ? ((totalChargeAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+    
+    // Update payment mode percentages
+    document.getElementById('cashPercentage').textContent = `${cashPercentage}% of total`;
+    document.getElementById('chargePercentage').textContent = `${chargePercentage}% of total`;
+    
+    // Update summary
+    document.getElementById('totalTallyAmount').textContent = `₱ ${totalTallyAmount.toFixed(2)}`;
+    document.getElementById('totalTallyCount').textContent = `${totalTransactions} total transaction${totalTransactions !== 1 ? 's' : ''}`;
+    
+    const totalWithholding = parseFloat(document.getElementById('totalWithholding').textContent) || 0;
+    document.getElementById('totalWithholdingTally').textContent = totalWithholding.toFixed(2);
+}
+
 // Function to export to Excel (XLS format) with improved design
 function exportToExcel() {
     // Validate required company info
@@ -468,6 +562,50 @@ function exportToExcel() {
     const totalInputTax = parseFloat(document.getElementById('totalInputTax').textContent) || 0;
     const totalWithholding = parseFloat(document.getElementById('totalWithholding').textContent) || 0;
     const netPayable = parseFloat(document.getElementById('netPayable').textContent) || 0;
+    
+    // Calculate tally data for export
+    let totalCashAmount = 0;
+    let totalChargeAmount = 0;
+    let totalOnePercent = 0;
+    let totalTwoPercent = 0;
+    let totalFivePercent = 0;
+    let totalZeroPercent = 0;
+    let cashCount = 0;
+    let chargeCount = 0;
+    let onePercentCount = 0;
+    let twoPercentCount = 0;
+    let fivePercentCount = 0;
+    let zeroPercentCount = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        const paymentMode = row.querySelector('.payment-mode').value;
+        const withholdingRate = parseFloat(row.querySelector('.withholding-rate').value) || 0;
+        const netPurchases = parseFloat(row.querySelector('.net-purchases').textContent) || 0;
+        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount').textContent) || 0;
+        
+        if (paymentMode === 'Cash') {
+            totalCashAmount += netPurchases;
+            cashCount++;
+        } else if (paymentMode === 'Charge') {
+            totalChargeAmount += netPurchases;
+            chargeCount++;
+        }
+        
+        if (withholdingRate === 0.01) {
+            totalOnePercent += withholdingAmount;
+            onePercentCount++;
+        } else if (withholdingRate === 0.02) {
+            totalTwoPercent += withholdingAmount;
+            twoPercentCount++;
+        } else if (withholdingRate === 0.05) {
+            totalFivePercent += withholdingAmount;
+            fivePercentCount++;
+        } else if (withholdingRate === 0) {
+            totalZeroPercent += netPurchases;
+            zeroPercentCount++;
+        }
+    });
     
     let htmlContent = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
@@ -763,7 +901,6 @@ function exportToExcel() {
     `;
     
     // Add data rows
-    const rows = document.querySelectorAll('#tableBody tr');
     let rowNumber = 1;
     
     rows.forEach(row => {
@@ -897,6 +1034,36 @@ function exportToExcel() {
                 </table>
             </div>
             
+            <div class="totals-section" style="margin-top: 15px;">
+                <div class="section-title">Payment & Withholding Tax Distribution</div>
+                <table class="totals-table">
+                    <tr>
+                        <td class="total-label">Cash Purchases:</td>
+                        <td class="total-value">₱ ${totalCashAmount.toFixed(2)} (${cashCount} transaction${cashCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Charge Purchases:</td>
+                        <td class="total-value">₱ ${totalChargeAmount.toFixed(2)} (${chargeCount} transaction${chargeCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">1% Withholding Tax:</td>
+                        <td class="total-value">₱ ${totalOnePercent.toFixed(2)} (${onePercentCount} transaction${onePercentCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">2% Withholding Tax:</td>
+                        <td class="total-value">₱ ${totalTwoPercent.toFixed(2)} (${twoPercentCount} transaction${twoPercentCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">5% Withholding Tax:</td>
+                        <td class="total-value">₱ ${totalFivePercent.toFixed(2)} (${fivePercentCount} transaction${fivePercentCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">0% Withholding Tax:</td>
+                        <td class="total-value">₱ ${totalZeroPercent.toFixed(2)} (${zeroPercentCount} transaction${zeroPercentCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                </table>
+            </div>
+            
             <div class="footer">
                 <p>Report generated on ${formattedDate} at ${formattedTime}</p>
                 <p>Authorized by: ${authorizedEmployee} | Prepared by: Vatable Purchases Data Tracker System</p>
@@ -924,7 +1091,7 @@ function exportToExcel() {
     }, 100);
     
     // Show success message
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Color-coded sections\n• Financial summary\n• Readable column widths\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Color-coded sections\n• Financial summary\n• Payment & withholding tax distribution\n• Readable column widths\n• Print-ready layout`);
 }
 
 // Add event listeners to existing rows (if any)
@@ -935,6 +1102,7 @@ document.addEventListener('input', function(e) {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         }
     }
 });
@@ -946,6 +1114,7 @@ document.addEventListener('change', function(e) {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         }
     }
 });
