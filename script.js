@@ -55,6 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
             clearAllData();
         }
     });
+    
+    // Initialize tally sections
+    updateTallySections();
 });
 
 // Function to create subtle background effects
@@ -233,12 +236,14 @@ function addNewRow() {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         });
         
         input.addEventListener('change', function() {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         });
     });
     
@@ -263,6 +268,8 @@ function addNewRow() {
             this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
         });
     });
+    
+    updateTallySections();
 }
 
 // Function to delete a row
@@ -279,6 +286,7 @@ function deleteRow(rowId) {
             updateRowCount();
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         }, 300);
     }
 }
@@ -291,6 +299,7 @@ function clearAllData() {
     updateRowCount();
     updateTotals();
     updateSummaryRow();
+    updateTallySections();
 }
 
 // Function to update calculations for a row
@@ -309,6 +318,8 @@ function updateCalculations(row) {
     // Calculate withholding amount: Net Sales * Withholding Tax Rate
     const withholdingAmount = netSales * withholdingRate;
     row.querySelector('.withholding-amount').textContent = withholdingAmount.toFixed(2);
+    
+    updateTallySections();
 }
 
 // Function to format TIN input
@@ -432,6 +443,79 @@ function updateSummaryRow() {
     `;
 }
 
+// Function to update tally sections
+function updateTallySections() {
+    let totalCashAmount = 0;
+    let totalChargeAmount = 0;
+    let totalPrivateAmount = 0;
+    let totalGovernmentAmount = 0;
+    
+    let cashCount = 0;
+    let chargeCount = 0;
+    let privateCount = 0;
+    let governmentCount = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    
+    rows.forEach(row => {
+        const paymentMode = row.querySelector('.payment-mode').value;
+        const salesType = row.querySelector('.sales-type').value;
+        const netSales = parseFloat(row.querySelector('.net-sales').textContent) || 0;
+        
+        // Count by payment mode
+        if (paymentMode === 'Cash') {
+            totalCashAmount += netSales;
+            cashCount++;
+        } else if (paymentMode === 'Charge') {
+            totalChargeAmount += netSales;
+            chargeCount++;
+        }
+        
+        // Count by sales type
+        if (salesType === 'Private') {
+            totalPrivateAmount += netSales;
+            privateCount++;
+        } else if (salesType === 'Government') {
+            totalGovernmentAmount += netSales;
+            governmentCount++;
+        }
+    });
+    
+    // Update DOM elements
+    document.getElementById('totalCashAmount').textContent = totalCashAmount.toFixed(2);
+    document.getElementById('totalChargeAmount').textContent = totalChargeAmount.toFixed(2);
+    document.getElementById('totalPrivateAmount').textContent = totalPrivateAmount.toFixed(2);
+    document.getElementById('totalGovernmentAmount').textContent = totalGovernmentAmount.toFixed(2);
+    
+    document.getElementById('cashCount').textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`;
+    document.getElementById('chargeCount').textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`;
+    document.getElementById('privateCount').textContent = `${privateCount} transaction${privateCount !== 1 ? 's' : ''}`;
+    document.getElementById('governmentCount').textContent = `${governmentCount} transaction${governmentCount !== 1 ? 's' : ''}`;
+    
+    // Calculate percentages
+    const totalTallyAmount = totalCashAmount + totalChargeAmount;
+    const totalTransactions = rows.length;
+    
+    const cashPercentage = totalTallyAmount > 0 ? ((totalCashAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+    const chargePercentage = totalTallyAmount > 0 ? ((totalChargeAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+    
+    const privatePercentage = totalTallyAmount > 0 ? ((totalPrivateAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+    const governmentPercentage = totalTallyAmount > 0 ? ((totalGovernmentAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+    
+    // Update percentages
+    document.getElementById('cashPercentage').textContent = `${cashPercentage}% of total`;
+    document.getElementById('chargePercentage').textContent = `${chargePercentage}% of total`;
+    document.getElementById('privatePercentage').textContent = `${privatePercentage}% of total`;
+    document.getElementById('governmentPercentage').textContent = `${governmentPercentage}% of total`;
+    
+    // Update summary
+    document.getElementById('totalTallyAmount').textContent = `₱ ${totalTallyAmount.toFixed(2)}`;
+    document.getElementById('totalTallyCount').textContent = `${totalTransactions} total transaction${totalTransactions !== 1 ? 's' : ''}`;
+    
+    const totalNetSales = parseFloat(document.getElementById('totalNetSales').textContent) || 0;
+    document.getElementById('totalNetSalesTally').textContent = totalNetSales.toFixed(2);
+}
+
 // Function to export to Excel (XLS format) with improved design
 function exportToExcel() {
     // Validate required company info
@@ -465,6 +549,39 @@ function exportToExcel() {
     const totalNetSales = parseFloat(document.getElementById('totalNetSales').textContent) || 0;
     const totalOutputTax = parseFloat(document.getElementById('totalOutputTax').textContent) || 0;
     const totalWithholding = parseFloat(document.getElementById('totalWithholding').textContent) || 0;
+    
+    // Calculate tally data for export
+    let totalCashAmount = 0;
+    let totalChargeAmount = 0;
+    let totalPrivateAmount = 0;
+    let totalGovernmentAmount = 0;
+    let cashCount = 0;
+    let chargeCount = 0;
+    let privateCount = 0;
+    let governmentCount = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        const paymentMode = row.querySelector('.payment-mode').value;
+        const salesType = row.querySelector('.sales-type').value;
+        const netSales = parseFloat(row.querySelector('.net-sales').textContent) || 0;
+        
+        if (paymentMode === 'Cash') {
+            totalCashAmount += netSales;
+            cashCount++;
+        } else if (paymentMode === 'Charge') {
+            totalChargeAmount += netSales;
+            chargeCount++;
+        }
+        
+        if (salesType === 'Private') {
+            totalPrivateAmount += netSales;
+            privateCount++;
+        } else if (salesType === 'Government') {
+            totalGovernmentAmount += netSales;
+            governmentCount++;
+        }
+    });
     
     let htmlContent = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
@@ -759,7 +876,6 @@ function exportToExcel() {
     `;
     
     // Add data rows
-    const rows = document.querySelectorAll('#tableBody tr');
     let rowNumber = 1;
     
     rows.forEach(row => {
@@ -903,6 +1019,28 @@ function exportToExcel() {
                 </table>
             </div>
             
+            <div class="totals-section" style="margin-top: 15px;">
+                <div class="section-title">Payment & Customer Distribution</div>
+                <table class="totals-table">
+                    <tr>
+                        <td class="total-label">Cash Transactions:</td>
+                        <td class="total-value">₱ ${totalCashAmount.toFixed(2)} (${cashCount} transaction${cashCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Charge Transactions:</td>
+                        <td class="total-value">₱ ${totalChargeAmount.toFixed(2)} (${chargeCount} transaction${chargeCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Private Sector Sales:</td>
+                        <td class="total-value">₱ ${totalPrivateAmount.toFixed(2)} (${privateCount} transaction${privateCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Government Sector Sales:</td>
+                        <td class="total-value">₱ ${totalGovernmentAmount.toFixed(2)} (${governmentCount} transaction${governmentCount !== 1 ? 's' : ''})</td>
+                    </tr>
+                </table>
+            </div>
+            
             <div class="footer">
                 <p>Report generated on ${formattedDate} at ${formattedTime}</p>
                 <p>Authorized by: ${authorizedEmployee} | Prepared by: Vatable Sales Data Tracker System</p>
@@ -930,7 +1068,7 @@ function exportToExcel() {
     }, 100);
     
     // Show success message
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Color-coded sections\n• Financial summary\n• Readable column widths\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Color-coded sections\n• Financial summary\n• Payment & customer distribution\n• Readable column widths\n• Print-ready layout`);
 }
 
 // Add event listeners to existing rows (if any)
@@ -941,6 +1079,7 @@ document.addEventListener('input', function(e) {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         }
     }
 });
@@ -952,6 +1091,7 @@ document.addEventListener('change', function(e) {
             updateCalculations(row);
             updateTotals();
             updateSummaryRow();
+            updateTallySections();
         }
     }
 });
