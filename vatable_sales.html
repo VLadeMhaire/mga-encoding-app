@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vatable Sales Data Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        /* Scale the entire page to 50% on load */
+        body.loaded {
+            transform: scale(0.5);
+            transform-origin: top left;
+            width: 200%;
+            height: 200%;
+            overflow: visible;
+            position: relative;
+        }
+        
+        .container {
+            min-height: 200vh;
+        }
+        
+        /* Optional: Add zoom controls */
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 30, 20, 0.9);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #00ff9d;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+        
+        .zoom-btn {
+            background: #00ff9d;
+            color: #002614;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .zoom-btn:hover {
+            background: #00ffaa;
+            transform: scale(1.05);
+        }
+        
+        .zoom-display {
+            color: #00ff9d;
+            padding: 8px 15px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="loaded">
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-placeholder" id="logoPlaceholder">
+                    <!-- Logo will be loaded here -->
+                    <div>MGAALogo.jpg</div>
+                </div>
+            </div>
+            <div class="header-text">
+                <h1><i class="fas fa-file-invoice-dollar"></i> Vatable Sales Data Tracker</h1>
+                <p>Professional Sales Tracking with Automated VAT Calculations</p>
+            </div>
+
+            <div class="header-right">
+    <a href="index.html" class="back-to-dashboard-btn">
+        <i class="fas fa-home"></i> Back to Dashboard
+    </a>
+</div>
+        </header>
+        
+        <div class="company-info-section">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-building"></i> Company Information
+            </h3>
+            <div class="company-info-grid">
+                <div class="info-group">
+                    <label for="companyName">Company Name *</label>
+                    <input type="text" id="companyName" placeholder="Enter company name">
+                </div>
+                <div class="info-group">
+                    <label for="companyTIN">Company TIN Number *</label>
+                    <input type="text" id="companyTIN" placeholder="000-000-000-000" class="tin-input" maxlength="15">
+                </div>
+                <div class="info-group">
+                    <label for="companyAddress">Company Address *</label>
+                    <input type="text" id="companyAddress" placeholder="Enter company address">
+                </div>
+                <div class="info-group">
+                    <label for="lineOfBusiness">Line of Business *</label>
+                    <input type="text" id="lineOfBusiness" placeholder="Enter line of business">
+                </div>
+                <div class="info-group">
+                    <label for="telephone">Telephone Number</label>
+                    <input type="tel" id="telephone" placeholder="Enter telephone number">
+                </div>
+                <div class="info-group">
+                    <label for="reportDate">Report Date</label>
+                    <input type="date" id="reportDate">
+                </div>
+                <div class="info-group">
+                    <label for="authorizedEmployee">Authorized Employee *</label>
+                    <input type="text" id="authorizedEmployee" placeholder="Enter authorized employee name">
+                </div>
+                <div class="info-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter email address">
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="addRowBtn">
+                <i class="fas fa-plus-circle"></i> Add New Row
+            </button>
+            <button class="btn btn-success" id="exportBtn">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+            <button class="btn btn-info" id="clearBtn">
+                <i class="fas fa-trash-alt"></i> Clear Table Data
+            </button>
+            <button class="btn btn-warning" id="clearInfoBtn">
+                <i class="fas fa-eraser"></i> Clear Company Info
+            </button>
+            <div style="margin-left: auto; font-size: 15px; font-weight: 500; color: #00ff9d; text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-list-alt"></i> <span id="rowCount">0</span> Rows
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="vatableTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice Number</th>
+                        <th>Invoice Type</th>
+                        <th>Mode of Payment</th>
+                        <th>12-digit TIN Number</th>
+                        <th>Particulars/Customer Name</th>
+                        <th>Address</th>
+                        <th>Vatable Gross Sales</th>
+                        <th>Exempt Sales</th>
+                        <th>Sales Type</th>
+                        <th>Net Sales</th>
+                        <th>Output Tax</th>
+                        <th>Withholding Tax Rate</th>
+                        <th>Withholding Amount</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows will be added here dynamically -->
+                </tbody>
+                <tfoot id="summaryRow">
+                    <!-- Summary row will be added here dynamically -->
+                </tfoot>
+            </table>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Total Vatable Gross Sales</span>
+                <span class="stat-value">₱ <span id="totalGrossSales">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Exempt Sales</span>
+                <span class="stat-value">₱ <span id="totalExemptSales">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Net Sales</span>
+                <span class="stat-value">₱ <span id="totalNetSales">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Output Tax</span>
+                <span class="stat-value">₱ <span id="totalOutputTax">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Withholding Amount</span>
+                <span class="stat-value">₱ <span id="totalWithholding">0.00</span></span>
+            </div>
+        </div>
+
+                <!-- Tally Sections -->
+        <div class="tally-section">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-calculator"></i> Payment & Customer Type Tally
+            </h3>
+            
+            <div class="tally-grid">
+                <!-- Payment Mode Tally -->
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-money-bill-wave"></i> Total Cash Transactions
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalCashAmount">0.00</span></span>
+                        <span class="tally-count" id="cashCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="cashPercentage">0% of total</span>
+                </div>
+                
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-credit-card"></i> Total Charge Transactions
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalChargeAmount">0.00</span></span>
+                        <span class="tally-count" id="chargeCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="chargePercentage">0% of total</span>
+                </div>
+                
+                <!-- Customer Type Tally -->
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-user-tie"></i> Private Sector Sales
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalPrivateAmount">0.00</span></span>
+                        <span class="tally-count" id="privateCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="privatePercentage">0% of total</span>
+                </div>
+                
+                <div class="tally-item">
+                    <div class="tally-category">
+                        <i class="fas fa-landmark"></i> Government Sector Sales
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount">₱ <span id="totalGovernmentAmount">0.00</span></span>
+                        <span class="tally-count" id="governmentCount">0 transactions</span>
+                    </div>
+                    <span class="tally-rate" id="governmentPercentage">0% of total</span>
+                </div>
+                
+                <!-- Summary Tally -->
+                <div class="tally-item tally-total">
+                    <div class="tally-category">
+                        <i class="fas fa-chart-pie"></i> Payment Distribution Summary
+                    </div>
+                    <div class="tally-details">
+                        <span class="tally-amount" id="totalTallyAmount">₱ 0.00</span>
+                        <span class="tally-count" id="totalTallyCount">0 total transactions</span>
+                    </div>
+                    <span class="tally-rate">Total Net Sales: ₱ <span id="totalNetSalesTally">0.00</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 Vatable Sales Data Tracker | Professional VAT-Compliant Sales Tracking System</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
