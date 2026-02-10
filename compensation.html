@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compensation Data Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        /* Scale the entire page to 50% on load */
+        body.loaded {
+            transform: scale(0.5);
+            transform-origin: top left;
+            width: 200%;
+            height: 200%;
+            overflow: visible;
+            position: relative;
+        }
+        
+        .container {
+            min-height: 200vh;
+        }
+        
+        /* Optional: Add zoom controls */
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 30, 20, 0.9);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #00ff9d;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+        
+        .zoom-btn {
+            background: #00ff9d;
+            color: #002614;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .zoom-btn:hover {
+            background: #00ffaa;
+            transform: scale(1.05);
+        }
+        
+        .zoom-display {
+            color: #00ff9d;
+            padding: 8px 15px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        /* Column width adjustments for compensation table */
+        th:nth-child(1) { width: 80px; } /* Sequence Number */
+        th:nth-child(2) { width: 120px; } /* TIN Number */
+        th:nth-child(3) { width: 120px; } /* Last Name */
+        th:nth-child(4) { width: 120px; } /* First Name */
+        th:nth-child(5) { width: 120px; } /* Middle Name */
+        th:nth-child(6) { width: 100px; } /* Daily Rate */
+        th:nth-child(7) { width: 120px; } /* Basic Salary */
+        th:nth-child(8) { width: 180px; } /* Holiday/Allowances/Overtime Pay */
+        th:nth-child(9) { width: 150px; } /* De Minimis Benefits */
+        th:nth-child(10) { width: 130px; } /* 13th Month Pay */
+        th:nth-child(11) { width: 150px; } /* Total Compensation */
+        th:nth-child(12) { width: 140px; } /* SSS Employee Share */
+        th:nth-child(13) { width: 150px; } /* PhilHealth Employee Share */
+        th:nth-child(14) { width: 140px; } /* Pag-ibig Employee Share */
+        th:nth-child(15) { width: 180px; } /* Total SSS, PHIC, and Pag-ibig */
+        th:nth-child(16) { width: 150px; } /* Total Deduction */
+        th:nth-child(17) { width: 180px; } /* Total Taxable Compensation */
+        th:nth-child(18) { width: 140px; } /* Exemption Amount */
+        th:nth-child(19) { width: 180px; } /* Net Taxable Compensation */
+        th:nth-child(20) { width: 90px; } /* Action */
+    </style>
+</head>
+<body class="loaded">
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-placeholder" id="logoPlaceholder">
+                    <div>MGAALogo.jpg</div>
+                </div>
+            </div>
+            <div class="header-text">
+                <h1><i class="fas fa-money-check-alt"></i> Compensation Data Tracker</h1>
+                <p>Employee Compensation, Benefits, and Tax Calculations</p>
+            </div>
+
+            <div class="header-right">
+                <a href="index.html" class="back-to-dashboard-btn">
+                    <i class="fas fa-home"></i> Back to Dashboard
+                </a>
+            </div>
+        </header>
+        
+        <div class="company-info-section">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-building"></i> Company Information
+            </h3>
+            <div class="company-info-grid">
+                <div class="info-group">
+                    <label for="companyName">Company Name *</label>
+                    <input type="text" id="companyName" placeholder="Enter company name">
+                </div>
+                <div class="info-group">
+                    <label for="companyTIN">Company TIN Number *</label>
+                    <input type="text" id="companyTIN" placeholder="000-000-000-000" class="tin-input" maxlength="15">
+                </div>
+                <div class="info-group">
+                    <label for="companyAddress">Company Address *</label>
+                    <input type="text" id="companyAddress" placeholder="Enter company address">
+                </div>
+                <div class="info-group">
+                    <label for="lineOfBusiness">Line of Business *</label>
+                    <input type="text" id="lineOfBusiness" placeholder="Enter line of business">
+                </div>
+                <div class="info-group">
+                    <label for="payrollPeriod">Payroll Period</label>
+                    <input type="text" id="payrollPeriod" placeholder="e.g., January 1-15, 2024">
+                </div>
+                <div class="info-group">
+                    <label for="payrollDate">Payroll Date</label>
+                    <input type="date" id="payrollDate">
+                </div>
+                <div class="info-group">
+                    <label for="authorizedEmployee">Payroll Officer *</label>
+                    <input type="text" id="authorizedEmployee" placeholder="Enter payroll officer name">
+                </div>
+                <div class="info-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter email address">
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="addRowBtn">
+                <i class="fas fa-plus-circle"></i> Add New Row
+            </button>
+            <button class="btn btn-success" id="exportBtn">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+            <button class="btn btn-info" id="clearBtn">
+                <i class="fas fa-trash-alt"></i> Clear Table Data
+            </button>
+            <button class="btn btn-warning" id="clearInfoBtn">
+                <i class="fas fa-eraser"></i> Clear Company Info
+            </button>
+            <div style="margin-left: auto; font-size: 15px; font-weight: 500; color: #00ff9d; text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);">
+                <i class="fas fa-users"></i> <span id="rowCount">0</span> Employees
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="compensationTable">
+                <thead>
+                    <tr>
+                        <th>Seq No</th>
+                        <th>TIN Number</th>
+                        <th>Last Name</th>
+                        <th>First Name</th>
+                        <th>Middle Name</th>
+                        <th>Daily Rate</th>
+                        <th>Basic Salary</th>
+                        <th>Holiday/Allowances/Overtime Pay</th>
+                        <th>De Minimis Benefits</th>
+                        <th>13th Month Pay</th>
+                        <th>Total Compensation</th>
+                        <th>SSS Employee Share</th>
+                        <th>PhilHealth Employee Share</th>
+                        <th>Pag-ibig Employee Share</th>
+                        <th>Total SSS, PHIC, and Pag-ibig</th>
+                        <th>Total Deduction</th>
+                        <th>Total Taxable Compensation</th>
+                        <th>Exemption Amount</th>
+                        <th>Net Taxable Compensation</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows will be added here dynamically -->
+                </tbody>
+                <tfoot id="summaryRow">
+                    <!-- Summary row will be added here dynamically -->
+                </tfoot>
+            </table>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Total Employees</span>
+                <span class="stat-value"><span id="totalEmployees">0</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Compensation</span>
+                <span class="stat-value">₱ <span id="totalCompensation">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Deductions</span>
+                <span class="stat-value">₱ <span id="totalDeductions">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Taxable Compensation</span>
+                <span class="stat-value">₱ <span id="totalTaxableCompensation">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Average Daily Rate</span>
+                <span class="stat-value">₱ <span id="averageDailyRate">0.00</span></span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 Compensation Data Tracker | Professional Employee Compensation Tracking System</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the table with one empty row
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date for payroll
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('payrollDate').value = today;
+            
+            // Try to load the logo
+            loadLogo();
+            
+            // Load saved company info if exists
+            loadCompanyInfo();
+            
+            // Initialize table
+            addNewRow();
+            updateRowCount();
+            updateTotals();
+            updateSummaryRow();
+            
+            // Add event listeners for company info to save automatically
+            document.querySelectorAll('.company-info-section input').forEach(input => {
+                input.addEventListener('input', saveCompanyInfo);
+                input.addEventListener('change', saveCompanyInfo);
+            });
+            
+            // Format company TIN input
+            const companyTIN = document.getElementById('companyTIN');
+            companyTIN.addEventListener('input', function(e) {
+                formatTIN(e.target);
+            });
+            
+            // Clear company info button
+            document.getElementById('clearInfoBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all company information?')) {
+                    clearCompanyInfo();
+                }
+            });
+            
+            // Add row button
+            document.getElementById('addRowBtn').addEventListener('click', function() {
+                addNewRow();
+                updateRowCount();
+                updateTotals();
+                updateSummaryRow();
+            });
+            
+            // Export to Excel button
+            document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+            
+            // Clear all data button
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all table data? This cannot be undone.')) {
+                    clearAllData();
+                }
+            });
+        });
+
+        // Function to load logo
+        function loadLogo() {
+            const logoPlaceholder = document.getElementById('logoPlaceholder');
+            const img = new Image();
+            img.onload = function() {
+                logoPlaceholder.innerHTML = '';
+                logoPlaceholder.appendChild(img);
+                img.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 157, 0.7))';
+            };
+            img.onerror = function() {
+                console.log('Logo not found, using placeholder');
+                logoPlaceholder.style.textShadow = '0 0 10px rgba(0, 255, 157, 0.7)';
+            };
+            img.src = 'MGAALogo.jpg';
+        }
+
+        // Save company info to localStorage
+        function saveCompanyInfo() {
+            const companyInfo = {
+                name: document.getElementById('companyName').value,
+                tin: document.getElementById('companyTIN').value,
+                address: document.getElementById('companyAddress').value,
+                business: document.getElementById('lineOfBusiness').value,
+                period: document.getElementById('payrollPeriod').value,
+                date: document.getElementById('payrollDate').value,
+                officer: document.getElementById('authorizedEmployee').value,
+                email: document.getElementById('email').value
+            };
+            localStorage.setItem('compensationCompanyInfo', JSON.stringify(companyInfo));
+        }
+
+        // Load company info from localStorage
+        function loadCompanyInfo() {
+            const savedInfo = localStorage.getItem('compensationCompanyInfo');
+            if (savedInfo) {
+                const companyInfo = JSON.parse(savedInfo);
+                document.getElementById('companyName').value = companyInfo.name || '';
+                document.getElementById('companyTIN').value = companyInfo.tin || '';
+                document.getElementById('companyAddress').value = companyInfo.address || '';
+                document.getElementById('lineOfBusiness').value = companyInfo.business || '';
+                document.getElementById('payrollPeriod').value = companyInfo.period || '';
+                document.getElementById('payrollDate').value = companyInfo.date || new Date().toISOString().split('T')[0];
+                document.getElementById('authorizedEmployee').value = companyInfo.officer || '';
+                document.getElementById('email').value = companyInfo.email || '';
+            }
+        }
+
+        // Clear company info
+        function clearCompanyInfo() {
+            document.getElementById('companyName').value = '';
+            document.getElementById('companyTIN').value = '';
+            document.getElementById('companyAddress').value = '';
+            document.getElementById('lineOfBusiness').value = '';
+            document.getElementById('payrollPeriod').value = '';
+            document.getElementById('payrollDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('authorizedEmployee').value = '';
+            document.getElementById('email').value = '';
+            localStorage.removeItem('compensationCompanyInfo');
+        }
+
+        // Function to add a new row
+        function addNewRow() {
+            const tableBody = document.getElementById('tableBody');
+            const rowCount = tableBody.children.length + 1;
+            const rowId = 'row_' + Date.now() + '_' + rowCount;
+            
+            const row = document.createElement('tr');
+            row.id = rowId;
+            
+            row.innerHTML = `
+                <td>
+                    <div class="uneditable sequence-number">${rowCount}</div>
+                </td>
+                <td>
+                    <input type="text" class="editable employee-tin tin-input" maxlength="15" placeholder="000-000-000-000">
+                    <div class="validation-message">TIN must be 12 digits</div>
+                </td>
+                <td>
+                    <input type="text" class="editable last-name" placeholder="Last name">
+                </td>
+                <td>
+                    <input type="text" class="editable first-name" placeholder="First name">
+                </td>
+                <td>
+                    <input type="text" class="editable middle-name" placeholder="Middle name">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable daily-rate" placeholder="0.00">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable basic-salary" placeholder="0.00">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable allowances" placeholder="0.00">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable de-minimis" placeholder="0.00">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable thirteenth-month" placeholder="0.00">
+                </td>
+                <td>
+                    <div class="uneditable total-compensation">0.00</div>
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable sss-share" placeholder="0.00">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable philhealth-share" placeholder="0.00">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable pagibig-share" placeholder="0.00">
+                </td>
+                <td>
+                    <div class="uneditable total-contributions">0.00</div>
+                </td>
+                <td>
+                    <div class="uneditable total-deduction">0.00</div>
+                </td>
+                <td>
+                    <div class="uneditable total-taxable-compensation">0.00</div>
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" class="editable exemption-amount" placeholder="0.00">
+                </td>
+                <td>
+                    <div class="uneditable net-taxable-compensation">0.00</div>
+                </td>
+                <td>
+                    <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            
+            tableBody.appendChild(row);
+            
+            // Add event listeners to the new row
+            const editableInputs = row.querySelectorAll('.editable');
+            editableInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    updateCalculations(row);
+                    updateTotals();
+                    updateSummaryRow();
+                });
+                
+                input.addEventListener('change', function() {
+                    updateCalculations(row);
+                    updateTotals();
+                    updateSummaryRow();
+                });
+            });
+            
+            // Special handling for TIN input
+            const tinInput = row.querySelector('.employee-tin');
+            tinInput.addEventListener('input', function(e) {
+                formatTIN(e.target);
+            });
+            
+            tinInput.addEventListener('blur', function(e) {
+                validateTIN(e.target);
+            });
+        }
+
+        // Function to delete a row
+        function deleteRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row && confirm('Are you sure you want to delete this row?')) {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                
+                setTimeout(() => {
+                    row.remove();
+                    updateRowCount();
+                    updateTotals();
+                    updateSummaryRow();
+                }, 300);
+            }
+        }
+
+        // Function to clear all data
+        function clearAllData() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            addNewRow();
+            updateRowCount();
+            updateTotals();
+            updateSummaryRow();
+        }
+
+        // Function to update calculations for a row
+        function updateCalculations(row) {
+            // Get values from inputs
+            const basicSalary = parseFloat(row.querySelector('.basic-salary').value) || 0;
+            const allowances = parseFloat(row.querySelector('.allowances').value) || 0;
+            const deMinimis = parseFloat(row.querySelector('.de-minimis').value) || 0;
+            const thirteenthMonth = parseFloat(row.querySelector('.thirteenth-month').value) || 0;
+            const sssShare = parseFloat(row.querySelector('.sss-share').value) || 0;
+            const philhealthShare = parseFloat(row.querySelector('.philhealth-share').value) || 0;
+            const pagibigShare = parseFloat(row.querySelector('.pagibig-share').value) || 0;
+            const exemptionAmount = parseFloat(row.querySelector('.exemption-amount').value) || 0;
+            
+            // Calculate Total Compensation: Basic Salary + Allowances + De Minimis + 13th Month Pay
+            const totalCompensation = basicSalary + allowances + deMinimis + thirteenthMonth;
+            row.querySelector('.total-compensation').textContent = totalCompensation.toFixed(2);
+            
+            // Calculate Total Contributions: SSS + PhilHealth + Pag-ibig
+            const totalContributions = sssShare + philhealthShare + pagibigShare;
+            row.querySelector('.total-contributions').textContent = totalContributions.toFixed(2);
+            
+            // Calculate Total Deduction: Total Contributions - De Minimis - 13th Month Pay
+            const totalDeduction = totalContributions - deMinimis - thirteenthMonth;
+            row.querySelector('.total-deduction').textContent = totalDeduction.toFixed(2);
+            
+            // Calculate Total Taxable Compensation: Total Compensation - Total Deduction
+            const totalTaxableCompensation = totalCompensation - totalDeduction;
+            row.querySelector('.total-taxable-compensation').textContent = totalTaxableCompensation.toFixed(2);
+            
+            // Calculate Net Taxable Compensation: Total Taxable Compensation - Exemption Amount
+            const netTaxableCompensation = Math.max(0, totalTaxableCompensation - exemptionAmount);
+            row.querySelector('.net-taxable-compensation').textContent = netTaxableCompensation.toFixed(2);
+        }
+
+        // Function to format TIN input
+        function formatTIN(input) {
+            let value = input.value.replace(/\D/g, '');
+            
+            if (value.length > 12) {
+                value = value.substring(0, 12);
+            }
+            
+            if (value.length > 9) {
+                value = value.substring(0, 9) + '-' + value.substring(9);
+            }
+            if (value.length > 6) {
+                value = value.substring(0, 6) + '-' + value.substring(6);
+            }
+            if (value.length > 3) {
+                value = value.substring(0, 3) + '-' + value.substring(3);
+            }
+            
+            input.value = value;
+        }
+
+        // Function to validate TIN input
+        function validateTIN(input) {
+            const value = input.value.replace(/\D/g, '');
+            const validationMessage = input.nextElementSibling;
+            
+            if (value.length === 12) {
+                validationMessage.style.display = 'none';
+                input.style.borderColor = '#00ff9d';
+                input.style.boxShadow = '0 0 5px rgba(0, 255, 157, 0.5), inset 0 0 10px rgba(0, 255, 157, 0.1)';
+            } else if (value.length > 0) {
+                validationMessage.style.display = 'block';
+                input.style.borderColor = '#ff6666';
+                input.style.boxShadow = '0 0 5px rgba(255, 102, 102, 0.5), inset 0 0 10px rgba(255, 102, 102, 0.1)';
+            } else {
+                validationMessage.style.display = 'none';
+                input.style.borderColor = 'rgba(0, 255, 157, 0.3)';
+                input.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+            }
+        }
+
+        // Function to update row count
+        function updateRowCount() {
+            const tableBody = document.getElementById('tableBody');
+            const rowCount = tableBody.children.length;
+            document.getElementById('rowCount').textContent = rowCount;
+            
+            // Update sequence numbers
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                const seqNumber = row.querySelector('.sequence-number');
+                if (seqNumber) {
+                    seqNumber.textContent = index + 1;
+                }
+            });
+        }
+
+        // Function to update totals
+        function updateTotals() {
+            let totalCompensation = 0;
+            let totalDeductions = 0;
+            let totalTaxableCompensation = 0;
+            let totalDailyRate = 0;
+            let employeeCount = 0;
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const compensation = parseFloat(row.querySelector('.total-compensation').textContent) || 0;
+                const deduction = parseFloat(row.querySelector('.total-deduction').textContent) || 0;
+                const taxableCompensation = parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
+                const dailyRate = parseFloat(row.querySelector('.daily-rate').value) || 0;
+                
+                totalCompensation += compensation;
+                totalDeductions += deduction;
+                totalTaxableCompensation += taxableCompensation;
+                totalDailyRate += dailyRate;
+                employeeCount++;
+            });
+            
+            document.getElementById('totalEmployees').textContent = employeeCount;
+            document.getElementById('totalCompensation').textContent = totalCompensation.toFixed(2);
+            document.getElementById('totalDeductions').textContent = totalDeductions.toFixed(2);
+            document.getElementById('totalTaxableCompensation').textContent = totalTaxableCompensation.toFixed(2);
+            document.getElementById('averageDailyRate').textContent = employeeCount > 0 ? (totalDailyRate / employeeCount).toFixed(2) : '0.00';
+        }
+
+        // Function to update summary row
+        function updateSummaryRow() {
+            let totalCompensation = 0;
+            let totalAllowances = 0;
+            let totalDeMinimis = 0;
+            let totalThirteenthMonth = 0;
+            let totalSSS = 0;
+            let totalPhilhealth = 0;
+            let totalPagibig = 0;
+            let totalDeductions = 0;
+            let totalTaxableCompensation = 0;
+            let totalNetTaxableCompensation = 0;
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                totalCompensation += parseFloat(row.querySelector('.total-compensation').textContent) || 0;
+                totalAllowances += parseFloat(row.querySelector('.allowances').value) || 0;
+                totalDeMinimis += parseFloat(row.querySelector('.de-minimis').value) || 0;
+                totalThirteenthMonth += parseFloat(row.querySelector('.thirteenth-month').value) || 0;
+                totalSSS += parseFloat(row.querySelector('.sss-share').value) || 0;
+                totalPhilhealth += parseFloat(row.querySelector('.philhealth-share').value) || 0;
+                totalPagibig += parseFloat(row.querySelector('.pagibig-share').value) || 0;
+                totalDeductions += parseFloat(row.querySelector('.total-deduction').textContent) || 0;
+                totalTaxableCompensation += parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
+                totalNetTaxableCompensation += parseFloat(row.querySelector('.net-taxable-compensation').textContent) || 0;
+            });
+            
+            const summaryRow = document.getElementById('summaryRow');
+            summaryRow.innerHTML = `
+                <tr class="summary-row">
+                    <td colspan="6" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
+                    <td class="uneditable">${totalAllowances.toFixed(2)}</td>
+                    <td class="uneditable">${totalAllowances.toFixed(2)}</td>
+                    <td class="uneditable">${totalDeMinimis.toFixed(2)}</td>
+                    <td class="uneditable">${totalThirteenthMonth.toFixed(2)}</td>
+                    <td class="uneditable">${totalCompensation.toFixed(2)}</td>
+                    <td class="uneditable">${totalSSS.toFixed(2)}</td>
+                    <td class="uneditable">${totalPhilhealth.toFixed(2)}</td>
+                    <td class="uneditable">${totalPagibig.toFixed(2)}</td>
+                    <td class="uneditable">${(totalSSS + totalPhilhealth + totalPagibig).toFixed(2)}</td>
+                    <td class="uneditable">${totalDeductions.toFixed(2)}</td>
+                    <td class="uneditable">${totalTaxableCompensation.toFixed(2)}</td>
+                    <td>-</td>
+                    <td class="uneditable">${totalNetTaxableCompensation.toFixed(2)}</td>
+                    <td>-</td>
+                </tr>
+            `;
+        }
+
+        // Function to export to Excel
+        function exportToExcel() {
+            // Validate required company info
+            const companyName = document.getElementById('companyName').value.trim();
+            const companyTIN = document.getElementById('companyTIN').value.trim();
+            const companyAddress = document.getElementById('companyAddress').value.trim();
+            const lineOfBusiness = document.getElementById('lineOfBusiness').value.trim();
+            const authorizedEmployee = document.getElementById('authorizedEmployee').value.trim();
+            
+            if (!companyName || !companyTIN || !companyAddress || !lineOfBusiness || !authorizedEmployee) {
+                alert('Please fill in all required company information fields (marked with *) before exporting.');
+                return;
+            }
+            
+            // Create HTML content for Excel
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const formattedTime = today.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute:'2-digit', 
+                hour12: true 
+            });
+            
+            // Calculate totals
+            const totalEmployees = document.getElementById('totalEmployees').textContent;
+            const totalCompensation = document.getElementById('totalCompensation').textContent;
+            const totalDeductions = document.getElementById('totalDeductions').textContent;
+            const totalTaxableCompensation = document.getElementById('totalTaxableCompensation').textContent;
+            
+            let htmlContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="UTF-8">
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <x:ExcelWorkbook>
+                            <x:ExcelWorksheets>
+                                <x:ExcelWorksheet>
+                                    <x:Name>Compensation Report</x:Name>
+                                    <x:WorksheetOptions>
+                                        <x:DisplayGridlines/>
+                                        <x:Print>
+                                            <x:ValidPrinterInfo/>
+                                            <x:PaperSizeIndex>9</x:PaperSizeIndex>
+                                            <x:HorizontalResolution>600</x:HorizontalResolution>
+                                            <x:VerticalResolution>600</x:VerticalResolution>
+                                            <x:FitToPage>1</x:FitToPage>
+                                            <x:FitWidth>1</x:FitWidth>
+                                            <x:FitHeight>100</x:FitHeight>
+                                        </x:Print>
+                                        <x:Selected/>
+                                        <x:ProtectContents>False</x:ProtectContents>
+                                        <x:ProtectObjects>False</x:ProtectObjects>
+                                        <x:ProtectScenarios>False</x:ProtectScenarios>
+                                        <x:FreezePanes/>
+                                        <x:FrozenNoSplit/>
+                                        <x:SplitHorizontal>6</x:SplitHorizontal>
+                                        <x:TopRowBottomPane>6</x:TopRowBottomPane>
+                                        <x:ActivePane>2</x:ActivePane>
+                                        <x:Panes>
+                                            <x:Pane>
+                                                <x:Number>3</x:Number>
+                                            </x:Pane>
+                                            <x:Pane>
+                                                <x:Number>2</x:Number>
+                                                <x:ActiveRow>0</x:ActiveRow>
+                                                <x:ActiveCol>5</x:ActiveCol>
+                                            </x:Pane>
+                                        </x:Panes>
+                                    </x:WorksheetOptions>
+                                </x:ExcelWorksheet>
+                            </x:ExcelWorksheets>
+                        </x:ExcelWorkbook>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                        * {
+                            font-family: 'Calibri', 'Arial', sans-serif;
+                            mso-font-charset: 0;
+                        }
+                        
+                        body {
+                            margin: 20px;
+                        }
+                        
+                        .report-title {
+                            font-size: 24pt;
+                            font-weight: bold;
+                            color: #006837;
+                            text-align: center;
+                            margin-bottom: 10px;
+                            border-bottom: 3px solid #00cc7a;
+                            padding-bottom: 10px;
+                        }
+                        
+                        .company-header {
+                            background-color: #f0f9f5;
+                            border: 2px solid #00cc7a;
+                            padding: 15px;
+                            margin-bottom: 20px;
+                            border-radius: 8px;
+                        }
+                        
+                        .company-info-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        
+                        .company-info-table td {
+                            padding: 5px 10px;
+                            vertical-align: top;
+                        }
+                        
+                        .company-label {
+                            font-weight: bold;
+                            color: #006837;
+                            width: 180px;
+                            white-space: nowrap;
+                        }
+                        
+                        .company-value {
+                            color: #333333;
+                        }
+                        
+                        .data-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                            font-size: 9pt;
+                        }
+                        
+                        .data-table th {
+                            background-color: #006837;
+                            color: white;
+                            font-weight: bold;
+                            text-align: center;
+                            padding: 10px 6px;
+                            border: 1px solid #004d26;
+                            white-space: nowrap;
+                            vertical-align: middle;
+                        }
+                        
+                        .data-table td {
+                            padding: 8px 6px;
+                            border: 1px solid #cccccc;
+                            vertical-align: middle;
+                        }
+                        
+                        .text-left { text-align: left; }
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        
+                        .currency {
+                            font-family: 'Consolas', 'Courier New', monospace;
+                            text-align: right;
+                            white-space: nowrap;
+                            mso-number-format: "#,##0.00";
+                        }
+                        
+                        .summary-row {
+                            background-color: #fff2cc;
+                            font-weight: bold;
+                        }
+                        
+                        .summary-row td {
+                            border-top: 2px solid #ff9900;
+                            border-bottom: 2px solid #ff9900;
+                        }
+                        
+                        .section-title {
+                            font-size: 14pt;
+                            font-weight: bold;
+                            color: #006837;
+                            margin-top: 25px;
+                            margin-bottom: 10px;
+                            padding-bottom: 5px;
+                            border-bottom: 1px solid #00cc7a;
+                        }
+                        
+                        .totals-section {
+                            margin-top: 25px;
+                            background-color: #f0f9f5;
+                            border: 1px solid #00cc7a;
+                            padding: 15px;
+                            border-radius: 8px;
+                        }
+                        
+                        .totals-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        
+                        .totals-table td {
+                            padding: 8px 15px;
+                            border: none;
+                        }
+                        
+                        .total-label {
+                            font-weight: bold;
+                            color: #006837;
+                            text-align: right;
+                            width: 60%;
+                        }
+                        
+                        .total-value {
+                            font-weight: bold;
+                            color: #333333;
+                            text-align: right;
+                            font-family: 'Consolas', 'Courier New', monospace;
+                            border-bottom: 1px dotted #cccccc;
+                        }
+                        
+                        .footer {
+                            margin-top: 30px;
+                            padding-top: 15px;
+                            border-top: 1px solid #cccccc;
+                            color: #666666;
+                            font-size: 9pt;
+                            text-align: center;
+                        }
+                    </style>
+                    <title>Compensation Report - ${formattedDate}</title>
+                </head>
+                <body>
+                    <div class="report-title">EMPLOYEE COMPENSATION REPORT</div>
+                    
+                    <div class="company-header">
+                        <table class="company-info-table">
+                            <tr>
+                                <td class="company-label">Company Name:</td>
+                                <td class="company-value">${companyName}</td>
+                                <td class="company-label">TIN Number:</td>
+                                <td class="company-value">${companyTIN}</td>
+                            </tr>
+                            <tr>
+                                <td class="company-label">Address:</td>
+                                <td class="company-value">${companyAddress}</td>
+                                <td class="company-label">Line of Business:</td>
+                                <td class="company-value">${lineOfBusiness}</td>
+                            </tr>
+                            <tr>
+                                <td class="company-label">Payroll Period:</td>
+                                <td class="company-value">${document.getElementById('payrollPeriod').value.trim() || 'N/A'}</td>
+                                <td class="company-label">Payroll Date:</td>
+                                <td class="company-value">${document.getElementById('payrollDate').value}</td>
+                            </tr>
+                            <tr>
+                                <td class="company-label">Payroll Officer:</td>
+                                <td class="company-value">${authorizedEmployee}</td>
+                                <td class="company-label">Email:</td>
+                                <td class="company-value">${document.getElementById('email').value.trim() || 'N/A'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section-title">Employee Compensation Details</div>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Seq No</th>
+                                <th>TIN Number</th>
+                                <th>Last Name</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Daily Rate</th>
+                                <th>Basic Salary</th>
+                                <th>Allowances/Overtime</th>
+                                <th>De Minimis</th>
+                                <th>13th Month</th>
+                                <th>Total Compensation</th>
+                                <th>SSS Share</th>
+                                <th>PhilHealth</th>
+                                <th>Pag-ibig</th>
+                                <th>Total Contributions</th>
+                                <th>Total Deduction</th>
+                                <th>Taxable Compensation</th>
+                                <th>Exemption</th>
+                                <th>Net Taxable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add data rows
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const sequence = row.querySelector('.sequence-number').textContent;
+                const tin = row.querySelector('.employee-tin').value;
+                const lastName = row.querySelector('.last-name').value;
+                const firstName = row.querySelector('.first-name').value;
+                const middleName = row.querySelector('.middle-name').value;
+                const dailyRate = parseFloat(row.querySelector('.daily-rate').value) || 0;
+                const basicSalary = parseFloat(row.querySelector('.basic-salary').value) || 0;
+                const allowances = parseFloat(row.querySelector('.allowances').value) || 0;
+                const deMinimis = parseFloat(row.querySelector('.de-minimis').value) || 0;
+                const thirteenthMonth = parseFloat(row.querySelector('.thirteenth-month').value) || 0;
+                const totalCompensation = parseFloat(row.querySelector('.total-compensation').textContent) || 0;
+                const sssShare = parseFloat(row.querySelector('.sss-share').value) || 0;
+                const philhealthShare = parseFloat(row.querySelector('.philhealth-share').value) || 0;
+                const pagibigShare = parseFloat(row.querySelector('.pagibig-share').value) || 0;
+                const totalContributions = parseFloat(row.querySelector('.total-contributions').textContent) || 0;
+                const totalDeduction = parseFloat(row.querySelector('.total-deduction').textContent) || 0;
+                const totalTaxableCompensation = parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
+                const exemptionAmount = parseFloat(row.querySelector('.exemption-amount').value) || 0;
+                const netTaxableCompensation = parseFloat(row.querySelector('.net-taxable-compensation').textContent) || 0;
+                
+                htmlContent += `
+                    <tr>
+                        <td class="text-center">${sequence}</td>
+                        <td class="text-center">${tin}</td>
+                        <td class="text-left">${lastName}</td>
+                        <td class="text-left">${firstName}</td>
+                        <td class="text-left">${middleName}</td>
+                        <td class="currency">${dailyRate.toFixed(2)}</td>
+                        <td class="currency">${basicSalary.toFixed(2)}</td>
+                        <td class="currency">${allowances.toFixed(2)}</td>
+                        <td class="currency">${deMinimis.toFixed(2)}</td>
+                        <td class="currency">${thirteenthMonth.toFixed(2)}</td>
+                        <td class="currency">${totalCompensation.toFixed(2)}</td>
+                        <td class="currency">${sssShare.toFixed(2)}</td>
+                        <td class="currency">${philhealthShare.toFixed(2)}</td>
+                        <td class="currency">${pagibigShare.toFixed(2)}</td>
+                        <td class="currency">${totalContributions.toFixed(2)}</td>
+                        <td class="currency">${totalDeduction.toFixed(2)}</td>
+                        <td class="currency">${totalTaxableCompensation.toFixed(2)}</td>
+                        <td class="currency">${exemptionAmount.toFixed(2)}</td>
+                        <td class="currency">${netTaxableCompensation.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            // Add summary row
+            const summaryData = calculateSummaryData();
+            htmlContent += `
+                        </tbody>
+                        <tfoot>
+                            <tr class="summary-row">
+                                <td colspan="6" class="text-right" style="font-weight: bold;">TOTALS:</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalBasicSalary.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalAllowances.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalDeMinimis.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalThirteenthMonth.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalCompensation.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalSSS.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalPhilhealth.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalPagibig.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalContributions.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalDeductions.toFixed(2)}</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalTaxableCompensation.toFixed(2)}</td>
+                                <td>-</td>
+                                <td class="currency" style="font-weight: bold;">${summaryData.totalNetTaxableCompensation.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <div class="totals-section">
+                        <div class="section-title">Compensation Summary</div>
+                        <table class="totals-table">
+                            <tr>
+                                <td class="total-label">Total Employees:</td>
+                                <td class="total-value">${totalEmployees}</td>
+                            </tr>
+                            <tr>
+                                <td class="total-label">Total Compensation:</td>
+                                <td class="total-value">₱ ${totalCompensation}</td>
+                            </tr>
+                            <tr>
+                                <td class="total-label">Total Deductions:</td>
+                                <td class="total-value">₱ ${totalDeductions}</td>
+                            </tr>
+                            <tr>
+                                <td class="total-label">Total Taxable Compensation:</td>
+                                <td class="total-value">₱ ${totalTaxableCompensation}</td>
+                            </tr>
+                            <tr>
+                                <td class="total-label" style="border-top: 1px solid #00cc7a; padding-top: 10px;">Net Payroll Amount:</td>
+                                <td class="total-value" style="border-top: 1px solid #00cc7a; padding-top: 10px; font-size: 11pt; color: #006837;">
+                                    ₱ ${(parseFloat(totalCompensation) - parseFloat(totalDeductions)).toFixed(2)}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>Report generated on ${formattedDate} at ${formattedTime}</p>
+                        <p>Authorized by: ${authorizedEmployee} | Prepared by: Compensation Data Tracker System</p>
+                        <p>This is a computer-generated report. No signature is required.</p>
+                        <p>© ${new Date().getFullYear()} Compensation Data Tracker - Professional Employee Compensation Tracking System</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Create download link for XLS file
+            const blob = new Blob([htmlContent], {type: 'application/vnd.ms-excel'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const fileName = `Compensation_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            // Show success message
+            alert(`✅ Excel report "${fileName}" has been generated successfully!`);
+        }
+
+        // Helper function to calculate summary data
+        function calculateSummaryData() {
+            let totalBasicSalary = 0;
+            let totalAllowances = 0;
+            let totalDeMinimis = 0;
+            let totalThirteenthMonth = 0;
+            let totalCompensation = 0;
+            let totalSSS = 0;
+            let totalPhilhealth = 0;
+            let totalPagibig = 0;
+            let totalContributions = 0;
+            let totalDeductions = 0;
+            let totalTaxableCompensation = 0;
+            let totalNetTaxableCompensation = 0;
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                totalBasicSalary += parseFloat(row.querySelector('.basic-salary').value) || 0;
+                totalAllowances += parseFloat(row.querySelector('.allowances').value) || 0;
+                totalDeMinimis += parseFloat(row.querySelector('.de-minimis').value) || 0;
+                totalThirteenthMonth += parseFloat(row.querySelector('.thirteenth-month').value) || 0;
+                totalCompensation += parseFloat(row.querySelector('.total-compensation').textContent) || 0;
+                totalSSS += parseFloat(row.querySelector('.sss-share').value) || 0;
+                totalPhilhealth += parseFloat(row.querySelector('.philhealth-share').value) || 0;
+                totalPagibig += parseFloat(row.querySelector('.pagibig-share').value) || 0;
+                totalContributions += parseFloat(row.querySelector('.total-contributions').textContent) || 0;
+                totalDeductions += parseFloat(row.querySelector('.total-deduction').textContent) || 0;
+                totalTaxableCompensation += parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
+                totalNetTaxableCompensation += parseFloat(row.querySelector('.net-taxable-compensation').textContent) || 0;
+            });
+            
+            return {
+                totalBasicSalary,
+                totalAllowances,
+                totalDeMinimis,
+                totalThirteenthMonth,
+                totalCompensation,
+                totalSSS,
+                totalPhilhealth,
+                totalPagibig,
+                totalContributions,
+                totalDeductions,
+                totalTaxableCompensation,
+                totalNetTaxableCompensation
+            };
+        }
+
+        // Add event listeners to existing rows
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('editable')) {
+                const row = e.target.closest('tr');
+                if (row) {
+                    updateCalculations(row);
+                    updateTotals();
+                    updateSummaryRow();
+                }
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('editable')) {
+                const row = e.target.closest('tr');
+                if (row) {
+                    updateCalculations(row);
+                    updateTotals();
+                    updateSummaryRow();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
