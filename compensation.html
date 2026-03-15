@@ -8,21 +8,233 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* Scale the entire page to 50% on load */
-        body.loaded {
-            transform: scale(0.5);
-            transform-origin: top left;
-            width: 200%;
-            height: 200%;
-            overflow: visible;
+        /* REMOVED the automatic scaling - no more transform: scale(0.5) */
+        
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Make table wrapper take maximum available space */
+        .table-wrapper {
+            flex: 1 1 auto;
+            min-height: 400px;
+            overflow: auto !important;
+            position: relative;
+            direction: rtl; /* This moves the vertical scrollbar to the left */
+        }
+        
+        /* Reset direction for the table itself to keep content LTR */
+        .table-wrapper table {
+            direction: ltr;
+            width: 100%;
+            min-width: 2800px;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+        
+        /* Adjust scrollbar styling for left-side scrollbar */
+        .table-wrapper::-webkit-scrollbar {
+            width: 14px;
+            height: 12px;
+            background: rgba(0, 30, 20, 0.95);
+        }
+        
+        .table-wrapper::-webkit-scrollbar-track {
+            background: rgba(0, 30, 20, 0.9);
+            border-right: 1px solid rgba(0, 255, 157, 0.2);
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #00ff9d, #00cc7a);
+            border-radius: 7px;
+            border: 2px solid rgba(0, 30, 20, 0.9);
+            min-height: 40px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #00ffaa, #00dd88);
+            box-shadow: 0 0 10px #00ff9d;
+        }
+        
+        /* Make table headers sticky with better visibility */
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: linear-gradient(135deg, rgba(0, 40, 25, 0.98) 0%, rgba(0, 60, 35, 0.98) 100%);
+        }
+        
+        /* Responsive header text that wraps at high zoom */
+        th {
+            padding: 15px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: clamp(10px, 0.9vw, 13px);
+            border-right: 1px solid rgba(0, 255, 157, 0.2);
+            position: relative;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+            line-height: 1.2;
+            vertical-align: middle;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+            white-space: normal;
+            min-width: 70px;
+        }
+        
+        /* Responsive cell content */
+        td {
+            padding: 10px 6px;
+            border-right: 1px solid rgba(0, 255, 157, 0.1);
+            font-size: clamp(11px, 0.85vw, 13px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            color: #e0f7e9;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+        
+        /* Allow cells with long content to wrap at high zoom */
+        @media screen and (max-width: 1800px) {
+            td {
+                white-space: normal;
+                word-break: break-word;
+                min-width: 80px;
+            }
+        }
+        
+        /* Responsive inputs */
+        input, select, .uneditable {
+            width: 100%;
+            padding: 6px 4px;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 3px;
+            font-size: clamp(10px, 0.85vw, 12px);
+            background: rgba(15, 30, 25, 0.8);
+            color: #e0f7e9;
+            box-sizing: border-box;
+        }
+        
+        /* Ensure delete button fits */
+        .delete-btn {
+            padding: 5px 6px;
+            font-size: clamp(10px, 0.85vw, 12px);
+            white-space: nowrap;
+        }
+        
+        /* Column-specific responsive widths - for Compensation */
+        th:nth-child(1), td:nth-child(1) { min-width: 60px; } /* Seq No */
+        th:nth-child(2), td:nth-child(2) { min-width: 120px; } /* TIN Number */
+        th:nth-child(3), td:nth-child(3) { min-width: 100px; } /* Last Name */
+        th:nth-child(4), td:nth-child(4) { min-width: 100px; } /* First Name */
+        th:nth-child(5), td:nth-child(5) { min-width: 100px; } /* Middle Name */
+        th:nth-child(6), td:nth-child(6) { min-width: 90px; } /* Daily Rate */
+        th:nth-child(7), td:nth-child(7) { min-width: 100px; } /* Basic Salary */
+        th:nth-child(8), td:nth-child(8) { min-width: 150px; } /* Allowances */
+        th:nth-child(9), td:nth-child(9) { min-width: 120px; } /* De Minimis */
+        th:nth-child(10), td:nth-child(10) { min-width: 110px; } /* 13th Month */
+        th:nth-child(11), td:nth-child(11) { min-width: 120px; } /* Total Compensation */
+        th:nth-child(12), td:nth-child(12) { min-width: 110px; } /* SSS Share */
+        th:nth-child(13), td:nth-child(13) { min-width: 120px; } /* PhilHealth */
+        th:nth-child(14), td:nth-child(14) { min-width: 110px; } /* Pag-ibig */
+        th:nth-child(15), td:nth-child(15) { min-width: 150px; } /* Total Contributions */
+        th:nth-child(16), td:nth-child(16) { min-width: 120px; } /* Total Deduction */
+        th:nth-child(17), td:nth-child(17) { min-width: 150px; } /* Taxable Compensation */
+        th:nth-child(18), td:nth-child(18) { min-width: 120px; } /* Exemption */
+        th:nth-child(19), td:nth-child(19) { min-width: 140px; } /* Net Taxable */
+        th:nth-child(20), td:nth-child(20) { min-width: 70px; } /* Action */
+        
+        /* Zoom level specific adjustments */
+        @media screen and (min-resolution: 120dpi) { /* 125% zoom */
+            th { font-size: 11px; padding: 10px 4px; }
+            td { font-size: 11px; padding: 8px 4px; }
+            input, select { font-size: 10px; padding: 5px 3px; }
+        }
+        
+        @media screen and (min-resolution: 144dpi) { /* 150% zoom */
+            th { font-size: 10px; padding: 8px 3px; }
+            td { font-size: 10px; padding: 6px 3px; }
+            input, select { font-size: 9px; padding: 4px 2px; }
+        }
+        
+        @media screen and (min-resolution: 168dpi) { /* 175% zoom */
+            th { font-size: 9px; padding: 6px 2px; letter-spacing: 0.2px; }
+            td { font-size: 9px; padding: 5px 2px; }
+            input, select { font-size: 8px; padding: 3px 2px; }
+        }
+        
+        @media screen and (min-resolution: 192dpi) { /* 200% zoom */
+            th { font-size: 8px; padding: 5px 2px; letter-spacing: 0.1px; }
+            td { font-size: 8px; padding: 4px 2px; }
+            input, select { font-size: 7px; padding: 2px 1px; }
+            .delete-btn { padding: 3px 4px; }
+        }
+        
+        /* Hidden state styles */
+        .company-info-section.hidden,
+        .stats.hidden,
+        .tally-section.hidden,
+        .footer.hidden {
+            display: none !important;
+        }
+        
+        /* Focus mode - when other sections are hidden, table takes full space */
+        body.table-focus-mode .company-info-section,
+        body.table-focus-mode .stats,
+        body.table-focus-mode .tally-section,
+        body.table-focus-mode .footer {
+            display: none !important;
+        }
+        
+        body.table-focus-mode .container {
+            height: 100vh;
+            margin: 0;
+            border-radius: 0;
+        }
+        
+        body.table-focus-mode .table-wrapper {
+            height: calc(100vh - 80px);
+        }
+        
+        /* Text truncation with ellipsis for very narrow columns */
+        .text-truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Validation message styling */
+        .validation-message {
+            display: none;
+            color: #ff6666;
+            font-size: 9px;
+            margin-top: 1px;
+            position: absolute;
+            background: rgba(0, 30, 20, 0.9);
+            padding: 2px 4px;
+            border-radius: 3px;
+            border: 1px solid #ff6666;
+            z-index: 100;
+        }
+        
+        td {
             position: relative;
         }
         
-        .container {
-            min-height: 200vh;
+        /* Sequence number styling */
+        .sequence-number {
+            text-align: center;
+            font-weight: 600;
+            color: #00ff9d;
         }
         
-        /* Optional: Add zoom controls */
+        /* Zoom controls - keep for compatibility but can be removed if not needed */
         .zoom-controls {
             position: fixed;
             bottom: 20px;
@@ -61,54 +273,134 @@
             text-align: center;
         }
         
-        /* Column width adjustments for compensation table */
-        th:nth-child(1) { width: 80px; } /* Sequence Number */
-        th:nth-child(2) { width: 120px; } /* TIN Number */
-        th:nth-child(3) { width: 120px; } /* Last Name */
-        th:nth-child(4) { width: 120px; } /* First Name */
-        th:nth-child(5) { width: 120px; } /* Middle Name */
-        th:nth-child(6) { width: 100px; } /* Daily Rate */
-        th:nth-child(7) { width: 120px; } /* Basic Salary */
-        th:nth-child(8) { width: 180px; } /* Holiday/Allowances/Overtime Pay */
-        th:nth-child(9) { width: 150px; } /* De Minimis Benefits */
-        th:nth-child(10) { width: 130px; } /* 13th Month Pay */
-        th:nth-child(11) { width: 150px; } /* Total Compensation */
-        th:nth-child(12) { width: 140px; } /* SSS Employee Share */
-        th:nth-child(13) { width: 150px; } /* PhilHealth Employee Share */
-        th:nth-child(14) { width: 140px; } /* Pag-ibig Employee Share */
-        th:nth-child(15) { width: 180px; } /* Total SSS, PHIC, and Pag-ibig */
-        th:nth-child(16) { width: 150px; } /* Total Deduction */
-        th:nth-child(17) { width: 180px; } /* Total Taxable Compensation */
-        th:nth-child(18) { width: 140px; } /* Exemption Amount */
-        th:nth-child(19) { width: 180px; } /* Net Taxable Compensation */
-        th:nth-child(20) { width: 90px; } /* Action */
+        /* Payroll period input styling */
+        #payrollPeriod {
+            width: 100%;
+        }
+        
+        /* Stat items adjustment for compensation */
+        .stats .stat-item {
+            min-width: 160px;
+        }
     </style>
 </head>
-<body class="loaded">
-    <div class="container">
-        <header>
-            <div class="logo-container">
-                <div class="logo-placeholder" id="logoPlaceholder">
-                    <div>MGAALogo.jpg</div>
-                </div>
-            </div>
-            <div class="header-text">
-                <h1><i class="fas fa-money-check-alt"></i> Compensation Data Tracker</h1>
-                <p>Employee Compensation, Benefits, and Tax Calculations</p>
-            </div>
-
-            <div class="header-right">
-                <a href="index.html" class="back-to-dashboard-btn">
-                    <i class="fas fa-home"></i> Back to Dashboard
-                </a>
-            </div>
-        </header>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar left-sidebar" id="leftSidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Payroll Menu</h2>
+            <button class="sidebar-toggle" id="leftSidebarToggle">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
         
-        <div class="company-info-section">
-            <h3 style="color: #00ff9d; margin-bottom: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);">
-                <i class="fas fa-building"></i> Company Information
-            </h3>
-            <div class="company-info-grid">
+        <div class="sidebar-content">
+            <nav class="sidebar-nav">
+                <!-- Dashboard Link -->
+                <a href="index.html" class="sidebar-btn">
+                    <i class="fas fa-home"></i>
+                    <span class="sidebar-btn-text">Dashboard</span>
+                </a>
+                
+                <div class="sidebar-divider"></div>
+                
+                <!-- Data Management Section -->
+                <div class="sidebar-section-title">DATA MANAGEMENT</div>
+
+                <!-- Select Multiple Button -->
+                <button class="sidebar-btn" id="selectMultipleBtn">
+                    <i class="fas fa-check-double"></i>
+                    <span class="sidebar-btn-text">Select Multiple</span>
+                </button>
+                
+                <button class="sidebar-btn" id="addRowBtn">
+                    <i class="fas fa-plus-circle"></i>
+                    <span class="sidebar-btn-text">Add New Employee</span>
+                </button>
+                
+                <button class="sidebar-btn" id="exportBtn">
+                    <i class="fas fa-file-excel"></i>
+                    <span class="sidebar-btn-text">Export to Excel</span>
+                </button>
+                
+                <button class="sidebar-btn" id="clearBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="sidebar-btn-text">Clear Table Data</span>
+                </button>
+                
+                <button class="sidebar-btn" id="clearInfoBtn">
+                    <i class="fas fa-eraser"></i>
+                    <span class="sidebar-btn-text">Clear Company Info</span>
+                </button>
+                
+                <div class="sidebar-divider"></div>
+                
+                <!-- Visibility Toggles Section -->
+                <div class="sidebar-section-title">VISIBILITY TOGGLES</div>
+                
+                <button class="sidebar-btn toggle-btn" id="toggleStatsBtn" data-target="stats">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="sidebar-btn-text">Hide Stats Summary</span>
+                </button>
+                
+                <button class="sidebar-btn toggle-btn" id="toggleTallyBtn" data-target="tally">
+                    <i class="fas fa-calculator"></i>
+                    <span class="sidebar-btn-text">Hide Tally Sections</span>
+                </button>
+                
+                <button class="sidebar-btn toggle-btn" id="toggleFooterBtn" data-target="footer">
+                    <i class="fas fa-copyright"></i>
+                    <span class="sidebar-btn-text">Hide Footer</span>
+                </button>
+                
+                <div class="sidebar-divider"></div>
+                
+                <!-- Quick Actions -->
+                <div class="sidebar-section-title">QUICK ACTIONS</div>
+                
+                <button class="sidebar-btn" id="hideAllBtn">
+                    <i class="fas fa-eye-slash"></i>
+                    <span class="sidebar-btn-text">Hide All Sections</span>
+                </button>
+                
+                <button class="sidebar-btn" id="showAllBtn">
+                    <i class="fas fa-eye"></i>
+                    <span class="sidebar-btn-text">Show All Sections</span>
+                </button>
+                
+                <!-- Table Focus Mode Toggle -->
+                <button class="sidebar-btn" id="tableFocusBtn">
+                    <i class="fas fa-table"></i>
+                    <span class="sidebar-btn-text">Table Focus Mode</span>
+                </button>
+                
+                <div class="sidebar-divider"></div>
+                
+                <!-- Navigation Links -->
+                <a href="index.html" class="sidebar-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="sidebar-btn-text">Back to Dashboard</span>
+                </a>
+            </nav>
+        </div>
+        
+        <div class="sidebar-footer">
+            <p>MGAA Expenses System v2.0</p>
+            <p>© 2026 All Rights Reserved</p>
+        </div>
+    </div>
+
+    <!-- Right Sidebar (Company Info) -->
+    <div class="sidebar right-sidebar" id="rightSidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Company Information</h2>
+            <button class="sidebar-toggle" id="rightSidebarToggle">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content company-info-sidebar">
+            <div class="company-info-grid-vertical">
                 <div class="info-group">
                     <label for="companyName">Company Name *</label>
                     <input type="text" id="companyName" placeholder="Enter company name">
@@ -142,25 +434,54 @@
                     <input type="email" id="email" placeholder="Enter email address">
                 </div>
             </div>
-        </div>
-        
-        <div class="controls">
-            <button class="btn btn-primary" id="addRowBtn">
-                <i class="fas fa-plus-circle"></i> Add New Row
-            </button>
-            <button class="btn btn-success" id="exportBtn">
-                <i class="fas fa-file-excel"></i> Export to Excel
-            </button>
-            <button class="btn btn-info" id="clearBtn">
-                <i class="fas fa-trash-alt"></i> Clear Table Data
-            </button>
-            <button class="btn btn-warning" id="clearInfoBtn">
-                <i class="fas fa-eraser"></i> Clear Company Info
-            </button>
-            <div style="margin-left: auto; font-size: 15px; font-weight: 500; color: #00ff9d; text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);">
-                <i class="fas fa-users"></i> <span id="rowCount">0</span> Employees
+            
+            <div class="company-info-actions">
+                <button class="sidebar-btn" id="clearInfoBtnSidebar">
+                    <i class="fas fa-eraser"></i>
+                    <span class="sidebar-btn-text">Clear Company Info</span>
+                </button>
             </div>
         </div>
+        
+        <div class="sidebar-footer">
+            <p>Company Details</p>
+            <p>Required fields marked with *</p>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <header>
+            <div class="logo-container">
+                <div class="logo-placeholder" id="logoPlaceholder">
+                    <!-- Logo will be loaded here -->
+                    <div>MGAALogo.jpg</div>
+                </div>
+            </div>
+            <div class="header-text">
+                <h1><i class="fas fa-money-check-alt"></i> Compensation Data Tracker</h1>
+                <p>Employee Compensation, Benefits, and Tax Calculations</p>
+            </div>
+            <div class="header-sidebar-buttons">
+                <!-- Entry Counter Button -->
+                <div class="header-entry-counter" id="entryCounterBtn">
+                    <i class="fas fa-users"></i>
+                    <span>Employees: <span id="entryCount">0</span></span>
+                </div>
+                
+                <!-- Left Sidebar Toggle Button -->
+                <div class="header-sidebar-toggle" id="headerLeftSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                    <span>Payroll Menu</span>
+                </div>
+                <!-- Right Sidebar Toggle Button -->
+                <div class="header-sidebar-toggle" id="headerRightSidebarToggle">
+                    <i class="fas fa-building"></i>
+                    <span>Company Information</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Company Info Section removed from main area - now in right sidebar -->
         
         <div class="table-wrapper">
             <table id="compensationTable">
@@ -221,913 +542,2103 @@
         </div>
         
         <div class="footer">
-            <p>© 2025 Compensation Data Tracker | Professional Employee Compensation Tracking System</p>
+            <p>© 2026 Compensation Data Tracker | Professional Employee Compensation Tracking System</p>
         </div>
     </div>
 
     <script>
-        // Initialize the table with one empty row
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set default date for payroll
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('payrollDate').value = today;
+// ============================================================================
+// COMPENSATION DATA TRACKER - COMPLETE JAVASCRIPT
+// ============================================================================
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date for payroll
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('payrollDate').value = today;
+    
+    // Try to load the logo
+    loadLogo();
+    
+    // Load saved company info if exists
+    loadCompanyInfo();
+    
+    // Initialize table with one empty row
+    addNewRow();
+    updateRowCount(); // This will update both row count and entry counter
+    updateTotals();
+    updateSummaryRow();
+    
+    // Add event listeners for company info to save automatically
+    document.querySelectorAll('.company-info-sidebar input').forEach(input => {
+        input.addEventListener('input', saveCompanyInfo);
+        input.addEventListener('change', saveCompanyInfo);
+    });
+    
+    // Format company TIN input
+    const companyTIN = document.getElementById('companyTIN');
+    if (companyTIN) {
+        companyTIN.addEventListener('input', function(e) {
+            formatTIN(e.target);
+        });
+    }
+    
+    // ===== SIDEBAR FUNCTIONALITY =====
+    initSidebarFunctionality();
+    
+    // ===== BUTTON EVENT LISTENERS =====
+    initButtonListeners();
+    
+    // ===== ADVANCED FEATURES =====
+    initVisibilityToggles();
+    initSelectMultiple();
+    initZoomDetection();
+    
+    // Add subtle background animation
+    createBackgroundEffects();
+    
+    // Add interactive cursor effect
+    initCursorEffect();
+});
+
+// ===== LOGO FUNCTIONS =====
+function loadLogo() {
+    const logoPlaceholder = document.getElementById('logoPlaceholder');
+    if (!logoPlaceholder) return;
+    
+    // Try to load from local file
+    const logoUrl = 'MGAALogo.jpg';
+    const img = new Image();
+    
+    img.onload = function() {
+        logoPlaceholder.innerHTML = '';
+        logoPlaceholder.appendChild(img);
+        // Add neon effect to logo
+        img.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 157, 0.7))';
+    };
+    
+    img.onerror = function() {
+        // If logo not found, keep the placeholder text
+        console.log('Logo not found at ' + logoUrl + ', using placeholder');
+        logoPlaceholder.style.textShadow = '0 0 10px rgba(0, 255, 157, 0.7)';
+    };
+    
+    img.src = logoUrl;
+}
+
+// ===== COMPANY INFO FUNCTIONS =====
+function saveCompanyInfo() {
+    const companyInfo = {
+        name: document.getElementById('companyName')?.value || '',
+        tin: document.getElementById('companyTIN')?.value || '',
+        address: document.getElementById('companyAddress')?.value || '',
+        business: document.getElementById('lineOfBusiness')?.value || '',
+        period: document.getElementById('payrollPeriod')?.value || '',
+        date: document.getElementById('payrollDate')?.value || '',
+        officer: document.getElementById('authorizedEmployee')?.value || '',
+        email: document.getElementById('email')?.value || ''
+    };
+    localStorage.setItem('compensationCompanyInfo', JSON.stringify(companyInfo));
+}
+
+function loadCompanyInfo() {
+    const savedInfo = localStorage.getItem('compensationCompanyInfo');
+    if (savedInfo) {
+        const companyInfo = JSON.parse(savedInfo);
+        if (document.getElementById('companyName')) document.getElementById('companyName').value = companyInfo.name || '';
+        if (document.getElementById('companyTIN')) document.getElementById('companyTIN').value = companyInfo.tin || '';
+        if (document.getElementById('companyAddress')) document.getElementById('companyAddress').value = companyInfo.address || '';
+        if (document.getElementById('lineOfBusiness')) document.getElementById('lineOfBusiness').value = companyInfo.business || '';
+        if (document.getElementById('payrollPeriod')) document.getElementById('payrollPeriod').value = companyInfo.period || '';
+        if (document.getElementById('payrollDate')) document.getElementById('payrollDate').value = companyInfo.date || new Date().toISOString().split('T')[0];
+        if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = companyInfo.officer || '';
+        if (document.getElementById('email')) document.getElementById('email').value = companyInfo.email || '';
+    }
+}
+
+function clearCompanyInfo() {
+    if (document.getElementById('companyName')) document.getElementById('companyName').value = '';
+    if (document.getElementById('companyTIN')) document.getElementById('companyTIN').value = '';
+    if (document.getElementById('companyAddress')) document.getElementById('companyAddress').value = '';
+    if (document.getElementById('lineOfBusiness')) document.getElementById('lineOfBusiness').value = '';
+    if (document.getElementById('payrollPeriod')) document.getElementById('payrollPeriod').value = '';
+    if (document.getElementById('payrollDate')) document.getElementById('payrollDate').value = new Date().toISOString().split('T')[0];
+    if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = '';
+    if (document.getElementById('email')) document.getElementById('email').value = '';
+    localStorage.removeItem('compensationCompanyInfo');
+}
+
+// ===== TABLE ROW FUNCTIONS =====
+function addNewRow() {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    const rowCount = tableBody.children.length + 1;
+    const rowId = 'row_' + Date.now() + '_' + rowCount;
+    
+    const row = document.createElement('tr');
+    row.id = rowId;
+    
+    row.innerHTML = `
+        <td>
+            <div class="uneditable sequence-number">${rowCount}</div>
+        </td>
+        <td style="position: relative;">
+            <input type="text" class="editable employee-tin tin-input" maxlength="15" placeholder="000-000-000-000">
+            <div class="validation-message" style="display: none; position: absolute; bottom: -20px; left: 0; right: 0;">TIN must be 12 digits</div>
+        </td>
+        <td>
+            <input type="text" class="editable last-name" placeholder="Last name">
+        </td>
+        <td>
+            <input type="text" class="editable first-name" placeholder="First name">
+        </td>
+        <td>
+            <input type="text" class="editable middle-name" placeholder="Middle name">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable daily-rate" placeholder="0.00">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable basic-salary" placeholder="0.00">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable allowances" placeholder="0.00">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable de-minimis" placeholder="0.00">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable thirteenth-month" placeholder="0.00">
+        </td>
+        <td>
+            <div class="uneditable total-compensation">0.00</div>
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable sss-share" placeholder="0.00">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable philhealth-share" placeholder="0.00">
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable pagibig-share" placeholder="0.00">
+        </td>
+        <td>
+            <div class="uneditable total-contributions">0.00</div>
+        </td>
+        <td>
+            <div class="uneditable total-deduction">0.00</div>
+        </td>
+        <td>
+            <div class="uneditable total-taxable-compensation">0.00</div>
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0" class="editable exemption-amount" placeholder="0.00">
+        </td>
+        <td>
+            <div class="uneditable net-taxable-compensation">0.00</div>
+        </td>
+        <td>
+            <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    tableBody.appendChild(row);
+    
+    // Add event listeners to the new row
+    const editableInputs = row.querySelectorAll('.editable');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        });
+        
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        });
+    });
+    
+    // Special handling for TIN input
+    const tinInput = row.querySelector('.employee-tin');
+    if (tinInput) {
+        tinInput.addEventListener('input', function(e) {
+            formatTIN(e.target);
+        });
+        
+        tinInput.addEventListener('blur', function(e) {
+            validateTIN(e.target);
+        });
+    }
+    
+    // Add neon effect to new row inputs on focus
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+        });
+    });
+    
+    updateRowCount();
+}
+
+function deleteRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row && confirm('Are you sure you want to delete this row?')) {
+        // Add fade out effect
+        row.style.transition = 'all 0.3s ease';
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+            row.remove();
+            updateRowCount(); // This will update both row count and entry counter
+            updateTotals();
+            updateSummaryRow();
+        }, 300);
+    }
+}
+
+function clearAllData() {
+    const tableBody = document.getElementById('tableBody');
+    if (tableBody) {
+        tableBody.innerHTML = '';
+        addNewRow();
+        updateRowCount(); // This will update both row count and entry counter
+        updateTotals();
+        updateSummaryRow();
+    }
+}
+
+// ===== CALCULATION FUNCTIONS =====
+function updateCalculations(row) {
+    // Get values from inputs
+    const basicSalary = parseFloat(row.querySelector('.basic-salary')?.value) || 0;
+    const allowances = parseFloat(row.querySelector('.allowances')?.value) || 0;
+    const deMinimis = parseFloat(row.querySelector('.de-minimis')?.value) || 0;
+    const thirteenthMonth = parseFloat(row.querySelector('.thirteenth-month')?.value) || 0;
+    const sssShare = parseFloat(row.querySelector('.sss-share')?.value) || 0;
+    const philhealthShare = parseFloat(row.querySelector('.philhealth-share')?.value) || 0;
+    const pagibigShare = parseFloat(row.querySelector('.pagibig-share')?.value) || 0;
+    const exemptionAmount = parseFloat(row.querySelector('.exemption-amount')?.value) || 0;
+    
+    // Calculate Total Compensation: Basic Salary + Allowances + De Minimis + 13th Month Pay
+    const totalCompensation = basicSalary + allowances + deMinimis + thirteenthMonth;
+    const totalCompensationEl = row.querySelector('.total-compensation');
+    if (totalCompensationEl) totalCompensationEl.textContent = totalCompensation.toFixed(2);
+    
+    // Calculate Total Contributions: SSS + PhilHealth + Pag-ibig
+    const totalContributions = sssShare + philhealthShare + pagibigShare;
+    const totalContributionsEl = row.querySelector('.total-contributions');
+    if (totalContributionsEl) totalContributionsEl.textContent = totalContributions.toFixed(2);
+    
+    // Calculate Total Deduction: Total Contributions - De Minimis - 13th Month Pay
+    const totalDeduction = totalContributions - deMinimis - thirteenthMonth;
+    const totalDeductionEl = row.querySelector('.total-deduction');
+    if (totalDeductionEl) totalDeductionEl.textContent = totalDeduction.toFixed(2);
+    
+    // Calculate Total Taxable Compensation: Total Compensation - Total Deduction
+    const totalTaxableCompensation = totalCompensation - totalDeduction;
+    const totalTaxableCompensationEl = row.querySelector('.total-taxable-compensation');
+    if (totalTaxableCompensationEl) totalTaxableCompensationEl.textContent = totalTaxableCompensation.toFixed(2);
+    
+    // Calculate Net Taxable Compensation: Total Taxable Compensation - Exemption Amount
+    const netTaxableCompensation = Math.max(0, totalTaxableCompensation - exemptionAmount);
+    const netTaxableCompensationEl = row.querySelector('.net-taxable-compensation');
+    if (netTaxableCompensationEl) netTaxableCompensationEl.textContent = netTaxableCompensation.toFixed(2);
+}
+
+// ===== TIN FORMATTING FUNCTIONS =====
+function formatTIN(input) {
+    if (!input) return;
+    
+    // Remove all non-digit characters
+    let value = input.value.replace(/\D/g, '');
+    
+    // Limit to 12 digits
+    if (value.length > 12) {
+        value = value.substring(0, 12);
+    }
+    
+    // Add dashes after every 3 digits
+    if (value.length > 9) {
+        value = value.substring(0, 9) + '-' + value.substring(9);
+    }
+    if (value.length > 6) {
+        value = value.substring(0, 6) + '-' + value.substring(6);
+    }
+    if (value.length > 3) {
+        value = value.substring(0, 3) + '-' + value.substring(3);
+    }
+    
+    input.value = value;
+}
+
+function validateTIN(input) {
+    if (!input) return;
+    
+    const value = input.value.replace(/\D/g, '');
+    const validationMessage = input.nextElementSibling;
+    
+    if (value.length === 12) {
+        if (validationMessage) validationMessage.style.display = 'none';
+        input.style.borderColor = '#00ff9d';
+        input.style.boxShadow = '0 0 5px rgba(0, 255, 157, 0.5), inset 0 0 10px rgba(0, 255, 157, 0.1)';
+    } else if (value.length > 0) {
+        if (validationMessage) validationMessage.style.display = 'block';
+        input.style.borderColor = '#ff6666';
+        input.style.boxShadow = '0 0 5px rgba(255, 102, 102, 0.5), inset 0 0 10px rgba(255, 102, 102, 0.1)';
+    } else {
+        if (validationMessage) validationMessage.style.display = 'none';
+        input.style.borderColor = 'rgba(0, 255, 157, 0.3)';
+        input.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+    }
+}
+
+// ===== UPDATE FUNCTIONS =====
+function updateRowCount() {
+    const tableBody = document.getElementById('tableBody');
+    const rowCount = tableBody ? tableBody.children.length : 0;
+    const rowCountEl = document.getElementById('rowCount');
+    if (rowCountEl) rowCountEl.textContent = rowCount;
+    
+    // Update entry counter
+    updateEntryCounter();
+    
+    // Update sequence numbers
+    const rows = tableBody?.querySelectorAll('tr') || [];
+    rows.forEach((row, index) => {
+        const seqNumber = row.querySelector('.sequence-number');
+        if (seqNumber) {
+            seqNumber.textContent = index + 1;
+        }
+    });
+}
+
+function updateEntryCounter() {
+    const tableBody = document.getElementById('tableBody');
+    const count = tableBody ? tableBody.children.length : 0;
+    const entryCountSpan = document.getElementById('entryCount');
+    
+    if (entryCountSpan) {
+        // Add pulse animation
+        entryCountSpan.classList.add('pulse');
+        
+        // Update the count
+        entryCountSpan.textContent = count;
+        
+        // Remove animation after it completes
+        setTimeout(() => {
+            entryCountSpan.classList.remove('pulse');
+        }, 300);
+        
+        // Update the button tooltip with additional info
+        const counterBtn = document.getElementById('entryCounterBtn');
+        if (counterBtn) {
+            if (count === 0) {
+                counterBtn.setAttribute('title', 'No employees. Click to add a new employee.');
+            } else if (count === 1) {
+                counterBtn.setAttribute('title', '1 employee currently in the payroll');
+            } else {
+                counterBtn.setAttribute('title', `${count} employees currently in the payroll`);
+            }
+        }
+    }
+}
+
+function updateTotals() {
+    let totalCompensation = 0;
+    let totalDeductions = 0;
+    let totalTaxableCompensation = 0;
+    let totalDailyRate = 0;
+    let employeeCount = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        const compensation = parseFloat(row.querySelector('.total-compensation')?.textContent) || 0;
+        const deduction = parseFloat(row.querySelector('.total-deduction')?.textContent) || 0;
+        const taxableCompensation = parseFloat(row.querySelector('.total-taxable-compensation')?.textContent) || 0;
+        const dailyRate = parseFloat(row.querySelector('.daily-rate')?.value) || 0;
+        
+        totalCompensation += compensation;
+        totalDeductions += deduction;
+        totalTaxableCompensation += taxableCompensation;
+        totalDailyRate += dailyRate;
+        employeeCount++;
+    });
+    
+    const totalEmployeesEl = document.getElementById('totalEmployees');
+    const totalCompensationEl = document.getElementById('totalCompensation');
+    const totalDeductionsEl = document.getElementById('totalDeductions');
+    const totalTaxableCompensationEl = document.getElementById('totalTaxableCompensation');
+    const averageDailyRateEl = document.getElementById('averageDailyRate');
+    
+    if (totalEmployeesEl) totalEmployeesEl.textContent = employeeCount;
+    if (totalCompensationEl) totalCompensationEl.textContent = totalCompensation.toFixed(2);
+    if (totalDeductionsEl) totalDeductionsEl.textContent = totalDeductions.toFixed(2);
+    if (totalTaxableCompensationEl) totalTaxableCompensationEl.textContent = totalTaxableCompensation.toFixed(2);
+    if (averageDailyRateEl) averageDailyRateEl.textContent = employeeCount > 0 ? (totalDailyRate / employeeCount).toFixed(2) : '0.00';
+}
+
+function updateSummaryRow() {
+    let totalBasicSalary = 0;
+    let totalAllowances = 0;
+    let totalDeMinimis = 0;
+    let totalThirteenthMonth = 0;
+    let totalCompensation = 0;
+    let totalSSS = 0;
+    let totalPhilhealth = 0;
+    let totalPagibig = 0;
+    let totalDeductions = 0;
+    let totalTaxableCompensation = 0;
+    let totalNetTaxableCompensation = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        totalBasicSalary += parseFloat(row.querySelector('.basic-salary')?.value) || 0;
+        totalAllowances += parseFloat(row.querySelector('.allowances')?.value) || 0;
+        totalDeMinimis += parseFloat(row.querySelector('.de-minimis')?.value) || 0;
+        totalThirteenthMonth += parseFloat(row.querySelector('.thirteenth-month')?.value) || 0;
+        totalCompensation += parseFloat(row.querySelector('.total-compensation')?.textContent) || 0;
+        totalSSS += parseFloat(row.querySelector('.sss-share')?.value) || 0;
+        totalPhilhealth += parseFloat(row.querySelector('.philhealth-share')?.value) || 0;
+        totalPagibig += parseFloat(row.querySelector('.pagibig-share')?.value) || 0;
+        totalDeductions += parseFloat(row.querySelector('.total-deduction')?.textContent) || 0;
+        totalTaxableCompensation += parseFloat(row.querySelector('.total-taxable-compensation')?.textContent) || 0;
+        totalNetTaxableCompensation += parseFloat(row.querySelector('.net-taxable-compensation')?.textContent) || 0;
+    });
+    
+    const summaryRow = document.getElementById('summaryRow');
+    if (summaryRow) {
+        summaryRow.innerHTML = `
+            <tr class="summary-row">
+                <td colspan="6" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
+                <td class="uneditable">${totalBasicSalary.toFixed(2)}</td>
+                <td class="uneditable">${totalAllowances.toFixed(2)}</td>
+                <td class="uneditable">${totalDeMinimis.toFixed(2)}</td>
+                <td class="uneditable">${totalThirteenthMonth.toFixed(2)}</td>
+                <td class="uneditable">${totalCompensation.toFixed(2)}</td>
+                <td class="uneditable">${totalSSS.toFixed(2)}</td>
+                <td class="uneditable">${totalPhilhealth.toFixed(2)}</td>
+                <td class="uneditable">${totalPagibig.toFixed(2)}</td>
+                <td class="uneditable">${(totalSSS + totalPhilhealth + totalPagibig).toFixed(2)}</td>
+                <td class="uneditable">${totalDeductions.toFixed(2)}</td>
+                <td class="uneditable">${totalTaxableCompensation.toFixed(2)}</td>
+                <td>-</td>
+                <td class="uneditable">${totalNetTaxableCompensation.toFixed(2)}</td>
+                <td>-</td>
+            </tr>
+        `;
+    }
+}
+
+// ===== EXPORT FUNCTION =====
+function exportToExcel() {
+    // Validate required company info
+    const companyName = document.getElementById('companyName')?.value.trim();
+    const companyTIN = document.getElementById('companyTIN')?.value.trim();
+    const companyAddress = document.getElementById('companyAddress')?.value.trim();
+    const lineOfBusiness = document.getElementById('lineOfBusiness')?.value.trim();
+    const authorizedEmployee = document.getElementById('authorizedEmployee')?.value.trim();
+    
+    if (!companyName || !companyTIN || !companyAddress || !lineOfBusiness || !authorizedEmployee) {
+        alert('Please fill in all required company information fields (marked with *) before exporting.');
+        return;
+    }
+    
+    // Create HTML content for Excel with professional styling
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    const formattedTime = today.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute:'2-digit', 
+        hour12: true 
+    });
+    
+    // Calculate totals for the report
+    const totalEmployees = document.getElementById('totalEmployees')?.textContent || '0';
+    const totalCompensation = parseFloat(document.getElementById('totalCompensation')?.textContent) || 0;
+    const totalDeductions = parseFloat(document.getElementById('totalDeductions')?.textContent) || 0;
+    const totalTaxableCompensation = parseFloat(document.getElementById('totalTaxableCompensation')?.textContent) || 0;
+    const netPayroll = totalCompensation - totalDeductions;
+    
+    let htmlContent = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta charset="UTF-8">
+            <!--[if gte mso 9]>
+            <xml>
+                <x:ExcelWorkbook>
+                    <x:ExcelWorksheets>
+                        <x:ExcelWorksheet>
+                            <x:Name>Compensation Report</x:Name>
+                            <x:WorksheetOptions>
+                                <x:DisplayGridlines/>
+                                <x:Print>
+                                    <x:ValidPrinterInfo/>
+                                    <x:PaperSizeIndex>9</x:PaperSizeIndex>
+                                    <x:HorizontalResolution>600</x:HorizontalResolution>
+                                    <x:VerticalResolution>600</x:VerticalResolution>
+                                    <x:FitToPage>1</x:FitToPage>
+                                    <x:FitWidth>1</x:FitWidth>
+                                    <x:FitHeight>100</x:FitHeight>
+                                </x:Print>
+                                <x:Selected/>
+                                <x:ProtectContents>False</x:ProtectContents>
+                                <x:ProtectObjects>False</x:ProtectObjects>
+                                <x:ProtectScenarios>False</x:ProtectScenarios>
+                                <x:FreezePanes/>
+                                <x:FrozenNoSplit/>
+                                <x:SplitHorizontal>6</x:SplitHorizontal>
+                                <x:TopRowBottomPane>6</x:TopRowBottomPane>
+                                <x:ActivePane>2</x:ActivePane>
+                                <x:Panes>
+                                    <x:Pane>
+                                        <x:Number>3</x:Number>
+                                    </x:Pane>
+                                    <x:Pane>
+                                        <x:Number>2</x:Number>
+                                        <x:ActiveRow>0</x:ActiveRow>
+                                        <x:ActiveCol>5</x:ActiveCol>
+                                    </x:Pane>
+                                </x:Panes>
+                            </x:WorksheetOptions>
+                        </x:ExcelWorksheet>
+                    </x:ExcelWorksheets>
+                    <x:WindowHeight>9000</x:WindowHeight>
+                    <x:WindowWidth>15360</x:WindowWidth>
+                    <x:WindowTopX>0</x:WindowTopX>
+                    <x:WindowTopY>0</x:WindowTopY>
+                    <x:ProtectStructure>False</x:ProtectStructure>
+                    <x:ProtectWindows>False</x:ProtectWindows>
+                </x:ExcelWorkbook>
+            </xml>
+            <![endif]-->
+            <style>
+                * {
+                    font-family: 'Calibri', 'Arial', sans-serif;
+                    mso-font-charset: 0;
+                }
+                
+                body {
+                    margin: 20px;
+                }
+                
+                .report-title {
+                    font-size: 24pt;
+                    font-weight: bold;
+                    color: #006837;
+                    text-align: center;
+                    margin-bottom: 10px;
+                    border-bottom: 3px solid #00cc7a;
+                    padding-bottom: 10px;
+                }
+                
+                .company-header {
+                    background-color: #f0f9f5;
+                    border: 2px solid #00cc7a;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    border-radius: 8px;
+                }
+                
+                .company-info-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                
+                .company-info-table td {
+                    padding: 5px 10px;
+                    vertical-align: top;
+                }
+                
+                .company-label {
+                    font-weight: bold;
+                    color: #006837;
+                    width: 180px;
+                    white-space: nowrap;
+                }
+                
+                .company-value {
+                    color: #333333;
+                }
+                
+                .data-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                    font-size: 9pt;
+                }
+                
+                .data-table th {
+                    background-color: #006837;
+                    color: white;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 8px 4px;
+                    border: 1px solid #004d26;
+                    white-space: nowrap;
+                    vertical-align: middle;
+                }
+                
+                .data-table td {
+                    padding: 6px 4px;
+                    border: 1px solid #cccccc;
+                    vertical-align: middle;
+                }
+                
+                .text-left { text-align: left; }
+                .text-center { text-align: center; }
+                .text-right { text-align: right; }
+                
+                .currency {
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    text-align: right;
+                    white-space: nowrap;
+                    mso-number-format: "#,##0.00";
+                }
+                
+                .summary-row {
+                    background-color: #fff2cc;
+                    font-weight: bold;
+                }
+                
+                .summary-row td {
+                    border-top: 2px solid #ff9900;
+                    border-bottom: 2px solid #ff9900;
+                }
+                
+                .section-title {
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: #006837;
+                    margin-top: 25px;
+                    margin-bottom: 10px;
+                    padding-bottom: 5px;
+                    border-bottom: 1px solid #00cc7a;
+                }
+                
+                .totals-section {
+                    margin-top: 25px;
+                    background-color: #f0f9f5;
+                    border: 1px solid #00cc7a;
+                    padding: 15px;
+                    border-radius: 8px;
+                }
+                
+                .totals-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                
+                .totals-table td {
+                    padding: 8px 15px;
+                    border: none;
+                }
+                
+                .total-label {
+                    font-weight: bold;
+                    color: #006837;
+                    text-align: right;
+                    width: 60%;
+                }
+                
+                .total-value {
+                    font-weight: bold;
+                    color: #333333;
+                    text-align: right;
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    border-bottom: 1px dotted #cccccc;
+                }
+                
+                .footer {
+                    margin-top: 30px;
+                    padding-top: 15px;
+                    border-top: 1px solid #cccccc;
+                    color: #666666;
+                    font-size: 9pt;
+                    text-align: center;
+                }
+            </style>
+            <title>Compensation Report - ${formattedDate}</title>
+        </head>
+        <body>
+            <div class="report-title">EMPLOYEE COMPENSATION REPORT</div>
             
-            // Try to load the logo
-            loadLogo();
+            <div class="company-header">
+                <table class="company-info-table">
+                    <tr>
+                        <td class="company-label">Company Name:</td>
+                        <td class="company-value">${companyName}</td>
+                        <td class="company-label">TIN Number:</td>
+                        <td class="company-value">${companyTIN}</td>
+                    </tr>
+                    <tr>
+                        <td class="company-label">Address:</td>
+                        <td class="company-value">${companyAddress}</td>
+                        <td class="company-label">Line of Business:</td>
+                        <td class="company-value">${lineOfBusiness}</td>
+                    </tr>
+                    <tr>
+                        <td class="company-label">Payroll Period:</td>
+                        <td class="company-value">${document.getElementById('payrollPeriod')?.value.trim() || 'N/A'}</td>
+                        <td class="company-label">Payroll Date:</td>
+                        <td class="company-value">${document.getElementById('payrollDate')?.value || ''}</td>
+                    </tr>
+                    <tr>
+                        <td class="company-label">Payroll Officer:</td>
+                        <td class="company-value">${authorizedEmployee}</td>
+                        <td class="company-label">Email:</td>
+                        <td class="company-value">${document.getElementById('email')?.value.trim() || 'N/A'}</td>
+                    </tr>
+                </table>
+            </div>
             
-            // Load saved company info if exists
-            loadCompanyInfo();
+            <div class="section-title">Employee Compensation Details</div>
             
-            // Initialize table
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Seq No</th>
+                        <th>TIN Number</th>
+                        <th>Last Name</th>
+                        <th>First Name</th>
+                        <th>Middle Name</th>
+                        <th>Daily Rate</th>
+                        <th>Basic Salary</th>
+                        <th>Allowances/Overtime</th>
+                        <th>De Minimis</th>
+                        <th>13th Month</th>
+                        <th>Total Comp</th>
+                        <th>SSS Share</th>
+                        <th>PhilHealth</th>
+                        <th>Pag-ibig</th>
+                        <th>Total Contrib</th>
+                        <th>Total Deduct</th>
+                        <th>Taxable Comp</th>
+                        <th>Exemption</th>
+                        <th>Net Taxable</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Add data rows
+    const rows = document.querySelectorAll('#tableBody tr');
+    let rowNumber = 1;
+    
+    rows.forEach(row => {
+        const sequence = row.querySelector('.sequence-number')?.textContent || '';
+        const tin = row.querySelector('.employee-tin')?.value || '';
+        const lastName = row.querySelector('.last-name')?.value || '';
+        const firstName = row.querySelector('.first-name')?.value || '';
+        const middleName = row.querySelector('.middle-name')?.value || '';
+        const dailyRate = parseFloat(row.querySelector('.daily-rate')?.value) || 0;
+        const basicSalary = parseFloat(row.querySelector('.basic-salary')?.value) || 0;
+        const allowances = parseFloat(row.querySelector('.allowances')?.value) || 0;
+        const deMinimis = parseFloat(row.querySelector('.de-minimis')?.value) || 0;
+        const thirteenthMonth = parseFloat(row.querySelector('.thirteenth-month')?.value) || 0;
+        const totalCompensation = parseFloat(row.querySelector('.total-compensation')?.textContent) || 0;
+        const sssShare = parseFloat(row.querySelector('.sss-share')?.value) || 0;
+        const philhealthShare = parseFloat(row.querySelector('.philhealth-share')?.value) || 0;
+        const pagibigShare = parseFloat(row.querySelector('.pagibig-share')?.value) || 0;
+        const totalContributions = parseFloat(row.querySelector('.total-contributions')?.textContent) || 0;
+        const totalDeduction = parseFloat(row.querySelector('.total-deduction')?.textContent) || 0;
+        const totalTaxableCompensation = parseFloat(row.querySelector('.total-taxable-compensation')?.textContent) || 0;
+        const exemptionAmount = parseFloat(row.querySelector('.exemption-amount')?.value) || 0;
+        const netTaxableCompensation = parseFloat(row.querySelector('.net-taxable-compensation')?.textContent) || 0;
+        
+        // Alternate row background for readability
+        const rowClass = rowNumber % 2 === 0 ? 'highlight' : '';
+        
+        htmlContent += `
+            <tr class="${rowClass}">
+                <td class="text-center">${sequence}</td>
+                <td class="text-center">${tin}</td>
+                <td class="text-left">${lastName}</td>
+                <td class="text-left">${firstName}</td>
+                <td class="text-left">${middleName}</td>
+                <td class="currency">${dailyRate.toFixed(2)}</td>
+                <td class="currency">${basicSalary.toFixed(2)}</td>
+                <td class="currency">${allowances.toFixed(2)}</td>
+                <td class="currency">${deMinimis.toFixed(2)}</td>
+                <td class="currency">${thirteenthMonth.toFixed(2)}</td>
+                <td class="currency">${totalCompensation.toFixed(2)}</td>
+                <td class="currency">${sssShare.toFixed(2)}</td>
+                <td class="currency">${philhealthShare.toFixed(2)}</td>
+                <td class="currency">${pagibigShare.toFixed(2)}</td>
+                <td class="currency">${totalContributions.toFixed(2)}</td>
+                <td class="currency">${totalDeduction.toFixed(2)}</td>
+                <td class="currency">${totalTaxableCompensation.toFixed(2)}</td>
+                <td class="currency">${exemptionAmount.toFixed(2)}</td>
+                <td class="currency">${netTaxableCompensation.toFixed(2)}</td>
+            </tr>
+        `;
+        
+        rowNumber++;
+    });
+    
+    // Calculate summary data for footer
+    const summaryData = calculateSummaryData();
+    
+    // Add summary row
+    htmlContent += `
+                </tbody>
+                <tfoot>
+                    <tr class="summary-row">
+                        <td colspan="6" class="text-right" style="font-weight: bold;">TOTALS:</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalBasicSalary.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalAllowances.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalDeMinimis.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalThirteenthMonth.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalCompensation.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalSSS.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalPhilhealth.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalPagibig.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalContributions.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalDeductions.toFixed(2)}</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalTaxableCompensation.toFixed(2)}</td>
+                        <td>-</td>
+                        <td class="currency" style="font-weight: bold;">${summaryData.totalNetTaxableCompensation.toFixed(2)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="totals-section">
+                <div class="section-title">Compensation Summary</div>
+                <table class="totals-table">
+                    <tr>
+                        <td class="total-label">Total Employees:</td>
+                        <td class="total-value">${totalEmployees}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Gross Compensation:</td>
+                        <td class="total-value">₱ ${totalCompensation.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Deductions:</td>
+                        <td class="total-value">₱ ${totalDeductions.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Taxable Compensation:</td>
+                        <td class="total-value">₱ ${totalTaxableCompensation.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label" style="border-top: 1px solid #00cc7a; padding-top: 10px;">Net Payroll Amount:</td>
+                        <td class="total-value" style="border-top: 1px solid #00cc7a; padding-top: 10px; font-size: 11pt; color: #006837;">
+                            ₱ ${netPayroll.toFixed(2)}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="footer">
+                <p>Report generated on ${formattedDate} at ${formattedTime}</p>
+                <p>Total Employees: ${totalEmployees} | Authorized by: ${authorizedEmployee}</p>
+                <p>Prepared by: Compensation Data Tracker System</p>
+                <p>This is a computer-generated report. No signature is required.</p>
+                <p>© ${new Date().getFullYear()} Compensation Data Tracker - Professional Employee Compensation Tracking System</p>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    // Create download link for XLS file
+    const blob = new Blob([htmlContent], {type: 'application/vnd.ms-excel'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const fileName = `Compensation_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 100);
+    
+    // Show success message
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Detailed employee compensation\n• Contribution breakdown\n• Tax calculations\n• ${rowNumber - 1} employees processed\n• Print-ready layout`);
+}
+
+// Helper function to calculate summary data for export
+function calculateSummaryData() {
+    let totalBasicSalary = 0;
+    let totalAllowances = 0;
+    let totalDeMinimis = 0;
+    let totalThirteenthMonth = 0;
+    let totalCompensation = 0;
+    let totalSSS = 0;
+    let totalPhilhealth = 0;
+    let totalPagibig = 0;
+    let totalContributions = 0;
+    let totalDeductions = 0;
+    let totalTaxableCompensation = 0;
+    let totalNetTaxableCompensation = 0;
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        totalBasicSalary += parseFloat(row.querySelector('.basic-salary')?.value) || 0;
+        totalAllowances += parseFloat(row.querySelector('.allowances')?.value) || 0;
+        totalDeMinimis += parseFloat(row.querySelector('.de-minimis')?.value) || 0;
+        totalThirteenthMonth += parseFloat(row.querySelector('.thirteenth-month')?.value) || 0;
+        totalCompensation += parseFloat(row.querySelector('.total-compensation')?.textContent) || 0;
+        totalSSS += parseFloat(row.querySelector('.sss-share')?.value) || 0;
+        totalPhilhealth += parseFloat(row.querySelector('.philhealth-share')?.value) || 0;
+        totalPagibig += parseFloat(row.querySelector('.pagibig-share')?.value) || 0;
+        totalContributions += parseFloat(row.querySelector('.total-contributions')?.textContent) || 0;
+        totalDeductions += parseFloat(row.querySelector('.total-deduction')?.textContent) || 0;
+        totalTaxableCompensation += parseFloat(row.querySelector('.total-taxable-compensation')?.textContent) || 0;
+        totalNetTaxableCompensation += parseFloat(row.querySelector('.net-taxable-compensation')?.textContent) || 0;
+    });
+    
+    return {
+        totalBasicSalary,
+        totalAllowances,
+        totalDeMinimis,
+        totalThirteenthMonth,
+        totalCompensation,
+        totalSSS,
+        totalPhilhealth,
+        totalPagibig,
+        totalContributions,
+        totalDeductions,
+        totalTaxableCompensation,
+        totalNetTaxableCompensation
+    };
+}
+
+// ===== SIDEBAR FUNCTIONALITY =====
+function initSidebarFunctionality() {
+    const leftSidebar = document.getElementById('leftSidebar');
+    const rightSidebar = document.getElementById('rightSidebar');
+    const leftSidebarToggle = document.getElementById('leftSidebarToggle');
+    const rightSidebarToggle = document.getElementById('rightSidebarToggle');
+    const headerLeftSidebarToggle = document.getElementById('headerLeftSidebarToggle');
+    const headerRightSidebarToggle = document.getElementById('headerRightSidebarToggle');
+    const body = document.body;
+
+    // Sidebar state management
+    let isLeftSidebarExpanded = false;
+    let isRightSidebarExpanded = false;
+
+    function toggleLeftSidebar() {
+        isLeftSidebarExpanded = !isLeftSidebarExpanded;
+        
+        if (isLeftSidebarExpanded) {
+            leftSidebar.classList.add('sidebar-expanded');
+            body.classList.add('left-sidebar-expanded');
+        } else {
+            leftSidebar.classList.remove('sidebar-expanded');
+            body.classList.remove('left-sidebar-expanded');
+        }
+        
+        // Update button appearance
+        if (headerLeftSidebarToggle) {
+            const icon = headerLeftSidebarToggle.querySelector('i');
+            if (isLeftSidebarExpanded) {
+                icon.style.transform = 'rotate(90deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+
+    function toggleRightSidebar() {
+        isRightSidebarExpanded = !isRightSidebarExpanded;
+        
+        if (isRightSidebarExpanded) {
+            rightSidebar.classList.add('sidebar-expanded');
+            body.classList.add('right-sidebar-expanded');
+        } else {
+            rightSidebar.classList.remove('sidebar-expanded');
+            body.classList.remove('right-sidebar-expanded');
+        }
+        
+        // Update button appearance
+        if (headerRightSidebarToggle) {
+            const icon = headerRightSidebarToggle.querySelector('i');
+            if (isRightSidebarExpanded) {
+                icon.style.transform = 'rotate(-90deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+
+    if (leftSidebarToggle) {
+        leftSidebarToggle.addEventListener('click', toggleLeftSidebar);
+    }
+
+    if (rightSidebarToggle) {
+        rightSidebarToggle.addEventListener('click', toggleRightSidebar);
+    }
+
+    if (headerLeftSidebarToggle) {
+        headerLeftSidebarToggle.addEventListener('click', toggleLeftSidebar);
+    }
+
+    if (headerRightSidebarToggle) {
+        headerRightSidebarToggle.addEventListener('click', toggleRightSidebar);
+    }
+    
+    // Close sidebars when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            if (isLeftSidebarExpanded && leftSidebar && headerLeftSidebarToggle && 
+                !leftSidebar.contains(e.target) && 
+                !headerLeftSidebarToggle.contains(e.target)) {
+                toggleLeftSidebar();
+            }
+            if (isRightSidebarExpanded && rightSidebar && headerRightSidebarToggle && 
+                !rightSidebar.contains(e.target) && 
+                !headerRightSidebarToggle.contains(e.target)) {
+                toggleRightSidebar();
+            }
+        }
+    });
+    
+    // Initialize sidebar states (open by default)
+    isLeftSidebarExpanded = true;
+    isRightSidebarExpanded = true;
+    
+    // Update sidebar classes
+    leftSidebar.classList.add('sidebar-expanded');
+    rightSidebar.classList.add('sidebar-expanded');
+    
+    // Update body classes
+    body.classList.add('left-sidebar-expanded', 'right-sidebar-expanded');
+    
+    // Update button appearances
+    if (headerLeftSidebarToggle) {
+        const icon = headerLeftSidebarToggle.querySelector('i');
+        icon.style.transform = 'rotate(90deg)';
+    }
+    
+    if (headerRightSidebarToggle) {
+        const icon = headerRightSidebarToggle.querySelector('i');
+        icon.style.transform = 'rotate(-90deg)';
+    }
+}
+
+// ===== BUTTON LISTENERS =====
+function initButtonListeners() {
+    // Get sidebar buttons
+    const addRowBtn = document.getElementById('addRowBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const clearInfoBtn = document.getElementById('clearInfoBtn');
+    const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
+    const selectMultipleBtn = document.getElementById('selectMultipleBtn');
+    const entryCounterBtn = document.getElementById('entryCounterBtn');
+    
+    // Add event listeners to sidebar buttons
+    if (addRowBtn) {
+        addRowBtn.addEventListener('click', function() {
+            addNewRow();
+            updateRowCount();
+            updateTotals();
+            updateSummaryRow();
+        });
+    }
+    
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportToExcel);
+    }
+    
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all employee data? This cannot be undone.')) {
+                clearAllData();
+            }
+        });
+    }
+    
+    if (clearInfoBtn) {
+        clearInfoBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all company information?')) {
+                clearCompanyInfo();
+            }
+        });
+    }
+    
+    if (clearInfoBtnSidebar) {
+        clearInfoBtnSidebar.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all company information?')) {
+                clearCompanyInfo();
+            }
+        });
+    }
+    
+    // Entry counter click handler
+    if (entryCounterBtn) {
+        entryCounterBtn.addEventListener('click', function() {
             addNewRow();
             updateRowCount();
             updateTotals();
             updateSummaryRow();
             
-            // Add event listeners for company info to save automatically
-            document.querySelectorAll('.company-info-section input').forEach(input => {
-                input.addEventListener('input', saveCompanyInfo);
-                input.addEventListener('change', saveCompanyInfo);
-            });
+            // Flash the counter to indicate new employee added
+            const entryCountSpan = document.getElementById('entryCount');
+            entryCountSpan.classList.add('pulse');
+            setTimeout(() => {
+                entryCountSpan.classList.remove('pulse');
+            }, 300);
+        });
+    }
+    
+    // Sidebar button active state
+    const sidebarButtons = document.querySelectorAll('.sidebar-btn');
+    sidebarButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            sidebarButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
             
-            // Format company TIN input
-            const companyTIN = document.getElementById('companyTIN');
-            companyTIN.addEventListener('input', function(e) {
-                formatTIN(e.target);
-            });
+            // Remove active class after 2 seconds
+            setTimeout(() => {
+                this.classList.remove('active');
+            }, 2000);
+        });
+    });
+}
+
+// ===== VISIBILITY TOGGLE FUNCTIONS =====
+function initVisibilityToggles() {
+    // Load saved visibility states from localStorage
+    loadVisibilityStates();
+    
+    // Add event listeners to toggle buttons
+    const toggleStatsBtn = document.getElementById('toggleStatsBtn');
+    const toggleTallyBtn = document.getElementById('toggleTallyBtn');
+    const toggleFooterBtn = document.getElementById('toggleFooterBtn');
+    const hideAllBtn = document.getElementById('hideAllBtn');
+    const showAllBtn = document.getElementById('showAllBtn');
+    const tableFocusBtn = document.getElementById('tableFocusBtn');
+    
+    if (toggleStatsBtn) {
+        toggleStatsBtn.addEventListener('click', function() {
+            toggleVisibility('stats', this);
+        });
+    }
+    
+    if (toggleTallyBtn) {
+        toggleTallyBtn.addEventListener('click', function() {
+            toggleVisibility('tally', this);
+        });
+    }
+    
+    if (toggleFooterBtn) {
+        toggleFooterBtn.addEventListener('click', function() {
+            toggleVisibility('footer', this);
+        });
+    }
+    
+    if (hideAllBtn) {
+        hideAllBtn.addEventListener('click', hideAllSections);
+    }
+    
+    if (showAllBtn) {
+        showAllBtn.addEventListener('click', showAllSections);
+    }
+    
+    if (tableFocusBtn) {
+        tableFocusBtn.addEventListener('click', toggleTableFocusMode);
+    }
+}
+
+function toggleVisibility(sectionType, button) {
+    let element = null;
+    let isHidden = false;
+    
+    switch(sectionType) {
+        case 'stats':
+            element = document.querySelector('.stats');
+            break;
+        case 'tally':
+            element = document.querySelector('.tally-section');
+            break;
+        case 'footer':
+            element = document.querySelector('.footer');
+            break;
+    }
+    
+    if (element) {
+        // Toggle hidden class
+        element.classList.toggle('hidden');
+        isHidden = element.classList.contains('hidden');
+        
+        // Update button text and icon
+        if (button) {
+            const icon = button.querySelector('i');
+            const text = button.querySelector('.sidebar-btn-text');
             
-            // Clear company info button
-            document.getElementById('clearInfoBtn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all company information?')) {
-                    clearCompanyInfo();
+            if (isHidden) {
+                text.textContent = `Show ${getSectionDisplayName(sectionType)}`;
+                if (icon) icon.className = 'fas fa-eye';
+            } else {
+                text.textContent = `Hide ${getSectionDisplayName(sectionType)}`;
+                if (icon) icon.className = 'fas fa-eye-slash';
+            }
+        }
+        
+        // Save state to localStorage
+        saveVisibilityState(sectionType, isHidden);
+    }
+}
+
+function getSectionDisplayName(sectionType) {
+    switch(sectionType) {
+        case 'stats': return 'Stats Summary';
+        case 'tally': return 'Tally Sections';
+        case 'footer': return 'Footer';
+        default: return sectionType;
+    }
+}
+
+function hideAllSections() {
+    const sections = [
+        { type: 'stats', element: '.stats' },
+        { type: 'tally', element: '.tally-section' },
+        { type: 'footer', element: '.footer' }
+    ];
+    
+    sections.forEach(section => {
+        const element = document.querySelector(section.element);
+        const button = document.getElementById(`toggle${section.type.charAt(0).toUpperCase() + section.type.slice(1)}Btn`);
+        
+        if (element && !element.classList.contains('hidden')) {
+            element.classList.add('hidden');
+            
+            // Update button
+            if (button) {
+                const icon = button.querySelector('i');
+                const text = button.querySelector('.sidebar-btn-text');
+                text.textContent = `Show ${getSectionDisplayName(section.type)}`;
+                if (icon) icon.className = 'fas fa-eye';
+            }
+            
+            // Save state
+            saveVisibilityState(section.type, true);
+        }
+    });
+}
+
+function showAllSections() {
+    const sections = [
+        { type: 'stats', element: '.stats' },
+        { type: 'tally', element: '.tally-section' },
+        { type: 'footer', element: '.footer' }
+    ];
+    
+    sections.forEach(section => {
+        const element = document.querySelector(section.element);
+        const button = document.getElementById(`toggle${section.type.charAt(0).toUpperCase() + section.type.slice(1)}Btn`);
+        
+        if (element && element.classList.contains('hidden')) {
+            element.classList.remove('hidden');
+            
+            // Update button
+            if (button) {
+                const icon = button.querySelector('i');
+                const text = button.querySelector('.sidebar-btn-text');
+                text.textContent = `Hide ${getSectionDisplayName(section.type)}`;
+                if (icon) icon.className = 'fas fa-eye-slash';
+            }
+            
+            // Save state
+            saveVisibilityState(section.type, false);
+        }
+    });
+}
+
+function saveVisibilityState(sectionType, isHidden) {
+    const states = JSON.parse(localStorage.getItem('visibilityStates') || '{}');
+    states[sectionType] = isHidden;
+    localStorage.setItem('visibilityStates', JSON.stringify(states));
+}
+
+function loadVisibilityStates() {
+    const states = JSON.parse(localStorage.getItem('visibilityStates') || '{}');
+    
+    Object.keys(states).forEach(sectionType => {
+        const isHidden = states[sectionType];
+        let element = null;
+        let button = null;
+        
+        switch(sectionType) {
+            case 'stats':
+                element = document.querySelector('.stats');
+                button = document.getElementById('toggleStatsBtn');
+                break;
+            case 'tally':
+                element = document.querySelector('.tally-section');
+                button = document.getElementById('toggleTallyBtn');
+                break;
+            case 'footer':
+                element = document.querySelector('.footer');
+                button = document.getElementById('toggleFooterBtn');
+                break;
+        }
+        
+        if (element && isHidden) {
+            element.classList.add('hidden');
+            
+            // Update button
+            if (button) {
+                const icon = button.querySelector('i');
+                const text = button.querySelector('.sidebar-btn-text');
+                text.textContent = `Show ${getSectionDisplayName(sectionType)}`;
+                if (icon) icon.className = 'fas fa-eye';
+            }
+        } else if (element && button && !isHidden) {
+            // Ensure button text is correct for visible sections
+            const icon = button.querySelector('i');
+            const text = button.querySelector('.sidebar-btn-text');
+            text.textContent = `Hide ${getSectionDisplayName(sectionType)}`;
+            if (icon) icon.className = 'fas fa-eye-slash';
+        }
+    });
+}
+
+function toggleTableFocusMode() {
+    document.body.classList.toggle('table-focus-mode');
+    
+    // Update button text and icon
+    const button = document.getElementById('tableFocusBtn');
+    if (button) {
+        const icon = button.querySelector('i');
+        const text = button.querySelector('.sidebar-btn-text');
+        
+        if (document.body.classList.contains('table-focus-mode')) {
+            text.textContent = 'Exit Focus Mode';
+            icon.className = 'fas fa-compress';
+            
+            // Automatically hide other sections when in focus mode
+            document.querySelectorAll('.stats, .tally-section, .footer').forEach(el => {
+                if (!el.classList.contains('hidden')) {
+                    el.classList.add('hidden-for-focus');
                 }
             });
+        } else {
+            text.textContent = 'Table Focus Mode';
+            icon.className = 'fas fa-table';
             
-            // Add row button
-            document.getElementById('addRowBtn').addEventListener('click', function() {
-                addNewRow();
-                updateRowCount();
-                updateTotals();
-                updateSummaryRow();
+            // Restore sections that were hidden by focus mode
+            document.querySelectorAll('.hidden-for-focus').forEach(el => {
+                el.classList.remove('hidden-for-focus');
             });
+        }
+    }
+}
+
+// ===== ZOOM DETECTION FUNCTIONS =====
+function initZoomDetection() {
+    detectZoomAndAdjust();
+    manageColumnVisibility();
+    
+    // Listen for zoom changes
+    window.addEventListener('resize', function() {
+        detectZoomAndAdjust();
+        manageColumnVisibility();
+    });
+    
+    // Also detect zoom on wheel events (Ctrl+Scroll)
+    document.addEventListener('wheel', function(e) {
+        if (e.ctrlKey) {
+            // Small delay to let zoom take effect
+            setTimeout(function() {
+                detectZoomAndAdjust();
+                manageColumnVisibility();
+            }, 50);
+        }
+    });
+    
+    // Keyboard zoom detection (Ctrl++ and Ctrl+-)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && (e.key === '=' || e.key === '-' || e.key === '0')) {
+            setTimeout(function() {
+                detectZoomAndAdjust();
+                manageColumnVisibility();
+            }, 50);
+        }
+    });
+    
+    // Add tooltips for shortened headers
+    const tooltipStyle = document.createElement('style');
+    tooltipStyle.textContent = `
+        th[data-shortened="true"] {
+            position: relative;
+            cursor: help;
+        }
+        
+        th[data-shortened="true"]:hover::after {
+            content: attr(data-original);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 40, 30, 0.95);
+            color: #00ff9d;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            border: 1px solid #00ff9d;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .extreme-zoom th,
+        .extreme-zoom td {
+            font-size: 7px;
+            padding: 3px 1px;
+        }
+        
+        .extreme-zoom input,
+        .extreme-zoom select,
+        .extreme-zoom .uneditable {
+            font-size: 6px;
+            padding: 1px 1px;
+        }
+    `;
+    document.head.appendChild(tooltipStyle);
+    
+    // Add keyboard shortcut for table focus mode (Ctrl+Shift+F)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'F') {
+            e.preventDefault();
+            const tableFocusBtn = document.getElementById('tableFocusBtn');
+            if (tableFocusBtn) {
+                tableFocusBtn.click();
+            }
+        }
+    });
+}
+
+function detectZoomAndAdjust() {
+    const zoomLevel = Math.round(window.devicePixelRatio * 100);
+    const headers = document.querySelectorAll('th');
+    
+    // Add zoom level class to body for CSS adjustments
+    document.body.classList.remove('zoom-100', 'zoom-125', 'zoom-150', 'zoom-175', 'zoom-200');
+    
+    if (zoomLevel >= 190) {
+        document.body.classList.add('zoom-200');
+    } else if (zoomLevel >= 165) {
+        document.body.classList.add('zoom-175');
+    } else if (zoomLevel >= 140) {
+        document.body.classList.add('zoom-150');
+    } else if (zoomLevel >= 115) {
+        document.body.classList.add('zoom-125');
+    } else {
+        document.body.classList.add('zoom-100');
+    }
+    
+    // Adjust header text for very high zoom
+    if (zoomLevel >= 150) {
+        // Shorten header texts at high zoom
+        const headerShortcuts = {
+            'TIN Number': 'TIN',
+            'Last Name': 'Last',
+            'First Name': 'First',
+            'Middle Name': 'Middle',
+            'Daily Rate': 'Rate',
+            'Basic Salary': 'Basic',
+            'Holiday/Allowances/Overtime Pay': 'Allowances',
+            'De Minimis Benefits': 'De Minimis',
+            '13th Month Pay': '13th Mo',
+            'Total Compensation': 'Total Comp',
+            'SSS Employee Share': 'SSS',
+            'PhilHealth Employee Share': 'PhilHealth',
+            'Pag-ibig Employee Share': 'Pag-ibig',
+            'Total SSS, PHIC, and Pag-ibig': 'Total Contrib',
+            'Total Deduction': 'Total Deduct',
+            'Total Taxable Compensation': 'Taxable Comp',
+            'Exemption Amount': 'Exemption',
+            'Net Taxable Compensation': 'Net Taxable'
+        };
+        
+        headers.forEach(header => {
+            const originalText = header.getAttribute('data-original') || header.textContent;
+            if (!header.getAttribute('data-original')) {
+                header.setAttribute('data-original', originalText);
+            }
             
-            // Export to Excel button
-            document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-            
-            // Clear all data button
-            document.getElementById('clearBtn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all table data? This cannot be undone.')) {
-                    clearAllData();
-                }
+            if (zoomLevel >= 175 && headerShortcuts[originalText.trim()]) {
+                header.textContent = headerShortcuts[originalText.trim()];
+                header.setAttribute('data-shortened', 'true');
+            } else {
+                // Restore original if zoom level decreases
+                header.textContent = header.getAttribute('data-original');
+                header.removeAttribute('data-shortened');
+            }
+        });
+    } else {
+        // Restore all headers
+        headers.forEach(header => {
+            if (header.getAttribute('data-original')) {
+                header.textContent = header.getAttribute('data-original');
+            }
+        });
+    }
+}
+
+function manageColumnVisibility() {
+    const zoomLevel = Math.round(window.devicePixelRatio * 100);
+    const table = document.getElementById('compensationTable');
+    
+    if (!table) return;
+    
+    // At very high zoom (200%+), hide less important columns
+    if (zoomLevel >= 200) {
+        // Hide Middle Name and Exemption Amount columns at extreme zoom
+        const rows = table.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('th, td');
+            if (cells.length >= 20) {
+                // Hide Middle Name (5th column) and Exemption (18th column)
+                if (cells[4]) cells[4].style.display = 'none'; // Middle Name
+                if (cells[17]) cells[17].style.display = 'none'; // Exemption
+            }
+        });
+        
+        // Adjust remaining column widths
+        document.body.classList.add('extreme-zoom');
+    } else {
+        // Show all columns
+        const rows = table.querySelectorAll('tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('th, td');
+            cells.forEach(cell => {
+                cell.style.display = ''; // Reset to default
             });
         });
+        document.body.classList.remove('extreme-zoom');
+    }
+}
 
-        // Function to load logo
-        function loadLogo() {
-            const logoPlaceholder = document.getElementById('logoPlaceholder');
-            const img = new Image();
-            img.onload = function() {
-                logoPlaceholder.innerHTML = '';
-                logoPlaceholder.appendChild(img);
-                img.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 157, 0.7))';
-            };
-            img.onerror = function() {
-                console.log('Logo not found, using placeholder');
-                logoPlaceholder.style.textShadow = '0 0 10px rgba(0, 255, 157, 0.7)';
-            };
-            img.src = 'MGAALogo.jpg';
+// ===== SELECT MULTIPLE FUNCTIONALITY =====
+let selectMultipleMode = false;
+let isDragging = false;
+let startCell = null;
+let selectedCells = new Set();
+
+function initSelectMultiple() {
+    const selectMultipleBtn = document.getElementById('selectMultipleBtn');
+    if (!selectMultipleBtn) return;
+    
+    selectMultipleBtn.addEventListener('click', toggleSelectMultipleMode);
+    
+    // Use mousedown on the table body to capture events
+    const tableBody = document.getElementById('tableBody');
+    
+    if (tableBody) {
+        // Mouse down on table body
+        tableBody.addEventListener('mousedown', function(e) {
+            if (!selectMultipleMode) return;
+            
+            const cell = getCellFromEvent(e);
+            if (!cell) return;
+            
+            // Prevent default to avoid text selection and input focus
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Clear any existing selection
+            clearSelection();
+            
+            // Start dragging
+            isDragging = true;
+            startCell = cell;
+            
+            // Select the initial cell
+            cell.classList.add('selected');
+            selectedCells.add(cell);
+            updateSelectedCount();
+        });
+        
+        // Mouse move on table body
+        tableBody.addEventListener('mousemove', function(e) {
+            if (!selectMultipleMode || !isDragging || !startCell) return;
+            
+            const cell = getCellFromEvent(e);
+            if (!cell) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const startCoord = getCellCoordinates(startCell);
+            const currentCoord = getCellCoordinates(cell);
+            
+            if (startCoord && currentCoord) {
+                selectCellsInRange(startCoord, currentCoord);
+            }
+        });
+        
+        // Mouse up on document to catch when mouse is released anywhere
+        document.addEventListener('mouseup', function(e) {
+            if (!selectMultipleMode || !isDragging) return;
+            
+            isDragging = false;
+            
+            if (selectedCells.size > 0) {
+                showToast(`${selectedCells.size} cell(s) selected`, 'info');
+            }
+        });
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (!selectMultipleMode) return;
+        
+        // Ctrl+C for copy
+        if (e.ctrlKey && e.key === 'c') {
+            e.preventDefault();
+            copySelectedCells();
         }
-
-        // Save company info to localStorage
-        function saveCompanyInfo() {
-            const companyInfo = {
-                name: document.getElementById('companyName').value,
-                tin: document.getElementById('companyTIN').value,
-                address: document.getElementById('companyAddress').value,
-                business: document.getElementById('lineOfBusiness').value,
-                period: document.getElementById('payrollPeriod').value,
-                date: document.getElementById('payrollDate').value,
-                officer: document.getElementById('authorizedEmployee').value,
-                email: document.getElementById('email').value
-            };
-            localStorage.setItem('compensationCompanyInfo', JSON.stringify(companyInfo));
+        
+        // Ctrl+V for paste
+        if (e.ctrlKey && e.key === 'v') {
+            e.preventDefault();
+            pasteToSelectedCells();
         }
-
-        // Load company info from localStorage
-        function loadCompanyInfo() {
-            const savedInfo = localStorage.getItem('compensationCompanyInfo');
-            if (savedInfo) {
-                const companyInfo = JSON.parse(savedInfo);
-                document.getElementById('companyName').value = companyInfo.name || '';
-                document.getElementById('companyTIN').value = companyInfo.tin || '';
-                document.getElementById('companyAddress').value = companyInfo.address || '';
-                document.getElementById('lineOfBusiness').value = companyInfo.business || '';
-                document.getElementById('payrollPeriod').value = companyInfo.period || '';
-                document.getElementById('payrollDate').value = companyInfo.date || new Date().toISOString().split('T')[0];
-                document.getElementById('authorizedEmployee').value = companyInfo.officer || '';
-                document.getElementById('email').value = companyInfo.email || '';
+        
+        // Delete key for delete
+        if (e.key === 'Delete' || e.key === 'Del') {
+            e.preventDefault();
+            deleteSelectedCells();
+        }
+        
+        // Escape to clear selection
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            if (selectedCells.size > 0) {
+                clearSelection();
+            } else {
+                toggleSelectMultipleMode();
             }
         }
+    });
+}
 
-        // Clear company info
-        function clearCompanyInfo() {
-            document.getElementById('companyName').value = '';
-            document.getElementById('companyTIN').value = '';
-            document.getElementById('companyAddress').value = '';
-            document.getElementById('lineOfBusiness').value = '';
-            document.getElementById('payrollPeriod').value = '';
-            document.getElementById('payrollDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('authorizedEmployee').value = '';
-            document.getElementById('email').value = '';
-            localStorage.removeItem('compensationCompanyInfo');
-        }
+function toggleSelectMultipleMode() {
+    selectMultipleMode = !selectMultipleMode;
+    
+    const selectMultipleBtn = document.getElementById('selectMultipleBtn');
+    const body = document.body;
+    
+    if (selectMultipleMode) {
+        body.classList.add('select-multiple-mode');
+        selectMultipleBtn.innerHTML = '<i class="fas fa-check-double"></i><span class="sidebar-btn-text">Exit Selection Mode</span>';
+        createSelectionToolbar();
+        showToast('Selection mode activated. All cells are selectable.', 'info');
+        
+        // Disable text selection
+        document.body.style.userSelect = 'none';
+    } else {
+        body.classList.remove('select-multiple-mode');
+        selectMultipleBtn.innerHTML = '<i class="fas fa-check-double"></i><span class="sidebar-btn-text">Select Multiple</span>';
+        clearSelection();
+        removeSelectionToolbar();
+        
+        // Re-enable text selection
+        document.body.style.userSelect = '';
+    }
+}
 
-        // Function to add a new row
-        function addNewRow() {
-            const tableBody = document.getElementById('tableBody');
-            const rowCount = tableBody.children.length + 1;
-            const rowId = 'row_' + Date.now() + '_' + rowCount;
-            
-            const row = document.createElement('tr');
-            row.id = rowId;
-            
-            row.innerHTML = `
-                <td>
-                    <div class="uneditable sequence-number">${rowCount}</div>
-                </td>
-                <td>
-                    <input type="text" class="editable employee-tin tin-input" maxlength="15" placeholder="000-000-000-000">
-                    <div class="validation-message">TIN must be 12 digits</div>
-                </td>
-                <td>
-                    <input type="text" class="editable last-name" placeholder="Last name">
-                </td>
-                <td>
-                    <input type="text" class="editable first-name" placeholder="First name">
-                </td>
-                <td>
-                    <input type="text" class="editable middle-name" placeholder="Middle name">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable daily-rate" placeholder="0.00">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable basic-salary" placeholder="0.00">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable allowances" placeholder="0.00">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable de-minimis" placeholder="0.00">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable thirteenth-month" placeholder="0.00">
-                </td>
-                <td>
-                    <div class="uneditable total-compensation">0.00</div>
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable sss-share" placeholder="0.00">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable philhealth-share" placeholder="0.00">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable pagibig-share" placeholder="0.00">
-                </td>
-                <td>
-                    <div class="uneditable total-contributions">0.00</div>
-                </td>
-                <td>
-                    <div class="uneditable total-deduction">0.00</div>
-                </td>
-                <td>
-                    <div class="uneditable total-taxable-compensation">0.00</div>
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="editable exemption-amount" placeholder="0.00">
-                </td>
-                <td>
-                    <div class="uneditable net-taxable-compensation">0.00</div>
-                </td>
-                <td>
-                    <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
-            
-            tableBody.appendChild(row);
-            
-            // Add event listeners to the new row
-            const editableInputs = row.querySelectorAll('.editable');
-            editableInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    updateCalculations(row);
-                    updateTotals();
-                    updateSummaryRow();
-                });
-                
-                input.addEventListener('change', function() {
-                    updateCalculations(row);
-                    updateTotals();
-                    updateSummaryRow();
-                });
-            });
-            
-            // Special handling for TIN input
-            const tinInput = row.querySelector('.employee-tin');
-            tinInput.addEventListener('input', function(e) {
-                formatTIN(e.target);
-            });
-            
-            tinInput.addEventListener('blur', function(e) {
-                validateTIN(e.target);
-            });
-        }
+function createSelectionToolbar() {
+    if (document.querySelector('.selection-toolbar')) return;
+    
+    const toolbar = document.createElement('div');
+    toolbar.className = 'selection-toolbar';
+    toolbar.innerHTML = `
+        <div class="selection-info">
+            <span id="selectedCount">0</span> cells selected
+        </div>
+        <button id="deleteSelectedBtn" class="danger">
+            <i class="fas fa-trash"></i> Delete Selected
+        </button>
+        <button id="copySelectedBtn">
+            <i class="fas fa-copy"></i> Copy
+        </button>
+        <button id="pasteSelectedBtn">
+            <i class="fas fa-paste"></i> Paste
+        </button>
+        <button id="clearSelectionBtn">
+            <i class="fas fa-times"></i> Clear
+        </button>
+        <button id="exitSelectionBtn">
+            <i class="fas fa-times-circle"></i> Exit
+        </button>
+    `;
+    document.body.appendChild(toolbar);
+    
+    // Add event listeners for toolbar buttons
+    document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedCells);
+    document.getElementById('copySelectedBtn').addEventListener('click', copySelectedCells);
+    document.getElementById('pasteSelectedBtn').addEventListener('click', pasteToSelectedCells);
+    document.getElementById('clearSelectionBtn').addEventListener('click', clearSelection);
+    document.getElementById('exitSelectionBtn').addEventListener('click', toggleSelectMultipleMode);
+}
 
-        // Function to delete a row
-        function deleteRow(rowId) {
-            const row = document.getElementById(rowId);
-            if (row && confirm('Are you sure you want to delete this row?')) {
-                row.style.transition = 'all 0.3s ease';
-                row.style.opacity = '0';
-                row.style.transform = 'translateX(-20px)';
-                
-                setTimeout(() => {
-                    row.remove();
-                    updateRowCount();
-                    updateTotals();
-                    updateSummaryRow();
-                }, 300);
+function removeSelectionToolbar() {
+    const toolbar = document.querySelector('.selection-toolbar');
+    if (toolbar) {
+        toolbar.remove();
+    }
+}
+
+function getCellFromEvent(e) {
+    return e.target.closest('td');
+}
+
+function getCellCoordinates(cell) {
+    if (!cell) return null;
+    const row = cell.parentNode;
+    const rowIndex = Array.from(row.parentNode.children).indexOf(row);
+    const cellIndex = Array.from(row.children).indexOf(cell);
+    return { row: rowIndex, col: cellIndex };
+}
+
+function getCellValue(cell) {
+    // Try to get value from input or select first
+    const input = cell.querySelector('input:not([readonly]), select:not([readonly])');
+    if (input) {
+        return input.value;
+    }
+    
+    // Then try uneditable div
+    const uneditable = cell.querySelector('.uneditable');
+    if (uneditable) {
+        return uneditable.textContent;
+    }
+    
+    // Fallback to text content
+    return cell.textContent.trim();
+}
+
+function setCellValue(cell, value) {
+    const input = cell.querySelector('input:not([readonly]), select:not([readonly])');
+    if (input) {
+        if (input.tagName === 'SELECT') {
+            // Try to match select option
+            const option = Array.from(input.options).find(opt => 
+                opt.text.toLowerCase().trim() === value.toLowerCase().trim() ||
+                opt.value.toLowerCase().trim() === value.toLowerCase().trim()
+            );
+            if (option) {
+                input.value = option.value;
+            } else {
+                // Try to set by index or leave as default
+                input.selectedIndex = 0;
             }
-        }
-
-        // Function to clear all data
-        function clearAllData() {
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = '';
-            addNewRow();
-            updateRowCount();
-            updateTotals();
-            updateSummaryRow();
-        }
-
-        // Function to update calculations for a row
-        function updateCalculations(row) {
-            // Get values from inputs
-            const basicSalary = parseFloat(row.querySelector('.basic-salary').value) || 0;
-            const allowances = parseFloat(row.querySelector('.allowances').value) || 0;
-            const deMinimis = parseFloat(row.querySelector('.de-minimis').value) || 0;
-            const thirteenthMonth = parseFloat(row.querySelector('.thirteenth-month').value) || 0;
-            const sssShare = parseFloat(row.querySelector('.sss-share').value) || 0;
-            const philhealthShare = parseFloat(row.querySelector('.philhealth-share').value) || 0;
-            const pagibigShare = parseFloat(row.querySelector('.pagibig-share').value) || 0;
-            const exemptionAmount = parseFloat(row.querySelector('.exemption-amount').value) || 0;
-            
-            // Calculate Total Compensation: Basic Salary + Allowances + De Minimis + 13th Month Pay
-            const totalCompensation = basicSalary + allowances + deMinimis + thirteenthMonth;
-            row.querySelector('.total-compensation').textContent = totalCompensation.toFixed(2);
-            
-            // Calculate Total Contributions: SSS + PhilHealth + Pag-ibig
-            const totalContributions = sssShare + philhealthShare + pagibigShare;
-            row.querySelector('.total-contributions').textContent = totalContributions.toFixed(2);
-            
-            // Calculate Total Deduction: Total Contributions - De Minimis - 13th Month Pay
-            const totalDeduction = totalContributions - deMinimis - thirteenthMonth;
-            row.querySelector('.total-deduction').textContent = totalDeduction.toFixed(2);
-            
-            // Calculate Total Taxable Compensation: Total Compensation - Total Deduction
-            const totalTaxableCompensation = totalCompensation - totalDeduction;
-            row.querySelector('.total-taxable-compensation').textContent = totalTaxableCompensation.toFixed(2);
-            
-            // Calculate Net Taxable Compensation: Total Taxable Compensation - Exemption Amount
-            const netTaxableCompensation = Math.max(0, totalTaxableCompensation - exemptionAmount);
-            row.querySelector('.net-taxable-compensation').textContent = netTaxableCompensation.toFixed(2);
-        }
-
-        // Function to format TIN input
-        function formatTIN(input) {
-            let value = input.value.replace(/\D/g, '');
-            
-            if (value.length > 12) {
-                value = value.substring(0, 12);
-            }
-            
-            if (value.length > 9) {
-                value = value.substring(0, 9) + '-' + value.substring(9);
-            }
-            if (value.length > 6) {
-                value = value.substring(0, 6) + '-' + value.substring(6);
-            }
-            if (value.length > 3) {
-                value = value.substring(0, 3) + '-' + value.substring(3);
-            }
-            
+        } else {
             input.value = value;
         }
+        // Trigger calculations
+        const event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+        const changeEvent = new Event('change', { bubbles: true });
+        input.dispatchEvent(changeEvent);
+        return true;
+    }
+    return false;
+}
 
-        // Function to validate TIN input
-        function validateTIN(input) {
-            const value = input.value.replace(/\D/g, '');
-            const validationMessage = input.nextElementSibling;
-            
-            if (value.length === 12) {
-                validationMessage.style.display = 'none';
-                input.style.borderColor = '#00ff9d';
-                input.style.boxShadow = '0 0 5px rgba(0, 255, 157, 0.5), inset 0 0 10px rgba(0, 255, 157, 0.1)';
-            } else if (value.length > 0) {
-                validationMessage.style.display = 'block';
-                input.style.borderColor = '#ff6666';
-                input.style.boxShadow = '0 0 5px rgba(255, 102, 102, 0.5), inset 0 0 10px rgba(255, 102, 102, 0.1)';
+function selectCellsInRange(startCoord, currentCoord) {
+    const tableBody = document.getElementById('tableBody');
+    const rows = tableBody.children;
+    
+    const startRow = Math.min(startCoord.row, currentCoord.row);
+    const endRow = Math.max(startCoord.row, currentCoord.row);
+    const startCol = Math.min(startCoord.col, currentCoord.col);
+    const endCol = Math.max(startCoord.col, currentCoord.col);
+    
+    // Clear previous selection
+    clearCellSelection();
+    
+    // Select new range
+    for (let r = startRow; r <= endRow; r++) {
+        const row = rows[r];
+        if (!row) continue;
+        
+        for (let c = startCol; c <= endCol; c++) {
+            const cell = row.children[c];
+            if (cell) {
+                cell.classList.add('selected');
+                selectedCells.add(cell);
+            }
+        }
+    }
+    
+    updateSelectedCount();
+}
+
+function clearCellSelection() {
+    document.querySelectorAll('td.selected').forEach(cell => {
+        cell.classList.remove('selected');
+    });
+    selectedCells.clear();
+}
+
+function clearSelection() {
+    clearCellSelection();
+    updateSelectedCount();
+    isDragging = false;
+    startCell = null;
+}
+
+function updateSelectedCount() {
+    const countSpan = document.getElementById('selectedCount');
+    if (countSpan) {
+        countSpan.textContent = selectedCells.size;
+    }
+}
+
+function deleteSelectedCells() {
+    if (selectedCells.size === 0) {
+        showToast('No cells selected', 'warning');
+        return;
+    }
+    
+    if (confirm(`Delete ${selectedCells.size} selected cell(s)?`)) {
+        let deletedCount = 0;
+        selectedCells.forEach(cell => {
+            const input = cell.querySelector('input:not([readonly]), select:not([readonly])');
+            if (input) {
+                if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else {
+                    input.value = '';
+                }
+                // Trigger calculations
+                const event = new Event('input', { bubbles: true });
+                input.dispatchEvent(event);
+                const changeEvent = new Event('change', { bubbles: true });
+                input.dispatchEvent(changeEvent);
+                deletedCount++;
+            }
+        });
+        clearSelection();
+        showToast(`Deleted ${deletedCount} cell(s) (uneditable cells were skipped)`, 'success');
+    }
+}
+
+function copySelectedCells() {
+    if (selectedCells.size === 0) {
+        showToast('No cells selected', 'warning');
+        return;
+    }
+    
+    // Organize cells by row and column
+    const cellsByRow = new Map();
+    selectedCells.forEach(cell => {
+        const coords = getCellCoordinates(cell);
+        if (!cellsByRow.has(coords.row)) {
+            cellsByRow.set(coords.row, new Map());
+        }
+        cellsByRow.get(coords.row).set(coords.col, cell);
+    });
+    
+    // Get min and max rows and columns
+    let minRow = Infinity, maxRow = -Infinity;
+    let minCol = Infinity, maxCol = -Infinity;
+    
+    selectedCells.forEach(cell => {
+        const coords = getCellCoordinates(cell);
+        minRow = Math.min(minRow, coords.row);
+        maxRow = Math.max(maxRow, coords.row);
+        minCol = Math.min(minCol, coords.col);
+        maxCol = Math.max(maxCol, coords.col);
+    });
+    
+    // Create a 2D array for copying
+    const copyData = [];
+    for (let r = minRow; r <= maxRow; r++) {
+        const rowData = [];
+        for (let c = minCol; c <= maxCol; c++) {
+            const cell = cellsByRow.get(r)?.get(c);
+            if (cell) {
+                rowData.push(getCellValue(cell));
             } else {
-                validationMessage.style.display = 'none';
-                input.style.borderColor = 'rgba(0, 255, 157, 0.3)';
-                input.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+                rowData.push('');
             }
         }
+        copyData.push(rowData);
+    }
+    
+    // Store in clipboard as TSV
+    const tsv = copyData.map(row => row.join('\t')).join('\n');
+    navigator.clipboard.writeText(tsv).then(() => {
+        showToast(`Copied ${selectedCells.size} cell(s) to clipboard`, 'success');
+    }).catch(err => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = tsv;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(`Copied ${selectedCells.size} cell(s) to clipboard`, 'success');
+    });
+}
 
-        // Function to update row count
-        function updateRowCount() {
-            const tableBody = document.getElementById('tableBody');
-            const rowCount = tableBody.children.length;
-            document.getElementById('rowCount').textContent = rowCount;
+function pasteToSelectedCells() {
+    if (selectedCells.size === 0) {
+        showToast('No cells selected', 'warning');
+        return;
+    }
+    
+    navigator.clipboard.readText().then(text => {
+        const rows = text.split('\n').filter(row => row.trim() !== '');
+        const pasteData = rows.map(row => row.split('\t'));
+        
+        // Sort selected cells by row and column
+        const sortedCells = Array.from(selectedCells).sort((a, b) => {
+            const coordsA = getCellCoordinates(a);
+            const coordsB = getCellCoordinates(b);
+            if (coordsA.row !== coordsB.row) return coordsA.row - coordsB.row;
+            return coordsA.col - coordsB.col;
+        });
+        
+        // Paste data starting from first selected cell
+        let pasteCount = 0;
+        let skippedCount = 0;
+        
+        for (let i = 0; i < sortedCells.length && i < pasteData.flat().length; i++) {
+            const targetCell = sortedCells[i];
+            const rowIndex = Math.floor(i / pasteData[0].length);
+            const colIndex = i % pasteData[0].length;
+            const value = pasteData[rowIndex]?.[colIndex] || '';
             
-            // Update sequence numbers
-            const rows = tableBody.querySelectorAll('tr');
-            rows.forEach((row, index) => {
-                const seqNumber = row.querySelector('.sequence-number');
-                if (seqNumber) {
-                    seqNumber.textContent = index + 1;
-                }
-            });
-        }
-
-        // Function to update totals
-        function updateTotals() {
-            let totalCompensation = 0;
-            let totalDeductions = 0;
-            let totalTaxableCompensation = 0;
-            let totalDailyRate = 0;
-            let employeeCount = 0;
-            
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => {
-                const compensation = parseFloat(row.querySelector('.total-compensation').textContent) || 0;
-                const deduction = parseFloat(row.querySelector('.total-deduction').textContent) || 0;
-                const taxableCompensation = parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
-                const dailyRate = parseFloat(row.querySelector('.daily-rate').value) || 0;
-                
-                totalCompensation += compensation;
-                totalDeductions += deduction;
-                totalTaxableCompensation += taxableCompensation;
-                totalDailyRate += dailyRate;
-                employeeCount++;
-            });
-            
-            document.getElementById('totalEmployees').textContent = employeeCount;
-            document.getElementById('totalCompensation').textContent = totalCompensation.toFixed(2);
-            document.getElementById('totalDeductions').textContent = totalDeductions.toFixed(2);
-            document.getElementById('totalTaxableCompensation').textContent = totalTaxableCompensation.toFixed(2);
-            document.getElementById('averageDailyRate').textContent = employeeCount > 0 ? (totalDailyRate / employeeCount).toFixed(2) : '0.00';
-        }
-
-        // Function to update summary row
-        function updateSummaryRow() {
-            let totalCompensation = 0;
-            let totalAllowances = 0;
-            let totalDeMinimis = 0;
-            let totalThirteenthMonth = 0;
-            let totalSSS = 0;
-            let totalPhilhealth = 0;
-            let totalPagibig = 0;
-            let totalDeductions = 0;
-            let totalTaxableCompensation = 0;
-            let totalNetTaxableCompensation = 0;
-            
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => {
-                totalCompensation += parseFloat(row.querySelector('.total-compensation').textContent) || 0;
-                totalAllowances += parseFloat(row.querySelector('.allowances').value) || 0;
-                totalDeMinimis += parseFloat(row.querySelector('.de-minimis').value) || 0;
-                totalThirteenthMonth += parseFloat(row.querySelector('.thirteenth-month').value) || 0;
-                totalSSS += parseFloat(row.querySelector('.sss-share').value) || 0;
-                totalPhilhealth += parseFloat(row.querySelector('.philhealth-share').value) || 0;
-                totalPagibig += parseFloat(row.querySelector('.pagibig-share').value) || 0;
-                totalDeductions += parseFloat(row.querySelector('.total-deduction').textContent) || 0;
-                totalTaxableCompensation += parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
-                totalNetTaxableCompensation += parseFloat(row.querySelector('.net-taxable-compensation').textContent) || 0;
-            });
-            
-            const summaryRow = document.getElementById('summaryRow');
-            summaryRow.innerHTML = `
-                <tr class="summary-row">
-                    <td colspan="6" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
-                    <td class="uneditable">${totalAllowances.toFixed(2)}</td>
-                    <td class="uneditable">${totalAllowances.toFixed(2)}</td>
-                    <td class="uneditable">${totalDeMinimis.toFixed(2)}</td>
-                    <td class="uneditable">${totalThirteenthMonth.toFixed(2)}</td>
-                    <td class="uneditable">${totalCompensation.toFixed(2)}</td>
-                    <td class="uneditable">${totalSSS.toFixed(2)}</td>
-                    <td class="uneditable">${totalPhilhealth.toFixed(2)}</td>
-                    <td class="uneditable">${totalPagibig.toFixed(2)}</td>
-                    <td class="uneditable">${(totalSSS + totalPhilhealth + totalPagibig).toFixed(2)}</td>
-                    <td class="uneditable">${totalDeductions.toFixed(2)}</td>
-                    <td class="uneditable">${totalTaxableCompensation.toFixed(2)}</td>
-                    <td>-</td>
-                    <td class="uneditable">${totalNetTaxableCompensation.toFixed(2)}</td>
-                    <td>-</td>
-                </tr>
-            `;
-        }
-
-        // Function to export to Excel
-        function exportToExcel() {
-            // Validate required company info
-            const companyName = document.getElementById('companyName').value.trim();
-            const companyTIN = document.getElementById('companyTIN').value.trim();
-            const companyAddress = document.getElementById('companyAddress').value.trim();
-            const lineOfBusiness = document.getElementById('lineOfBusiness').value.trim();
-            const authorizedEmployee = document.getElementById('authorizedEmployee').value.trim();
-            
-            if (!companyName || !companyTIN || !companyAddress || !lineOfBusiness || !authorizedEmployee) {
-                alert('Please fill in all required company information fields (marked with *) before exporting.');
-                return;
+            if (setCellValue(targetCell, value)) {
+                pasteCount++;
+            } else {
+                skippedCount++;
             }
-            
-            // Create HTML content for Excel
-            const today = new Date();
-            const formattedDate = today.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            const formattedTime = today.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute:'2-digit', 
-                hour12: true 
-            });
-            
-            // Calculate totals
-            const totalEmployees = document.getElementById('totalEmployees').textContent;
-            const totalCompensation = document.getElementById('totalCompensation').textContent;
-            const totalDeductions = document.getElementById('totalDeductions').textContent;
-            const totalTaxableCompensation = document.getElementById('totalTaxableCompensation').textContent;
-            
-            let htmlContent = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <meta charset="UTF-8">
-                    <!--[if gte mso 9]>
-                    <xml>
-                        <x:ExcelWorkbook>
-                            <x:ExcelWorksheets>
-                                <x:ExcelWorksheet>
-                                    <x:Name>Compensation Report</x:Name>
-                                    <x:WorksheetOptions>
-                                        <x:DisplayGridlines/>
-                                        <x:Print>
-                                            <x:ValidPrinterInfo/>
-                                            <x:PaperSizeIndex>9</x:PaperSizeIndex>
-                                            <x:HorizontalResolution>600</x:HorizontalResolution>
-                                            <x:VerticalResolution>600</x:VerticalResolution>
-                                            <x:FitToPage>1</x:FitToPage>
-                                            <x:FitWidth>1</x:FitWidth>
-                                            <x:FitHeight>100</x:FitHeight>
-                                        </x:Print>
-                                        <x:Selected/>
-                                        <x:ProtectContents>False</x:ProtectContents>
-                                        <x:ProtectObjects>False</x:ProtectObjects>
-                                        <x:ProtectScenarios>False</x:ProtectScenarios>
-                                        <x:FreezePanes/>
-                                        <x:FrozenNoSplit/>
-                                        <x:SplitHorizontal>6</x:SplitHorizontal>
-                                        <x:TopRowBottomPane>6</x:TopRowBottomPane>
-                                        <x:ActivePane>2</x:ActivePane>
-                                        <x:Panes>
-                                            <x:Pane>
-                                                <x:Number>3</x:Number>
-                                            </x:Pane>
-                                            <x:Pane>
-                                                <x:Number>2</x:Number>
-                                                <x:ActiveRow>0</x:ActiveRow>
-                                                <x:ActiveCol>5</x:ActiveCol>
-                                            </x:Pane>
-                                        </x:Panes>
-                                    </x:WorksheetOptions>
-                                </x:ExcelWorksheet>
-                            </x:ExcelWorksheets>
-                        </x:ExcelWorkbook>
-                    </xml>
-                    <![endif]-->
-                    <style>
-                        * {
-                            font-family: 'Calibri', 'Arial', sans-serif;
-                            mso-font-charset: 0;
-                        }
-                        
-                        body {
-                            margin: 20px;
-                        }
-                        
-                        .report-title {
-                            font-size: 24pt;
-                            font-weight: bold;
-                            color: #006837;
-                            text-align: center;
-                            margin-bottom: 10px;
-                            border-bottom: 3px solid #00cc7a;
-                            padding-bottom: 10px;
-                        }
-                        
-                        .company-header {
-                            background-color: #f0f9f5;
-                            border: 2px solid #00cc7a;
-                            padding: 15px;
-                            margin-bottom: 20px;
-                            border-radius: 8px;
-                        }
-                        
-                        .company-info-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-                        
-                        .company-info-table td {
-                            padding: 5px 10px;
-                            vertical-align: top;
-                        }
-                        
-                        .company-label {
-                            font-weight: bold;
-                            color: #006837;
-                            width: 180px;
-                            white-space: nowrap;
-                        }
-                        
-                        .company-value {
-                            color: #333333;
-                        }
-                        
-                        .data-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-top: 20px;
-                            font-size: 9pt;
-                        }
-                        
-                        .data-table th {
-                            background-color: #006837;
-                            color: white;
-                            font-weight: bold;
-                            text-align: center;
-                            padding: 10px 6px;
-                            border: 1px solid #004d26;
-                            white-space: nowrap;
-                            vertical-align: middle;
-                        }
-                        
-                        .data-table td {
-                            padding: 8px 6px;
-                            border: 1px solid #cccccc;
-                            vertical-align: middle;
-                        }
-                        
-                        .text-left { text-align: left; }
-                        .text-center { text-align: center; }
-                        .text-right { text-align: right; }
-                        
-                        .currency {
-                            font-family: 'Consolas', 'Courier New', monospace;
-                            text-align: right;
-                            white-space: nowrap;
-                            mso-number-format: "#,##0.00";
-                        }
-                        
-                        .summary-row {
-                            background-color: #fff2cc;
-                            font-weight: bold;
-                        }
-                        
-                        .summary-row td {
-                            border-top: 2px solid #ff9900;
-                            border-bottom: 2px solid #ff9900;
-                        }
-                        
-                        .section-title {
-                            font-size: 14pt;
-                            font-weight: bold;
-                            color: #006837;
-                            margin-top: 25px;
-                            margin-bottom: 10px;
-                            padding-bottom: 5px;
-                            border-bottom: 1px solid #00cc7a;
-                        }
-                        
-                        .totals-section {
-                            margin-top: 25px;
-                            background-color: #f0f9f5;
-                            border: 1px solid #00cc7a;
-                            padding: 15px;
-                            border-radius: 8px;
-                        }
-                        
-                        .totals-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-                        
-                        .totals-table td {
-                            padding: 8px 15px;
-                            border: none;
-                        }
-                        
-                        .total-label {
-                            font-weight: bold;
-                            color: #006837;
-                            text-align: right;
-                            width: 60%;
-                        }
-                        
-                        .total-value {
-                            font-weight: bold;
-                            color: #333333;
-                            text-align: right;
-                            font-family: 'Consolas', 'Courier New', monospace;
-                            border-bottom: 1px dotted #cccccc;
-                        }
-                        
-                        .footer {
-                            margin-top: 30px;
-                            padding-top: 15px;
-                            border-top: 1px solid #cccccc;
-                            color: #666666;
-                            font-size: 9pt;
-                            text-align: center;
-                        }
-                    </style>
-                    <title>Compensation Report - ${formattedDate}</title>
-                </head>
-                <body>
-                    <div class="report-title">EMPLOYEE COMPENSATION REPORT</div>
-                    
-                    <div class="company-header">
-                        <table class="company-info-table">
-                            <tr>
-                                <td class="company-label">Company Name:</td>
-                                <td class="company-value">${companyName}</td>
-                                <td class="company-label">TIN Number:</td>
-                                <td class="company-value">${companyTIN}</td>
-                            </tr>
-                            <tr>
-                                <td class="company-label">Address:</td>
-                                <td class="company-value">${companyAddress}</td>
-                                <td class="company-label">Line of Business:</td>
-                                <td class="company-value">${lineOfBusiness}</td>
-                            </tr>
-                            <tr>
-                                <td class="company-label">Payroll Period:</td>
-                                <td class="company-value">${document.getElementById('payrollPeriod').value.trim() || 'N/A'}</td>
-                                <td class="company-label">Payroll Date:</td>
-                                <td class="company-value">${document.getElementById('payrollDate').value}</td>
-                            </tr>
-                            <tr>
-                                <td class="company-label">Payroll Officer:</td>
-                                <td class="company-value">${authorizedEmployee}</td>
-                                <td class="company-label">Email:</td>
-                                <td class="company-value">${document.getElementById('email').value.trim() || 'N/A'}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div class="section-title">Employee Compensation Details</div>
-                    
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Seq No</th>
-                                <th>TIN Number</th>
-                                <th>Last Name</th>
-                                <th>First Name</th>
-                                <th>Middle Name</th>
-                                <th>Daily Rate</th>
-                                <th>Basic Salary</th>
-                                <th>Allowances/Overtime</th>
-                                <th>De Minimis</th>
-                                <th>13th Month</th>
-                                <th>Total Compensation</th>
-                                <th>SSS Share</th>
-                                <th>PhilHealth</th>
-                                <th>Pag-ibig</th>
-                                <th>Total Contributions</th>
-                                <th>Total Deduction</th>
-                                <th>Taxable Compensation</th>
-                                <th>Exemption</th>
-                                <th>Net Taxable</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            // Add data rows
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => {
-                const sequence = row.querySelector('.sequence-number').textContent;
-                const tin = row.querySelector('.employee-tin').value;
-                const lastName = row.querySelector('.last-name').value;
-                const firstName = row.querySelector('.first-name').value;
-                const middleName = row.querySelector('.middle-name').value;
-                const dailyRate = parseFloat(row.querySelector('.daily-rate').value) || 0;
-                const basicSalary = parseFloat(row.querySelector('.basic-salary').value) || 0;
-                const allowances = parseFloat(row.querySelector('.allowances').value) || 0;
-                const deMinimis = parseFloat(row.querySelector('.de-minimis').value) || 0;
-                const thirteenthMonth = parseFloat(row.querySelector('.thirteenth-month').value) || 0;
-                const totalCompensation = parseFloat(row.querySelector('.total-compensation').textContent) || 0;
-                const sssShare = parseFloat(row.querySelector('.sss-share').value) || 0;
-                const philhealthShare = parseFloat(row.querySelector('.philhealth-share').value) || 0;
-                const pagibigShare = parseFloat(row.querySelector('.pagibig-share').value) || 0;
-                const totalContributions = parseFloat(row.querySelector('.total-contributions').textContent) || 0;
-                const totalDeduction = parseFloat(row.querySelector('.total-deduction').textContent) || 0;
-                const totalTaxableCompensation = parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
-                const exemptionAmount = parseFloat(row.querySelector('.exemption-amount').value) || 0;
-                const netTaxableCompensation = parseFloat(row.querySelector('.net-taxable-compensation').textContent) || 0;
-                
-                htmlContent += `
-                    <tr>
-                        <td class="text-center">${sequence}</td>
-                        <td class="text-center">${tin}</td>
-                        <td class="text-left">${lastName}</td>
-                        <td class="text-left">${firstName}</td>
-                        <td class="text-left">${middleName}</td>
-                        <td class="currency">${dailyRate.toFixed(2)}</td>
-                        <td class="currency">${basicSalary.toFixed(2)}</td>
-                        <td class="currency">${allowances.toFixed(2)}</td>
-                        <td class="currency">${deMinimis.toFixed(2)}</td>
-                        <td class="currency">${thirteenthMonth.toFixed(2)}</td>
-                        <td class="currency">${totalCompensation.toFixed(2)}</td>
-                        <td class="currency">${sssShare.toFixed(2)}</td>
-                        <td class="currency">${philhealthShare.toFixed(2)}</td>
-                        <td class="currency">${pagibigShare.toFixed(2)}</td>
-                        <td class="currency">${totalContributions.toFixed(2)}</td>
-                        <td class="currency">${totalDeduction.toFixed(2)}</td>
-                        <td class="currency">${totalTaxableCompensation.toFixed(2)}</td>
-                        <td class="currency">${exemptionAmount.toFixed(2)}</td>
-                        <td class="currency">${netTaxableCompensation.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-            
-            // Add summary row
-            const summaryData = calculateSummaryData();
-            htmlContent += `
-                        </tbody>
-                        <tfoot>
-                            <tr class="summary-row">
-                                <td colspan="6" class="text-right" style="font-weight: bold;">TOTALS:</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalBasicSalary.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalAllowances.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalDeMinimis.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalThirteenthMonth.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalCompensation.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalSSS.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalPhilhealth.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalPagibig.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalContributions.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalDeductions.toFixed(2)}</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalTaxableCompensation.toFixed(2)}</td>
-                                <td>-</td>
-                                <td class="currency" style="font-weight: bold;">${summaryData.totalNetTaxableCompensation.toFixed(2)}</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    
-                    <div class="totals-section">
-                        <div class="section-title">Compensation Summary</div>
-                        <table class="totals-table">
-                            <tr>
-                                <td class="total-label">Total Employees:</td>
-                                <td class="total-value">${totalEmployees}</td>
-                            </tr>
-                            <tr>
-                                <td class="total-label">Total Compensation:</td>
-                                <td class="total-value">₱ ${totalCompensation}</td>
-                            </tr>
-                            <tr>
-                                <td class="total-label">Total Deductions:</td>
-                                <td class="total-value">₱ ${totalDeductions}</td>
-                            </tr>
-                            <tr>
-                                <td class="total-label">Total Taxable Compensation:</td>
-                                <td class="total-value">₱ ${totalTaxableCompensation}</td>
-                            </tr>
-                            <tr>
-                                <td class="total-label" style="border-top: 1px solid #00cc7a; padding-top: 10px;">Net Payroll Amount:</td>
-                                <td class="total-value" style="border-top: 1px solid #00cc7a; padding-top: 10px; font-size: 11pt; color: #006837;">
-                                    ₱ ${(parseFloat(totalCompensation) - parseFloat(totalDeductions)).toFixed(2)}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div class="footer">
-                        <p>Report generated on ${formattedDate} at ${formattedTime}</p>
-                        <p>Authorized by: ${authorizedEmployee} | Prepared by: Compensation Data Tracker System</p>
-                        <p>This is a computer-generated report. No signature is required.</p>
-                        <p>© ${new Date().getFullYear()} Compensation Data Tracker - Professional Employee Compensation Tracking System</p>
-                    </div>
-                </body>
-                </html>
-            `;
-            
-            // Create download link for XLS file
-            const blob = new Blob([htmlContent], {type: 'application/vnd.ms-excel'});
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            const fileName = `Compensation_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Clean up
-            setTimeout(() => {
-                URL.revokeObjectURL(url);
-            }, 100);
-            
-            // Show success message
-            alert(`✅ Excel report "${fileName}" has been generated successfully!`);
         }
-
-        // Helper function to calculate summary data
-        function calculateSummaryData() {
-            let totalBasicSalary = 0;
-            let totalAllowances = 0;
-            let totalDeMinimis = 0;
-            let totalThirteenthMonth = 0;
-            let totalCompensation = 0;
-            let totalSSS = 0;
-            let totalPhilhealth = 0;
-            let totalPagibig = 0;
-            let totalContributions = 0;
-            let totalDeductions = 0;
-            let totalTaxableCompensation = 0;
-            let totalNetTaxableCompensation = 0;
-            
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => {
-                totalBasicSalary += parseFloat(row.querySelector('.basic-salary').value) || 0;
-                totalAllowances += parseFloat(row.querySelector('.allowances').value) || 0;
-                totalDeMinimis += parseFloat(row.querySelector('.de-minimis').value) || 0;
-                totalThirteenthMonth += parseFloat(row.querySelector('.thirteenth-month').value) || 0;
-                totalCompensation += parseFloat(row.querySelector('.total-compensation').textContent) || 0;
-                totalSSS += parseFloat(row.querySelector('.sss-share').value) || 0;
-                totalPhilhealth += parseFloat(row.querySelector('.philhealth-share').value) || 0;
-                totalPagibig += parseFloat(row.querySelector('.pagibig-share').value) || 0;
-                totalContributions += parseFloat(row.querySelector('.total-contributions').textContent) || 0;
-                totalDeductions += parseFloat(row.querySelector('.total-deduction').textContent) || 0;
-                totalTaxableCompensation += parseFloat(row.querySelector('.total-taxable-compensation').textContent) || 0;
-                totalNetTaxableCompensation += parseFloat(row.querySelector('.net-taxable-compensation').textContent) || 0;
-            });
-            
-            return {
-                totalBasicSalary,
-                totalAllowances,
-                totalDeMinimis,
-                totalThirteenthMonth,
-                totalCompensation,
-                totalSSS,
-                totalPhilhealth,
-                totalPagibig,
-                totalContributions,
-                totalDeductions,
-                totalTaxableCompensation,
-                totalNetTaxableCompensation
-            };
+        
+        clearSelection();
+        if (skippedCount > 0) {
+            showToast(`Pasted ${pasteCount} cell(s) (skipped ${skippedCount} uneditable cells)`, 'success');
+        } else {
+            showToast(`Pasted ${pasteCount} cell(s)`, 'success');
         }
+    }).catch(err => {
+        showToast('Failed to read clipboard data. Make sure you have copied something first.', 'error');
+    });
+}
 
-        // Add event listeners to existing rows
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('editable')) {
-                const row = e.target.closest('tr');
-                if (row) {
-                    updateCalculations(row);
-                    updateTotals();
-                    updateSummaryRow();
-                }
+function showToast(message, type = 'info') {
+    // Remove any existing toast
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    
+    if (type === 'success') {
+        toast.style.borderColor = '#00ff9d';
+        toast.style.color = '#00ff9d';
+    } else if (type === 'warning') {
+        toast.style.borderColor = '#ffaa00';
+        toast.style.color = '#ffaa00';
+    } else if (type === 'error') {
+        toast.style.borderColor = '#ff5555';
+        toast.style.color = '#ff5555';
+    }
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 300);
+    }, 2000);
+}
+
+// ===== BACKGROUND EFFECTS =====
+function createBackgroundEffects() {
+    const container = document.querySelector('.container');
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                // Container style changed
             }
         });
+    });
+    
+    if (container) {
+        observer.observe(container, { attributes: true });
+    }
+}
 
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('editable')) {
-                const row = e.target.closest('tr');
-                if (row) {
-                    updateCalculations(row);
-                    updateTotals();
-                    updateSummaryRow();
-                }
-            }
-        });
+function initCursorEffect() {
+    document.addEventListener('mousemove', (e) => {
+        const pulse = document.querySelector('.neon-pulse');
+        if (pulse) {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            pulse.style.background = `
+                radial-gradient(circle at ${x}% ${y}%, rgba(0, 195, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at ${100 - x}% ${100 - y}%, rgba(0, 119, 255, 0.3) 0%, transparent 50%)
+            `;
+        }
+    });
+}
+
+// Add global event listeners for updates
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('editable')) {
+        const row = e.target.closest('tr');
+        if (row) {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        }
+    }
+});
+
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('editable')) {
+        const row = e.target.closest('tr');
+        if (row) {
+            updateCalculations(row);
+            updateTotals();
+            updateSummaryRow();
+        }
+    }
+});
+
+// Make functions globally available for onclick handlers
+window.deleteRow = deleteRow;
+window.updateRowCount = updateRowCount;
+window.updateTotals = updateTotals;
+window.updateSummaryRow = updateSummaryRow;
     </script>
 </body>
 </html>
