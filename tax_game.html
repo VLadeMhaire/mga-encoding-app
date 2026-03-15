@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes">
+    <title>Tax Game - VAT Tracking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Import styles from main system */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        
+        :root {
+            --primary-color: #00ff9d;
+            --secondary-color: #0a0f1a;
+            --card-bg: rgba(0, 30, 20, 0.9);
+            --header-bg: linear-gradient(135deg, rgba(0, 30, 20, 0.9) 0%, rgba(0, 40, 25, 0.95) 100%);
+            --text-color: #e0f7e9;
+            --text-secondary: #80ffd4;
+            --sidebar-bg: rgba(0, 20, 15, 0.98);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0f1a 0%, #0d1913 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: var(--header-bg);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            background: rgba(0, 40, 25, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+        
+        .header-text h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #a7ffeb, #00ff9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .header-text p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        /* Game Container */
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Game Area */
+        .game-area {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(0, 255, 157, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Game Stats */
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: rgba(0, 40, 25, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Game Controls */
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%);
+            color: #002614;
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        /* Tax Puzzle */
+        .tax-puzzle {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .puzzle-piece {
+            background: rgba(0, 40, 25, 0.7);
+            border: 2px solid rgba(0, 255, 157, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .puzzle-piece:hover {
+            background: rgba(0, 255, 157, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .puzzle-piece.selected {
+            background: rgba(0, 255, 157, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+        
+        /* Game Messages */
+        .game-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .game-message.success {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            display: block;
+        }
+        
+        .game-message.error {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid #ff3333;
+            color: #ff6666;
+            display: block;
+        }
+        
+        /* Tax Quiz */
+        .quiz-question {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            background: rgba(0, 40, 25, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+        
+        .quiz-option:hover {
+            background: rgba(0, 255, 157, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.correct {
+            background: rgba(0, 255, 157, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .quiz-option.incorrect {
+            background: rgba(255, 51, 51, 0.2);
+            border-color: #ff3333;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%);
+            color: #002614;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.5);
+        }
+        
+        /* Game Instructions */
+        .instructions {
+            background: rgba(0, 40, 25, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .instructions li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        /* Tax Visualization */
+        .tax-visual {
+            height: 200px;
+            background: rgba(0, 40, 25, 0.6);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+        
+        .tax-bar {
+            width: 50px;
+            background: linear-gradient(to top, #00ff9d, #00b36b);
+            border-radius: 5px 5px 0 0;
+            transition: height 0.5s ease;
+            position: relative;
+        }
+        
+        .tax-bar-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            height: 10px;
+            background: rgba(0, 40, 25, 0.6);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff9d, #00cc7a);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        /* Difficulty Selector */
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .difficulty-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            background: rgba(0, 40, 25, 0.6);
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn:hover {
+            background: rgba(0, 255, 157, 0.1);
+        }
+        
+        .difficulty-btn.active {
+            background: rgba(0, 255, 157, 0.2);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+        }
+        
+        /* Timer */
+        .timer {
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Game Over Modal */
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 15, 26, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 50px rgba(0, 255, 157, 0.5);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .modal-score {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+        
+        /* Achievement Badges */
+        .achievements {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .badge i {
+            color: var(--primary-color);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #80cbc4;
+            font-size: 0.9rem;
+            margin-top: 40px;
+            border-top: 1px solid rgba(0, 255, 157, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <div class="header-text">
+                <h1>Tax Game</h1>
+                <p>Learn VAT concepts through fun, interactive challenges and puzzles</p>
+            </div>
+        </div>
+        
+        <!-- Game Container -->
+        <div class="game-container">
+            <!-- Game Area -->
+            <div class="game-area">
+                <h2 class="game-title">
+                    <i class="fas fa-puzzle-piece"></i>
+                    Tax Puzzle Challenge
+                </h2>
+                
+                <div class="game-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="score">0</div>
+                        <div class="stat-label">Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="level">1</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="lives">3</div>
+                        <div class="stat-label">Lives</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="time">60</div>
+                        <div class="stat-label">Seconds</div>
+                    </div>
+                </div>
+                
+                <!-- Puzzle Area -->
+                <div id="puzzleArea">
+                    <div class="quiz-question" id="question">
+                        Match the tax term with its correct definition:
+                    </div>
+                    
+                    <div class="tax-puzzle" id="puzzleContainer">
+                        <!-- Puzzle pieces will be generated here -->
+                    </div>
+                    
+                    <div class="game-message" id="message"></div>
+                </div>
+                
+                <!-- Quiz Area (hidden initially) -->
+                <div id="quizArea" style="display: none;">
+                    <div class="quiz-question" id="quizQuestion"></div>
+                    
+                    <div class="quiz-options" id="quizOptions">
+                        <!-- Options will be generated here -->
+                    </div>
+                    
+                    <div class="game-message" id="quizMessage"></div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn" id="startBtn">
+                        <i class="fas fa-play"></i>
+                        Start Game
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo"></i>
+                        Reset Game
+                    </button>
+                    <button class="btn" id="nextGameBtn" style="display: none;">
+                        <i class="fas fa-arrow-right"></i>
+                        Next Challenge
+                    </button>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-level="easy">Easy</button>
+                    <button class="difficulty-btn" data-level="medium">Medium</button>
+                    <button class="difficulty-btn" data-level="hard">Hard</button>
+                </div>
+            </div>
+            
+            <!-- Instructions & Info -->
+            <div>
+                <div class="game-area">
+                    <h2 class="game-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        How to Play
+                    </h2>
+                    
+                    <div class="instructions">
+                        <h3><i class="fas fa-info-circle"></i> Game Rules</h3>
+                        <ul>
+                            <li>Match tax terms with their correct definitions</li>
+                            <li>Answer VAT calculation questions correctly</li>
+                            <li>Complete challenges within the time limit</li>
+                            <li>Earn points for correct answers</li>
+                            <li>Level up every 100 points</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="instructions" style="margin-top: 20px;">
+                        <h3><i class="fas fa-trophy"></i> Achievements</h3>
+                        <div class="achievements">
+                            <div class="badge">
+                                <i class="fas fa-star"></i>
+                                Tax Novice
+                            </div>
+                            <div class="badge">
+                                <i class="fas fa-star-half-alt"></i>
+                                VAT Learner
+                            </div>
+                            <div class="badge">
+                                <i class="fas fa-crown"></i>
+                                Tax Master
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tax-visual" id="taxVisual">
+                        <!-- Tax visualization bars will be added here -->
+                    </div>
+                </div>
+                
+                <a href="index.html" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+        
+        <!-- Game Over Modal -->
+        <div class="game-over-modal" id="gameOverModal">
+            <div class="modal-content">
+                <h2 class="modal-title">Game Over!</h2>
+                <div class="modal-score" id="finalScore">0</div>
+                <p id="gameOverMessage">Great effort! Try again to beat your high score.</p>
+                <div class="game-controls" style="margin-top: 30px;">
+                    <button class="btn" id="playAgainBtn">
+                        <i class="fas fa-redo"></i>
+                        Play Again
+                    </button>
+                    <button class="btn btn-secondary" id="closeModalBtn">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 MGAA VAT Tracking System | Tax Game - Educational Entertainment Module</p>
+        </div>
+    </div>
+    
+    <script>
+        // Game Variables
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let timeLeft = 60;
+        let gameActive = false;
+        let timer;
+        let currentGame = 'puzzle';
+        let difficulty = 'easy';
+        
+        // Tax Terms and Definitions
+        const taxTerms = {
+            easy: [
+                { term: 'VAT', definition: 'Value Added Tax on goods and services' },
+                { term: 'TIN', definition: 'Tax Identification Number for taxpayers' },
+                { term: 'BIR', definition: 'Bureau of Internal Revenue' },
+                { term: 'Input Tax', definition: 'VAT on business purchases' },
+                { term: 'Output Tax', definition: 'VAT on business sales' },
+                { term: 'Exempt', definition: 'Not subject to VAT' },
+                { term: 'Zero-rated', definition: 'Subject to 0% VAT rate' },
+                { term: 'Receipt', definition: 'Proof of transaction for taxes' },
+                { term: 'Withholding Tax', definition: 'Tax deducted at source' }
+            ],
+            medium: [
+                { term: 'Vatable Sales', definition: 'Sales subject to 12% VAT' },
+                { term: 'Non-Vatable', definition: 'Sales not subject to VAT' },
+                { term: 'VAT Payable', definition: 'Output tax minus input tax' },
+                { term: 'VAT Refund', definition: 'Excess input tax to be refunded' },
+                { term: 'Capital Goods', definition: 'Assets subject to VAT' },
+                { term: 'Creditable Tax', definition: 'Tax that can be deducted' },
+                { term: 'Gross Sales', definition: 'Total sales before VAT' },
+                { term: 'Net Sales', definition: 'Gross sales divided by 1.12' },
+                { term: 'Percentage Tax', definition: 'Tax based on gross sales' }
+            ],
+            hard: [
+                { term: 'Expanded Withholding Tax', definition: 'Withholding tax on certain income payments' },
+                { term: 'Final Withholding Tax', definition: 'Full tax withheld at source' },
+                { term: 'Graduated Tax', definition: 'Tax rate increases with income' },
+                { term: 'Optional Standard Deduction', definition: '40% of gross income deduction' },
+                { term: 'Itemized Deduction', definition: 'Actual expenses deduction' },
+                { term: 'Fringe Benefit Tax', definition: 'Tax on non-cash benefits' },
+                { term: 'Donor\'s Tax', definition: 'Tax on gifts and donations' },
+                { term: 'Estate Tax', definition: 'Tax on inherited property' },
+                { term: 'Documentary Stamp Tax', definition: 'Tax on documents and instruments' }
+            ]
+        };
+        
+        // Quiz Questions
+        const quizQuestions = {
+            easy: [
+                {
+                    question: 'What is the current VAT rate in the Philippines?',
+                    options: ['10%', '12%', '15%', '18%'],
+                    answer: 1
+                },
+                {
+                    question: 'What does VAT stand for?',
+                    options: [
+                        'Value Added Tax',
+                        'Variable Amount Tax',
+                        'Volume Assessment Tax',
+                        'Value Assessment Tax'
+                    ],
+                    answer: 0
+                },
+                {
+                    question: 'Which government agency collects VAT?',
+                    options: [
+                        'Bureau of Customs',
+                        'Bureau of Internal Revenue',
+                        'Department of Finance',
+                        'Securities and Exchange Commission'
+                    ],
+                    answer: 1
+                },
+                {
+                    question: 'If a product costs ₱1,120 including VAT, what is the net price?',
+                    options: ['₱1,000', '₱1,100', '₱1,120', '₱1,200'],
+                    answer: 0
+                }
+            ],
+            medium: [
+                {
+                    question: 'Calculate VAT on ₱10,000 net sales:',
+                    options: ['₱1,000', '₱1,200', '₱1,500', '₱2,000'],
+                    answer: 1
+                },
+                {
+                    question: 'What is the formula for calculating net sales?',
+                    options: [
+                        'Gross Sales × 1.12',
+                        'Gross Sales ÷ 1.12',
+                        'Gross Sales × 0.12',
+                        'Gross Sales ÷ 0.12'
+                    ],
+                    answer: 1
+                },
+                {
+                    question: 'Which sales are VAT-exempt?',
+                    options: [
+                        'Export sales',
+                        'Sales to senior citizens',
+                        'Sales of agricultural products',
+                        'All of the above'
+                    ],
+                    answer: 3
+                },
+                {
+                    question: 'What is the threshold for VAT registration?',
+                    options: [
+                        '₱1.5M annual sales',
+                        '₱3M annual sales',
+                        '₱5M annual sales',
+                        '₱10M annual sales'
+                    ],
+                    answer: 1
+                }
+            ],
+            hard: [
+                {
+                    question: 'Calculate VAT payable with ₱50,000 output tax and ₱30,000 input tax:',
+                    options: ['₱20,000', '₱30,000', '₱50,000', '₱80,000'],
+                    answer: 0
+                },
+                {
+                    question: 'What percentage of input tax can be claimed as credit?',
+                    options: ['70%', '80%', '90%', '100%'],
+                    answer: 3
+                },
+                {
+                    question: 'When is VAT return due?',
+                    options: [
+                        'Every 10th day of the month',
+                        'Every 20th day of the month',
+                        'Every 25th day of the month',
+                        'Every 30th day of the month'
+                    ],
+                    answer: 1
+                },
+                {
+                    question: 'Which is subject to percentage tax instead of VAT?',
+                    options: [
+                        'Non-VAT registered businesses',
+                        'Banks and financial institutions',
+                        'Insurance companies',
+                        'All of the above'
+                    ],
+                    answer: 3
+                }
+            ]
+        };
+        
+        // DOM Elements
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const livesElement = document.getElementById('lives');
+        const timeElement = document.getElementById('time');
+        const puzzleContainer = document.getElementById('puzzleContainer');
+        const messageElement = document.getElementById('message');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const nextGameBtn = document.getElementById('nextGameBtn');
+        const gameOverModal = document.getElementById('gameOverModal');
+        const finalScoreElement = document.getElementById('finalScore');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const progressFill = document.getElementById('progressFill');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        const quizArea = document.getElementById('quizArea');
+        const puzzleArea = document.getElementById('puzzleArea');
+        const quizQuestion = document.getElementById('quizQuestion');
+        const quizOptions = document.getElementById('quizOptions');
+        const quizMessage = document.getElementById('quizMessage');
+        const taxVisual = document.getElementById('taxVisual');
+        
+        // Initialize Game
+        function initGame() {
+            updateUI();
+            createTaxVisualization();
+        }
+        
+        // Start Game
+        startBtn.addEventListener('click', function() {
+            if (!gameActive) {
+                startGame();
+            }
+        });
+        
+        function startGame() {
+            gameActive = true;
+            score = 0;
+            level = 1;
+            lives = 3;
+            timeLeft = 60;
+            
+            updateUI();
+            startTimer();
+            generatePuzzle();
+            
+            startBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Game';
+            startBtn.onclick = pauseGame;
+        }
+        
+        // Pause Game
+        function pauseGame() {
+            gameActive = false;
+            clearInterval(timer);
+            startBtn.innerHTML = '<i class="fas fa-play"></i> Resume Game';
+            startBtn.onclick = resumeGame;
+        }
+        
+        // Resume Game
+        function resumeGame() {
+            gameActive = true;
+            startTimer();
+            startBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Game';
+            startBtn.onclick = pauseGame;
+        }
+        
+        // Reset Game
+        resetBtn.addEventListener('click', function() {
+            resetGame();
+        });
+        
+        function resetGame() {
+            gameActive = false;
+            clearInterval(timer);
+            
+            score = 0;
+            level = 1;
+            lives = 3;
+            timeLeft = 60;
+            
+            updateUI();
+            puzzleContainer.innerHTML = '';
+            messageElement.style.display = 'none';
+            
+            startBtn.innerHTML = '<i class="fas fa-play"></i> Start Game';
+            startBtn.onclick = startGame;
+            
+            // Hide quiz area, show puzzle area
+            quizArea.style.display = 'none';
+            puzzleArea.style.display = 'block';
+            nextGameBtn.style.display = 'none';
+            
+            // Reset progress
+            progressFill.style.width = '0%';
+        }
+        
+        // Next Game
+        nextGameBtn.addEventListener('click', function() {
+            if (currentGame === 'puzzle') {
+                startQuiz();
+            } else {
+                generatePuzzle();
+            }
+        });
+        
+        // Update UI
+        function updateUI() {
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+            livesElement.textContent = lives;
+            timeElement.textContent = timeLeft;
+            
+            // Update progress
+            const progress = (score % 100) / 100 * 100;
+            progressFill.style.width = progress + '%';
+            
+            // Update level based on score
+            const newLevel = Math.floor(score / 100) + 1;
+            if (newLevel !== level) {
+                level = newLevel;
+                showMessage(`🎉 Level Up! You're now at level ${level}`, 'success');
+            }
+        }
+        
+        // Timer
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(function() {
+                if (gameActive && timeLeft > 0) {
+                    timeLeft--;
+                    timeElement.textContent = timeLeft;
+                    
+                    // Visual timer warning
+                    if (timeLeft <= 10) {
+                        timeElement.style.color = '#ff3333';
+                        timeElement.style.animation = 'pulse 1s infinite';
+                    }
+                } else if (timeLeft <= 0) {
+                    endGame('Time\'s up!');
+                }
+            }, 1000);
+        }
+        
+        // Generate Puzzle
+        function generatePuzzle() {
+            currentGame = 'puzzle';
+            puzzleArea.style.display = 'block';
+            quizArea.style.display = 'none';
+            nextGameBtn.style.display = 'none';
+            
+            // Clear previous puzzle
+            puzzleContainer.innerHTML = '';
+            messageElement.style.display = 'none';
+            
+            // Get terms based on difficulty
+            const terms = [...taxTerms[difficulty]];
+            const selectedTerms = [];
+            
+            // Select 6 random terms (3 pairs)
+            for (let i = 0; i < 3; i++) {
+                const randomIndex = Math.floor(Math.random() * terms.length);
+                selectedTerms.push(terms[randomIndex]);
+                terms.splice(randomIndex, 1);
+            }
+            
+            // Create shuffled array of all items
+            const allItems = [];
+            selectedTerms.forEach(item => {
+                allItems.push({ type: 'term', text: item.term });
+                allItems.push({ type: 'definition', text: item.definition, match: item.term });
+            });
+            
+            // Shuffle array
+            shuffleArray(allItems);
+            
+            // Create puzzle pieces
+            allItems.forEach((item, index) => {
+                const piece = document.createElement('div');
+                piece.className = 'puzzle-piece';
+                piece.textContent = item.text;
+                piece.dataset.index = index;
+                piece.dataset.type = item.type;
+                piece.dataset.match = item.match || '';
+                
+                piece.addEventListener('click', function() {
+                    handlePuzzleClick(this);
+                });
+                
+                puzzleContainer.appendChild(piece);
+            });
+            
+            // Update question
+            document.getElementById('question').textContent = 
+                `Match ${difficulty} tax terms with their correct definitions:`;
+        }
+        
+        // Handle Puzzle Click
+        let selectedPiece = null;
+        
+        function handlePuzzleClick(piece) {
+            if (!gameActive) return;
+            
+            if (!selectedPiece) {
+                // First selection
+                selectedPiece = piece;
+                piece.classList.add('selected');
+            } else {
+                // Second selection
+                if (selectedPiece === piece) {
+                    // Deselect if same piece clicked
+                    piece.classList.remove('selected');
+                    selectedPiece = null;
+                    return;
+                }
+                
+                // Check if match
+                if (
+                    (selectedPiece.dataset.type === 'term' && piece.dataset.type === 'definition' && 
+                     selectedPiece.textContent === piece.dataset.match) ||
+                    (selectedPiece.dataset.type === 'definition' && piece.dataset.type === 'term' && 
+                     selectedPiece.dataset.match === piece.textContent)
+                ) {
+                    // Correct match
+                    selectedPiece.classList.add('selected');
+                    piece.classList.add('selected');
+                    
+                    // Disable pieces
+                    selectedPiece.style.opacity = '0.5';
+                    selectedPiece.style.cursor = 'default';
+                    piece.style.opacity = '0.5';
+                    piece.style.cursor = 'default';
+                    
+                    // Remove event listeners
+                    selectedPiece.replaceWith(selectedPiece.cloneNode(true));
+                    piece.replaceWith(piece.cloneNode(true));
+                    
+                    // Add score
+                    score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 15 : 20;
+                    showMessage('✅ Correct match! +' + (difficulty === 'easy' ? 10 : difficulty === 'medium' ? 15 : 20) + ' points', 'success');
+                    
+                    // Check if all matches found
+                    const remainingPieces = document.querySelectorAll('.puzzle-piece:not([style*="opacity: 0.5"])');
+                    if (remainingPieces.length === 0) {
+                        setTimeout(() => {
+                            showMessage('🎉 Puzzle Complete! Starting next challenge...', 'success');
+                            nextGameBtn.style.display = 'flex';
+                        }, 1000);
+                    }
+                } else {
+                    // Wrong match
+                    selectedPiece.classList.remove('selected');
+                    piece.classList.add('selected');
+                    setTimeout(() => {
+                        piece.classList.remove('selected');
+                    }, 500);
+                    
+                    lives--;
+                    showMessage('❌ Wrong match! Try again.', 'error');
+                    
+                    if (lives <= 0) {
+                        endGame('No more lives!');
+                    }
+                }
+                
+                selectedPiece = null;
+                updateUI();
+            }
+        }
+        
+        // Start Quiz
+        function startQuiz() {
+            currentGame = 'quiz';
+            puzzleArea.style.display = 'none';
+            quizArea.style.display = 'block';
+            nextGameBtn.style.display = 'none';
+            
+            // Clear previous quiz
+            quizOptions.innerHTML = '';
+            quizMessage.style.display = 'none';
+            
+            // Get random question
+            const questions = quizQuestions[difficulty];
+            const question = questions[Math.floor(Math.random() * questions.length)];
+            
+            // Display question
+            quizQuestion.textContent = question.question;
+            
+            // Display options
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'quiz-option';
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                
+                optionElement.addEventListener('click', function() {
+                    handleQuizAnswer(this, question.answer);
+                });
+                
+                quizOptions.appendChild(optionElement);
+            });
+        }
+        
+        // Handle Quiz Answer
+        function handleQuizAnswer(option, correctIndex) {
+            if (!gameActive) return;
+            
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+                opt.style.cursor = 'default';
+                
+                // Remove event listeners
+                opt.replaceWith(opt.cloneNode(true));
+            });
+            
+            // Show correct answer
+            options[correctIndex].classList.add('correct');
+            
+            if (parseInt(option.dataset.index) === correctIndex) {
+                // Correct answer
+                option.classList.add('correct');
+                score += difficulty === 'easy' ? 15 : difficulty === 'medium' ? 25 : 35;
+                quizMessage.textContent = '✅ Correct answer! +' + (difficulty === 'easy' ? 15 : difficulty === 'medium' ? 25 : 35) + ' points';
+                quizMessage.className = 'game-message success';
+                
+                // Show next game button
+                setTimeout(() => {
+                    nextGameBtn.style.display = 'flex';
+                }, 1000);
+            } else {
+                // Wrong answer
+                option.classList.add('incorrect');
+                lives--;
+                quizMessage.textContent = '❌ Wrong answer! Try again next time.';
+                quizMessage.className = 'game-message error';
+                
+                if (lives <= 0) {
+                    setTimeout(() => {
+                        endGame('No more lives!');
+                    }, 1500);
+                }
+            }
+            
+            quizMessage.style.display = 'block';
+            updateUI();
+        }
+        
+        // Show Message
+        function showMessage(text, type) {
+            messageElement.textContent = text;
+            messageElement.className = 'game-message ' + type;
+            messageElement.style.display = 'block';
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 3000);
+        }
+        
+        // End Game
+        function endGame(reason) {
+            gameActive = false;
+            clearInterval(timer);
+            
+            // Update modal
+            finalScoreElement.textContent = score;
+            document.getElementById('gameOverMessage').textContent = reason;
+            
+            // Show modal
+            gameOverModal.style.display = 'flex';
+        }
+        
+        // Play Again
+        playAgainBtn.addEventListener('click', function() {
+            gameOverModal.style.display = 'none';
+            resetGame();
+            startGame();
+        });
+        
+        // Close Modal
+        closeModalBtn.addEventListener('click', function() {
+            gameOverModal.style.display = 'none';
+        });
+        
+        // Difficulty Selector
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                difficultyBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                difficulty = this.dataset.level;
+                
+                if (gameActive) {
+                    // Regenerate current game with new difficulty
+                    if (currentGame === 'puzzle') {
+                        generatePuzzle();
+                    } else {
+                        startQuiz();
+                    }
+                }
+            });
+        });
+        
+        // Create Tax Visualization
+        function createTaxVisualization() {
+            taxVisual.innerHTML = '';
+            
+            const taxData = [
+                { label: 'VAT (12%)', value: 12, color: '#00ff9d' },
+                { label: 'Income Tax', value: 8, color: '#667eea' },
+                { label: 'Excise Tax', value: 5, color: '#764ba2' },
+                { label: 'Withholding', value: 7, color: '#ff9900' },
+                { label: 'Percentage', value: 3, color: '#ff3333' }
+            ];
+            
+            taxData.forEach(data => {
+                const bar = document.createElement('div');
+                bar.className = 'tax-bar';
+                bar.style.height = (data.value * 15) + 'px';
+                bar.style.background = `linear-gradient(to top, ${data.color}, ${data.color}99)`;
+                
+                const label = document.createElement('div');
+                label.className = 'tax-bar-label';
+                label.textContent = data.label;
+                
+                bar.appendChild(label);
+                taxVisual.appendChild(bar);
+            });
+        }
+        
+        // Utility Functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initGame();
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && gameActive) {
+                    pauseGame();
+                }
+                if (e.key === 'r' && e.ctrlKey) {
+                    resetGame();
+                }
+                if (e.key === ' ' && !gameActive) {
+                    startGame();
+                }
+            });
+            
+            // Add CSS for pulse animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
