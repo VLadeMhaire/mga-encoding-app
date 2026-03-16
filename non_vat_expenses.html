@@ -3,322 +3,568 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Non-Vatable Expenses Data Tracker</title>
+    <title>Vatable Expenses Data Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* REMOVED the automatic scaling - no more transform: scale(0.5) */
-        
-        .container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Make table wrapper take maximum available space */
-        .table-wrapper {
-            flex: 1 1 auto;
-            min-height: 400px;
-            overflow: auto !important;
-            position: relative;
-            direction: rtl; /* This moves the vertical scrollbar to the left */
-        }
-        
-        /* Reset direction for the table itself to keep content LTR */
-        .table-wrapper table {
-            direction: ltr;
-            width: 100%;
-            min-width: 1500px;
-            border-collapse: collapse;
-            table-layout: auto;
-        }
-        
-        /* Adjust scrollbar styling for left-side scrollbar */
-        .table-wrapper::-webkit-scrollbar {
-            width: 14px;
-            height: 12px;
-            background: rgba(0, 30, 20, 0.95);
-        }
-        
-        .table-wrapper::-webkit-scrollbar-track {
-            background: rgba(0, 30, 20, 0.9);
-            border-right: 1px solid rgba(0, 255, 157, 0.2);
-        }
-        
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #00ff9d, #00cc7a);
-            border-radius: 7px;
-            border: 2px solid rgba(0, 30, 20, 0.9);
-            min-height: 40px;
-        }
-        
-        .table-wrapper::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #00ffaa, #00dd88);
-            box-shadow: 0 0 10px #00ff9d;
-        }
-        
-        /* Make table headers sticky with better visibility */
-        thead {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: linear-gradient(135deg, rgba(0, 40, 25, 0.98) 0%, rgba(0, 60, 35, 0.98) 100%);
-        }
-        
-        /* Responsive header text that wraps at high zoom */
-        th {
-            padding: 15px 8px;
-            text-align: left;
-            font-weight: 600;
-            font-size: clamp(11px, 1vw, 14px);
-            border-right: 1px solid rgba(0, 255, 157, 0.2);
-            position: relative;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-            word-break: break-word;
-            hyphens: auto;
-            line-height: 1.3;
-            vertical-align: middle;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+    /* REMOVED the automatic scaling - no more transform: scale(0.5) */
+    
+    .container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Make table wrapper take maximum available space */
+    .table-wrapper {
+        flex: 1 1 auto;
+        min-height: 400px;
+        overflow: auto !important;
+        position: relative;
+        direction: rtl; /* This moves the vertical scrollbar to the left */
+    }
+    
+    /* Reset direction for the table itself to keep content LTR */
+    .table-wrapper table {
+        direction: ltr;
+        width: 100%;
+        min-width: 1500px;
+        border-collapse: collapse;
+        table-layout: auto;
+    }
+    
+    /* Adjust scrollbar styling for left-side scrollbar */
+    .table-wrapper::-webkit-scrollbar {
+        width: 14px;
+        height: 12px;
+        background: rgba(0, 30, 20, 0.95);
+    }
+    
+    .table-wrapper::-webkit-scrollbar-track {
+        background: rgba(0, 30, 20, 0.9);
+        border-right: 1px solid rgba(0, 255, 157, 0.2);
+    }
+    
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #00ff9d, #00cc7a);
+        border-radius: 7px;
+        border: 2px solid rgba(0, 30, 20, 0.9);
+        min-height: 40px;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #00ffaa, #00dd88);
+        box-shadow: 0 0 10px #00ff9d;
+    }
+    
+    /* Make table headers sticky with better visibility */
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: linear-gradient(135deg, rgba(0, 40, 25, 0.98) 0%, rgba(0, 60, 35, 0.98) 100%);
+    }
+    
+    /* Responsive header text that wraps at high zoom */
+    th {
+        padding: 15px 8px;
+        text-align: left;
+        font-weight: 600;
+        font-size: clamp(11px, 1vw, 14px);
+        border-right: 1px solid rgba(0, 255, 157, 0.2);
+        position: relative;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
+        hyphens: auto;
+        line-height: 1.3;
+        vertical-align: middle;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+        white-space: normal;
+        min-width: 80px;
+    }
+    
+    /* Responsive cell content */
+    td {
+        padding: 12px 8px;
+        border-right: 1px solid rgba(0, 255, 157, 0.1);
+        font-size: clamp(12px, 0.9vw, 14px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        color: #e0f7e9;
+        white-space: nowrap;
+        max-width: 200px;
+    }
+    
+    /* Allow cells with long content to wrap at high zoom */
+    @media screen and (max-width: 1400px) {
+        td {
             white-space: normal;
-            min-width: 80px;
+            word-break: break-word;
+            min-width: 100px;
+        }
+    }
+    
+    /* Responsive inputs */
+    input, select, .uneditable {
+        width: 100%;
+        padding: 8px 6px;
+        border: 1px solid rgba(0, 255, 157, 0.3);
+        border-radius: 4px;
+        font-size: clamp(11px, 0.9vw, 13px);
+        background: rgba(15, 30, 25, 0.8);
+        color: #e0f7e9;
+        box-sizing: border-box;
+    }
+    
+    /* Ensure delete button fits */
+    .delete-btn {
+        padding: 6px 8px;
+        font-size: clamp(11px, 0.9vw, 13px);
+        white-space: nowrap;
+    }
+    
+    /* Column-specific responsive widths - Adjusted for Expenses columns */
+    th:nth-child(1), td:nth-child(1) { min-width: 90px; } /* Date */
+    th:nth-child(2), td:nth-child(2) { min-width: 110px; } /* Invoice Number */
+    th:nth-child(3), td:nth-child(3) { min-width: 90px; } /* Invoice Type */
+    th:nth-child(4), td:nth-child(4) { min-width: 100px; } /* Transaction Type */
+    th:nth-child(5), td:nth-child(5) { min-width: 140px; } /* TIN Number */
+    th:nth-child(6), td:nth-child(6) { min-width: 150px; } /* Supplier Name */
+    th:nth-child(7), td:nth-child(7) { min-width: 160px; } /* Address */
+    th:nth-child(8), td:nth-child(8) { min-width: 120px; } /* Gross Amount */
+    th:nth-child(9), td:nth-child(9) { min-width: 180px; } /* Nature of Expense */
+    th:nth-child(10), td:nth-child(10) { min-width: 110px; } /* Net Expenses */
+    th:nth-child(11), td:nth-child(11) { min-width: 100px; } /* Input Tax */
+    th:nth-child(12), td:nth-child(12) { min-width: 100px; } /* Withholding Rate */
+    th:nth-child(13), td:nth-child(13) { min-width: 110px; } /* Withholding Tax */
+    th:nth-child(14), td:nth-child(14) { min-width: 130px; } /* Gross - Withholding Tax */
+    th:nth-child(15), td:nth-child(15) { min-width: 130px; } /* Remarks */
+    th:nth-child(16), td:nth-child(16) { min-width: 70px; } /* Action */
+    
+    /* Zoom level specific adjustments */
+    @media screen and (min-resolution: 120dpi) { /* 125% zoom */
+        th { font-size: 12px; padding: 12px 6px; }
+        td { font-size: 12px; padding: 10px 6px; }
+        input, select { font-size: 11px; padding: 6px 4px; }
+    }
+    
+    @media screen and (min-resolution: 144dpi) { /* 150% zoom */
+        th { font-size: 11px; padding: 10px 4px; }
+        td { font-size: 11px; padding: 8px 4px; }
+        input, select { font-size: 10px; padding: 5px 3px; }
+        th:nth-child(1), td:nth-child(1) { min-width: 80px; }
+        th:nth-child(2), td:nth-child(2) { min-width: 90px; }
+    }
+    
+    @media screen and (min-resolution: 168dpi) { /* 175% zoom */
+        th { font-size: 10px; padding: 8px 3px; letter-spacing: 0.3px; }
+        td { font-size: 10px; padding: 6px 3px; }
+        input, select { font-size: 9px; padding: 4px 2px; }
+    }
+    
+    @media screen and (min-resolution: 192dpi) { /* 200% zoom */
+        th { font-size: 9px; padding: 6px 2px; letter-spacing: 0.2px; }
+        td { font-size: 9px; padding: 5px 2px; }
+        input, select { font-size: 8px; padding: 3px 2px; }
+        .delete-btn { padding: 4px 5px; }
+    }
+    
+    /* Hidden state styles */
+    .company-info-section.hidden,
+    .stats.hidden,
+    .tally-section.hidden,
+    .footer.hidden {
+        display: none !important;
+    }
+    
+    /* Focus mode - when other sections are hidden, table takes full space */
+    body.table-focus-mode .company-info-section,
+    body.table-focus-mode .stats,
+    body.table-focus-mode .tally-section,
+    body.table-focus-mode .footer {
+        display: none !important;
+    }
+    
+    body.table-focus-mode .container {
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    body.table-focus-mode .table-wrapper {
+        height: calc(100vh - 80px);
+    }
+    
+    /* Text truncation with ellipsis for very narrow columns */
+    .text-truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Validation message styling */
+    .validation-message {
+        display: none;
+        color: #ff6666;
+        font-size: 10px;
+        margin-top: 2px;
+        position: absolute;
+        background: rgba(0, 30, 20, 0.9);
+        padding: 2px 5px;
+        border-radius: 3px;
+        border: 1px solid #ff6666;
+        z-index: 100;
+    }
+    
+    td {
+        position: relative;
+    }
+    
+    /* Expense category tally styling */
+    .tally-section .tally-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+    }
+    
+    .tally-item.services {
+        border-left: 4px solid #00b3ff;
+    }
+    
+    .tally-item.goods {
+        border-left: 4px solid #ff9900;
+    }
+    
+    .tally-item.rental {
+        border-left: 4px solid #9d00ff;
+    }
+    
+    .tally-item .tally-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
+    }
+    
+    .tally-item .tally-amount {
+        font-size: 18px;
+        font-weight: 700;
+        color: #00ff9d;
+        text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
+    }
+    
+    .tally-item .tally-count {
+        font-size: 12px;
+        color: #80cbc4;
+        background: rgba(0, 40, 30, 0.5);
+        padding: 3px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 255, 157, 0.2);
+    }
+    
+    .tally-item .tally-rate {
+        font-size: 11px;
+        color: #00ff9d;
+        background: rgba(0, 255, 157, 0.1);
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-top: 8px;
+        display: inline-block;
+        border: 1px solid rgba(0, 255, 157, 0.2);
+    }
+
+    /* ===== IMPROVED PAGINATION CONTROLS DESIGN ===== */
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 25px;
+        background: linear-gradient(135deg, rgba(0, 30, 20, 0.97) 0%, rgba(0, 45, 30, 0.98) 100%);
+        border-top: 2px solid rgba(0, 255, 157, 0.3);
+        border-bottom: 1px solid rgba(0, 255, 157, 0.2);
+        flex-shrink: 0;
+        box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 255, 157, 0.2);
+        gap: 20px;
+        flex-wrap: wrap;
+        position: relative;
+        backdrop-filter: blur(5px);
+    }
+
+    .pagination-controls::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #00ff9d, #00ff9d, #00ff9d, transparent);
+        filter: blur(2px);
+        opacity: 0.6;
+    }
+
+    .pagination-controls::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 10%;
+        right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #00ff9d, transparent);
+        opacity: 0.3;
+    }
+
+    .pagination-info {
+        color: #a7ffeb;
+        font-size: 14px;
+        font-weight: 500;
+        background: rgba(0, 40, 25, 0.6);
+        padding: 8px 20px;
+        border-radius: 30px;
+        border: 1px solid rgba(0, 255, 157, 0.3);
+        box-shadow: 0 0 20px rgba(0, 255, 157, 0.1), inset 0 0 10px rgba(0, 255, 157, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 0.3px;
+        backdrop-filter: blur(5px);
+    }
+
+    .pagination-info i {
+        color: #00ff9d;
+        font-size: 16px;
+        text-shadow: 0 0 10px #00ff9d;
+    }
+
+    .pagination-info span {
+        color: #00ff9d;
+        font-weight: 700;
+        margin: 0 3px;
+        text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
+    }
+
+    .pagination-buttons {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        background: rgba(0, 30, 20, 0.5);
+        padding: 5px;
+        border-radius: 40px;
+        border: 1px solid rgba(0, 255, 157, 0.2);
+        backdrop-filter: blur(5px);
+    }
+
+    .pagination-btn {
+        background: transparent;
+        border: none;
+        color: #a7ffeb;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s ease;
+        font-size: 16px;
+        position: relative;
+        border: 1px solid transparent;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+        background: rgba(0, 255, 157, 0.15);
+        color: #00ff9d;
+        border-color: rgba(0, 255, 157, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 255, 157, 0.2);
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.25;
+        cursor: not-allowed;
+    }
+
+    .pagination-page-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 40, 25, 0.7);
+        padding: 4px 12px 4px 16px;
+        border-radius: 40px;
+        border: 1px solid rgba(0, 255, 157, 0.3);
+        box-shadow: inset 0 0 15px rgba(0, 20, 15, 0.8);
+    }
+
+    .pagination-page-number {
+        color: #00ff9d;
+        font-size: 16px;
+        font-weight: 700;
+        min-width: 40px;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+        background: transparent;
+        border: none;
+        padding: 6px 0;
+    }
+
+    .pagination-page-number:focus {
+        outline: none;
+    }
+
+    /* Remove spinner from number input */
+    .pagination-page-number::-webkit-inner-spin-button,
+    .pagination-page-number::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .pagination-page-number[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .pagination-total-pages {
+        color: #80cbc4;
+        font-size: 14px;
+        font-weight: 500;
+        padding-left: 8px;
+        border-left: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
+    .pagination-total-pages span {
+        color: #00ff9d;
+        font-weight: 700;
+        margin-left: 4px;
+    }
+
+    .pagination-select {
+        background: rgba(0, 40, 25, 0.8);
+        border: 1px solid rgba(0, 255, 157, 0.3);
+        color: #a7ffeb;
+        padding: 8px 32px 8px 16px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300ff9d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        background-size: 12px;
+        transition: all 0.25s ease;
+        box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+        backdrop-filter: blur(5px);
+    }
+
+    .pagination-select:hover {
+        border-color: #00ff9d;
+        background-color: rgba(0, 60, 35, 0.9);
+        box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+    }
+
+    .pagination-select:focus {
+        outline: none;
+        border-color: #00ff9d;
+        box-shadow: 0 0 25px rgba(0, 255, 157, 0.3);
+    }
+
+    .pagination-left-section,
+    .pagination-right-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    /* Elegant divider between sections */
+    .pagination-divider {
+        width: 1px;
+        height: 30px;
+        background: linear-gradient(to bottom, transparent, rgba(0, 255, 157, 0.3), transparent);
+        margin: 0 5px;
+    }
+
+    @media (max-width: 1024px) {
+        .pagination-controls {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 15px;
         }
         
-        /* Responsive cell content */
-        td {
-            padding: 12px 8px;
-            border-right: 1px solid rgba(0, 255, 157, 0.1);
-            font-size: clamp(12px, 0.9vw, 14px);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            vertical-align: middle;
-            color: #e0f7e9;
-            white-space: nowrap;
-            max-width: 200px;
+        .pagination-left-section,
+        .pagination-right-section {
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
-        /* Allow cells with long content to wrap at high zoom */
-        @media screen and (max-width: 1400px) {
-            td {
-                white-space: normal;
-                word-break: break-word;
-                min-width: 100px;
-            }
-        }
-        
-        /* Responsive inputs */
-        input, select, .uneditable {
-            width: 100%;
-            padding: 8px 6px;
-            border: 1px solid rgba(0, 255, 157, 0.3);
-            border-radius: 4px;
-            font-size: clamp(11px, 0.9vw, 13px);
-            background: rgba(15, 30, 25, 0.8);
-            color: #e0f7e9;
-            box-sizing: border-box;
-        }
-        
-        /* Ensure delete button fits */
-        .delete-btn {
-            padding: 6px 8px;
-            font-size: clamp(11px, 0.9vw, 13px);
-            white-space: nowrap;
-        }
-        
-        /* Column-specific responsive widths - for Non-Vatable Expenses */
-        th:nth-child(1), td:nth-child(1) { min-width: 90px; } /* Date */
-        th:nth-child(2), td:nth-child(2) { min-width: 110px; } /* Invoice Number */
-        th:nth-child(3), td:nth-child(3) { min-width: 90px; } /* Invoice Type */
-        th:nth-child(4), td:nth-child(4) { min-width: 100px; } /* Transaction Type */
-        th:nth-child(5), td:nth-child(5) { min-width: 140px; } /* TIN Number */
-        th:nth-child(6), td:nth-child(6) { min-width: 150px; } /* Supplier Name */
-        th:nth-child(7), td:nth-child(7) { min-width: 160px; } /* Address */
-        th:nth-child(8), td:nth-child(8) { min-width: 120px; } /* Gross Amount */
-        th:nth-child(9), td:nth-child(9) { min-width: 180px; } /* Nature of Expense */
-        th:nth-child(10), td:nth-child(10) { min-width: 100px; } /* Withholding Rate */
-        th:nth-child(11), td:nth-child(11) { min-width: 110px; } /* Withholding Tax */
-        th:nth-child(12), td:nth-child(12) { min-width: 130px; } /* Gross - Withholding Tax */
-        th:nth-child(13), td:nth-child(13) { min-width: 130px; } /* Remarks */
-        th:nth-child(14), td:nth-child(14) { min-width: 70px; } /* Action */
-        
-        /* Zoom level specific adjustments */
-        @media screen and (min-resolution: 120dpi) { /* 125% zoom */
-            th { font-size: 12px; padding: 12px 6px; }
-            td { font-size: 12px; padding: 10px 6px; }
-            input, select { font-size: 11px; padding: 6px 4px; }
-        }
-        
-        @media screen and (min-resolution: 144dpi) { /* 150% zoom */
-            th { font-size: 11px; padding: 10px 4px; }
-            td { font-size: 11px; padding: 8px 4px; }
-            input, select { font-size: 10px; padding: 5px 3px; }
-            th:nth-child(1), td:nth-child(1) { min-width: 80px; }
-            th:nth-child(2), td:nth-child(2) { min-width: 90px; }
-        }
-        
-        @media screen and (min-resolution: 168dpi) { /* 175% zoom */
-            th { font-size: 10px; padding: 8px 3px; letter-spacing: 0.3px; }
-            td { font-size: 10px; padding: 6px 3px; }
-            input, select { font-size: 9px; padding: 4px 2px; }
-        }
-        
-        @media screen and (min-resolution: 192dpi) { /* 200% zoom */
-            th { font-size: 9px; padding: 6px 2px; letter-spacing: 0.2px; }
-            td { font-size: 9px; padding: 5px 2px; }
-            input, select { font-size: 8px; padding: 3px 2px; }
-            .delete-btn { padding: 4px 5px; }
-        }
-        
-        /* Hidden state styles */
-        .company-info-section.hidden,
-        .stats.hidden,
-        .tally-section.hidden,
-        .footer.hidden {
-            display: none !important;
-        }
-        
-        /* Focus mode - when other sections are hidden, table takes full space */
-        body.table-focus-mode .company-info-section,
-        body.table-focus-mode .stats,
-        body.table-focus-mode .tally-section,
-        body.table-focus-mode .footer {
-            display: none !important;
-        }
-        
-        body.table-focus-mode .container {
-            height: 100vh;
-            margin: 0;
-            border-radius: 0;
-        }
-        
-        body.table-focus-mode .table-wrapper {
-            height: calc(100vh - 80px);
-        }
-        
-        /* Text truncation with ellipsis for very narrow columns */
-        .text-truncate {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* Validation message styling */
-        .validation-message {
+        .pagination-divider {
             display: none;
-            color: #ff6666;
-            font-size: 10px;
-            margin-top: 2px;
-            position: absolute;
-            background: rgba(0, 30, 20, 0.9);
-            padding: 2px 5px;
-            border-radius: 3px;
-            border: 1px solid #ff6666;
-            z-index: 100;
         }
-        
-        td {
-            position: relative;
-        }
-        
-        /* Expense category tally styling - NonVAT specific */
-        .tally-section .tally-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-        }
-        
-        .tally-item.nonvat {
-            border-left: 4px solid #666666;
-        }
-        
-        .tally-item.services {
-            border-left: 4px solid #00b3ff;
-        }
-        
-        .tally-item.goods {
-            border-left: 4px solid #ff9900;
-        }
-        
-        .tally-item.rental {
-            border-left: 4px solid #9d00ff;
-        }
-        
-        .tally-item .tally-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 5px;
-        }
-        
-        .tally-item .tally-amount {
-            font-size: 18px;
-            font-weight: 700;
-            color: #00ff9d;
-            text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
-        }
-        
-        .tally-item .tally-count {
-            font-size: 12px;
-            color: #80cbc4;
-            background: rgba(0, 40, 30, 0.5);
-            padding: 3px 10px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 255, 157, 0.2);
-        }
-        
-        .tally-item .tally-rate {
-            font-size: 11px;
-            color: #00ff9d;
-            background: rgba(0, 255, 157, 0.1);
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-top: 8px;
-            display: inline-block;
-            border: 1px solid rgba(0, 255, 157, 0.2);
-        }
-        
-        /* Zoom controls - keep for compatibility but can be removed if not needed */
-        .zoom-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 10px;
-            background: rgba(0, 30, 20, 0.9);
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #00ff9d;
-            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
-        }
-        
-        .zoom-btn {
-            background: #00ff9d;
-            color: #002614;
+    }
+
+    @media (max-width: 768px) {
+        .pagination-buttons {
+            flex-wrap: wrap;
+            justify-content: center;
+            background: transparent;
             border: none;
-            border-radius: 5px;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            padding: 0;
         }
         
-        .zoom-btn:hover {
-            background: #00ffaa;
-            transform: scale(1.05);
+        .pagination-info {
+            width: 100%;
+            justify-content: center;
         }
         
-        .zoom-display {
-            color: #00ff9d;
-            padding: 8px 15px;
-            font-weight: bold;
-            min-width: 80px;
-            text-align: center;
+        .pagination-select {
+            width: 100%;
         }
-    </style>
+    }
+
+    /* Smooth animations for page changes */
+    @keyframes pageFadeIn {
+        from {
+            opacity: 0.7;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .table-wrapper tbody tr {
+        animation: pageFadeIn 0.3s ease;
+    }
+
+    /* Enhanced active page indicator */
+    .pagination-page-indicator {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pagination-page-indicator::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, #00ff9d, #00b36b);
+        border-radius: 42px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+    }
+
+    .pagination-page-indicator:focus-within::before {
+        opacity: 0.2;
+    }
+</style>
 </head>
 <body>
     <!-- Left Sidebar -->
@@ -357,6 +603,17 @@
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
                     <span class="sidebar-btn-text">Export to Excel</span>
+                </button>
+                
+                <!-- NEW: Save/Load Buttons -->
+                <button class="sidebar-btn" id="saveDataBtn">
+                    <i class="fas fa-save"></i>
+                    <span class="sidebar-btn-text">Save Data to File</span>
+                </button>
+
+                <button class="sidebar-btn" id="loadDataBtn">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="sidebar-btn-text">Load Data from File</span>
                 </button>
                 
                 <button class="sidebar-btn" id="clearBtn">
@@ -494,8 +751,8 @@
                 </div>
             </div>
             <div class="header-text">
-                <h1><i class="fas fa-money-bill-wave"></i> Non-Vatable Expenses Data Tracker</h1>
-                <p>Professional Expenses Tracking for Non-VAT Transactions</p>
+                <h1><i class="fas fa-money-bill-wave"></i> Vatable Expenses Data Tracker</h1>
+                <p>Professional Expenses Tracking with Automated VAT and Withholding Tax Calculations</p>
             </div>
             <div class="header-sidebar-buttons">
                 <!-- Entry Counter Button -->
@@ -520,7 +777,7 @@
         <!-- Company Info Section removed from main area - now in right sidebar -->
         
         <div class="table-wrapper">
-            <table id="nonVatableExpensesTable">
+            <table id="vatableExpensesTable">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -532,6 +789,8 @@
                         <th>Address</th>
                         <th>Gross Amount</th>
                         <th>Nature of Expense</th>
+                        <th>Net Expenses</th>
+                        <th>Input Tax</th>
                         <th>Withholding Tax Rate</th>
                         <th>Withholding Tax</th>
                         <th>Gross - Withholding Tax</th>
@@ -546,6 +805,48 @@
                     <!-- Summary row will be added here dynamically -->
                 </tfoot>
             </table>
+        </div>
+        
+        <!-- Improved Pagination Controls -->
+        <div class="pagination-controls" id="paginationControls">
+            <div class="pagination-left-section">
+                <div class="pagination-info">
+                    <i class="fas fa-database"></i>
+                    <span id="startEntry">0</span> - <span id="endEntry">0</span> of <span id="totalEntries">0</span>
+                </div>
+                
+                <select id="rowsPerPage" class="pagination-select">
+                    <option value="10">10 rows</option>
+                    <option value="25" selected>25 rows</option>
+                    <option value="50">50 rows</option>
+                    <option value="100">100 rows</option>
+                </select>
+            </div>
+            
+            <div class="pagination-divider"></div>
+            
+            <div class="pagination-right-section">
+                <div class="pagination-buttons">
+                    <button class="pagination-btn" id="firstPageBtn" title="First Page">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="pagination-btn" id="prevPageBtn" title="Previous Page">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    
+                    <div class="pagination-page-indicator">
+                        <span class="pagination-page-number" id="currentPageDisplay">1</span>
+                        <span class="pagination-total-pages">/ <span id="totalPages">1</span></span>
+                    </div>
+                    
+                    <button class="pagination-btn" id="nextPageBtn" title="Next Page">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button class="pagination-btn" id="lastPageBtn" title="Last Page">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="tally-section">
@@ -563,6 +864,14 @@
                 <span class="stat-value">₱ <span id="totalGrossAmount">0.00</span></span>
             </div>
             <div class="stat-item">
+                <span class="stat-label">Total Net Expenses</span>
+                <span class="stat-value">₱ <span id="totalNetExpenses">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Input Tax</span>
+                <span class="stat-value">₱ <span id="totalInputTax">0.00</span></span>
+            </div>
+            <div class="stat-item">
                 <span class="stat-label">Total Withholding Tax</span>
                 <span class="stat-value">₱ <span id="totalWithholdingTax">0.00</span></span>
             </div>
@@ -573,32 +882,21 @@
         </div>
         
         <div class="footer">
-            <p>© 2026 Non-Vatable Expenses Data Tracker | Professional Non-VAT Expenses Tracking System</p>
+            <p>© 2026 Vatable Expenses Data Tracker | Professional VAT-Compliant Expenses Tracking System</p>
         </div>
     </div>
 
     <script>
 // ============================================================================
-// NON-VATABLE EXPENSES DATA TRACKER - COMPLETE JAVASCRIPT
+// VATABLE EXPENSES DATA TRACKER - COMPLETE JAVASCRIPT WITH PAGINATION & SAVE/LOAD
 // ============================================================================
+
+// ===== PAGINATION VARIABLES =====
+let currentPage = 1;
+let rowsPerPage = 25;
 
 // Expense categories with their withholding tax rates
 const expenseCategories = {
-    // NonVat (0%)
-    "SALARIES AND WAGES": 0.00,
-    "SSS/PHILHEALTH/PAG-IBIG": 0.00,
-    
-    // Goods (1%)
-    "REPAIRS AND MAINTENANCE-MATERIALS": 0.01,
-    "MEALS AND ALLOWANCES – GOODS": 0.01,
-    "REPRESENTATIONS – GOODS": 0.01,
-    "FUEL AND OIL": 0.01,
-    "OFFICE SUPPLIES": 0.01,
-    "UNIFORMS": 0.01,
-    "MEDICAL EXPENSES – GOODS": 0.01,
-    "CLEANING SUPPLIES": 0.01,
-    "OTHERS - GOODS": 0.01,
-    
     // Services (2%)
     "REPAIRS AND MAINTENANCE-LABOR": 0.02,
     "MEALS AND ACCOMMODATION – SERVICES": 0.02,
@@ -616,6 +914,17 @@ const expenseCategories = {
     "CLEANING SERVICES": 0.02,
     "OTHERS - SERVICES": 0.02,
     
+    // Goods (1%)
+    "REPAIRS AND MAINTENANCE-MATERIALS": 0.01,
+    "MEALS AND ALLOWANCES – GOODS": 0.01,
+    "REPRESENTATIONS – GOODS": 0.01,
+    "FUEL AND OIL": 0.01,
+    "OFFICE SUPPLIES": 0.01,
+    "UNIFORMS": 0.01,
+    "MEDICAL EXPENSES – GOODS": 0.01,
+    "CLEANING SUPPLIES": 0.01,
+    "OTHERS - GOODS": 0.01,
+    
     // Rental (5%)
     "Rental": 0.05
 };
@@ -632,12 +941,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load saved company info if exists
     loadCompanyInfo();
     
+    // Initialize pagination
+    initPagination();
+    
     // Initialize table with one empty row
     addNewRow();
-    updateRowCount(); // This will update both row count and entry counter
-    updateTotals();
-    updateSummaryRow();
-    updateExpenseTally();
+    updateAllStats();
     
     // Add event listeners for company info to save automatically
     document.querySelectorAll('.company-info-sidebar input').forEach(input => {
@@ -708,11 +1017,11 @@ function saveCompanyInfo() {
         employee: document.getElementById('authorizedEmployee')?.value || '',
         email: document.getElementById('email')?.value || ''
     };
-    localStorage.setItem('nonVatableExpensesCompanyInfo', JSON.stringify(companyInfo));
+    localStorage.setItem('vatableExpensesCompanyInfo', JSON.stringify(companyInfo));
 }
 
 function loadCompanyInfo() {
-    const savedInfo = localStorage.getItem('nonVatableExpensesCompanyInfo');
+    const savedInfo = localStorage.getItem('vatableExpensesCompanyInfo');
     if (savedInfo) {
         const companyInfo = JSON.parse(savedInfo);
         if (document.getElementById('companyName')) document.getElementById('companyName').value = companyInfo.name || '';
@@ -735,7 +1044,149 @@ function clearCompanyInfo() {
     if (document.getElementById('reportDate')) document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
     if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = '';
     if (document.getElementById('email')) document.getElementById('email').value = '';
-    localStorage.removeItem('nonVatableExpensesCompanyInfo');
+    localStorage.removeItem('vatableExpensesCompanyInfo');
+}
+
+// ===== PAGINATION FUNCTIONS =====
+function initPagination() {
+    const rowsPerPageSelect = document.getElementById('rowsPerPage');
+    const firstPageBtn = document.getElementById('firstPageBtn');
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    const lastPageBtn = document.getElementById('lastPageBtn');
+    const currentPageDisplay = document.getElementById('currentPageDisplay');
+
+    rowsPerPageSelect.addEventListener('change', function() {
+        rowsPerPage = parseInt(this.value);
+        currentPage = 1;
+        updatePagination();
+        renderCurrentPage();
+    });
+
+    firstPageBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage = 1;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    prevPageBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    nextPageBtn.addEventListener('click', function() {
+        const totalPages = getTotalPages();
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    lastPageBtn.addEventListener('click', function() {
+        const totalPages = getTotalPages();
+        if (currentPage < totalPages) {
+            currentPage = totalPages;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    // Make page number display clickable to edit
+    currentPageDisplay.addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 1;
+        input.max = getTotalPages();
+        input.value = currentPage;
+        input.className = 'pagination-page-number';
+        input.style.width = '50px';
+        input.style.textAlign = 'center';
+        
+        const parent = this.parentNode;
+        parent.replaceChild(input, this);
+        input.focus();
+        
+        input.addEventListener('blur', function() {
+            goToPage(this.value);
+        });
+        
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+    });
+}
+
+function goToPage(pageNum) {
+    const totalPages = getTotalPages();
+    pageNum = parseInt(pageNum);
+    
+    if (isNaN(pageNum) || pageNum < 1) {
+        pageNum = 1;
+    } else if (pageNum > totalPages) {
+        pageNum = totalPages;
+    }
+    
+    if (pageNum !== currentPage) {
+        currentPage = pageNum;
+        renderCurrentPage();
+        updatePagination();
+    } else {
+        // Just update the display
+        updatePagination();
+    }
+}
+
+function getTotalPages() {
+    const totalRows = document.querySelectorAll('#tableBody tr').length;
+    return Math.max(1, Math.ceil(totalRows / rowsPerPage));
+}
+
+function updatePagination() {
+    const totalRows = document.querySelectorAll('#tableBody tr').length;
+    const totalPages = getTotalPages();
+    const startEntry = totalRows === 0 ? 0 : ((currentPage - 1) * rowsPerPage) + 1;
+    const endEntry = Math.min(currentPage * rowsPerPage, totalRows);
+
+    document.getElementById('startEntry').textContent = startEntry;
+    document.getElementById('endEntry').textContent = endEntry;
+    document.getElementById('totalEntries').textContent = totalRows;
+    document.getElementById('totalPages').textContent = totalPages;
+    document.getElementById('currentPageDisplay').textContent = currentPage;
+
+    // Enable/disable pagination buttons
+    document.getElementById('firstPageBtn').disabled = currentPage === 1;
+    document.getElementById('prevPageBtn').disabled = currentPage === 1;
+    document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+    document.getElementById('lastPageBtn').disabled = currentPage === totalPages;
+}
+
+function renderCurrentPage() {
+    const tableBody = document.getElementById('tableBody');
+    const allRows = Array.from(tableBody.children);
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, allRows.length);
+
+    // Hide all rows first
+    allRows.forEach(row => {
+        row.style.display = 'none';
+    });
+
+    // Show only rows for current page
+    for (let i = startIndex; i < endIndex; i++) {
+        if (allRows[i]) {
+            allRows[i].style.display = '';
+        }
+    }
+
+    updatePagination();
 }
 
 // ===== TABLE ROW FUNCTIONS =====
@@ -755,25 +1206,6 @@ function addNewRow() {
     // Create nature of expense options
     let natureOptions = '<option value="">Select Nature of Expense</option>';
     
-    // Add NonVat category
-    natureOptions += '<optgroup label="NonVat (0%)">';
-    natureOptions += '<option value="SALARIES AND WAGES">SALARIES AND WAGES</option>';
-    natureOptions += '<option value="SSS/PHILHEALTH/PAG-IBIG">SSS/PHILHEALTH/PAG-IBIG</option>';
-    natureOptions += '</optgroup>';
-    
-    // Add Goods category
-    natureOptions += '<optgroup label="Goods (1%)">';
-    natureOptions += '<option value="REPAIRS AND MAINTENANCE-MATERIALS">REPAIRS AND MAINTENANCE-MATERIALS</option>';
-    natureOptions += '<option value="MEALS AND ALLOWANCES – GOODS">MEALS AND ALLOWANCES – GOODS</option>';
-    natureOptions += '<option value="REPRESENTATIONS – GOODS">REPRESENTATIONS – GOODS</option>';
-    natureOptions += '<option value="FUEL AND OIL">FUEL AND OIL</option>';
-    natureOptions += '<option value="OFFICE SUPPLIES">OFFICE SUPPLIES</option>';
-    natureOptions += '<option value="UNIFORMS">UNIFORMS</option>';
-    natureOptions += '<option value="MEDICAL EXPENSES – GOODS">MEDICAL EXPENSES – GOODS</option>';
-    natureOptions += '<option value="CLEANING SUPPLIES">CLEANING SUPPLIES</option>';
-    natureOptions += '<option value="OTHERS - GOODS">OTHERS - GOODS</option>';
-    natureOptions += '</optgroup>';
-    
     // Add Services category
     natureOptions += '<optgroup label="Services (2%)">';
     natureOptions += '<option value="REPAIRS AND MAINTENANCE-LABOR">REPAIRS AND MAINTENANCE-LABOR</option>';
@@ -791,6 +1223,19 @@ function addNewRow() {
     natureOptions += '<option value="PROFESSIONAL FEES">PROFESSIONAL FEES</option>';
     natureOptions += '<option value="CLEANING SERVICES">CLEANING SERVICES</option>';
     natureOptions += '<option value="OTHERS - SERVICES">OTHERS - SERVICES</option>';
+    natureOptions += '</optgroup>';
+    
+    // Add Goods category
+    natureOptions += '<optgroup label="Goods (1%)">';
+    natureOptions += '<option value="REPAIRS AND MAINTENANCE-MATERIALS">REPAIRS AND MAINTENANCE-MATERIALS</option>';
+    natureOptions += '<option value="MEALS AND ALLOWANCES – GOODS">MEALS AND ALLOWANCES – GOODS</option>';
+    natureOptions += '<option value="REPRESENTATIONS – GOODS">REPRESENTATIONS – GOODS</option>';
+    natureOptions += '<option value="FUEL AND OIL">FUEL AND OIL</option>';
+    natureOptions += '<option value="OFFICE SUPPLIES">OFFICE SUPPLIES</option>';
+    natureOptions += '<option value="UNIFORMS">UNIFORMS</option>';
+    natureOptions += '<option value="MEDICAL EXPENSES – GOODS">MEDICAL EXPENSES – GOODS</option>';
+    natureOptions += '<option value="CLEANING SUPPLIES">CLEANING SUPPLIES</option>';
+    natureOptions += '<option value="OTHERS - GOODS">OTHERS - GOODS</option>';
     natureOptions += '</optgroup>';
     
     // Add Rental category
@@ -843,6 +1288,12 @@ function addNewRow() {
             </select>
         </td>
         <td>
+            <div class="uneditable net-expenses">0.00</div>
+        </td>
+        <td>
+            <div class="uneditable input-tax">0.00</div>
+        </td>
+        <td>
             <div class="uneditable withholding-rate">0%</div>
         </td>
         <td>
@@ -868,16 +1319,12 @@ function addNewRow() {
     editableInputs.forEach(input => {
         input.addEventListener('input', function() {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
-            updateExpenseTally();
+            updateAllStats();
         });
         
         input.addEventListener('change', function() {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
-            updateExpenseTally();
+            updateAllStats();
         });
     });
     
@@ -905,8 +1352,13 @@ function addNewRow() {
         });
     });
     
-    updateRowCount();
-    updateExpenseTally();
+    // Update pagination for new row
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages; // Go to last page to see new row
+    renderCurrentPage();
+    
+    updateAllStats();
 }
 
 function deleteRow(rowId) {
@@ -919,10 +1371,19 @@ function deleteRow(rowId) {
         
         setTimeout(() => {
             row.remove();
-            updateRowCount(); // This will update both row count and entry counter
-            updateTotals();
-            updateSummaryRow();
-            updateExpenseTally();
+            
+            // Update pagination
+            const tableBody = document.getElementById('tableBody');
+            const totalRows = tableBody.children.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            
+            // Adjust current page if necessary
+            if (currentPage > totalPages) {
+                currentPage = Math.max(1, totalPages);
+            }
+            
+            renderCurrentPage();
+            updateAllStats();
         }, 300);
     }
 }
@@ -932,10 +1393,9 @@ function clearAllData() {
     if (tableBody) {
         tableBody.innerHTML = '';
         addNewRow();
-        updateRowCount(); // This will update both row count and entry counter
-        updateTotals();
-        updateSummaryRow();
-        updateExpenseTally();
+        currentPage = 1;
+        renderCurrentPage();
+        updateAllStats();
     }
 }
 
@@ -944,9 +1404,19 @@ function updateCalculations(row) {
     const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
     const natureExpense = row.querySelector('.nature-expense')?.value;
     
+    // Calculate net expenses: Gross Amount / 1.12
+    const netExpenses = grossAmount / 1.12;
+    const netExpensesEl = row.querySelector('.net-expenses');
+    if (netExpensesEl) netExpensesEl.textContent = netExpenses.toFixed(2);
+    
+    // Calculate input tax: Net Expenses * 0.12
+    const inputTax = netExpenses * 0.12;
+    const inputTaxEl = row.querySelector('.input-tax');
+    if (inputTaxEl) inputTaxEl.textContent = inputTax.toFixed(2);
+    
     // Get withholding tax rate based on nature of expense
     let withholdingRate = 0;
-    if (natureExpense && expenseCategories[natureExpense] !== undefined) {
+    if (natureExpense && expenseCategories[natureExpense]) {
         withholdingRate = expenseCategories[natureExpense];
     }
     
@@ -955,8 +1425,8 @@ function updateCalculations(row) {
     const withholdingRateEl = row.querySelector('.withholding-rate');
     if (withholdingRateEl) withholdingRateEl.textContent = ratePercentage;
     
-    // For non-vatable expenses: Withholding Tax = Gross Amount * Withholding Tax Rate
-    const withholdingTax = grossAmount * withholdingRate;
+    // Calculate withholding tax: Net Expenses * Withholding Tax Rate
+    const withholdingTax = netExpenses * withholdingRate;
     const withholdingTaxEl = row.querySelector('.withholding-tax');
     if (withholdingTaxEl) withholdingTaxEl.textContent = withholdingTax.toFixed(2);
     
@@ -965,7 +1435,7 @@ function updateCalculations(row) {
     const grossMinusWithholdingEl = row.querySelector('.gross-minus-withholding');
     if (grossMinusWithholdingEl) grossMinusWithholdingEl.textContent = grossMinusWithholding.toFixed(2);
     
-    updateExpenseTally();
+    updateAllStats();
 }
 
 // ===== TIN FORMATTING FUNCTIONS =====
@@ -1016,6 +1486,13 @@ function validateTIN(input) {
 }
 
 // ===== UPDATE FUNCTIONS =====
+function updateAllStats() {
+    updateRowCount();
+    updateTotals();
+    updateSummaryRow();
+    updateExpenseTally();
+}
+
 function updateRowCount() {
     const tableBody = document.getElementById('tableBody');
     const rowCount = tableBody ? tableBody.children.length : 0;
@@ -1059,25 +1536,35 @@ function updateEntryCounter() {
 
 function updateTotals() {
     let totalGrossAmount = 0;
+    let totalNetExpenses = 0;
+    let totalInputTax = 0;
     let totalWithholdingTax = 0;
     let totalGrossMinusWithholding = 0;
     
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
         const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
+        const netExpenses = parseFloat(row.querySelector('.net-expenses')?.textContent) || 0;
+        const inputTax = parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
         const withholdingTax = parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
         const grossMinusWithholding = parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
         
         totalGrossAmount += grossAmount;
+        totalNetExpenses += netExpenses;
+        totalInputTax += inputTax;
         totalWithholdingTax += withholdingTax;
         totalGrossMinusWithholding += grossMinusWithholding;
     });
     
     const totalGrossAmountEl = document.getElementById('totalGrossAmount');
+    const totalNetExpensesEl = document.getElementById('totalNetExpenses');
+    const totalInputTaxEl = document.getElementById('totalInputTax');
     const totalWithholdingTaxEl = document.getElementById('totalWithholdingTax');
     const netPayableEl = document.getElementById('netPayable');
     
     if (totalGrossAmountEl) totalGrossAmountEl.textContent = totalGrossAmount.toFixed(2);
+    if (totalNetExpensesEl) totalNetExpensesEl.textContent = totalNetExpenses.toFixed(2);
+    if (totalInputTaxEl) totalInputTaxEl.textContent = totalInputTax.toFixed(2);
     if (totalWithholdingTaxEl) totalWithholdingTaxEl.textContent = totalWithholdingTax.toFixed(2);
     if (netPayableEl) netPayableEl.textContent = totalGrossMinusWithholding.toFixed(2);
     
@@ -1087,16 +1574,22 @@ function updateTotals() {
 
 function updateSummaryRow() {
     let totalGrossAmount = 0;
+    let totalNetExpenses = 0;
+    let totalInputTax = 0;
     let totalWithholdingTax = 0;
     let totalGrossMinusWithholding = 0;
     
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
         const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
+        const netExpenses = parseFloat(row.querySelector('.net-expenses')?.textContent) || 0;
+        const inputTax = parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
         const withholdingTax = parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
         const grossMinusWithholding = parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
         
         totalGrossAmount += grossAmount;
+        totalNetExpenses += netExpenses;
+        totalInputTax += inputTax;
         totalWithholdingTax += withholdingTax;
         totalGrossMinusWithholding += grossMinusWithholding;
     });
@@ -1108,6 +1601,8 @@ function updateSummaryRow() {
                 <td colspan="7" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
                 <td class="uneditable">${totalGrossAmount.toFixed(2)}</td>
                 <td>-</td>
+                <td class="uneditable">${totalNetExpenses.toFixed(2)}</td>
+                <td class="uneditable">${totalInputTax.toFixed(2)}</td>
                 <td>-</td>
                 <td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>
                 <td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>
@@ -1134,6 +1629,7 @@ function updateExpenseTally() {
         expenseTally[category] = {
             count: 0,
             totalGrossAmount: 0,
+            totalNetExpenses: 0,
             totalWithholdingTax: 0,
             rate: expenseCategories[category]
         };
@@ -1143,16 +1639,21 @@ function updateExpenseTally() {
     rows.forEach(row => {
         const grossAmountInput = row.querySelector('.gross-amount');
         const natureExpenseSelect = row.querySelector('.nature-expense');
-        const withholdingTaxDiv = row.querySelector('.withholding-tax');
         
         if (grossAmountInput && natureExpenseSelect) {
             const grossAmount = parseFloat(grossAmountInput.value) || 0;
             const natureExpense = natureExpenseSelect.value;
-            const withholdingTax = parseFloat(withholdingTaxDiv?.textContent) || 0;
             
-            if (natureExpense && expenseCategories[natureExpense] !== undefined) {
+            if (natureExpense && expenseCategories[natureExpense]) {
                 expenseTally[natureExpense].count++;
                 expenseTally[natureExpense].totalGrossAmount += grossAmount;
+                
+                // Calculate net expenses for this row
+                const netExpenses = grossAmount / 1.12;
+                expenseTally[natureExpense].totalNetExpenses += netExpenses;
+                
+                // Calculate withholding tax for this row
+                const withholdingTax = netExpenses * expenseCategories[natureExpense];
                 expenseTally[natureExpense].totalWithholdingTax += withholdingTax;
                 
                 totalGrossAmount += grossAmount;
@@ -1175,9 +1676,7 @@ function updateExpenseTally() {
         
         // Determine category type for styling
         let categoryType = '';
-        if (category === 'SALARIES AND WAGES' || category === 'SSS/PHILHEALTH/PAG-IBIG') {
-            categoryType = 'nonvat';
-        } else if (category.includes('SERVICES') || category === 'Rental') {
+        if (category.includes('SERVICES') || category === 'Rental') {
             categoryType = category === 'Rental' ? 'rental' : 'services';
         } else {
             categoryType = 'goods';
@@ -1192,21 +1691,9 @@ function updateExpenseTally() {
         // Get rate percentage
         const ratePercentage = (data.rate * 100).toFixed(0);
         
-        // Get icon based on category type
-        let icon = '';
-        if (categoryType === 'nonvat') {
-            icon = 'fa-file-invoice-dollar';
-        } else if (categoryType === 'services') {
-            icon = 'fa-cogs';
-        } else if (categoryType === 'goods') {
-            icon = 'fa-box';
-        } else if (categoryType === 'rental') {
-            icon = 'fa-building';
-        }
-        
         tallyItem.innerHTML = `
             <div class="tally-category">
-                <i class="fas ${icon}"></i>
+                <i class="fas ${categoryType === 'services' ? 'fa-cogs' : categoryType === 'goods' ? 'fa-box' : 'fa-building'}"></i>
                 ${displayCategory}
             </div>
             <div class="tally-details">
@@ -1215,7 +1702,7 @@ function updateExpenseTally() {
             </div>
             <div class="tally-rate">Withholding: ${ratePercentage}%</div>
             <div style="margin-top: 8px; font-size: 11px; color: #80cbc4;">
-                W/Tax: ₱ ${data.totalWithholdingTax.toFixed(2)}
+                Net: ₱ ${data.totalNetExpenses.toFixed(2)} | W/Tax: ₱ ${data.totalWithholdingTax.toFixed(2)}
             </div>
         `;
         
@@ -1224,8 +1711,6 @@ function updateExpenseTally() {
     
     // Add total tally item
     if (totalRows > 0) {
-        const totalWithholdingTax = parseFloat(document.getElementById('totalWithholdingTax')?.textContent) || 0;
-        
         const totalItem = document.createElement('div');
         totalItem.className = 'tally-item tally-total';
         totalItem.innerHTML = `
@@ -1240,9 +1725,6 @@ function updateExpenseTally() {
             <div style="margin-top: 8px; font-size: 12px; color: #80ffd4; font-weight: 500;">
                 Summarized across ${sortedCategories.length} expense categories
             </div>
-            <div style="margin-top: 8px; font-size: 11px; color: #00ff9d; font-weight: 600;">
-                Total Withholding Tax: ₱ ${totalWithholdingTax.toFixed(2)}
-            </div>
         `;
         tallyGrid.appendChild(totalItem);
     } else {
@@ -1255,11 +1737,282 @@ function updateExpenseTally() {
                 NO EXPENSE DATA
             </div>
             <div style="color: #80cbc4; font-size: 14px; text-align: center; padding: 10px 0;">
-                Add non-vatable expenses to see category totals here
+                Add expenses to see category totals here
             </div>
         `;
         tallyGrid.appendChild(emptyItem);
     }
+}
+
+// ===== NEW: SAVE/LOAD FUNCTIONS =====
+function saveDataToFile() {
+    // Collect all table data
+    const tableData = [];
+    const rows = document.querySelectorAll('#tableBody tr');
+    
+    rows.forEach(row => {
+        const rowData = {
+            date: row.querySelector('.date-input')?.value || '',
+            invoiceNumber: row.querySelector('.invoice-number')?.value || '',
+            invoiceType: row.querySelector('.invoice-type')?.value || '',
+            transactionType: row.querySelector('.transaction-type')?.value || '',
+            tinNumber: row.querySelector('.tin-number')?.value || '',
+            supplierName: row.querySelector('.supplier-name')?.value || '',
+            address: row.querySelector('.address')?.value || '',
+            grossAmount: row.querySelector('.gross-amount')?.value || '',
+            natureExpense: row.querySelector('.nature-expense')?.value || '',
+            remarks: row.querySelector('.remarks')?.value || ''
+        };
+        tableData.push(rowData);
+    });
+    
+    // Collect company info
+    const companyInfo = {
+        name: document.getElementById('companyName')?.value || '',
+        tin: document.getElementById('companyTIN')?.value || '',
+        address: document.getElementById('companyAddress')?.value || '',
+        business: document.getElementById('lineOfBusiness')?.value || '',
+        telephone: document.getElementById('telephone')?.value || '',
+        date: document.getElementById('reportDate')?.value || '',
+        employee: document.getElementById('authorizedEmployee')?.value || '',
+        email: document.getElementById('email')?.value || ''
+    };
+    
+    // Create save data object
+    const saveData = {
+        version: '1.0',
+        type: 'vatable-expenses',
+        timestamp: new Date().toISOString(),
+        companyInfo: companyInfo,
+        tableData: tableData
+    };
+    
+    // Convert to JSON and download
+    const jsonData = JSON.stringify(saveData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    const fileName = `Expenses_Data_${new Date().toISOString().split('T')[0]}.exp`;
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    
+    showToast(`✅ Data saved to ${fileName}`, 'success');
+}
+
+function loadDataFromFile() {
+    // Create file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.exp,.json';
+    
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const saveData = JSON.parse(e.target.result);
+                
+                // Validate file format
+                if (!saveData.version || !saveData.tableData) {
+                    throw new Error('Invalid file format');
+                }
+                
+                // Optional: Check file type
+                if (saveData.type && saveData.type !== 'vatable-expenses') {
+                    if (!confirm('This appears to be a different type of data file. Load it as Expenses data anyway?')) {
+                        return;
+                    }
+                }
+                
+                // Load company info
+                if (saveData.companyInfo) {
+                    document.getElementById('companyName').value = saveData.companyInfo.name || '';
+                    document.getElementById('companyTIN').value = saveData.companyInfo.tin || '';
+                    document.getElementById('companyAddress').value = saveData.companyInfo.address || '';
+                    document.getElementById('lineOfBusiness').value = saveData.companyInfo.business || '';
+                    document.getElementById('telephone').value = saveData.companyInfo.telephone || '';
+                    document.getElementById('reportDate').value = saveData.companyInfo.date || new Date().toISOString().split('T')[0];
+                    document.getElementById('authorizedEmployee').value = saveData.companyInfo.employee || '';
+                    document.getElementById('email').value = saveData.companyInfo.email || '';
+                    
+                    // Save to localStorage
+                    saveCompanyInfo();
+                }
+                
+                // Clear existing table
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';
+                
+                // Load table data
+                if (saveData.tableData.length === 0) {
+                    addNewRow(); // Add at least one empty row
+                } else {
+                    saveData.tableData.forEach(rowData => {
+                        addRowFromData(rowData);
+                    });
+                }
+                
+                // Update all calculations and pagination
+                updateAllStats();
+                currentPage = 1;
+                renderCurrentPage();
+                
+                showToast(`✅ Loaded ${saveData.tableData.length} rows from file`, 'success');
+                
+            } catch (error) {
+                console.error('Error loading file:', error);
+                showToast('❌ Error loading file. Invalid format.', 'error');
+            }
+        };
+        
+        reader.readAsText(file);
+    });
+    
+    fileInput.click();
+}
+
+// Helper function to add a row from saved data
+function addRowFromData(rowData) {
+    const tableBody = document.getElementById('tableBody');
+    const rowId = 'row_' + Date.now() + '_' + Math.random();
+    
+    const row = document.createElement('tr');
+    row.id = rowId;
+    
+    // Create nature of expense options with selection
+    let natureOptions = '<option value="">Select Nature of Expense</option>';
+    
+    // Add Services category
+    natureOptions += '<optgroup label="Services (2%)">';
+    const servicesOptions = [
+        "REPAIRS AND MAINTENANCE-LABOR",
+        "MEALS AND ACCOMMODATION – SERVICES",
+        "REPRESENTATIONS – SERVICES",
+        "ELECTRICITY AND WATER",
+        "COMMUNICATION EXPENSE",
+        "FREIGHT AND COURIER",
+        "TRAVEL AND TRANSPORTATION",
+        "ADVERTISING AND MARKETING",
+        "SECURITY SERVICES",
+        "INSURANCE",
+        "SEMINAR AND TRAINING",
+        "MEDICAL EXPENSES – SERVICES",
+        "PROFESSIONAL FEES",
+        "CLEANING SERVICES",
+        "OTHERS - SERVICES"
+    ];
+    servicesOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // Add Goods category
+    natureOptions += '<optgroup label="Goods (1%)">';
+    const goodsOptions = [
+        "REPAIRS AND MAINTENANCE-MATERIALS",
+        "MEALS AND ALLOWANCES – GOODS",
+        "REPRESENTATIONS – GOODS",
+        "FUEL AND OIL",
+        "OFFICE SUPPLIES",
+        "UNIFORMS",
+        "MEDICAL EXPENSES – GOODS",
+        "CLEANING SUPPLIES",
+        "OTHERS - GOODS"
+    ];
+    goodsOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // Add Rental category
+    natureOptions += '<optgroup label="Rental (5%)">';
+    natureOptions += `<option value="Rental" ${rowData.natureExpense === 'Rental' ? 'selected' : ''}>Rental</option>`;
+    natureOptions += '</optgroup>';
+    
+    row.innerHTML = `
+        <td><input type="date" value="${rowData.date || ''}" class="editable date-input"></td>
+        <td><input type="text" value="${escapeHtml(rowData.invoiceNumber || '')}" class="editable invoice-number" placeholder="INV-001"></td>
+        <td>
+            <select class="editable invoice-type">
+                <option value="">Select</option>
+                <option value="OR" ${rowData.invoiceType === 'OR' ? 'selected' : ''}>OR</option>
+                <option value="SI" ${rowData.invoiceType === 'SI' ? 'selected' : ''}>SI</option>
+                <option value="DR" ${rowData.invoiceType === 'DR' ? 'selected' : ''}>DR</option>
+                <option value="AR" ${rowData.invoiceType === 'AR' ? 'selected' : ''}>AR</option>
+                <option value="TR" ${rowData.invoiceType === 'TR' ? 'selected' : ''}>TR</option>
+                <option value="CR" ${rowData.invoiceType === 'CR' ? 'selected' : ''}>CR</option>
+                <option value="OTHERS" ${rowData.invoiceType === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
+            </select>
+        </td>
+        <td>
+            <select class="editable transaction-type">
+                <option value="">Select</option>
+                <option value="Goods" ${rowData.transactionType === 'Goods' ? 'selected' : ''}>Goods</option>
+                <option value="Services" ${rowData.transactionType === 'Services' ? 'selected' : ''}>Services</option>
+            </select>
+        </td>
+        <td style="position: relative;">
+            <input type="text" value="${escapeHtml(rowData.tinNumber || '')}" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+            <div class="validation-message" style="display: none; position: absolute; bottom: -20px; left: 0; right: 0;">TIN must be 12 digits</div>
+        </td>
+        <td><input type="text" value="${escapeHtml(rowData.supplierName || '')}" class="editable supplier-name" placeholder="Supplier name"></td>
+        <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></td>
+        <td><input type="number" step="0.01" min="0" value="${rowData.grossAmount || ''}" class="editable gross-amount" placeholder="0.00"></td>
+        <td>
+            <select class="editable nature-expense">
+                ${natureOptions}
+            </select>
+        </td>
+        <td><div class="uneditable net-expenses">0.00</div></td>
+        <td><div class="uneditable input-tax">0.00</div></td>
+        <td><div class="uneditable withholding-rate">0%</div></td>
+        <td><div class="uneditable withholding-tax">0.00</div></td>
+        <td><div class="uneditable gross-minus-withholding">0.00</div></td>
+        <td><input type="text" value="${escapeHtml(rowData.remarks || '')}" class="editable remarks" placeholder="Enter remarks"></td>
+        <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></td>
+    `;
+    
+    tableBody.appendChild(row);
+    
+    // Add event listeners
+    const editableInputs = row.querySelectorAll('.editable');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+    });
+    
+    // Format TIN input
+    const tinInput = row.querySelector('.tin-number');
+    tinInput.addEventListener('input', function(e) {
+        formatTIN(e.target);
+    });
+    tinInput.addEventListener('blur', function(e) {
+        validateTIN(e.target);
+    });
+    
+    // Trigger calculations for this row
+    updateCalculations(row);
+}
+
+// Helper function to escape HTML special characters
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ===== EXPORT FUNCTION =====
@@ -1297,6 +2050,8 @@ function exportToExcel() {
     
     // Calculate totals for the report
     const totalGrossAmount = parseFloat(document.getElementById('totalGrossAmount')?.textContent) || 0;
+    const totalNetExpenses = parseFloat(document.getElementById('totalNetExpenses')?.textContent) || 0;
+    const totalInputTax = parseFloat(document.getElementById('totalInputTax')?.textContent) || 0;
     const totalWithholdingTax = parseFloat(document.getElementById('totalWithholdingTax')?.textContent) || 0;
     const netPayable = parseFloat(document.getElementById('netPayable')?.textContent) || 0;
     
@@ -1309,7 +2064,7 @@ function exportToExcel() {
                 <x:ExcelWorkbook>
                     <x:ExcelWorksheets>
                         <x:ExcelWorksheet>
-                            <x:Name>Non-Vatable Expenses Report</x:Name>
+                            <x:Name>Vatable Expenses Report</x:Name>
                             <x:WorksheetOptions>
                                 <x:DisplayGridlines/>
                                 <x:Print>
@@ -1584,25 +2339,11 @@ function exportToExcel() {
                     color: #006837;
                     font-weight: 600;
                 }
-                
-                .nonvat-note {
-                    background-color: #fff9e6;
-                    border: 1px solid #ffcc00;
-                    padding: 8px;
-                    border-radius: 5px;
-                    margin: 10px 0;
-                    font-size: 9pt;
-                    color: #663300;
-                }
             </style>
-            <title>Non-Vatable Expenses Report - ${formattedDate}</title>
+            <title>Vatable Expenses Report - ${formattedDate}</title>
         </head>
         <body>
-            <div class="report-title">NON-VATABLE EXPENSES DATA REPORT</div>
-            
-            <div class="nonvat-note">
-                <strong>Note:</strong> This report contains Non-VAT transactions. No 12% Input Tax is applied to these expenses.
-            </div>
+            <div class="report-title">VATABLE EXPENSES DATA REPORT</div>
             
             <div class="company-header">
                 <table class="company-info-table">
@@ -1633,7 +2374,7 @@ function exportToExcel() {
                 </table>
             </div>
             
-            <div class="section-title">Non-Vatable Expenses Transactions</div>
+            <div class="section-title">Expenses Transactions</div>
             
             <table class="data-table">
                 <thead>
@@ -1647,6 +2388,8 @@ function exportToExcel() {
                         <th>Address</th>
                         <th>Gross Amount</th>
                         <th>Nature of Expense</th>
+                        <th>Net Expenses</th>
+                        <th>Input Tax</th>
                         <th>W/Tax Rate</th>
                         <th>Withholding Tax</th>
                         <th>Gross - W/Tax</th>
@@ -1697,6 +2440,14 @@ function exportToExcel() {
         const natureExpenseSelect = row.querySelector('.nature-expense');
         const natureExpenseValue = natureExpenseSelect ? natureExpenseSelect.value : '';
         
+        // Net Expenses
+        const netExpensesDiv = row.querySelector('.net-expenses');
+        const netExpensesValue = netExpensesDiv ? parseFloat(netExpensesDiv.textContent) || 0 : 0;
+        
+        // Input Tax
+        const inputTaxDiv = row.querySelector('.input-tax');
+        const inputTaxValue = inputTaxDiv ? parseFloat(inputTaxDiv.textContent) || 0 : 0;
+        
         // Withholding Tax Rate
         const withholdingRateDiv = row.querySelector('.withholding-rate');
         const withholdingRateValue = withholdingRateDiv ? withholdingRateDiv.textContent : '0%';
@@ -1727,6 +2478,8 @@ function exportToExcel() {
                 <td class="text-left">${addressValue}</td>
                 <td class="currency numeric">${grossAmountValue.toFixed(2)}</td>
                 <td class="text-left">${natureExpenseValue}</td>
+                <td class="currency numeric">${netExpensesValue.toFixed(2)}</td>
+                <td class="currency numeric">${inputTaxValue.toFixed(2)}</td>
                 <td class="text-center">${withholdingRateValue}</td>
                 <td class="currency numeric">${withholdingTaxValue.toFixed(2)}</td>
                 <td class="currency numeric">${grossMinusWithholdingValue.toFixed(2)}</td>
@@ -1745,6 +2498,8 @@ function exportToExcel() {
                         <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalGrossAmount.toFixed(2)}</td>
                         <td>-</td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalNetExpenses.toFixed(2)}</td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalInputTax.toFixed(2)}</td>
                         <td>-</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalWithholdingTax.toFixed(2)}</td>
                         <td class="currency numeric" style="font-weight: bold;">${netPayable.toFixed(2)}</td>
@@ -1756,18 +2511,17 @@ function exportToExcel() {
             <!-- EXPENSE CATEGORY TALLY SECTION -->
             <div class="tally-section">
                 <div class="tally-header">
-                    EXPENSE CATEGORY TALLY SUMMARY (NON-VAT)
+                    EXPENSE CATEGORY TALLY SUMMARY
                 </div>
                 
                 <table class="tally-table">
                     <thead>
                         <tr>
                             <th width="40%">Nature of Expense</th>
-                            <th width="10%">Category Type</th>
                             <th width="10%">W/Tax Rate</th>
                             <th width="10%">Item Count</th>
-                            <th width="15%">Total Gross Amount</th>
-                            <th width="15%">Total Withholding Tax</th>
+                            <th width="20%">Total Gross Amount</th>
+                            <th width="20%">Total Withholding Tax</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1783,31 +2537,13 @@ function exportToExcel() {
         const displayCategory = category.replace(/–/g, '-').replace(/ {2,}/g, ' ');
         const ratePercentage = (data.rate * 100).toFixed(0);
         
-        // Determine category type
-        let categoryType = '';
-        let categoryDisplay = '';
-        if (category === 'SALARIES AND WAGES' || category === 'SSS/PHILHEALTH/PAG-IBIG') {
-            categoryType = 'category-nonvat';
-            categoryDisplay = 'NonVAT';
-        } else if (category.includes('SERVICES') || category === 'Rental') {
-            categoryType = category === 'Rental' ? 'category-rental' : 'category-services';
-            categoryDisplay = category === 'Rental' ? 'Rental' : 'Services';
-        } else if (category.includes('GOODS') || category.includes('MATERIALS') || category.includes('SUPPLIES')) {
-            categoryType = 'category-goods';
-            categoryDisplay = 'Goods';
-        } else {
-            categoryType = '';
-            categoryDisplay = 'Other';
-        }
-        
         tallyTotalGross += data.totalGrossAmount;
         tallyTotalWithholdingTax += data.totalWithholdingTax;
         tallyTotalItems += data.count;
         
         htmlContent += `
-            <tr class="${categoryType}">
+            <tr>
                 <td class="tally-category">${displayCategory}</td>
-                <td class="text-center">${categoryDisplay}</td>
                 <td class="tally-rate">${ratePercentage}%</td>
                 <td class="tally-count">${data.count}</td>
                 <td class="currency numeric">${data.totalGrossAmount.toFixed(2)}</td>
@@ -1819,7 +2555,7 @@ function exportToExcel() {
     // Add total row for tally
     htmlContent += `
                         <tr class="tally-total-row">
-                            <td colspan="3" class="text-right" style="font-weight: bold;">TOTAL:</td>
+                            <td colspan="2" class="text-right" style="font-weight: bold;">TOTAL:</td>
                             <td class="text-center" style="font-weight: bold;">${tallyTotalItems}</td>
                             <td class="currency numeric" style="font-weight: bold;">${tallyTotalGross.toFixed(2)}</td>
                             <td class="currency numeric" style="font-weight: bold;">${tallyTotalWithholdingTax.toFixed(2)}</td>
@@ -1829,11 +2565,19 @@ function exportToExcel() {
             </div>
             
             <div class="totals-section">
-                <div class="section-title">Financial Summary (Non-VAT)</div>
+                <div class="section-title">Financial Summary</div>
                 <table class="totals-table">
                     <tr>
                         <td class="total-label">Total Gross Amount:</td>
                         <td class="total-value">₱ ${totalGrossAmount.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Net Expenses:</td>
+                        <td class="total-value">₱ ${totalNetExpenses.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="total-label">Total Input Tax (12%):</td>
+                        <td class="total-value">₱ ${totalInputTax.toFixed(2)}</td>
                     </tr>
                     <tr>
                         <td class="total-label">Total Withholding Tax:</td>
@@ -1851,10 +2595,10 @@ function exportToExcel() {
             <div class="footer">
                 <p>Report generated on ${formattedDate} at ${formattedTime}</p>
                 <p>Number of Expense Categories: ${sortedCategories.length}</p>
-                <p>Total Non-VAT Transactions: ${rowNumber - 1} items across ${sortedCategories.length} categories</p>
-                <p>Authorized by: ${authorizedEmployee} | Prepared by: Non-Vatable Expenses Data Tracker System</p>
+                <p>Total Transactions: ${rowNumber - 1} items across ${sortedCategories.length} categories</p>
+                <p>Authorized by: ${authorizedEmployee} | Prepared by: Vatable Expenses Data Tracker System</p>
                 <p>This is a computer-generated report. No signature is required.</p>
-                <p>© ${new Date().getFullYear()} Non-Vatable Expenses Data Tracker - Professional Non-VAT Expenses Tracking System</p>
+                <p>© ${new Date().getFullYear()} Vatable Expenses Data Tracker - Professional VAT-Compliant Expenses Tracking System</p>
             </div>
         </body>
         </html>
@@ -1865,7 +2609,7 @@ function exportToExcel() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    const fileName = `Non_Vatable_Expenses_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
+    const fileName = `Vatable_Expenses_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
@@ -1877,7 +2621,7 @@ function exportToExcel() {
     }, 100);
     
     // Show success message
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Detailed non-VAT transactions\n• Expense category tally\n• Financial summary\n• ${sortedCategories.length} expense categories analyzed\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Detailed transactions\n• Expense category tally\n• Financial summary\n• ${sortedCategories.length} expense categories analyzed\n• Print-ready layout`);
 }
 
 // Helper function to calculate expense tally for export
@@ -1890,6 +2634,7 @@ function calculateExpenseTallyForExport() {
         expenseTally[category] = {
             count: 0,
             totalGrossAmount: 0,
+            totalNetExpenses: 0,
             totalWithholdingTax: 0,
             rate: expenseCategories[category]
         };
@@ -1899,16 +2644,21 @@ function calculateExpenseTallyForExport() {
     rows.forEach(row => {
         const grossAmountInput = row.querySelector('.gross-amount');
         const natureExpenseSelect = row.querySelector('.nature-expense');
-        const withholdingTaxDiv = row.querySelector('.withholding-tax');
         
         if (grossAmountInput && natureExpenseSelect) {
             const grossAmount = parseFloat(grossAmountInput.value) || 0;
             const natureExpense = natureExpenseSelect.value;
-            const withholdingTax = parseFloat(withholdingTaxDiv?.textContent) || 0;
             
-            if (natureExpense && expenseCategories[natureExpense] !== undefined) {
+            if (natureExpense && expenseCategories[natureExpense]) {
                 expenseTally[natureExpense].count++;
                 expenseTally[natureExpense].totalGrossAmount += grossAmount;
+                
+                // Calculate net expenses for this row
+                const netExpenses = grossAmount / 1.12;
+                expenseTally[natureExpense].totalNetExpenses += netExpenses;
+                
+                // Calculate withholding tax for this row
+                const withholdingTax = netExpenses * expenseCategories[natureExpense];
                 expenseTally[natureExpense].totalWithholdingTax += withholdingTax;
             }
         }
@@ -2035,6 +2785,8 @@ function initButtonListeners() {
     // Get sidebar buttons
     const addRowBtn = document.getElementById('addRowBtn');
     const exportBtn = document.getElementById('exportBtn');
+    const saveDataBtn = document.getElementById('saveDataBtn');
+    const loadDataBtn = document.getElementById('loadDataBtn');
     const clearBtn = document.getElementById('clearBtn');
     const clearInfoBtn = document.getElementById('clearInfoBtn');
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
@@ -2045,14 +2797,21 @@ function initButtonListeners() {
     if (addRowBtn) {
         addRowBtn.addEventListener('click', function() {
             addNewRow();
-            updateRowCount();
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
         });
     }
     
     if (exportBtn) {
         exportBtn.addEventListener('click', exportToExcel);
+    }
+    
+    // NEW: Save/Load event listeners
+    if (saveDataBtn) {
+        saveDataBtn.addEventListener('click', saveDataToFile);
+    }
+
+    if (loadDataBtn) {
+        loadDataBtn.addEventListener('click', loadDataFromFile);
     }
     
     if (clearBtn) {
@@ -2083,9 +2842,7 @@ function initButtonListeners() {
     if (entryCounterBtn) {
         entryCounterBtn.addEventListener('click', function() {
             addNewRow();
-            updateRowCount();
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
             
             // Flash the counter to indicate new row added
             const entryCountSpan = document.getElementById('entryCount');
@@ -2342,6 +3099,17 @@ function toggleTableFocusMode() {
     }
 }
 
+// Add keyboard shortcut for table focus mode (Ctrl+Shift+F)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'F') {
+        e.preventDefault();
+        const tableFocusBtn = document.getElementById('tableFocusBtn');
+        if (tableFocusBtn) {
+            tableFocusBtn.click();
+        }
+    }
+});
+
 // ===== ZOOM DETECTION FUNCTIONS =====
 function initZoomDetection() {
     detectZoomAndAdjust();
@@ -2414,17 +3182,6 @@ function initZoomDetection() {
         }
     `;
     document.head.appendChild(tooltipStyle);
-    
-    // Add keyboard shortcut for table focus mode (Ctrl+Shift+F)
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.shiftKey && e.key === 'F') {
-            e.preventDefault();
-            const tableFocusBtn = document.getElementById('tableFocusBtn');
-            if (tableFocusBtn) {
-                tableFocusBtn.click();
-            }
-        }
-    });
 }
 
 function detectZoomAndAdjust() {
@@ -2456,6 +3213,8 @@ function detectZoomAndAdjust() {
             'Particulars/Supplier Name': 'Supplier',
             'Gross Amount': 'Gross',
             'Nature of Expense': 'Expense Type',
+            'Net Expenses': 'Net',
+            'Input Tax': 'Input Tax',
             'Withholding Tax Rate': 'W/T Rate',
             'Withholding Tax': 'W/Tax',
             'Gross - Withholding Tax': 'Gross-W/T'
@@ -2488,7 +3247,7 @@ function detectZoomAndAdjust() {
 
 function manageColumnVisibility() {
     const zoomLevel = Math.round(window.devicePixelRatio * 100);
-    const table = document.getElementById('nonVatableExpensesTable');
+    const table = document.getElementById('vatableExpensesTable');
     
     if (!table) return;
     
@@ -2499,10 +3258,10 @@ function manageColumnVisibility() {
         
         rows.forEach(row => {
             const cells = row.querySelectorAll('th, td');
-            if (cells.length >= 14) {
-                // Hide address (7th column) and remarks (13th column)
+            if (cells.length >= 16) {
+                // Hide address (7th column) and remarks (15th column)
                 if (cells[6]) cells[6].style.display = 'none'; // Address
-                if (cells[12]) cells[12].style.display = 'none'; // Remarks
+                if (cells[14]) cells[14].style.display = 'none'; // Remarks
             }
         });
         
@@ -2519,6 +3278,41 @@ function manageColumnVisibility() {
         });
         document.body.classList.remove('extreme-zoom');
     }
+}
+
+// Add zoom indicator to show current zoom level (optional)
+function addZoomIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'zoom-indicator';
+    indicator.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 30, 20, 0.9);
+        border: 1px solid #00ff9d;
+        color: #00ff9d;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 1000;
+        display: none;
+    `;
+    document.body.appendChild(indicator);
+    
+    // Show zoom level on demand (when Ctrl key is pressed)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey) {
+            const zoom = Math.round(window.devicePixelRatio * 100);
+            indicator.textContent = `Zoom: ${zoom}%`;
+            indicator.style.display = 'block';
+        }
+    });
+    
+    document.addEventListener('keyup', function(e) {
+        if (!e.ctrlKey) {
+            indicator.style.display = 'none';
+        }
+    });
 }
 
 // ===== SELECT MULTIPLE FUNCTIONALITY =====
@@ -2751,7 +3545,7 @@ function setCellValue(cell, value) {
 
 function selectCellsInRange(startCoord, currentCoord) {
     const tableBody = document.getElementById('tableBody');
-    const rows = tableBody.children;
+    const rows = Array.from(tableBody.children).filter(row => row.style.display !== 'none');
     
     const startRow = Math.min(startCoord.row, currentCoord.row);
     const endRow = Math.max(startCoord.row, currentCoord.row);
@@ -2825,6 +3619,7 @@ function deleteSelectedCells() {
         });
         clearSelection();
         showToast(`Deleted ${deletedCount} cell(s) (uneditable cells were skipped)`, 'success');
+        updateAllStats();
     }
 }
 
@@ -2928,6 +3723,7 @@ function pasteToSelectedCells() {
         } else {
             showToast(`Pasted ${pasteCount} cell(s)`, 'success');
         }
+        updateAllStats();
     }).catch(err => {
         showToast('Failed to read clipboard data. Make sure you have copied something first.', 'error');
     });
@@ -3003,9 +3799,7 @@ document.addEventListener('input', function(e) {
         const row = e.target.closest('tr');
         if (row) {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
-            updateExpenseTally();
+            updateAllStats();
         }
     }
 });
@@ -3015,19 +3809,21 @@ document.addEventListener('change', function(e) {
         const row = e.target.closest('tr');
         if (row) {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
-            updateExpenseTally();
+            updateAllStats();
         }
     }
 });
 
 // Make functions globally available for onclick handlers
 window.deleteRow = deleteRow;
-window.updateRowCount = updateRowCount;
-window.updateTotals = updateTotals;
-window.updateSummaryRow = updateSummaryRow;
-window.updateExpenseTally = updateExpenseTally;
+window.updateAllStats = updateAllStats;
+window.updateCalculations = updateCalculations;
+window.formatTIN = formatTIN;
+window.validateTIN = validateTIN;
+window.showToast = showToast;
+
+// Call addZoomIndicator after DOM is loaded
+addZoomIndicator();
     </script>
 </body>
 </html>
