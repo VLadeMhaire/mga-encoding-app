@@ -519,10 +519,10 @@
                 <div class="sidebar-section-title">DATA MANAGEMENT</div>
 
                 <!-- Add this button after the Clear Table Data button in the Data Management section -->
-<button class="sidebar-btn" id="selectMultipleBtn">
-    <i class="fas fa-check-double"></i>
-    <span class="sidebar-btn-text">Select Multiple</span>
-</button>
+                <button class="sidebar-btn" id="selectMultipleBtn">
+                    <i class="fas fa-check-double"></i>
+                    <span class="sidebar-btn-text">Select Multiple</span>
+                </button>
                 
                 <button class="sidebar-btn" id="addRowBtn">
                     <i class="fas fa-plus-circle"></i>
@@ -532,6 +532,17 @@
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
                     <span class="sidebar-btn-text">Export to Excel</span>
+                </button>
+                
+                <!-- NEW: Save/Load Buttons -->
+                <button class="sidebar-btn" id="saveDataBtn">
+                    <i class="fas fa-save"></i>
+                    <span class="sidebar-btn-text">Save Data to File</span>
+                </button>
+
+                <button class="sidebar-btn" id="loadDataBtn">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="sidebar-btn-text">Load Data from File</span>
                 </button>
                 
                 <button class="sidebar-btn" id="clearBtn">
@@ -673,23 +684,23 @@
                 <p>Professional Sales Tracking with Automated VAT Calculations</p>
             </div>
             <div class="header-sidebar-buttons">
-    <!-- Entry Counter Button -->
-    <div class="header-entry-counter" id="entryCounterBtn">
-        <i class="fas fa-list-ol"></i>
-        <span>Entries: <span id="entryCount">0</span></span>
-    </div>
-    
-    <!-- Left Sidebar Toggle Button -->
-    <div class="header-sidebar-toggle" id="headerLeftSidebarToggle">
-        <i class="fas fa-bars"></i>
-        <span>VAT Sales Menu</span>
-    </div>
-    <!-- Right Sidebar Toggle Button -->
-    <div class="header-sidebar-toggle" id="headerRightSidebarToggle">
-        <i class="fas fa-building"></i>
-        <span>Company Information</span>
-    </div>
-</div>
+                <!-- Entry Counter Button -->
+                <div class="header-entry-counter" id="entryCounterBtn">
+                    <i class="fas fa-list-ol"></i>
+                    <span>Entries: <span id="entryCount">0</span></span>
+                </div>
+                
+                <!-- Left Sidebar Toggle Button -->
+                <div class="header-sidebar-toggle" id="headerLeftSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                    <span>VAT Sales Menu</span>
+                </div>
+                <!-- Right Sidebar Toggle Button -->
+                <div class="header-sidebar-toggle" id="headerRightSidebarToggle">
+                    <i class="fas fa-building"></i>
+                    <span>Company Information</span>
+                </div>
+            </div>
         </header>
         
         <!-- Company Info Section removed from main area - now in right sidebar -->
@@ -990,29 +1001,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize sidebar states based on screen size
-function initSidebarStates() {
-    // Open both sidebars by default on all screen sizes
-    isLeftSidebarExpanded = true;
-    isRightSidebarExpanded = true;
-    
-    // Update sidebar classes
-    leftSidebar.classList.add('sidebar-expanded');
-    rightSidebar.classList.add('sidebar-expanded');
-    
-    // Update body classes
-    body.classList.add('left-sidebar-expanded', 'right-sidebar-expanded');
-    
-    // Update button appearances
-    if (headerLeftSidebarToggle) {
-        const icon = headerLeftSidebarToggle.querySelector('i');
-        icon.style.transform = 'rotate(90deg)';
+    function initSidebarStates() {
+        // Open both sidebars by default on all screen sizes
+        isLeftSidebarExpanded = true;
+        isRightSidebarExpanded = true;
+        
+        // Update sidebar classes
+        leftSidebar.classList.add('sidebar-expanded');
+        rightSidebar.classList.add('sidebar-expanded');
+        
+        // Update body classes
+        body.classList.add('left-sidebar-expanded', 'right-sidebar-expanded');
+        
+        // Update button appearances
+        if (headerLeftSidebarToggle) {
+            const icon = headerLeftSidebarToggle.querySelector('i');
+            icon.style.transform = 'rotate(90deg)';
+        }
+        
+        if (headerRightSidebarToggle) {
+            const icon = headerRightSidebarToggle.querySelector('i');
+            icon.style.transform = 'rotate(-90deg)';
+        }
     }
-    
-    if (headerRightSidebarToggle) {
-        const icon = headerRightSidebarToggle.querySelector('i');
-        icon.style.transform = 'rotate(-90deg)';
-    }
-}
     
     initSidebarStates();
     
@@ -1020,6 +1031,8 @@ function initSidebarStates() {
     // Get sidebar buttons
     const addRowBtn = document.getElementById('addRowBtn');
     const exportBtn = document.getElementById('exportBtn');
+    const saveDataBtn = document.getElementById('saveDataBtn');
+    const loadDataBtn = document.getElementById('loadDataBtn');
     const clearBtn = document.getElementById('clearBtn');
     const clearInfoBtn = document.getElementById('clearInfoBtn');
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
@@ -1035,6 +1048,15 @@ function initSidebarStates() {
     
     if (exportBtn) {
         exportBtn.addEventListener('click', exportToExcel);
+    }
+    
+    // NEW: Save/Load event listeners
+    if (saveDataBtn) {
+        saveDataBtn.addEventListener('click', saveDataToFile);
+    }
+
+    if (loadDataBtn) {
+        loadDataBtn.addEventListener('click', loadDataFromFile);
     }
     
     if (clearBtn) {
@@ -1815,6 +1837,221 @@ function clearAllData() {
         renderCurrentPage();
         updateAllStats();
     }
+}
+
+// ===== NEW: SAVE/LOAD FUNCTIONALITY =====
+function saveDataToFile() {
+    // Collect all table data
+    const tableData = [];
+    const rows = document.querySelectorAll('#tableBody tr');
+    
+    rows.forEach(row => {
+        const rowData = {
+            date: row.querySelector('.date-input')?.value || '',
+            invoiceNumber: row.querySelector('.invoice-number')?.value || '',
+            invoiceType: row.querySelector('.invoice-type')?.value || '',
+            paymentMode: row.querySelector('.payment-mode')?.value || '',
+            tinNumber: row.querySelector('.tin-number')?.value || '',
+            customerName: row.querySelector('.customer-name')?.value || '',
+            address: row.querySelector('.address')?.value || '',
+            grossSales: row.querySelector('.gross-sales')?.value || '',
+            exemptSales: row.querySelector('.exempt-sales')?.value || '',
+            salesType: row.querySelector('.sales-type')?.value || '',
+            withholdingRate: row.querySelector('.withholding-rate')?.value || '0',
+            remarks: row.querySelector('.remarks')?.value || ''
+        };
+        tableData.push(rowData);
+    });
+    
+    // Collect company info
+    const companyInfo = {
+        name: document.getElementById('companyName')?.value || '',
+        tin: document.getElementById('companyTIN')?.value || '',
+        address: document.getElementById('companyAddress')?.value || '',
+        business: document.getElementById('lineOfBusiness')?.value || '',
+        telephone: document.getElementById('telephone')?.value || '',
+        date: document.getElementById('reportDate')?.value || '',
+        employee: document.getElementById('authorizedEmployee')?.value || '',
+        email: document.getElementById('email')?.value || ''
+    };
+    
+    // Create save data object
+    const saveData = {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        companyInfo: companyInfo,
+        tableData: tableData
+    };
+    
+    // Convert to JSON and download
+    const jsonData = JSON.stringify(saveData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    const fileName = `VAT_Data_${new Date().toISOString().split('T')[0]}.vat`;
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    
+    showToast(`✅ Data saved to ${fileName}`, 'success');
+}
+
+function loadDataFromFile() {
+    // Create file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.vat,.json';
+    
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const saveData = JSON.parse(e.target.result);
+                
+                // Validate file format
+                if (!saveData.version || !saveData.tableData) {
+                    throw new Error('Invalid file format');
+                }
+                
+                // Load company info
+                if (saveData.companyInfo) {
+                    document.getElementById('companyName').value = saveData.companyInfo.name || '';
+                    document.getElementById('companyTIN').value = saveData.companyInfo.tin || '';
+                    document.getElementById('companyAddress').value = saveData.companyInfo.address || '';
+                    document.getElementById('lineOfBusiness').value = saveData.companyInfo.business || '';
+                    document.getElementById('telephone').value = saveData.companyInfo.telephone || '';
+                    document.getElementById('reportDate').value = saveData.companyInfo.date || new Date().toISOString().split('T')[0];
+                    document.getElementById('authorizedEmployee').value = saveData.companyInfo.employee || '';
+                    document.getElementById('email').value = saveData.companyInfo.email || '';
+                    
+                    // Save to localStorage
+                    saveCompanyInfo();
+                }
+                
+                // Clear existing table
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';
+                
+                // Load table data
+                if (saveData.tableData.length === 0) {
+                    addNewRow(); // Add at least one empty row
+                } else {
+                    saveData.tableData.forEach(rowData => {
+                        addRowFromData(rowData);
+                    });
+                }
+                
+                // Update all calculations and pagination
+                updateAllStats();
+                currentPage = 1;
+                renderCurrentPage();
+                
+                showToast(`✅ Loaded ${saveData.tableData.length} rows from file`, 'success');
+                
+            } catch (error) {
+                console.error('Error loading file:', error);
+                showToast('❌ Error loading file. Invalid format.', 'error');
+            }
+        };
+        
+        reader.readAsText(file);
+    });
+    
+    fileInput.click();
+}
+
+// Helper function to add a row from saved data
+function addRowFromData(rowData) {
+    const tableBody = document.getElementById('tableBody');
+    const rowId = 'row_' + Date.now() + '_' + Math.random();
+    
+    const row = document.createElement('tr');
+    row.id = rowId;
+    
+    row.innerHTML = `
+        <td><input type="date" value="${rowData.date || ''}" class="editable date-input"></td>
+        <td><input type="text" value="${escapeHtml(rowData.invoiceNumber || '')}" class="editable invoice-number" placeholder="INV-001"></td>
+        <td>
+            <select class="editable invoice-type">
+                <option value="">Select</option>
+                <option value="Cash" ${rowData.invoiceType === 'Cash' ? 'selected' : ''}>Cash</option>
+                <option value="Charge" ${rowData.invoiceType === 'Charge' ? 'selected' : ''}>Charge</option>
+                <option value="Billing" ${rowData.invoiceType === 'Billing' ? 'selected' : ''}>Billing</option>
+                <option value="Service" ${rowData.invoiceType === 'Service' ? 'selected' : ''}>Service</option>
+            </select>
+        </td>
+        <td>
+            <select class="editable payment-mode">
+                <option value="">Select</option>
+                <option value="Cash" ${rowData.paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+                <option value="Charge" ${rowData.paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
+            </select>
+        </td>
+        <td><input type="text" value="${escapeHtml(rowData.tinNumber || '')}" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000"></td>
+        <td><input type="text" value="${escapeHtml(rowData.customerName || '')}" class="editable customer-name" placeholder="Customer name"></td>
+        <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Customer address"></td>
+        <td><input type="number" step="0.01" min="0" value="${rowData.grossSales || ''}" class="editable gross-sales" placeholder="0.00"></td>
+        <td><input type="number" step="0.01" min="0" value="${rowData.exemptSales || ''}" class="editable exempt-sales" placeholder="0.00"></td>
+        <td>
+            <select class="editable sales-type">
+                <option value="">Select</option>
+                <option value="Private" ${rowData.salesType === 'Private' ? 'selected' : ''}>Private</option>
+                <option value="Government" ${rowData.salesType === 'Government' ? 'selected' : ''}>Government</option>
+            </select>
+        </td>
+        <td><div class="uneditable net-sales">0.00</div></td>
+        <td><div class="uneditable output-tax">0.00</div></td>
+        <td>
+            <select class="editable withholding-rate">
+                <option value="0" ${rowData.withholdingRate === '0' ? 'selected' : ''}>0%</option>
+                <option value="0.01" ${rowData.withholdingRate === '0.01' ? 'selected' : ''}>1%</option>
+                <option value="0.02" ${rowData.withholdingRate === '0.02' ? 'selected' : ''}>2%</option>
+                <option value="0.05" ${rowData.withholdingRate === '0.05' ? 'selected' : ''}>5%</option>
+            </select>
+        </td>
+        <td><div class="uneditable withholding-amount">0.00</div></td>
+        <td><input type="text" value="${escapeHtml(rowData.remarks || '')}" class="editable remarks" placeholder="Enter remarks"></td>
+        <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></td>
+    `;
+    
+    tableBody.appendChild(row);
+    
+    // Add event listeners
+    const editableInputs = row.querySelectorAll('.editable');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+    });
+    
+    // Format TIN input
+    const tinInput = row.querySelector('.tin-number');
+    tinInput.addEventListener('input', function(e) {
+        formatTIN(e.target);
+    });
+    
+    // Trigger calculations for this row
+    updateCalculations(row);
+}
+
+// Helper function to escape HTML special characters
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Function to export to Excel (XLS format) with improved design
