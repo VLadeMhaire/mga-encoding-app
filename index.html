@@ -41,7 +41,8 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0b1a2a 0%, #1a2635 100%);
+            /* NEW: BIR background image, with fallback gradient and overlay for readability */
+            background: linear-gradient(135deg, rgba(11, 26, 42, 0.82), rgba(26, 38, 53, 0.85)), url('retro.jpg') center/cover no-repeat fixed;
             color: var(--text-color);
             min-height: 100vh;
             width: 100%;
@@ -54,6 +55,8 @@
             align-items: center;
             transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Smooth body shift */
             opacity: 1;
+            /* ensure background covers entire viewport */
+            background-blend-mode: overlay;
         }
         
         /* Sidebar open state for body */
@@ -617,6 +620,7 @@
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         
+        /* Overlay effect softened — BIR image visible beneath */
         body::before {
             content: '';
             position: fixed;
@@ -817,17 +821,13 @@
                     <span class="sidebar-btn-text">Tax Game</span>
                 </a>
                 <div class="sidebar-divider"></div>
-                <a href="#" class="sidebar-btn" id="quickGuideBtn">
-                    <i class="fas fa-question-circle"></i>
+                <a href="quick_guide.html" class="sidebar-btn">
+                    <i class="fas fa-compass"></i>
                     <span class="sidebar-btn-text">Quick Guide</span>
                 </a>
                 <a href="#" class="sidebar-btn" id="helpBtn">
                     <i class="fas fa-life-ring"></i>
                     <span class="sidebar-btn-text">Help & Support</span>
-                </a>
-                <a href="#" class="sidebar-btn" id="printBtn">
-                    <i class="fas fa-print"></i>
-                    <span class="sidebar-btn-text">Print Report</span>
                 </a>
             </nav>
         </div>
@@ -846,6 +846,11 @@
             <div class="header-text">
                 <h1>VAT Tracking System</h1>
                 <p>Comprehensive Kiosk Interface for All VAT-Related Tracking Modules</p>
+                <!-- Updated description with Quick Guide reference -->
+                <div class="system-status" style="margin-top: 10px;">
+                    <i class="fas fa-info-circle" style="color: var(--primary-blue);"></i>
+                    <span>New: Check the <a href="quick_guide.html" style="color: var(--primary-red); text-decoration: none; font-weight: 600;">Quick Guide</a> for detailed instructions!</span>
+                </div>
             </div>
         </header>
         
@@ -964,6 +969,16 @@
                 <div class="status-indicator"></div>
                 <span id="statusText">System Status: Online | All Modules Available</span>
             </div>
+            <!-- Updated footer with Quick Guide link -->
+            <div style="margin-top: 10px; font-size: 0.9rem;">
+                <a href="quick_guide.html" style="color: var(--primary-red); text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-compass"></i> Quick Guide
+                </a> 
+                <span style="margin: 0 10px; color: var(--border-mix);">|</span>
+                <a href="#" id="helpLink" style="color: var(--primary-blue); text-decoration: none;">
+                    <i class="fas fa-question-circle"></i> Help
+                </a>
+            </div>
         </div>
     </div>
 
@@ -976,6 +991,15 @@
             const sidebarToggle = document.getElementById('sidebarToggle');
             const floatingToggle = document.getElementById('floatingToggle');
             const body = document.getElementById('mainBody');
+            const helpLink = document.getElementById('helpLink');
+            
+            // Help link - open quick guide
+            if (helpLink) {
+                helpLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'quick_guide.html';
+                });
+            }
             
             // State: sidebar is initially hidden, then we animate it open after a tiny delay
             let isSidebarOpen = false; // start closed for entrance animation
@@ -1079,9 +1103,11 @@
                 btn.addEventListener('click', function(e) {
                     if (this.id && !this.href) {
                         e.preventDefault();
-                        if (this.id === 'quickGuideBtn') alert('Quick Guide:\n\n1. Dashboard with 9 modules\n2. Tax Facts, Calculator, Game\n3. Use sidebar navigation');
-                        else if (this.id === 'helpBtn') alert('Help & Support:\n📧 support@mgaa-vat.com\n📞 (02) 1234-5678');
-                        else if (this.id === 'printBtn') window.print();
+                        if (this.id === 'quickGuideBtn') {
+                            window.location.href = 'quick_guide.html';
+                        } else if (this.id === 'helpBtn') {
+                            window.location.href = 'quick_guide.html#faq';
+                        } else if (this.id === 'printBtn') window.print();
                     }
                 });
             });
