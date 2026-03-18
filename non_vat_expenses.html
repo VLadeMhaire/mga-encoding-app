@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vatable Expenses Data Tracker</title>
+    <title>Non-VAT Expenses Data Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -29,7 +29,7 @@
     .table-wrapper table {
         direction: ltr;
         width: 100%;
-        min-width: 1500px;
+        min-width: 1400px;
         border-collapse: collapse;
         table-layout: auto;
     }
@@ -128,7 +128,7 @@
         white-space: nowrap;
     }
     
-    /* Column-specific responsive widths - Adjusted for Expenses columns */
+    /* Column-specific responsive widths - Adjusted for Non-VAT Expenses (Net Expenses removed) */
     th:nth-child(1), td:nth-child(1) { min-width: 90px; } /* Date */
     th:nth-child(2), td:nth-child(2) { min-width: 110px; } /* Invoice Number */
     th:nth-child(3), td:nth-child(3) { min-width: 90px; } /* Invoice Type */
@@ -138,13 +138,12 @@
     th:nth-child(7), td:nth-child(7) { min-width: 160px; } /* Address */
     th:nth-child(8), td:nth-child(8) { min-width: 120px; } /* Gross Amount */
     th:nth-child(9), td:nth-child(9) { min-width: 180px; } /* Nature of Expense */
-    th:nth-child(10), td:nth-child(10) { min-width: 110px; } /* Net Expenses */
-    th:nth-child(11), td:nth-child(11) { min-width: 100px; } /* Input Tax */
-    th:nth-child(12), td:nth-child(12) { min-width: 100px; } /* Withholding Rate */
-    th:nth-child(13), td:nth-child(13) { min-width: 110px; } /* Withholding Tax */
-    th:nth-child(14), td:nth-child(14) { min-width: 130px; } /* Gross - Withholding Tax */
-    th:nth-child(15), td:nth-child(15) { min-width: 130px; } /* Remarks */
-    th:nth-child(16), td:nth-child(16) { min-width: 70px; } /* Action */
+    th:nth-child(10), td:nth-child(10) { min-width: 100px; } /* Input Tax */
+    th:nth-child(11), td:nth-child(11) { min-width: 100px; } /* Withholding Rate */
+    th:nth-child(12), td:nth-child(12) { min-width: 110px; } /* Withholding Tax */
+    th:nth-child(13), td:nth-child(13) { min-width: 130px; } /* Gross - Withholding Tax */
+    th:nth-child(14), td:nth-child(14) { min-width: 130px; } /* Remarks */
+    th:nth-child(15), td:nth-child(15) { min-width: 70px; } /* Action */
     
     /* Zoom level specific adjustments */
     @media screen and (min-resolution: 120dpi) { /* 125% zoom */
@@ -232,15 +231,19 @@
         gap: 15px;
     }
     
-    .tally-item.services {
-        border-left: 4px solid #00b3ff;
+    .tally-item.zero-percent {
+        border-left: 4px solid #9b59b6;
     }
     
-    .tally-item.goods {
+    .tally-item.one-percent {
         border-left: 4px solid #ff9900;
     }
     
-    .tally-item.rental {
+    .tally-item.two-percent {
+        border-left: 4px solid #00b3ff;
+    }
+    
+    .tally-item.five-percent {
         border-left: 4px solid #9d00ff;
     }
     
@@ -564,6 +567,124 @@
     .pagination-page-indicator:focus-within::before {
         opacity: 0.2;
     }
+
+    /* ===== IMPROVED NATURE OF EXPENSE DROPDOWN STYLING ===== */
+    .nature-expense {
+        font-family: 'Segoe UI', 'Arial', sans-serif;
+        cursor: pointer;
+    }
+    
+    /* Style for the dropdown options when expanded */
+    .nature-expense optgroup {
+        font-weight: 700;
+        font-size: 13px;
+        padding: 8px 0;
+        letter-spacing: 0.3px;
+    }
+    
+    /* 0% category - Purple theme */
+    .nature-expense optgroup[label="0% - No Withholding"] {
+        color: #9b59b6;
+        background: linear-gradient(90deg, rgba(155, 89, 182, 0.15), transparent);
+        border-left: 3px solid #9b59b6;
+        margin: 4px 0;
+    }
+    
+    /* 1% category - Orange theme */
+    .nature-expense optgroup[label="1% Withholding"] {
+        color: #ffaa33;
+        background: linear-gradient(90deg, rgba(255, 170, 51, 0.15), transparent);
+        border-left: 3px solid #ffaa33;
+        margin: 4px 0;
+    }
+    
+    /* 2% category - Blue theme */
+    .nature-expense optgroup[label="2% Withholding"] {
+        color: #4da6ff;
+        background: linear-gradient(90deg, rgba(77, 166, 255, 0.15), transparent);
+        border-left: 3px solid #4da6ff;
+        margin: 4px 0;
+    }
+    
+    /* 5% category - Green/Purple theme */
+    .nature-expense optgroup[label="5% Withholding"] {
+        color: #9d00ff;
+        background: linear-gradient(90deg, rgba(157, 0, 255, 0.15), transparent);
+        border-left: 3px solid #9d00ff;
+        margin: 4px 0;
+    }
+    
+    /* Individual option styling */
+    .nature-expense option {
+        padding: 10px 15px;
+        background-color: rgba(20, 40, 30, 0.95);
+        color: #e0f7e9;
+        font-weight: 400;
+        font-size: 12px;
+        border-bottom: 1px solid rgba(0, 255, 157, 0.1);
+        transition: all 0.2s ease;
+    }
+    
+    /* Option hover effect */
+    .nature-expense option:hover {
+        background-color: rgba(0, 255, 157, 0.3) !important;
+        color: #ffffff;
+        transform: translateX(5px);
+    }
+    
+    /* Selected option styling */
+    .nature-expense option:checked {
+        background: linear-gradient(135deg, rgba(0, 255, 157, 0.4), rgba(0, 200, 120, 0.5));
+        color: #ffffff;
+        font-weight: 600;
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    }
+    
+    /* Category-specific selected colors */
+    .nature-expense optgroup[label="0% - No Withholding"] option:checked {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.5), rgba(120, 60, 150, 0.6));
+    }
+    
+    .nature-expense optgroup[label="1% Withholding"] option:checked {
+        background: linear-gradient(135deg, rgba(255, 170, 51, 0.5), rgba(200, 130, 30, 0.6));
+    }
+    
+    .nature-expense optgroup[label="2% Withholding"] option:checked {
+        background: linear-gradient(135deg, rgba(77, 166, 255, 0.5), rgba(40, 120, 200, 0.6));
+    }
+    
+    .nature-expense optgroup[label="5% Withholding"] option:checked {
+        background: linear-gradient(135deg, rgba(157, 0, 255, 0.5), rgba(120, 0, 200, 0.6));
+    }
+    
+    /* When a nature of expense is selected, change text color to distinguish it */
+    .nature-expense.has-value {
+        color: #00ffff !important;
+        font-weight: 600;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        background: rgba(0, 100, 100, 0.3);
+    }
+    
+    /* Add icons to optgroup labels */
+    .nature-expense optgroup[label="0% - No Withholding"]::before {
+        content: "🟣 ";
+        font-size: 12px;
+    }
+    
+    .nature-expense optgroup[label="1% Withholding"]::before {
+        content: "🟠 ";
+        font-size: 12px;
+    }
+    
+    .nature-expense optgroup[label="2% Withholding"]::before {
+        content: "🔵 ";
+        font-size: 12px;
+    }
+    
+    .nature-expense optgroup[label="5% Withholding"]::before {
+        content: "🟣 ";
+        font-size: 12px;
+    }
 </style>
 </head>
 <body>
@@ -605,7 +726,7 @@
                     <span class="sidebar-btn-text">Export to Excel</span>
                 </button>
                 
-                <!-- NEW: Save/Load Buttons -->
+                <!-- Save/Load Buttons -->
                 <button class="sidebar-btn" id="saveDataBtn">
                     <i class="fas fa-save"></i>
                     <span class="sidebar-btn-text">Save Data to File</span>
@@ -751,8 +872,8 @@
                 </div>
             </div>
             <div class="header-text">
-                <h1><i class="fas fa-money-bill-wave"></i> Vatable Expenses Data Tracker</h1>
-                <p>Professional Expenses Tracking with Automated VAT and Withholding Tax Calculations</p>
+                <h1><i class="fas fa-money-bill-wave"></i> Non-VAT Expenses Data Tracker</h1>
+                <p>Professional Non-VAT Expenses Tracking with Withholding Tax Calculations</p>
             </div>
             <div class="header-sidebar-buttons">
                 <!-- Entry Counter Button -->
@@ -777,7 +898,7 @@
         <!-- Company Info Section removed from main area - now in right sidebar -->
         
         <div class="table-wrapper">
-            <table id="vatableExpensesTable">
+            <table id="nonVatExpensesTable">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -789,7 +910,6 @@
                         <th>Address</th>
                         <th>Gross Amount</th>
                         <th>Nature of Expense</th>
-                        <th>Net Expenses</th>
                         <th>Input Tax</th>
                         <th>Withholding Tax Rate</th>
                         <th>Withholding Tax</th>
@@ -864,10 +984,6 @@
                 <span class="stat-value">₱ <span id="totalGrossAmount">0.00</span></span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Total Net Expenses</span>
-                <span class="stat-value">₱ <span id="totalNetExpenses">0.00</span></span>
-            </div>
-            <div class="stat-item">
                 <span class="stat-label">Total Input Tax</span>
                 <span class="stat-value">₱ <span id="totalInputTax">0.00</span></span>
             </div>
@@ -882,51 +998,59 @@
         </div>
         
         <div class="footer">
-            <p>© 2026 Vatable Expenses Data Tracker | Professional VAT-Compliant Expenses Tracking System</p>
+            <p>© 2026 Non-VAT Expenses Data Tracker | Professional Expenses Tracking System</p>
         </div>
     </div>
 
     <script>
 // ============================================================================
-// VATABLE EXPENSES DATA TRACKER - COMPLETE JAVASCRIPT WITH PAGINATION & SAVE/LOAD
+// NON-VAT EXPENSES DATA TRACKER - COMPLETE JAVASCRIPT
 // ============================================================================
 
 // ===== PAGINATION VARIABLES =====
 let currentPage = 1;
 let rowsPerPage = 25;
 
-// Expense categories with their withholding tax rates
+// Expense categories with their withholding tax rates - UPDATED WITH NEW CATEGORIES
 const expenseCategories = {
-    // Services (2%)
-    "REPAIRS AND MAINTENANCE-LABOR": 0.02,
-    "MEALS AND ACCOMMODATION – SERVICES": 0.02,
-    "REPRESENTATIONS – SERVICES": 0.02,
+    // 0% - No Withholding
+    "SALARIES AND WAGES": 0,
+    "SSS/PHILHEALTH/PAG-IBIG": 0,
+    "INTERMENT FEE": 0,
+    "PRINTING AND REPRODUCTION": 0,
+    
+    // 1% Withholding
+    "REPAIRS AND MAINTENANCE- MATERIALS": 0.01,
+    "MEALS AND ACCOMMODATION - GOODS": 0.01,
+    "REPRESENTATION- GOODS": 0.01,
+    "OTHERS - GOODS": 0.01,
+    "FUEL AND OIL": 0.01,
+    "OFFICE SUPPLIES": 0.01,
+    "UNIFORMS": 0.01,
+    "MEDICAL EXPENSE - GOODS": 0.01,
+    "CLEANING SUPPLIES": 0.01,
+    
+    // 2% Withholding
+    "REPAIRS AND MAINTENANCE- LABOR": 0.02,
+    "MEALS AND ACCOMMODATION - SERVICES": 0.02,
+    "REPRESENTATION - SERVICES": 0.02,
+    "OTHERS - SERVICES": 0.02,
     "ELECTRICITY AND WATER": 0.02,
     "COMMUNICATION EXPENSE": 0.02,
     "FREIGHT AND COURIER": 0.02,
     "TRAVEL AND TRANSPORTATION": 0.02,
+    "CLEANING SERVICES": 0.02,
+    "COMMISSION FEE": 0.02,
+    "SERVICES CHARGE": 0.02,
     "ADVERTISING AND MARKETING": 0.02,
     "SECURITY SERVICES": 0.02,
     "INSURANCE": 0.02,
     "SEMINAR AND TRAINING": 0.02,
-    "MEDICAL EXPENSES – SERVICES": 0.02,
+    "MEDICAL EXPENSE - SERVICES": 0.02,
     "PROFESSIONAL FEES": 0.02,
-    "CLEANING SERVICES": 0.02,
-    "OTHERS - SERVICES": 0.02,
     
-    // Goods (1%)
-    "REPAIRS AND MAINTENANCE-MATERIALS": 0.01,
-    "MEALS AND ALLOWANCES – GOODS": 0.01,
-    "REPRESENTATIONS – GOODS": 0.01,
-    "FUEL AND OIL": 0.01,
-    "OFFICE SUPPLIES": 0.01,
-    "UNIFORMS": 0.01,
-    "MEDICAL EXPENSES – GOODS": 0.01,
-    "CLEANING SUPPLIES": 0.01,
-    "OTHERS - GOODS": 0.01,
-    
-    // Rental (5%)
-    "Rental": 0.05
+    // 5% Withholding
+    "RENTAL": 0.05
 };
 
 // ===== INITIALIZATION =====
@@ -1017,11 +1141,11 @@ function saveCompanyInfo() {
         employee: document.getElementById('authorizedEmployee')?.value || '',
         email: document.getElementById('email')?.value || ''
     };
-    localStorage.setItem('vatableExpensesCompanyInfo', JSON.stringify(companyInfo));
+    localStorage.setItem('nonVatExpensesCompanyInfo', JSON.stringify(companyInfo));
 }
 
 function loadCompanyInfo() {
-    const savedInfo = localStorage.getItem('vatableExpensesCompanyInfo');
+    const savedInfo = localStorage.getItem('nonVatExpensesCompanyInfo');
     if (savedInfo) {
         const companyInfo = JSON.parse(savedInfo);
         if (document.getElementById('companyName')) document.getElementById('companyName').value = companyInfo.name || '';
@@ -1044,7 +1168,7 @@ function clearCompanyInfo() {
     if (document.getElementById('reportDate')) document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
     if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = '';
     if (document.getElementById('email')) document.getElementById('email').value = '';
-    localStorage.removeItem('vatableExpensesCompanyInfo');
+    localStorage.removeItem('nonVatExpensesCompanyInfo');
 }
 
 // ===== PAGINATION FUNCTIONS =====
@@ -1203,44 +1327,69 @@ function addNewRow() {
     // Set current date as default
     const today = new Date().toISOString().split('T')[0];
     
-    // Create nature of expense options
+    // Create nature of expense options with improved readability - UPDATED WITH NEW CATEGORIES
     let natureOptions = '<option value="">Select Nature of Expense</option>';
     
-    // Add Services category
-    natureOptions += '<optgroup label="Services (2%)">';
-    natureOptions += '<option value="REPAIRS AND MAINTENANCE-LABOR">REPAIRS AND MAINTENANCE-LABOR</option>';
-    natureOptions += '<option value="MEALS AND ACCOMMODATION – SERVICES">MEALS AND ACCOMMODATION – SERVICES</option>';
-    natureOptions += '<option value="REPRESENTATIONS – SERVICES">REPRESENTATIONS – SERVICES</option>';
-    natureOptions += '<option value="ELECTRICITY AND WATER">ELECTRICITY AND WATER</option>';
-    natureOptions += '<option value="COMMUNICATION EXPENSE">COMMUNICATION EXPENSE</option>';
-    natureOptions += '<option value="FREIGHT AND COURIER">FREIGHT AND COURIER</option>';
-    natureOptions += '<option value="TRAVEL AND TRANSPORTATION">TRAVEL AND TRANSPORTATION</option>';
-    natureOptions += '<option value="ADVERTISING AND MARKETING">ADVERTISING AND MARKETING</option>';
-    natureOptions += '<option value="SECURITY SERVICES">SECURITY SERVICES</option>';
-    natureOptions += '<option value="INSURANCE">INSURANCE</option>';
-    natureOptions += '<option value="SEMINAR AND TRAINING">SEMINAR AND TRAINING</option>';
-    natureOptions += '<option value="MEDICAL EXPENSES – SERVICES">MEDICAL EXPENSES – SERVICES</option>';
-    natureOptions += '<option value="PROFESSIONAL FEES">PROFESSIONAL FEES</option>';
-    natureOptions += '<option value="CLEANING SERVICES">CLEANING SERVICES</option>';
-    natureOptions += '<option value="OTHERS - SERVICES">OTHERS - SERVICES</option>';
+    // 0% - No Withholding category
+    natureOptions += '<optgroup label="0% - No Withholding">';
+    const zeroPercentOptions = [
+        "SALARIES AND WAGES",
+        "SSS/PHILHEALTH/PAG-IBIG",
+        "INTERMENT FEE",
+        "PRINTING AND REPRODUCTION"
+    ];
+    zeroPercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}">🟣 ${opt}</option>`;
+    });
     natureOptions += '</optgroup>';
     
-    // Add Goods category
-    natureOptions += '<optgroup label="Goods (1%)">';
-    natureOptions += '<option value="REPAIRS AND MAINTENANCE-MATERIALS">REPAIRS AND MAINTENANCE-MATERIALS</option>';
-    natureOptions += '<option value="MEALS AND ALLOWANCES – GOODS">MEALS AND ALLOWANCES – GOODS</option>';
-    natureOptions += '<option value="REPRESENTATIONS – GOODS">REPRESENTATIONS – GOODS</option>';
-    natureOptions += '<option value="FUEL AND OIL">FUEL AND OIL</option>';
-    natureOptions += '<option value="OFFICE SUPPLIES">OFFICE SUPPLIES</option>';
-    natureOptions += '<option value="UNIFORMS">UNIFORMS</option>';
-    natureOptions += '<option value="MEDICAL EXPENSES – GOODS">MEDICAL EXPENSES – GOODS</option>';
-    natureOptions += '<option value="CLEANING SUPPLIES">CLEANING SUPPLIES</option>';
-    natureOptions += '<option value="OTHERS - GOODS">OTHERS - GOODS</option>';
+    // 1% Withholding category
+    natureOptions += '<optgroup label="1% Withholding">';
+    const onePercentOptions = [
+        "REPAIRS AND MAINTENANCE- MATERIALS",
+        "MEALS AND ACCOMMODATION - GOODS",
+        "REPRESENTATION- GOODS",
+        "OTHERS - GOODS",
+        "FUEL AND OIL",
+        "OFFICE SUPPLIES",
+        "UNIFORMS",
+        "MEDICAL EXPENSE - GOODS",
+        "CLEANING SUPPLIES"
+    ];
+    onePercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}">🟠 ${opt}</option>`;
+    });
     natureOptions += '</optgroup>';
     
-    // Add Rental category
-    natureOptions += '<optgroup label="Rental (5%)">';
-    natureOptions += '<option value="Rental">Rental</option>';
+    // 2% Withholding category
+    natureOptions += '<optgroup label="2% Withholding">';
+    const twoPercentOptions = [
+        "REPAIRS AND MAINTENANCE- LABOR",
+        "MEALS AND ACCOMMODATION - SERVICES",
+        "REPRESENTATION - SERVICES",
+        "OTHERS - SERVICES",
+        "ELECTRICITY AND WATER",
+        "COMMUNICATION EXPENSE",
+        "FREIGHT AND COURIER",
+        "TRAVEL AND TRANSPORTATION",
+        "CLEANING SERVICES",
+        "COMMISSION FEE",
+        "SERVICES CHARGE",
+        "ADVERTISING AND MARKETING",
+        "SECURITY SERVICES",
+        "INSURANCE",
+        "SEMINAR AND TRAINING",
+        "MEDICAL EXPENSE - SERVICES",
+        "PROFESSIONAL FEES"
+    ];
+    twoPercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}">🔵 ${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // 5% Withholding category
+    natureOptions += '<optgroup label="5% Withholding">';
+    natureOptions += '<option value="RENTAL">🟣 RENTAL</option>';
     natureOptions += '</optgroup>';
     
     row.innerHTML = `
@@ -1288,9 +1437,6 @@ function addNewRow() {
             </select>
         </td>
         <td>
-            <div class="uneditable net-expenses">0.00</div>
-        </td>
-        <td>
             <div class="uneditable input-tax">0.00</div>
         </td>
         <td>
@@ -1327,6 +1473,18 @@ function addNewRow() {
             updateAllStats();
         });
     });
+    
+    // Special handling for Nature of Expense - add class when value changes
+    const natureExpenseSelect = row.querySelector('.nature-expense');
+    if (natureExpenseSelect) {
+        natureExpenseSelect.addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
+            }
+        });
+    }
     
     // Special handling for TIN input
     const tinInput = row.querySelector('.tin-number');
@@ -1404,19 +1562,13 @@ function updateCalculations(row) {
     const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
     const natureExpense = row.querySelector('.nature-expense')?.value;
     
-    // Calculate net expenses: Gross Amount / 1.12
-    const netExpenses = grossAmount / 1.12;
-    const netExpensesEl = row.querySelector('.net-expenses');
-    if (netExpensesEl) netExpensesEl.textContent = netExpenses.toFixed(2);
-    
-    // Calculate input tax: Net Expenses * 0.12
-    const inputTax = netExpenses * 0.12;
+    // For Non-VAT, input tax is 0
     const inputTaxEl = row.querySelector('.input-tax');
-    if (inputTaxEl) inputTaxEl.textContent = inputTax.toFixed(2);
+    if (inputTaxEl) inputTaxEl.textContent = '0.00';
     
     // Get withholding tax rate based on nature of expense
     let withholdingRate = 0;
-    if (natureExpense && expenseCategories[natureExpense]) {
+    if (natureExpense && expenseCategories[natureExpense] !== undefined) {
         withholdingRate = expenseCategories[natureExpense];
     }
     
@@ -1425,8 +1577,8 @@ function updateCalculations(row) {
     const withholdingRateEl = row.querySelector('.withholding-rate');
     if (withholdingRateEl) withholdingRateEl.textContent = ratePercentage;
     
-    // Calculate withholding tax: Net Expenses * Withholding Tax Rate
-    const withholdingTax = netExpenses * withholdingRate;
+    // Calculate withholding tax: Gross Amount * Withholding Tax Rate
+    const withholdingTax = grossAmount * withholdingRate;
     const withholdingTaxEl = row.querySelector('.withholding-tax');
     if (withholdingTaxEl) withholdingTaxEl.textContent = withholdingTax.toFixed(2);
     
@@ -1536,7 +1688,6 @@ function updateEntryCounter() {
 
 function updateTotals() {
     let totalGrossAmount = 0;
-    let totalNetExpenses = 0;
     let totalInputTax = 0;
     let totalWithholdingTax = 0;
     let totalGrossMinusWithholding = 0;
@@ -1544,26 +1695,22 @@ function updateTotals() {
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
         const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
-        const netExpenses = parseFloat(row.querySelector('.net-expenses')?.textContent) || 0;
         const inputTax = parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
         const withholdingTax = parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
         const grossMinusWithholding = parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
         
         totalGrossAmount += grossAmount;
-        totalNetExpenses += netExpenses;
         totalInputTax += inputTax;
         totalWithholdingTax += withholdingTax;
         totalGrossMinusWithholding += grossMinusWithholding;
     });
     
     const totalGrossAmountEl = document.getElementById('totalGrossAmount');
-    const totalNetExpensesEl = document.getElementById('totalNetExpenses');
     const totalInputTaxEl = document.getElementById('totalInputTax');
     const totalWithholdingTaxEl = document.getElementById('totalWithholdingTax');
     const netPayableEl = document.getElementById('netPayable');
     
     if (totalGrossAmountEl) totalGrossAmountEl.textContent = totalGrossAmount.toFixed(2);
-    if (totalNetExpensesEl) totalNetExpensesEl.textContent = totalNetExpenses.toFixed(2);
     if (totalInputTaxEl) totalInputTaxEl.textContent = totalInputTax.toFixed(2);
     if (totalWithholdingTaxEl) totalWithholdingTaxEl.textContent = totalWithholdingTax.toFixed(2);
     if (netPayableEl) netPayableEl.textContent = totalGrossMinusWithholding.toFixed(2);
@@ -1574,7 +1721,6 @@ function updateTotals() {
 
 function updateSummaryRow() {
     let totalGrossAmount = 0;
-    let totalNetExpenses = 0;
     let totalInputTax = 0;
     let totalWithholdingTax = 0;
     let totalGrossMinusWithholding = 0;
@@ -1582,13 +1728,11 @@ function updateSummaryRow() {
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
         const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
-        const netExpenses = parseFloat(row.querySelector('.net-expenses')?.textContent) || 0;
         const inputTax = parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
         const withholdingTax = parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
         const grossMinusWithholding = parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
         
         totalGrossAmount += grossAmount;
-        totalNetExpenses += netExpenses;
         totalInputTax += inputTax;
         totalWithholdingTax += withholdingTax;
         totalGrossMinusWithholding += grossMinusWithholding;
@@ -1601,7 +1745,6 @@ function updateSummaryRow() {
                 <td colspan="7" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
                 <td class="uneditable">${totalGrossAmount.toFixed(2)}</td>
                 <td>-</td>
-                <td class="uneditable">${totalNetExpenses.toFixed(2)}</td>
                 <td class="uneditable">${totalInputTax.toFixed(2)}</td>
                 <td>-</td>
                 <td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>
@@ -1629,7 +1772,6 @@ function updateExpenseTally() {
         expenseTally[category] = {
             count: 0,
             totalGrossAmount: 0,
-            totalNetExpenses: 0,
             totalWithholdingTax: 0,
             rate: expenseCategories[category]
         };
@@ -1644,16 +1786,12 @@ function updateExpenseTally() {
             const grossAmount = parseFloat(grossAmountInput.value) || 0;
             const natureExpense = natureExpenseSelect.value;
             
-            if (natureExpense && expenseCategories[natureExpense]) {
+            if (natureExpense && expenseCategories[natureExpense] !== undefined) {
                 expenseTally[natureExpense].count++;
                 expenseTally[natureExpense].totalGrossAmount += grossAmount;
                 
-                // Calculate net expenses for this row
-                const netExpenses = grossAmount / 1.12;
-                expenseTally[natureExpense].totalNetExpenses += netExpenses;
-                
                 // Calculate withholding tax for this row
-                const withholdingTax = netExpenses * expenseCategories[natureExpense];
+                const withholdingTax = grossAmount * expenseCategories[natureExpense];
                 expenseTally[natureExpense].totalWithholdingTax += withholdingTax;
                 
                 totalGrossAmount += grossAmount;
@@ -1674,12 +1812,16 @@ function updateExpenseTally() {
     sortedCategories.forEach(category => {
         const data = expenseTally[category];
         
-        // Determine category type for styling
+        // Determine category type for styling based on rate
         let categoryType = '';
-        if (category.includes('SERVICES') || category === 'Rental') {
-            categoryType = category === 'Rental' ? 'rental' : 'services';
-        } else {
-            categoryType = 'goods';
+        if (data.rate === 0) {
+            categoryType = 'zero-percent';
+        } else if (data.rate === 0.01) {
+            categoryType = 'one-percent';
+        } else if (data.rate === 0.02) {
+            categoryType = 'two-percent';
+        } else if (data.rate === 0.05) {
+            categoryType = 'five-percent';
         }
         
         const tallyItem = document.createElement('div');
@@ -1693,7 +1835,7 @@ function updateExpenseTally() {
         
         tallyItem.innerHTML = `
             <div class="tally-category">
-                <i class="fas ${categoryType === 'services' ? 'fa-cogs' : categoryType === 'goods' ? 'fa-box' : 'fa-building'}"></i>
+                <i class="fas ${data.rate === 0 ? 'fa-ban' : (data.rate === 0.01 ? 'fa-box' : (data.rate === 0.02 ? 'fa-cogs' : 'fa-building'))}"></i>
                 ${displayCategory}
             </div>
             <div class="tally-details">
@@ -1702,7 +1844,7 @@ function updateExpenseTally() {
             </div>
             <div class="tally-rate">Withholding: ${ratePercentage}%</div>
             <div style="margin-top: 8px; font-size: 11px; color: #80cbc4;">
-                Net: ₱ ${data.totalNetExpenses.toFixed(2)} | W/Tax: ₱ ${data.totalWithholdingTax.toFixed(2)}
+                W/Tax: ₱ ${data.totalWithholdingTax.toFixed(2)}
             </div>
         `;
         
@@ -1744,7 +1886,7 @@ function updateExpenseTally() {
     }
 }
 
-// ===== NEW: SAVE/LOAD FUNCTIONS =====
+// ===== SAVE/LOAD FUNCTIONS =====
 function saveDataToFile() {
     // Collect all table data
     const tableData = [];
@@ -1781,7 +1923,7 @@ function saveDataToFile() {
     // Create save data object
     const saveData = {
         version: '1.0',
-        type: 'vatable-expenses',
+        type: 'non-vat-expenses',
         timestamp: new Date().toISOString(),
         companyInfo: companyInfo,
         tableData: tableData
@@ -1793,7 +1935,7 @@ function saveDataToFile() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     
-    const fileName = `Expenses_Data_${new Date().toISOString().split('T')[0]}.exp`;
+    const fileName = `NonVAT_Expenses_${new Date().toISOString().split('T')[0]}.exp`;
     link.href = url;
     link.download = fileName;
     document.body.appendChild(link);
@@ -1823,13 +1965,6 @@ function loadDataFromFile() {
                 // Validate file format
                 if (!saveData.version || !saveData.tableData) {
                     throw new Error('Invalid file format');
-                }
-                
-                // Optional: Check file type
-                if (saveData.type && saveData.type !== 'vatable-expenses') {
-                    if (!confirm('This appears to be a different type of data file. Load it as Expenses data anyway?')) {
-                        return;
-                    }
                 }
                 
                 // Load company info
@@ -1879,7 +2014,7 @@ function loadDataFromFile() {
     fileInput.click();
 }
 
-// Helper function to add a row from saved data
+// Helper function to add a row from saved data - UPDATED WITH NEW CATEGORIES
 function addRowFromData(rowData) {
     const tableBody = document.getElementById('tableBody');
     const rowId = 'row_' + Date.now() + '_' + Math.random();
@@ -1887,54 +2022,69 @@ function addRowFromData(rowData) {
     const row = document.createElement('tr');
     row.id = rowId;
     
-    // Create nature of expense options with selection
+    // Create nature of expense options with improved readability and selection - UPDATED WITH NEW CATEGORIES
     let natureOptions = '<option value="">Select Nature of Expense</option>';
     
-    // Add Services category
-    natureOptions += '<optgroup label="Services (2%)">';
-    const servicesOptions = [
-        "REPAIRS AND MAINTENANCE-LABOR",
-        "MEALS AND ACCOMMODATION – SERVICES",
-        "REPRESENTATIONS – SERVICES",
+    // 0% - No Withholding category
+    natureOptions += '<optgroup label="0% - No Withholding">';
+    const zeroPercentOptions = [
+        "SALARIES AND WAGES",
+        "SSS/PHILHEALTH/PAG-IBIG",
+        "INTERMENT FEE",
+        "PRINTING AND REPRODUCTION"
+    ];
+    zeroPercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>🟣 ${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // 1% Withholding category
+    natureOptions += '<optgroup label="1% Withholding">';
+    const onePercentOptions = [
+        "REPAIRS AND MAINTENANCE- MATERIALS",
+        "MEALS AND ACCOMMODATION - GOODS",
+        "REPRESENTATION- GOODS",
+        "OTHERS - GOODS",
+        "FUEL AND OIL",
+        "OFFICE SUPPLIES",
+        "UNIFORMS",
+        "MEDICAL EXPENSE - GOODS",
+        "CLEANING SUPPLIES"
+    ];
+    onePercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>🟠 ${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // 2% Withholding category
+    natureOptions += '<optgroup label="2% Withholding">';
+    const twoPercentOptions = [
+        "REPAIRS AND MAINTENANCE- LABOR",
+        "MEALS AND ACCOMMODATION - SERVICES",
+        "REPRESENTATION - SERVICES",
+        "OTHERS - SERVICES",
         "ELECTRICITY AND WATER",
         "COMMUNICATION EXPENSE",
         "FREIGHT AND COURIER",
         "TRAVEL AND TRANSPORTATION",
+        "CLEANING SERVICES",
+        "COMMISSION FEE",
+        "SERVICES CHARGE",
         "ADVERTISING AND MARKETING",
         "SECURITY SERVICES",
         "INSURANCE",
         "SEMINAR AND TRAINING",
-        "MEDICAL EXPENSES – SERVICES",
-        "PROFESSIONAL FEES",
-        "CLEANING SERVICES",
-        "OTHERS - SERVICES"
+        "MEDICAL EXPENSE - SERVICES",
+        "PROFESSIONAL FEES"
     ];
-    servicesOptions.forEach(opt => {
-        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>${opt}</option>`;
+    twoPercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>🔵 ${opt}</option>`;
     });
     natureOptions += '</optgroup>';
     
-    // Add Goods category
-    natureOptions += '<optgroup label="Goods (1%)">';
-    const goodsOptions = [
-        "REPAIRS AND MAINTENANCE-MATERIALS",
-        "MEALS AND ALLOWANCES – GOODS",
-        "REPRESENTATIONS – GOODS",
-        "FUEL AND OIL",
-        "OFFICE SUPPLIES",
-        "UNIFORMS",
-        "MEDICAL EXPENSES – GOODS",
-        "CLEANING SUPPLIES",
-        "OTHERS - GOODS"
-    ];
-    goodsOptions.forEach(opt => {
-        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>${opt}</option>`;
-    });
-    natureOptions += '</optgroup>';
-    
-    // Add Rental category
-    natureOptions += '<optgroup label="Rental (5%)">';
-    natureOptions += `<option value="Rental" ${rowData.natureExpense === 'Rental' ? 'selected' : ''}>Rental</option>`;
+    // 5% Withholding category
+    natureOptions += '<optgroup label="5% Withholding">';
+    natureOptions += `<option value="RENTAL" ${rowData.natureExpense === 'RENTAL' ? 'selected' : ''}>🟣 RENTAL</option>`;
     natureOptions += '</optgroup>';
     
     row.innerHTML = `
@@ -1967,11 +2117,10 @@ function addRowFromData(rowData) {
         <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></td>
         <td><input type="number" step="0.01" min="0" value="${rowData.grossAmount || ''}" class="editable gross-amount" placeholder="0.00"></td>
         <td>
-            <select class="editable nature-expense">
+            <select class="editable nature-expense ${rowData.natureExpense ? 'has-value' : ''}">
                 ${natureOptions}
             </select>
         </td>
-        <td><div class="uneditable net-expenses">0.00</div></td>
         <td><div class="uneditable input-tax">0.00</div></td>
         <td><div class="uneditable withholding-rate">0%</div></td>
         <td><div class="uneditable withholding-tax">0.00</div></td>
@@ -1994,6 +2143,18 @@ function addRowFromData(rowData) {
             updateAllStats();
         });
     });
+    
+    // Special handling for Nature of Expense - add class when value changes
+    const natureExpenseSelect = row.querySelector('.nature-expense');
+    if (natureExpenseSelect) {
+        natureExpenseSelect.addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
+            }
+        });
+    }
     
     // Format TIN input
     const tinInput = row.querySelector('.tin-number');
@@ -2050,7 +2211,6 @@ function exportToExcel() {
     
     // Calculate totals for the report
     const totalGrossAmount = parseFloat(document.getElementById('totalGrossAmount')?.textContent) || 0;
-    const totalNetExpenses = parseFloat(document.getElementById('totalNetExpenses')?.textContent) || 0;
     const totalInputTax = parseFloat(document.getElementById('totalInputTax')?.textContent) || 0;
     const totalWithholdingTax = parseFloat(document.getElementById('totalWithholdingTax')?.textContent) || 0;
     const netPayable = parseFloat(document.getElementById('netPayable')?.textContent) || 0;
@@ -2064,7 +2224,7 @@ function exportToExcel() {
                 <x:ExcelWorkbook>
                     <x:ExcelWorksheets>
                         <x:ExcelWorksheet>
-                            <x:Name>Vatable Expenses Report</x:Name>
+                            <x:Name>Non-VAT Expenses Report</x:Name>
                             <x:WorksheetOptions>
                                 <x:DisplayGridlines/>
                                 <x:Print>
@@ -2340,10 +2500,10 @@ function exportToExcel() {
                     font-weight: 600;
                 }
             </style>
-            <title>Vatable Expenses Report - ${formattedDate}</title>
+            <title>Non-VAT Expenses Report - ${formattedDate}</title>
         </head>
         <body>
-            <div class="report-title">VATABLE EXPENSES DATA REPORT</div>
+            <div class="report-title">NON-VAT EXPENSES DATA REPORT</div>
             
             <div class="company-header">
                 <table class="company-info-table">
@@ -2388,7 +2548,6 @@ function exportToExcel() {
                         <th>Address</th>
                         <th>Gross Amount</th>
                         <th>Nature of Expense</th>
-                        <th>Net Expenses</th>
                         <th>Input Tax</th>
                         <th>W/Tax Rate</th>
                         <th>Withholding Tax</th>
@@ -2440,10 +2599,6 @@ function exportToExcel() {
         const natureExpenseSelect = row.querySelector('.nature-expense');
         const natureExpenseValue = natureExpenseSelect ? natureExpenseSelect.value : '';
         
-        // Net Expenses
-        const netExpensesDiv = row.querySelector('.net-expenses');
-        const netExpensesValue = netExpensesDiv ? parseFloat(netExpensesDiv.textContent) || 0 : 0;
-        
         // Input Tax
         const inputTaxDiv = row.querySelector('.input-tax');
         const inputTaxValue = inputTaxDiv ? parseFloat(inputTaxDiv.textContent) || 0 : 0;
@@ -2478,7 +2633,6 @@ function exportToExcel() {
                 <td class="text-left">${addressValue}</td>
                 <td class="currency numeric">${grossAmountValue.toFixed(2)}</td>
                 <td class="text-left">${natureExpenseValue}</td>
-                <td class="currency numeric">${netExpensesValue.toFixed(2)}</td>
                 <td class="currency numeric">${inputTaxValue.toFixed(2)}</td>
                 <td class="text-center">${withholdingRateValue}</td>
                 <td class="currency numeric">${withholdingTaxValue.toFixed(2)}</td>
@@ -2498,7 +2652,6 @@ function exportToExcel() {
                         <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalGrossAmount.toFixed(2)}</td>
                         <td>-</td>
-                        <td class="currency numeric" style="font-weight: bold;">${totalNetExpenses.toFixed(2)}</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalInputTax.toFixed(2)}</td>
                         <td>-</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalWithholdingTax.toFixed(2)}</td>
@@ -2572,11 +2725,7 @@ function exportToExcel() {
                         <td class="total-value">₱ ${totalGrossAmount.toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <td class="total-label">Total Net Expenses:</td>
-                        <td class="total-value">₱ ${totalNetExpenses.toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                        <td class="total-label">Total Input Tax (12%):</td>
+                        <td class="total-label">Total Input Tax (0%):</td>
                         <td class="total-value">₱ ${totalInputTax.toFixed(2)}</td>
                     </tr>
                     <tr>
@@ -2596,9 +2745,9 @@ function exportToExcel() {
                 <p>Report generated on ${formattedDate} at ${formattedTime}</p>
                 <p>Number of Expense Categories: ${sortedCategories.length}</p>
                 <p>Total Transactions: ${rowNumber - 1} items across ${sortedCategories.length} categories</p>
-                <p>Authorized by: ${authorizedEmployee} | Prepared by: Vatable Expenses Data Tracker System</p>
+                <p>Authorized by: ${authorizedEmployee} | Prepared by: Non-VAT Expenses Data Tracker System</p>
                 <p>This is a computer-generated report. No signature is required.</p>
-                <p>© ${new Date().getFullYear()} Vatable Expenses Data Tracker - Professional VAT-Compliant Expenses Tracking System</p>
+                <p>© ${new Date().getFullYear()} Non-VAT Expenses Data Tracker - Professional Expenses Tracking System</p>
             </div>
         </body>
         </html>
@@ -2609,7 +2758,7 @@ function exportToExcel() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    const fileName = `Vatable_Expenses_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
+    const fileName = `NonVAT_Expenses_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xls`;
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
@@ -2634,7 +2783,6 @@ function calculateExpenseTallyForExport() {
         expenseTally[category] = {
             count: 0,
             totalGrossAmount: 0,
-            totalNetExpenses: 0,
             totalWithholdingTax: 0,
             rate: expenseCategories[category]
         };
@@ -2649,16 +2797,12 @@ function calculateExpenseTallyForExport() {
             const grossAmount = parseFloat(grossAmountInput.value) || 0;
             const natureExpense = natureExpenseSelect.value;
             
-            if (natureExpense && expenseCategories[natureExpense]) {
+            if (natureExpense && expenseCategories[natureExpense] !== undefined) {
                 expenseTally[natureExpense].count++;
                 expenseTally[natureExpense].totalGrossAmount += grossAmount;
                 
-                // Calculate net expenses for this row
-                const netExpenses = grossAmount / 1.12;
-                expenseTally[natureExpense].totalNetExpenses += netExpenses;
-                
                 // Calculate withholding tax for this row
-                const withholdingTax = netExpenses * expenseCategories[natureExpense];
+                const withholdingTax = grossAmount * expenseCategories[natureExpense];
                 expenseTally[natureExpense].totalWithholdingTax += withholdingTax;
             }
         }
@@ -2805,7 +2949,7 @@ function initButtonListeners() {
         exportBtn.addEventListener('click', exportToExcel);
     }
     
-    // NEW: Save/Load event listeners
+    // Save/Load event listeners
     if (saveDataBtn) {
         saveDataBtn.addEventListener('click', saveDataToFile);
     }
@@ -3213,7 +3357,6 @@ function detectZoomAndAdjust() {
             'Particulars/Supplier Name': 'Supplier',
             'Gross Amount': 'Gross',
             'Nature of Expense': 'Expense Type',
-            'Net Expenses': 'Net',
             'Input Tax': 'Input Tax',
             'Withholding Tax Rate': 'W/T Rate',
             'Withholding Tax': 'W/Tax',
@@ -3247,7 +3390,7 @@ function detectZoomAndAdjust() {
 
 function manageColumnVisibility() {
     const zoomLevel = Math.round(window.devicePixelRatio * 100);
-    const table = document.getElementById('vatableExpensesTable');
+    const table = document.getElementById('nonVatExpensesTable');
     
     if (!table) return;
     
@@ -3258,10 +3401,10 @@ function manageColumnVisibility() {
         
         rows.forEach(row => {
             const cells = row.querySelectorAll('th, td');
-            if (cells.length >= 16) {
-                // Hide address (7th column) and remarks (15th column)
+            if (cells.length >= 15) {
+                // Hide address (7th column) and remarks (14th column)
                 if (cells[6]) cells[6].style.display = 'none'; // Address
-                if (cells[14]) cells[14].style.display = 'none'; // Remarks
+                if (cells[13]) cells[13].style.display = 'none'; // Remarks
             }
         });
         
