@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -563,6 +564,80 @@
 
     .pagination-page-indicator:focus-within::before {
         opacity: 0.2;
+    }
+
+    /* Nature of Expense dropdown styling - IMPROVED READABILITY */
+    .nature-expense {
+        font-family: 'Segoe UI', 'Arial', sans-serif;
+    }
+    
+    /* Style for the dropdown options */
+    .nature-expense optgroup[label="Services (2%)"] {
+        color: #7b68ee;
+        font-weight: 700;
+        background: rgba(123, 104, 238, 0.1);
+    }
+    
+    .nature-expense optgroup[label="Goods (1%)"] {
+        color: #ffa500;
+        font-weight: 700;
+        background: rgba(255, 165, 0, 0.1);
+    }
+    
+    .nature-expense optgroup[label="Rental (5%)"] {
+        color: #32cd32;
+        font-weight: 700;
+        background: rgba(50, 205, 50, 0.1);
+    }
+    
+    /* Style individual options */
+    .nature-expense option {
+        padding: 8px 12px;
+        background: rgba(15, 30, 25, 0.95);
+        color: #e0f7e9;
+        font-weight: 400;
+    }
+    
+    .nature-expense option:hover {
+        background: rgba(0, 255, 157, 0.3);
+    }
+    
+    /* When a nature of expense is selected, change text color to distinguish it */
+    .nature-expense.has-value {
+        color: #00ffff !important;
+        font-weight: 600;
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    }
+    
+    /* Style for the selected option in the dropdown */
+    .nature-expense option:checked {
+        background: rgba(0, 255, 157, 0.4);
+        color: #ffffff;
+        font-weight: 600;
+    }
+    
+    /* Category-specific selected colors */
+    .nature-expense option[value*="SERVICES"]:checked,
+    .nature-expense option[value*="SERVICES"]:hover {
+        background: rgba(123, 104, 238, 0.5);
+    }
+    
+    .nature-expense option[value*="GOODS"]:checked,
+    .nature-expense option[value*="GOODS"]:hover {
+        background: rgba(255, 165, 0, 0.5);
+    }
+    
+    .nature-expense option[value="Rental"]:checked,
+    .nature-expense option[value="Rental"]:hover {
+        background: rgba(50, 205, 50, 0.5);
+    }
+    
+    /* Add icons to optgroup labels via pseudo-elements */
+    .nature-expense optgroup[label="Services (2%)"]::before {
+        content: "\f085"; /* FontAwesome cog icon */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 5px;
     }
 </style>
 </head>
@@ -1203,44 +1278,44 @@ function addNewRow() {
     // Set current date as default
     const today = new Date().toISOString().split('T')[0];
     
-    // Create nature of expense options
+    // Create nature of expense options with improved styling
     let natureOptions = '<option value="">Select Nature of Expense</option>';
     
     // Add Services category
-    natureOptions += '<optgroup label="Services (2%)">';
-    natureOptions += '<option value="REPAIRS AND MAINTENANCE-LABOR">REPAIRS AND MAINTENANCE-LABOR</option>';
-    natureOptions += '<option value="MEALS AND ACCOMMODATION – SERVICES">MEALS AND ACCOMMODATION – SERVICES</option>';
-    natureOptions += '<option value="REPRESENTATIONS – SERVICES">REPRESENTATIONS – SERVICES</option>';
-    natureOptions += '<option value="ELECTRICITY AND WATER">ELECTRICITY AND WATER</option>';
-    natureOptions += '<option value="COMMUNICATION EXPENSE">COMMUNICATION EXPENSE</option>';
-    natureOptions += '<option value="FREIGHT AND COURIER">FREIGHT AND COURIER</option>';
-    natureOptions += '<option value="TRAVEL AND TRANSPORTATION">TRAVEL AND TRANSPORTATION</option>';
-    natureOptions += '<option value="ADVERTISING AND MARKETING">ADVERTISING AND MARKETING</option>';
-    natureOptions += '<option value="SECURITY SERVICES">SECURITY SERVICES</option>';
-    natureOptions += '<option value="INSURANCE">INSURANCE</option>';
-    natureOptions += '<option value="SEMINAR AND TRAINING">SEMINAR AND TRAINING</option>';
-    natureOptions += '<option value="MEDICAL EXPENSES – SERVICES">MEDICAL EXPENSES – SERVICES</option>';
-    natureOptions += '<option value="PROFESSIONAL FEES">PROFESSIONAL FEES</option>';
-    natureOptions += '<option value="CLEANING SERVICES">CLEANING SERVICES</option>';
-    natureOptions += '<option value="OTHERS - SERVICES">OTHERS - SERVICES</option>';
+    natureOptions += '<optgroup label="🚀 Services (2%)" style="color: #7b68ee; font-weight: bold;">';
+    natureOptions += '<option value="REPAIRS AND MAINTENANCE-LABOR">🔧 REPAIRS AND MAINTENANCE-LABOR</option>';
+    natureOptions += '<option value="MEALS AND ACCOMMODATION – SERVICES">🍽️ MEALS AND ACCOMMODATION – SERVICES</option>';
+    natureOptions += '<option value="REPRESENTATIONS – SERVICES">🤝 REPRESENTATIONS – SERVICES</option>';
+    natureOptions += '<option value="ELECTRICITY AND WATER">⚡ ELECTRICITY AND WATER</option>';
+    natureOptions += '<option value="COMMUNICATION EXPENSE">📞 COMMUNICATION EXPENSE</option>';
+    natureOptions += '<option value="FREIGHT AND COURIER">📦 FREIGHT AND COURIER</option>';
+    natureOptions += '<option value="TRAVEL AND TRANSPORTATION">✈️ TRAVEL AND TRANSPORTATION</option>';
+    natureOptions += '<option value="ADVERTISING AND MARKETING">📢 ADVERTISING AND MARKETING</option>';
+    natureOptions += '<option value="SECURITY SERVICES">🔒 SECURITY SERVICES</option>';
+    natureOptions += '<option value="INSURANCE">🛡️ INSURANCE</option>';
+    natureOptions += '<option value="SEMINAR AND TRAINING">📚 SEMINAR AND TRAINING</option>';
+    natureOptions += '<option value="MEDICAL EXPENSES – SERVICES">🏥 MEDICAL EXPENSES – SERVICES</option>';
+    natureOptions += '<option value="PROFESSIONAL FEES">👔 PROFESSIONAL FEES</option>';
+    natureOptions += '<option value="CLEANING SERVICES">🧹 CLEANING SERVICES</option>';
+    natureOptions += '<option value="OTHERS - SERVICES">❓ OTHERS - SERVICES</option>';
     natureOptions += '</optgroup>';
     
     // Add Goods category
-    natureOptions += '<optgroup label="Goods (1%)">';
-    natureOptions += '<option value="REPAIRS AND MAINTENANCE-MATERIALS">REPAIRS AND MAINTENANCE-MATERIALS</option>';
-    natureOptions += '<option value="MEALS AND ALLOWANCES – GOODS">MEALS AND ALLOWANCES – GOODS</option>';
-    natureOptions += '<option value="REPRESENTATIONS – GOODS">REPRESENTATIONS – GOODS</option>';
-    natureOptions += '<option value="FUEL AND OIL">FUEL AND OIL</option>';
-    natureOptions += '<option value="OFFICE SUPPLIES">OFFICE SUPPLIES</option>';
-    natureOptions += '<option value="UNIFORMS">UNIFORMS</option>';
-    natureOptions += '<option value="MEDICAL EXPENSES – GOODS">MEDICAL EXPENSES – GOODS</option>';
-    natureOptions += '<option value="CLEANING SUPPLIES">CLEANING SUPPLIES</option>';
-    natureOptions += '<option value="OTHERS - GOODS">OTHERS - GOODS</option>';
+    natureOptions += '<optgroup label="📦 Goods (1%)" style="color: #ffa500; font-weight: bold;">';
+    natureOptions += '<option value="REPAIRS AND MAINTENANCE-MATERIALS">🔧 REPAIRS AND MAINTENANCE-MATERIALS</option>';
+    natureOptions += '<option value="MEALS AND ALLOWANCES – GOODS">🍱 MEALS AND ALLOWANCES – GOODS</option>';
+    natureOptions += '<option value="REPRESENTATIONS – GOODS">🎁 REPRESENTATIONS – GOODS</option>';
+    natureOptions += '<option value="FUEL AND OIL">⛽ FUEL AND OIL</option>';
+    natureOptions += '<option value="OFFICE SUPPLIES">📎 OFFICE SUPPLIES</option>';
+    natureOptions += '<option value="UNIFORMS">👕 UNIFORMS</option>';
+    natureOptions += '<option value="MEDICAL EXPENSES – GOODS">💊 MEDICAL EXPENSES – GOODS</option>';
+    natureOptions += '<option value="CLEANING SUPPLIES">🧼 CLEANING SUPPLIES</option>';
+    natureOptions += '<option value="OTHERS - GOODS">❓ OTHERS - GOODS</option>';
     natureOptions += '</optgroup>';
     
     // Add Rental category
-    natureOptions += '<optgroup label="Rental (5%)">';
-    natureOptions += '<option value="Rental">Rental</option>';
+    natureOptions += '<optgroup label="🏢 Rental (5%)" style="color: #32cd32; font-weight: bold;">';
+    natureOptions += '<option value="Rental">🏠 Rental</option>';
     natureOptions += '</optgroup>';
     
     row.innerHTML = `
@@ -1327,6 +1402,18 @@ function addNewRow() {
             updateAllStats();
         });
     });
+    
+    // Special handling for Nature of Expense - add class when value changes
+    const natureExpenseSelect = row.querySelector('.nature-expense');
+    if (natureExpenseSelect) {
+        natureExpenseSelect.addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
+            }
+        });
+    }
     
     // Special handling for TIN input
     const tinInput = row.querySelector('.tin-number');
@@ -1887,11 +1974,11 @@ function addRowFromData(rowData) {
     const row = document.createElement('tr');
     row.id = rowId;
     
-    // Create nature of expense options with selection
+    // Create nature of expense options with improved styling and selection
     let natureOptions = '<option value="">Select Nature of Expense</option>';
     
     // Add Services category
-    natureOptions += '<optgroup label="Services (2%)">';
+    natureOptions += '<optgroup label="🚀 Services (2%)" style="color: #7b68ee; font-weight: bold;">';
     const servicesOptions = [
         "REPAIRS AND MAINTENANCE-LABOR",
         "MEALS AND ACCOMMODATION – SERVICES",
@@ -1910,12 +1997,12 @@ function addRowFromData(rowData) {
         "OTHERS - SERVICES"
     ];
     servicesOptions.forEach(opt => {
-        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>${opt}</option>`;
+        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>🔧 ${opt}</option>`;
     });
     natureOptions += '</optgroup>';
     
     // Add Goods category
-    natureOptions += '<optgroup label="Goods (1%)">';
+    natureOptions += '<optgroup label="📦 Goods (1%)" style="color: #ffa500; font-weight: bold;">';
     const goodsOptions = [
         "REPAIRS AND MAINTENANCE-MATERIALS",
         "MEALS AND ALLOWANCES – GOODS",
@@ -1928,13 +2015,13 @@ function addRowFromData(rowData) {
         "OTHERS - GOODS"
     ];
     goodsOptions.forEach(opt => {
-        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>${opt}</option>`;
+        natureOptions += `<option value="${opt}" ${rowData.natureExpense === opt ? 'selected' : ''}>📦 ${opt}</option>`;
     });
     natureOptions += '</optgroup>';
     
     // Add Rental category
-    natureOptions += '<optgroup label="Rental (5%)">';
-    natureOptions += `<option value="Rental" ${rowData.natureExpense === 'Rental' ? 'selected' : ''}>Rental</option>`;
+    natureOptions += '<optgroup label="🏢 Rental (5%)" style="color: #32cd32; font-weight: bold;">';
+    natureOptions += `<option value="Rental" ${rowData.natureExpense === 'Rental' ? 'selected' : ''}>🏠 Rental</option>`;
     natureOptions += '</optgroup>';
     
     row.innerHTML = `
@@ -1967,7 +2054,7 @@ function addRowFromData(rowData) {
         <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></td>
         <td><input type="number" step="0.01" min="0" value="${rowData.grossAmount || ''}" class="editable gross-amount" placeholder="0.00"></td>
         <td>
-            <select class="editable nature-expense">
+            <select class="editable nature-expense ${rowData.natureExpense ? 'has-value' : ''}">
                 ${natureOptions}
             </select>
         </td>
@@ -1994,6 +2081,18 @@ function addRowFromData(rowData) {
             updateAllStats();
         });
     });
+    
+    // Special handling for Nature of Expense - add class when value changes
+    const natureExpenseSelect = row.querySelector('.nature-expense');
+    if (natureExpenseSelect) {
+        natureExpenseSelect.addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
+            }
+        });
+    }
     
     // Format TIN input
     const tinInput = row.querySelector('.tin-number');
@@ -2508,7 +2607,7 @@ function exportToExcel() {
                 </tfoot>
             </table>
             
-            <!-- EXPENSE CATEGORY TALLY SECTION -->
+            <!-- EXPENSE CATEGORY TALLY SECTION - UPDATED WITH TOTAL NET AMOUNT -->
             <div class="tally-section">
                 <div class="tally-header">
                     EXPENSE CATEGORY TALLY SUMMARY
@@ -2517,11 +2616,12 @@ function exportToExcel() {
                 <table class="tally-table">
                     <thead>
                         <tr>
-                            <th width="40%">Nature of Expense</th>
-                            <th width="10%">W/Tax Rate</th>
-                            <th width="10%">Item Count</th>
-                            <th width="20%">Total Gross Amount</th>
-                            <th width="20%">Total Withholding Tax</th>
+                            <th width="35%">Nature of Expense</th>
+                            <th width="8%">W/Tax Rate</th>
+                            <th width="8%">Count</th>
+                            <th width="15%">Total Gross</th>
+                            <th width="15%">Total Net</th>
+                            <th width="19%">Total W/Tax</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2529,6 +2629,7 @@ function exportToExcel() {
     
     // Add tally rows
     let tallyTotalGross = 0;
+    let tallyTotalNet = 0;
     let tallyTotalWithholdingTax = 0;
     let tallyTotalItems = 0;
     
@@ -2538,6 +2639,7 @@ function exportToExcel() {
         const ratePercentage = (data.rate * 100).toFixed(0);
         
         tallyTotalGross += data.totalGrossAmount;
+        tallyTotalNet += data.totalNetExpenses;
         tallyTotalWithholdingTax += data.totalWithholdingTax;
         tallyTotalItems += data.count;
         
@@ -2547,17 +2649,19 @@ function exportToExcel() {
                 <td class="tally-rate">${ratePercentage}%</td>
                 <td class="tally-count">${data.count}</td>
                 <td class="currency numeric">${data.totalGrossAmount.toFixed(2)}</td>
+                <td class="currency numeric">${data.totalNetExpenses.toFixed(2)}</td>
                 <td class="currency numeric">${data.totalWithholdingTax.toFixed(2)}</td>
             </tr>
         `;
     });
     
-    // Add total row for tally
+    // Add total row for tally - now includes Total Net column
     htmlContent += `
                         <tr class="tally-total-row">
                             <td colspan="2" class="text-right" style="font-weight: bold;">TOTAL:</td>
                             <td class="text-center" style="font-weight: bold;">${tallyTotalItems}</td>
                             <td class="currency numeric" style="font-weight: bold;">${tallyTotalGross.toFixed(2)}</td>
+                            <td class="currency numeric" style="font-weight: bold;">${tallyTotalNet.toFixed(2)}</td>
                             <td class="currency numeric" style="font-weight: bold;">${tallyTotalWithholdingTax.toFixed(2)}</td>
                         </tr>
                     </tbody>
@@ -2621,7 +2725,7 @@ function exportToExcel() {
     }, 100);
     
     // Show success message
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Detailed transactions\n• Expense category tally\n• Financial summary\n• ${sortedCategories.length} expense categories analyzed\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Detailed transactions\n• Expense category tally with Total Net Amount\n• Financial summary\n• ${sortedCategories.length} expense categories analyzed\n• Print-ready layout`);
 }
 
 // Helper function to calculate expense tally for export
@@ -3827,3 +3931,4 @@ addZoomIndicator();
     </script>
 </body>
 </html>
+```
