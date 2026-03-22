@@ -275,6 +275,449 @@
             min-width: 80px;
             text-align: center;
         }
+
+        /* ===== IMPROVED PAGINATION CONTROLS DESIGN ===== */
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 25px;
+            background: linear-gradient(135deg, rgba(0, 30, 20, 0.97) 0%, rgba(0, 45, 30, 0.98) 100%);
+            border-top: 2px solid rgba(0, 255, 157, 0.3);
+            border-bottom: 1px solid rgba(0, 255, 157, 0.2);
+            flex-shrink: 0;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 255, 157, 0.2);
+            gap: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .pagination-controls::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ff9d, #00ff9d, #00ff9d, transparent);
+            filter: blur(2px);
+            opacity: 0.6;
+        }
+
+        .pagination-controls::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ff9d, transparent);
+            opacity: 0.3;
+        }
+
+        .pagination-info {
+            color: #a7ffeb;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(0, 40, 25, 0.6);
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.1), inset 0 0 10px rgba(0, 255, 157, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(5px);
+        }
+
+        .pagination-info i {
+            color: #00ff9d;
+            font-size: 16px;
+            text-shadow: 0 0 10px #00ff9d;
+        }
+
+        .pagination-info span {
+            color: #00ff9d;
+            font-weight: 700;
+            margin: 0 3px;
+            text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            background: rgba(0, 30, 20, 0.5);
+            padding: 5px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .pagination-btn {
+            background: transparent;
+            border: none;
+            color: #a7ffeb;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            font-size: 16px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: rgba(0, 255, 157, 0.15);
+            color: #00ff9d;
+            border-color: rgba(0, 255, 157, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.2);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .pagination-page-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 40, 25, 0.7);
+            padding: 4px 12px 4px 16px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            box-shadow: inset 0 0 15px rgba(0, 20, 15, 0.8);
+        }
+
+        .pagination-page-number {
+            color: #00ff9d;
+            font-size: 16px;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+            background: transparent;
+            border: none;
+            padding: 6px 0;
+        }
+
+        .pagination-page-number:focus {
+            outline: none;
+        }
+
+        /* Remove spinner from number input */
+        .pagination-page-number::-webkit-inner-spin-button,
+        .pagination-page-number::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .pagination-page-number[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .pagination-total-pages {
+            color: #80cbc4;
+            font-size: 14px;
+            font-weight: 500;
+            padding-left: 8px;
+            border-left: 1px solid rgba(0, 255, 157, 0.3);
+        }
+
+        .pagination-total-pages span {
+            color: #00ff9d;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .pagination-select {
+            background: rgba(0, 40, 25, 0.8);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            color: #a7ffeb;
+            padding: 8px 32px 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300ff9d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .pagination-select:hover {
+            border-color: #00ff9d;
+            background-color: rgba(0, 60, 35, 0.9);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .pagination-select:focus {
+            outline: none;
+            border-color: #00ff9d;
+            box-shadow: 0 0 25px rgba(0, 255, 157, 0.3);
+        }
+
+        .pagination-left-section,
+        .pagination-right-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Elegant divider between sections */
+        .pagination-divider {
+            width: 1px;
+            height: 30px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 255, 157, 0.3), transparent);
+            margin: 0 5px;
+        }
+
+        @media (max-width: 1024px) {
+            .pagination-controls {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+            }
+            
+            .pagination-left-section,
+            .pagination-right-section {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .pagination-divider {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pagination-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+                background: transparent;
+                border: none;
+                padding: 0;
+            }
+            
+            .pagination-info {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .pagination-select {
+                width: 100%;
+            }
+        }
+
+        /* Smooth animations for page changes */
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0.7;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-wrapper tbody tr {
+            animation: pageFadeIn 0.3s ease;
+        }
+
+        /* Enhanced active page indicator */
+        .pagination-page-indicator {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pagination-page-indicator::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #00ff9d, #00b36b);
+            border-radius: 42px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .pagination-page-indicator:focus-within::before {
+            opacity: 0.2;
+        }
+
+        /* Column Visibility Dropdown Styles - For CAPEX Page */
+.column-visibility-container {
+    position: relative;
+    display: inline-block;
+}
+
+.column-visibility-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 160, 0, 0.3) 100%);
+    border: 2px solid rgba(255, 193, 7, 0.5);
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+    white-space: nowrap;
+    color: #ffd966;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.column-visibility-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.3) 0%, rgba(255, 193, 7, 0.4) 100%);
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 193, 7, 0.5);
+    border-color: #ffd966;
+}
+
+.column-visibility-btn i {
+    font-size: 20px;
+    color: #ffd966;
+}
+
+.column-visibility-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: rgba(0, 30, 20, 0.98);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 12px;
+    min-width: 260px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 193, 7, 0.2);
+    overflow: hidden;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.column-visibility-header {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.column-visibility-header h4 {
+    color: #ffd966;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.column-visibility-header h4 i {
+    font-size: 14px;
+}
+
+.column-visibility-actions {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.15);
+    display: flex;
+    gap: 10px;
+}
+
+.column-visibility-actions button {
+    flex: 1;
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffd966;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.column-visibility-actions button:hover {
+    background: rgba(255, 193, 7, 0.3);
+    transform: translateY(-1px);
+}
+
+.column-list {
+    max-height: 450px;
+    overflow-y: auto;
+    padding: 5px 0;
+}
+
+.column-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.1);
+}
+
+.column-item:hover {
+    background: rgba(255, 193, 7, 0.15);
+}
+
+.column-item-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #ffd966;
+}
+
+.column-item-label {
+    flex: 1;
+    font-size: 13px;
+    color: #e0f7e9;
+    cursor: pointer;
+    user-select: none;
+}
+
+.column-item-checkbox:checked + .column-item-label,
+.column-item-checkbox:checked ~ .column-item-label {
+    color: #ffd966;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Column hidden styles */
+th.hidden-column,
+td.hidden-column {
+    display: none !important;
+}
     </style>
 </head>
 <body>
@@ -314,6 +757,17 @@
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
                     <span class="sidebar-btn-text">Export to Excel</span>
+                </button>
+                
+                <!-- NEW: Save/Load Buttons -->
+                <button class="sidebar-btn" id="saveDataBtn">
+                    <i class="fas fa-save"></i>
+                    <span class="sidebar-btn-text">Save Data to File</span>
+                </button>
+
+                <button class="sidebar-btn" id="loadDataBtn">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="sidebar-btn-text">Load Data from File</span>
                 </button>
                 
                 <button class="sidebar-btn" id="clearBtn">
@@ -455,6 +909,27 @@
                 <p>Professional Asset Acquisition Tracking with Automated VAT Calculations</p>
             </div>
             <div class="header-sidebar-buttons">
+
+                <!-- Column Visibility Button (NEW) - Gold/Yellow theme for CAPEX -->
+    <div class="column-visibility-container">
+        <button class="column-visibility-btn" id="columnVisibilityBtn">
+            <i class="fas fa-columns"></i>
+            <span>Show/Hide Columns</span>
+        </button>
+        <div class="column-visibility-dropdown" id="columnVisibilityDropdown" style="display: none;">
+            <div class="column-visibility-header">
+                <h4><i class="fas fa-eye-slash"></i> Toggle Column Visibility</h4>
+            </div>
+            <div class="column-visibility-actions">
+                <button id="showAllColumnsBtn"><i class="fas fa-eye"></i> Show All</button>
+                <button id="hideAllColumnsBtn"><i class="fas fa-eye-slash"></i> Hide All</button>
+            </div>
+            <div class="column-list" id="columnList">
+                <!-- Column list will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
                 <!-- Entry Counter Button -->
                 <div class="header-entry-counter" id="entryCounterBtn">
                     <i class="fas fa-list-ol"></i>
@@ -507,6 +982,48 @@
             </table>
         </div>
         
+        <!-- NEW: Pagination Controls -->
+        <div class="pagination-controls" id="paginationControls">
+            <div class="pagination-left-section">
+                <div class="pagination-info">
+                    <i class="fas fa-database"></i>
+                    <span id="startEntry">0</span> - <span id="endEntry">0</span> of <span id="totalEntries">0</span>
+                </div>
+                
+                <select id="rowsPerPage" class="pagination-select">
+                    <option value="10">10 rows</option>
+                    <option value="25" selected>25 rows</option>
+                    <option value="50">50 rows</option>
+                    <option value="100">100 rows</option>
+                </select>
+            </div>
+            
+            <div class="pagination-divider"></div>
+            
+            <div class="pagination-right-section">
+                <div class="pagination-buttons">
+                    <button class="pagination-btn" id="firstPageBtn" title="First Page">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="pagination-btn" id="prevPageBtn" title="Previous Page">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    
+                    <div class="pagination-page-indicator">
+                        <span class="pagination-page-number" id="currentPageDisplay">1</span>
+                        <span class="pagination-total-pages">/ <span id="totalPages">1</span></span>
+                    </div>
+                    
+                    <button class="pagination-btn" id="nextPageBtn" title="Next Page">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button class="pagination-btn" id="lastPageBtn" title="Last Page">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
         <div class="stats">
             <div class="stat-item">
                 <span class="stat-label">Total Non-Vat Purchases</span>
@@ -537,8 +1054,12 @@
 
     <script>
 // ============================================================================
-// CAPITAL EXPENDITURES (CAPEX) DATA TRACKER - COMPLETE JAVASCRIPT
+// CAPITAL EXPENDITURES (CAPEX) DATA TRACKER - COMPLETE JAVASCRIPT WITH PAGINATION & SAVE/LOAD
 // ============================================================================
+
+// ===== PAGINATION VARIABLES =====
+let currentPage = 1;
+let rowsPerPage = 25;
 
 // Asset categories for CAPEX (optional, can be expanded later)
 const assetCategories = {
@@ -554,6 +1075,260 @@ const assetCategories = {
     "Others": 0.12
 };
 
+// ===== LONG PRESS FUNCTIONALITY =====
+let longPressTimer = null;
+let isLongPressing = false;
+let longPressInterval = null;
+let addedRowsCount = 0;
+
+function startLongPress(button) {
+    if (longPressTimer) clearTimeout(longPressTimer);
+    
+    longPressTimer = setTimeout(() => {
+        if (!isLongPressing) {
+            isLongPressing = true;
+            addedRowsCount = 0;
+            
+            // Add visual feedback
+            button.classList.add('long-press-active');
+            
+            // Show toast notification
+            showLongPressToast('Adding rows continuously... Release to stop');
+            
+            // Start adding rows repeatedly
+            longPressInterval = setInterval(() => {
+                addNewRow();
+                addedRowsCount++;
+                
+                // Update toast with count every 5 rows
+                if (addedRowsCount % 5 === 0) {
+                    updateLongPressToast(`Added ${addedRowsCount} rows...`);
+                }
+            }, 200); // Add a new row every 200ms (5 rows per second)
+        }
+    }, 500); // 500ms delay to trigger long press
+}
+
+function stopLongPress(button) {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+    
+    if (isLongPressing) {
+        isLongPressing = false;
+        
+        if (longPressInterval) {
+            clearInterval(longPressInterval);
+            longPressInterval = null;
+        }
+        
+        // Remove visual feedback
+        button.classList.remove('long-press-active');
+        
+        // Show completion message
+        if (addedRowsCount > 0) {
+            showLongPressToast(`✓ Added ${addedRowsCount} new row${addedRowsCount !== 1 ? 's' : ''}!`, 3000, 'success');
+        } else {
+            hideLongPressToast();
+        }
+        
+        addedRowsCount = 0;
+        
+        // Update all stats after adding rows
+        updateAllStats();
+    }
+}
+
+function showLongPressToast(message, duration = 2000, type = 'info') {
+    const existingToast = document.querySelector('.long-press-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = 'long-press-toast';
+    
+    const icon = type === 'success' ? '✓' : '🔄';
+    toast.innerHTML = `<i>${icon}</i> ${message}`;
+    
+    if (type === 'success') {
+        toast.style.borderColor = '#00ff9d';
+        toast.style.color = '#00ff9d';
+    }
+    
+    document.body.appendChild(toast);
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.classList.add('fade-out');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, duration);
+    }
+}
+
+function updateLongPressToast(message) {
+    const toast = document.querySelector('.long-press-toast');
+    if (toast) {
+        toast.innerHTML = `<i>🔄</i> ${message}`;
+    }
+}
+
+function hideLongPressToast() {
+    const toast = document.querySelector('.long-press-toast');
+    if (toast) {
+        toast.remove();
+    }
+}
+
+// Add long press event listeners to Add Row button
+function initLongPressFeature() {
+    const addRowBtn = document.getElementById('addRowBtn');
+    if (addRowBtn) {
+        // Mouse events
+        addRowBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('mouseup', () => {
+            stopLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('mouseleave', () => {
+            stopLongPress(addRowBtn);
+        });
+        
+        // Touch events for mobile
+        addRowBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            stopLongPress(addRowBtn);
+        });
+        
+        // Add tooltip to indicate long press functionality
+        addRowBtn.setAttribute('title', 'Click: Add 1 row | Long press: Continuously add multiple rows');
+        
+        // Add a small indicator icon
+        const icon = addRowBtn.querySelector('i');
+        if (icon) {
+            icon.style.transition = 'all 0.3s ease';
+        }
+        
+        // Add long press hint
+        const hintSpan = document.createElement('span');
+        hintSpan.className = 'long-press-hint';
+        hintSpan.innerHTML = '<small style="font-size: 9px; opacity: 0.6; margin-left: 5px;"></small>';
+        addRowBtn.appendChild(hintSpan);
+    }
+}
+
+// Also add the same functionality to the entry counter button (optional)
+function initEntryCounterLongPress() {
+    const entryCounterBtn = document.getElementById('entryCounterBtn');
+    if (entryCounterBtn) {
+        let counterLongPressTimer = null;
+        let counterIsLongPressing = false;
+        let counterLongPressInterval = null;
+        let counterAddedRows = 0;
+        
+        function startCounterLongPress(button) {
+            if (counterLongPressTimer) clearTimeout(counterLongPressTimer);
+            
+            counterLongPressTimer = setTimeout(() => {
+                if (!counterIsLongPressing) {
+                    counterIsLongPressing = true;
+                    counterAddedRows = 0;
+                    
+                    button.classList.add('long-press-active');
+                    showLongPressToast('Adding rows continuously... Release to stop');
+                    
+                    counterLongPressInterval = setInterval(() => {
+                        addNewRow();
+                        counterAddedRows++;
+                        
+                        if (counterAddedRows % 5 === 0) {
+                            updateLongPressToast(`Added ${counterAddedRows} rows...`);
+                        }
+                    }, 200);
+                }
+            }, 500);
+        }
+        
+        function stopCounterLongPress(button) {
+            if (counterLongPressTimer) {
+                clearTimeout(counterLongPressTimer);
+                counterLongPressTimer = null;
+            }
+            
+            if (counterIsLongPressing) {
+                counterIsLongPressing = false;
+                
+                if (counterLongPressInterval) {
+                    clearInterval(counterLongPressInterval);
+                    counterLongPressInterval = null;
+                }
+                
+                button.classList.remove('long-press-active');
+                
+                if (counterAddedRows > 0) {
+                    showLongPressToast(`✓ Added ${counterAddedRows} new row${counterAddedRows !== 1 ? 's' : ''}!`, 3000, 'success');
+                } else {
+                    hideLongPressToast();
+                }
+                
+                counterAddedRows = 0;
+                updateAllStats();
+            }
+        }
+        
+        entryCounterBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('mouseup', () => {
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('mouseleave', () => {
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.setAttribute('title', 'Click: Add 1 row | Long press: Continuously add multiple rows');
+    }
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
     // Set default date for report
@@ -566,11 +1341,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load saved company info if exists
     loadCompanyInfo();
     
+    // Initialize pagination
+    initPagination();
+    
     // Initialize table with one empty row
     addNewRow();
-    updateRowCount(); // This will update both row count and entry counter
-    updateTotals();
-    updateSummaryRow();
+    updateAllStats();
+
+    // Initialize column visibility
+    initColumnVisibility();
+
+        // Initialize long press feature for Add Row button
+    initLongPressFeature();
+    
+    // Initialize long press for entry counter button (optional)
+    initEntryCounterLongPress();
     
     // Add event listeners for company info to save automatically
     document.querySelectorAll('.company-info-sidebar input').forEach(input => {
@@ -671,6 +1456,148 @@ function clearCompanyInfo() {
     localStorage.removeItem('capexCompanyInfo');
 }
 
+// ===== PAGINATION FUNCTIONS =====
+function initPagination() {
+    const rowsPerPageSelect = document.getElementById('rowsPerPage');
+    const firstPageBtn = document.getElementById('firstPageBtn');
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    const lastPageBtn = document.getElementById('lastPageBtn');
+    const currentPageDisplay = document.getElementById('currentPageDisplay');
+
+    rowsPerPageSelect.addEventListener('change', function() {
+        rowsPerPage = parseInt(this.value);
+        currentPage = 1;
+        updatePagination();
+        renderCurrentPage();
+    });
+
+    firstPageBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage = 1;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    prevPageBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    nextPageBtn.addEventListener('click', function() {
+        const totalPages = getTotalPages();
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    lastPageBtn.addEventListener('click', function() {
+        const totalPages = getTotalPages();
+        if (currentPage < totalPages) {
+            currentPage = totalPages;
+            renderCurrentPage();
+            updatePagination();
+        }
+    });
+
+    // Make page number display clickable to edit
+    currentPageDisplay.addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 1;
+        input.max = getTotalPages();
+        input.value = currentPage;
+        input.className = 'pagination-page-number';
+        input.style.width = '50px';
+        input.style.textAlign = 'center';
+        
+        const parent = this.parentNode;
+        parent.replaceChild(input, this);
+        input.focus();
+        
+        input.addEventListener('blur', function() {
+            goToPage(this.value);
+        });
+        
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+    });
+}
+
+function goToPage(pageNum) {
+    const totalPages = getTotalPages();
+    pageNum = parseInt(pageNum);
+    
+    if (isNaN(pageNum) || pageNum < 1) {
+        pageNum = 1;
+    } else if (pageNum > totalPages) {
+        pageNum = totalPages;
+    }
+    
+    if (pageNum !== currentPage) {
+        currentPage = pageNum;
+        renderCurrentPage();
+        updatePagination();
+    } else {
+        // Just update the display
+        updatePagination();
+    }
+}
+
+function getTotalPages() {
+    const totalRows = document.querySelectorAll('#tableBody tr').length;
+    return Math.max(1, Math.ceil(totalRows / rowsPerPage));
+}
+
+function updatePagination() {
+    const totalRows = document.querySelectorAll('#tableBody tr').length;
+    const totalPages = getTotalPages();
+    const startEntry = totalRows === 0 ? 0 : ((currentPage - 1) * rowsPerPage) + 1;
+    const endEntry = Math.min(currentPage * rowsPerPage, totalRows);
+
+    document.getElementById('startEntry').textContent = startEntry;
+    document.getElementById('endEntry').textContent = endEntry;
+    document.getElementById('totalEntries').textContent = totalRows;
+    document.getElementById('totalPages').textContent = totalPages;
+    document.getElementById('currentPageDisplay').textContent = currentPage;
+
+    // Enable/disable pagination buttons
+    document.getElementById('firstPageBtn').disabled = currentPage === 1;
+    document.getElementById('prevPageBtn').disabled = currentPage === 1;
+    document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+    document.getElementById('lastPageBtn').disabled = currentPage === totalPages;
+}
+
+function renderCurrentPage() {
+    const tableBody = document.getElementById('tableBody');
+    const allRows = Array.from(tableBody.children);
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, allRows.length);
+
+    // Hide all rows first
+    allRows.forEach(row => {
+        row.style.display = 'none';
+    });
+
+    // Show only rows for current page
+    for (let i = startIndex; i < endIndex; i++) {
+        if (allRows[i]) {
+            allRows[i].style.display = '';
+        }
+    }
+
+    updatePagination();
+}
+
 // ===== TABLE ROW FUNCTIONS =====
 function addNewRow() {
     const tableBody = document.getElementById('tableBody');
@@ -761,14 +1688,12 @@ function addNewRow() {
     editableInputs.forEach(input => {
         input.addEventListener('input', function() {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
         });
         
         input.addEventListener('change', function() {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
         });
     });
     
@@ -796,7 +1721,13 @@ function addNewRow() {
         });
     });
     
-    updateRowCount();
+    // Update pagination for new row
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages; // Go to last page to see new row
+    renderCurrentPage();
+    
+    updateAllStats();
 }
 
 function deleteRow(rowId) {
@@ -809,9 +1740,19 @@ function deleteRow(rowId) {
         
         setTimeout(() => {
             row.remove();
-            updateRowCount(); // This will update both row count and entry counter
-            updateTotals();
-            updateSummaryRow();
+            
+            // Update pagination
+            const tableBody = document.getElementById('tableBody');
+            const totalRows = tableBody.children.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            
+            // Adjust current page if necessary
+            if (currentPage > totalPages) {
+                currentPage = Math.max(1, totalPages);
+            }
+            
+            renderCurrentPage();
+            updateAllStats();
         }, 300);
     }
 }
@@ -821,9 +1762,9 @@ function clearAllData() {
     if (tableBody) {
         tableBody.innerHTML = '';
         addNewRow();
-        updateRowCount(); // This will update both row count and entry counter
-        updateTotals();
-        updateSummaryRow();
+        currentPage = 1;
+        renderCurrentPage();
+        updateAllStats();
     }
 }
 
@@ -850,6 +1791,8 @@ function updateCalculations(row) {
     const grossMinusWithholding = totalGross - withholdingTax;
     const grossMinusWithholdingEl = row.querySelector('.gross-minus-withholding');
     if (grossMinusWithholdingEl) grossMinusWithholdingEl.textContent = grossMinusWithholding.toFixed(2);
+    
+    updateAllStats();
 }
 
 // ===== TIN FORMATTING FUNCTIONS =====
@@ -900,6 +1843,12 @@ function validateTIN(input) {
 }
 
 // ===== UPDATE FUNCTIONS =====
+function updateAllStats() {
+    updateRowCount();
+    updateTotals();
+    updateSummaryRow();
+}
+
 function updateRowCount() {
     const tableBody = document.getElementById('tableBody');
     const rowCount = tableBody ? tableBody.children.length : 0;
@@ -1023,6 +1972,227 @@ function updateSummaryRow() {
     }
 }
 
+// ===== NEW: SAVE/LOAD FUNCTIONS =====
+function saveDataToFile() {
+    // Collect all table data
+    const tableData = [];
+    const rows = document.querySelectorAll('#tableBody tr');
+    
+    rows.forEach(row => {
+        const rowData = {
+            date: row.querySelector('.date-input')?.value || '',
+            invoiceNumber: row.querySelector('.invoice-number')?.value || '',
+            invoiceType: row.querySelector('.invoice-type')?.value || '',
+            paymentMode: row.querySelector('.payment-mode')?.value || '',
+            supplierName: row.querySelector('.supplier-name')?.value || '',
+            assetDescription: row.querySelector('.asset-description')?.value || '',
+            address: row.querySelector('.address')?.value || '',
+            tinNumber: row.querySelector('.tin-number')?.value || '',
+            nonVatGross: row.querySelector('.non-vat-gross')?.value || '',
+            vatableGross: row.querySelector('.vatable-gross')?.value || '',
+            withholdingTax: row.querySelector('.withholding-tax')?.value || '',
+            remarks: row.querySelector('.remarks')?.value || ''
+        };
+        tableData.push(rowData);
+    });
+    
+    // Collect company info
+    const companyInfo = {
+        name: document.getElementById('companyName')?.value || '',
+        tin: document.getElementById('companyTIN')?.value || '',
+        address: document.getElementById('companyAddress')?.value || '',
+        business: document.getElementById('lineOfBusiness')?.value || '',
+        telephone: document.getElementById('telephone')?.value || '',
+        date: document.getElementById('reportDate')?.value || '',
+        employee: document.getElementById('authorizedEmployee')?.value || '',
+        email: document.getElementById('email')?.value || ''
+    };
+    
+    // Create save data object
+    const saveData = {
+        version: '1.0',
+        type: 'capex',
+        timestamp: new Date().toISOString(),
+        companyInfo: companyInfo,
+        tableData: tableData
+    };
+    
+    // Convert to JSON and download
+    const jsonData = JSON.stringify(saveData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    const fileName = `CAPEX_Data_${new Date().toISOString().split('T')[0]}.exp`;
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    
+    showToast(`✅ Data saved to ${fileName}`, 'success');
+}
+
+function loadDataFromFile() {
+    // Create file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.exp,.json';
+    
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const saveData = JSON.parse(e.target.result);
+                
+                // Validate file format
+                if (!saveData.version || !saveData.tableData) {
+                    throw new Error('Invalid file format');
+                }
+                
+                // Optional: Check file type
+                if (saveData.type && saveData.type !== 'capex') {
+                    if (!confirm('This appears to be a different type of data file. Load it as CAPEX data anyway?')) {
+                        return;
+                    }
+                }
+                
+                // Load company info
+                if (saveData.companyInfo) {
+                    document.getElementById('companyName').value = saveData.companyInfo.name || '';
+                    document.getElementById('companyTIN').value = saveData.companyInfo.tin || '';
+                    document.getElementById('companyAddress').value = saveData.companyInfo.address || '';
+                    document.getElementById('lineOfBusiness').value = saveData.companyInfo.business || '';
+                    document.getElementById('telephone').value = saveData.companyInfo.telephone || '';
+                    document.getElementById('reportDate').value = saveData.companyInfo.date || new Date().toISOString().split('T')[0];
+                    document.getElementById('authorizedEmployee').value = saveData.companyInfo.employee || '';
+                    document.getElementById('email').value = saveData.companyInfo.email || '';
+                    
+                    // Save to localStorage
+                    saveCompanyInfo();
+                }
+                
+                // Clear existing table
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';
+                
+                // Load table data
+                if (saveData.tableData.length === 0) {
+                    addNewRow(); // Add at least one empty row
+                } else {
+                    saveData.tableData.forEach(rowData => {
+                        addRowFromData(rowData);
+                    });
+                }
+                
+                // Update all calculations and pagination
+                updateAllStats();
+                currentPage = 1;
+                renderCurrentPage();
+                
+                showToast(`✅ Loaded ${saveData.tableData.length} rows from file`, 'success');
+                
+            } catch (error) {
+                console.error('Error loading file:', error);
+                showToast('❌ Error loading file. Invalid format.', 'error');
+            }
+        };
+        
+        reader.readAsText(file);
+    });
+    
+    fileInput.click();
+}
+
+// Helper function to add a row from saved data
+function addRowFromData(rowData) {
+    const tableBody = document.getElementById('tableBody');
+    const rowId = 'row_' + Date.now() + '_' + Math.random();
+    
+    const row = document.createElement('tr');
+    row.id = rowId;
+    
+    row.innerHTML = `
+        <td><input type="date" value="${rowData.date || ''}" class="editable date-input"></td>
+        <td><input type="text" value="${escapeHtml(rowData.invoiceNumber || '')}" class="editable invoice-number" placeholder="INV-001"></td>
+        <td>
+            <select class="editable invoice-type">
+                <option value="">Select</option>
+                <option value="OR" ${rowData.invoiceType === 'OR' ? 'selected' : ''}>OR</option>
+                <option value="SI" ${rowData.invoiceType === 'SI' ? 'selected' : ''}>SI</option>
+                <option value="DR" ${rowData.invoiceType === 'DR' ? 'selected' : ''}>DR</option>
+                <option value="AR" ${rowData.invoiceType === 'AR' ? 'selected' : ''}>AR</option>
+                <option value="TR" ${rowData.invoiceType === 'TR' ? 'selected' : ''}>TR</option>
+                <option value="CR" ${rowData.invoiceType === 'CR' ? 'selected' : ''}>CR</option>
+                <option value="OTHERS" ${rowData.invoiceType === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
+            </select>
+        </td>
+        <td>
+            <select class="editable payment-mode">
+                <option value="">Select</option>
+                <option value="Cash" ${rowData.paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+                <option value="Charge" ${rowData.paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
+                <option value="Credit" ${rowData.paymentMode === 'Credit' ? 'selected' : ''}>Credit</option>
+                <option value="Lease" ${rowData.paymentMode === 'Lease' ? 'selected' : ''}>Lease</option>
+            </select>
+        </td>
+        <td><input type="text" value="${escapeHtml(rowData.supplierName || '')}" class="editable supplier-name" placeholder="Supplier name"></td>
+        <td><input type="text" value="${escapeHtml(rowData.assetDescription || '')}" class="editable asset-description" placeholder="Asset description"></td>
+        <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></td>
+        <td style="position: relative;">
+            <input type="text" value="${escapeHtml(rowData.tinNumber || '')}" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+            <div class="validation-message" style="display: none; position: absolute; bottom: -20px; left: 0; right: 0;">TIN must be 12 digits</div>
+        </td>
+        <td><input type="number" step="0.01" min="0" value="${rowData.nonVatGross || ''}" class="editable non-vat-gross" placeholder="0.00"></td>
+        <td><input type="number" step="0.01" min="0" value="${rowData.vatableGross || ''}" class="editable vatable-gross" placeholder="0.00"></td>
+        <td><div class="uneditable net-purchases">0.00</div></td>
+        <td><div class="uneditable input-tax">0.00</div></td>
+        <td><input type="number" step="0.01" min="0" value="${rowData.withholdingTax || ''}" class="editable withholding-tax" placeholder="0.00"></td>
+        <td><div class="uneditable gross-minus-withholding">0.00</div></td>
+        <td><input type="text" value="${escapeHtml(rowData.remarks || '')}" class="editable remarks" placeholder="Enter remarks"></td>
+        <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></td>
+    `;
+    
+    tableBody.appendChild(row);
+    
+    // Add event listeners
+    const editableInputs = row.querySelectorAll('.editable');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+    });
+    
+    // Format TIN input
+    const tinInput = row.querySelector('.tin-number');
+    tinInput.addEventListener('input', function(e) {
+        formatTIN(e.target);
+    });
+    tinInput.addEventListener('blur', function(e) {
+        validateTIN(e.target);
+    });
+    
+    // Trigger calculations for this row
+    updateCalculations(row);
+}
+
+// Helper function to escape HTML special characters
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // ===== EXPORT FUNCTION =====
 function exportToExcel() {
     // Validate required company info
@@ -1055,7 +2225,6 @@ function exportToExcel() {
     const totalVatablePurchases = parseFloat(document.getElementById('totalVatablePurchases')?.textContent) || 0;
     const totalNetPurchases = parseFloat(document.getElementById('totalNetPurchases')?.textContent) || 0;
     const totalInputTax = parseFloat(document.getElementById('totalInputTax')?.textContent) || 0;
-    const totalWithholdingTax = parseFloat(document.getElementById('totalWithholdingTax')?.textContent) || 0;
     const netPayable = parseFloat(document.getElementById('netPayable')?.textContent) || 0;
     
     let htmlContent = `
@@ -1630,6 +2799,8 @@ function initButtonListeners() {
     // Get sidebar buttons
     const addRowBtn = document.getElementById('addRowBtn');
     const exportBtn = document.getElementById('exportBtn');
+    const saveDataBtn = document.getElementById('saveDataBtn');
+    const loadDataBtn = document.getElementById('loadDataBtn');
     const clearBtn = document.getElementById('clearBtn');
     const clearInfoBtn = document.getElementById('clearInfoBtn');
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
@@ -1640,14 +2811,21 @@ function initButtonListeners() {
     if (addRowBtn) {
         addRowBtn.addEventListener('click', function() {
             addNewRow();
-            updateRowCount();
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
         });
     }
     
     if (exportBtn) {
         exportBtn.addEventListener('click', exportToExcel);
+    }
+    
+    // NEW: Save/Load event listeners
+    if (saveDataBtn) {
+        saveDataBtn.addEventListener('click', saveDataToFile);
+    }
+
+    if (loadDataBtn) {
+        loadDataBtn.addEventListener('click', loadDataFromFile);
     }
     
     if (clearBtn) {
@@ -1678,9 +2856,7 @@ function initButtonListeners() {
     if (entryCounterBtn) {
         entryCounterBtn.addEventListener('click', function() {
             addNewRow();
-            updateRowCount();
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
             
             // Flash the counter to indicate new row added
             const entryCountSpan = document.getElementById('entryCount');
@@ -1937,6 +3113,17 @@ function toggleTableFocusMode() {
     }
 }
 
+// Add keyboard shortcut for table focus mode (Ctrl+Shift+F)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'F') {
+        e.preventDefault();
+        const tableFocusBtn = document.getElementById('tableFocusBtn');
+        if (tableFocusBtn) {
+            tableFocusBtn.click();
+        }
+    }
+});
+
 // ===== ZOOM DETECTION FUNCTIONS =====
 function initZoomDetection() {
     detectZoomAndAdjust();
@@ -2010,16 +3197,8 @@ function initZoomDetection() {
     `;
     document.head.appendChild(tooltipStyle);
     
-    // Add keyboard shortcut for table focus mode (Ctrl+Shift+F)
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.shiftKey && e.key === 'F') {
-            e.preventDefault();
-            const tableFocusBtn = document.getElementById('tableFocusBtn');
-            if (tableFocusBtn) {
-                tableFocusBtn.click();
-            }
-        }
-    });
+    // Add zoom indicator
+    addZoomIndicator();
 }
 
 function detectZoomAndAdjust() {
@@ -2116,6 +3295,41 @@ function manageColumnVisibility() {
         });
         document.body.classList.remove('extreme-zoom');
     }
+}
+
+// Add zoom indicator to show current zoom level (optional)
+function addZoomIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'zoom-indicator';
+    indicator.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 30, 20, 0.9);
+        border: 1px solid #00ff9d;
+        color: #00ff9d;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 1000;
+        display: none;
+    `;
+    document.body.appendChild(indicator);
+    
+    // Show zoom level on demand (when Ctrl key is pressed)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey) {
+            const zoom = Math.round(window.devicePixelRatio * 100);
+            indicator.textContent = `Zoom: ${zoom}%`;
+            indicator.style.display = 'block';
+        }
+    });
+    
+    document.addEventListener('keyup', function(e) {
+        if (!e.ctrlKey) {
+            indicator.style.display = 'none';
+        }
+    });
 }
 
 // ===== SELECT MULTIPLE FUNCTIONALITY =====
@@ -2348,7 +3562,7 @@ function setCellValue(cell, value) {
 
 function selectCellsInRange(startCoord, currentCoord) {
     const tableBody = document.getElementById('tableBody');
-    const rows = tableBody.children;
+    const rows = Array.from(tableBody.children).filter(row => row.style.display !== 'none');
     
     const startRow = Math.min(startCoord.row, currentCoord.row);
     const endRow = Math.max(startCoord.row, currentCoord.row);
@@ -2422,6 +3636,7 @@ function deleteSelectedCells() {
         });
         clearSelection();
         showToast(`Deleted ${deletedCount} cell(s) (uneditable cells were skipped)`, 'success');
+        updateAllStats();
     }
 }
 
@@ -2525,6 +3740,7 @@ function pasteToSelectedCells() {
         } else {
             showToast(`Pasted ${pasteCount} cell(s)`, 'success');
         }
+        updateAllStats();
     }).catch(err => {
         showToast('Failed to read clipboard data. Make sure you have copied something first.', 'error');
     });
@@ -2600,8 +3816,7 @@ document.addEventListener('input', function(e) {
         const row = e.target.closest('tr');
         if (row) {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
         }
     }
 });
@@ -2611,17 +3826,232 @@ document.addEventListener('change', function(e) {
         const row = e.target.closest('tr');
         if (row) {
             updateCalculations(row);
-            updateTotals();
-            updateSummaryRow();
+            updateAllStats();
         }
     }
 });
 
 // Make functions globally available for onclick handlers
 window.deleteRow = deleteRow;
-window.updateRowCount = updateRowCount;
-window.updateTotals = updateTotals;
-window.updateSummaryRow = updateSummaryRow;
+window.updateAllStats = updateAllStats;
+window.updateCalculations = updateCalculations;
+window.formatTIN = formatTIN;
+window.validateTIN = validateTIN;
+window.showToast = showToast;
+
+// ===== COLUMN VISIBILITY FUNCTIONALITY FOR CAPEX =====
+function initColumnVisibility() {
+    const columnVisibilityBtn = document.getElementById('columnVisibilityBtn');
+    const columnVisibilityDropdown = document.getElementById('columnVisibilityDropdown');
+    const columnList = document.getElementById('columnList');
+    const showAllColumnsBtn = document.getElementById('showAllColumnsBtn');
+    const hideAllColumnsBtn = document.getElementById('hideAllColumnsBtn');
+    
+    // Define column names for CAPEX table (16 columns including Action)
+    const columns = [
+        { index: 0, name: 'Date', key: 'date' },
+        { index: 1, name: 'Invoice Number', key: 'invoiceNumber' },
+        { index: 2, name: 'Invoice Type', key: 'invoiceType' },
+        { index: 3, name: 'Mode of Payment', key: 'paymentMode' },
+        { index: 4, name: 'Supplier Name', key: 'supplierName' },
+        { index: 5, name: 'Asset Description', key: 'assetDescription' },
+        { index: 6, name: 'Address', key: 'address' },
+        { index: 7, name: 'TIN Number', key: 'tinNumber' },
+        { index: 8, name: 'Non Vat Gross Purchases', key: 'nonVatGross' },
+        { index: 9, name: 'Vatable Gross Purchases', key: 'vatableGross' },
+        { index: 10, name: 'Net Purchases', key: 'netPurchases' },
+        { index: 11, name: 'Input Tax', key: 'inputTax' },
+        { index: 12, name: 'Withholding Tax', key: 'withholdingTax' },
+        { index: 13, name: 'Gross - Withholding Tax', key: 'grossMinusWithholding' },
+        { index: 14, name: 'Remarks', key: 'remarks' },
+        { index: 15, name: 'Action', key: 'action' }
+    ];
+    
+    // Load saved column visibility from localStorage (use capex-specific key)
+    let columnVisibility = JSON.parse(localStorage.getItem('capexColumnVisibility')) || {};
+    
+    // Function to populate column list dropdown
+    function populateColumnList() {
+        if (!columnList) return;
+        
+        columnList.innerHTML = '';
+        
+        columns.forEach(column => {
+            const isHidden = columnVisibility[column.key] || false;
+            
+            const columnItem = document.createElement('div');
+            columnItem.className = 'column-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'column-item-checkbox';
+            checkbox.id = `capex_col_${column.key}`;
+            checkbox.checked = !isHidden; // Checked = visible, Unchecked = hidden
+            checkbox.dataset.columnKey = column.key;
+            checkbox.dataset.columnIndex = column.index;
+            
+            const label = document.createElement('label');
+            label.htmlFor = `capex_col_${column.key}`;
+            label.className = 'column-item-label';
+            label.textContent = column.name;
+            
+            columnItem.appendChild(checkbox);
+            columnItem.appendChild(label);
+            
+            // Add click handler
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                const isChecked = this.checked;
+                const columnKey = this.dataset.columnKey;
+                const columnIndex = parseInt(this.dataset.columnIndex);
+                
+                // Update visibility
+                toggleColumnVisibility(columnIndex, !isChecked);
+                
+                // Save state
+                columnVisibility[columnKey] = !isChecked;
+                localStorage.setItem('capexColumnVisibility', JSON.stringify(columnVisibility));
+                
+                // Update pagination (re-render current page)
+                renderCurrentPage();
+            });
+            
+            columnList.appendChild(columnItem);
+        });
+    }
+    
+    // Function to toggle column visibility
+    function toggleColumnVisibility(columnIndex, hide) {
+        const table = document.getElementById('capexTable');
+        if (!table) return;
+        
+        // Get all headers and cells for this column
+        const headers = table.querySelectorAll('thead th');
+        const rows = document.querySelectorAll('#tableBody tr');
+        const footRows = document.querySelectorAll('#summaryRow');
+        
+        // Toggle header
+        if (headers[columnIndex]) {
+            if (hide) {
+                headers[columnIndex].classList.add('hidden-column');
+            } else {
+                headers[columnIndex].classList.remove('hidden-column');
+            }
+        }
+        
+        // Toggle data rows
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells[columnIndex]) {
+                if (hide) {
+                    cells[columnIndex].classList.add('hidden-column');
+                } else {
+                    cells[columnIndex].classList.remove('hidden-column');
+                }
+            }
+        });
+        
+        // Toggle summary row
+        footRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells[columnIndex]) {
+                if (hide) {
+                    cells[columnIndex].classList.add('hidden-column');
+                } else {
+                    cells[columnIndex].classList.remove('hidden-column');
+                }
+            }
+        });
+    }
+    
+    // Function to apply all saved column states
+    function applyColumnVisibility() {
+        columns.forEach(column => {
+            const isHidden = columnVisibility[column.key] || false;
+            toggleColumnVisibility(column.index, isHidden);
+        });
+    }
+    
+    // Show all columns
+    function showAllColumns() {
+        columns.forEach(column => {
+            columnVisibility[column.key] = false;
+            toggleColumnVisibility(column.index, false);
+        });
+        localStorage.setItem('capexColumnVisibility', JSON.stringify(columnVisibility));
+        
+        // Update checkboxes
+        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        
+        renderCurrentPage();
+        showToast('All columns are now visible', 'success');
+    }
+    
+    // Hide all columns
+    function hideAllColumns() {
+        columns.forEach(column => {
+            columnVisibility[column.key] = true;
+            toggleColumnVisibility(column.index, true);
+        });
+        localStorage.setItem('capexColumnVisibility', JSON.stringify(columnVisibility));
+        
+        // Update checkboxes
+        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        renderCurrentPage();
+        showToast('All columns are now hidden', 'info');
+    }
+    
+    // Toggle dropdown
+    function toggleDropdown() {
+        if (columnVisibilityDropdown.style.display === 'none') {
+            columnVisibilityDropdown.style.display = 'block';
+            // Close dropdown when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', closeDropdownOnClickOutside);
+            }, 0);
+        } else {
+            columnVisibilityDropdown.style.display = 'none';
+            document.removeEventListener('click', closeDropdownOnClickOutside);
+        }
+    }
+    
+    function closeDropdownOnClickOutside(e) {
+        const container = document.querySelector('.column-visibility-container');
+        if (container && !container.contains(e.target)) {
+            columnVisibilityDropdown.style.display = 'none';
+            document.removeEventListener('click', closeDropdownOnClickOutside);
+        }
+    }
+    
+    // Event listeners
+    if (columnVisibilityBtn) {
+        columnVisibilityBtn.addEventListener('click', toggleDropdown);
+    }
+    
+    if (showAllColumnsBtn) {
+        showAllColumnsBtn.addEventListener('click', showAllColumns);
+    }
+    
+    if (hideAllColumnsBtn) {
+        hideAllColumnsBtn.addEventListener('click', hideAllColumns);
+    }
+    
+    // Initialize
+    populateColumnList();
+    applyColumnVisibility();
+    
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && columnVisibilityDropdown.style.display === 'block') {
+            columnVisibilityDropdown.style.display = 'none';
+        }
+    });
+}
     </script>
 </body>
 </html>
