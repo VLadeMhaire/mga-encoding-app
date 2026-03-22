@@ -510,6 +510,162 @@
     .pagination-page-indicator:focus-within::before {
         opacity: 0.2;
     }
+
+    /* Column Visibility Dropdown Styles - For Purchases Page */
+.column-visibility-container {
+    position: relative;
+    display: inline-block;
+}
+
+.column-visibility-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.2) 0%, rgba(123, 31, 162, 0.3) 100%);
+    border: 2px solid rgba(156, 39, 176, 0.5);
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+    white-space: nowrap;
+    color: #ce93d8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.column-visibility-btn:hover {
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.3) 0%, rgba(156, 39, 176, 0.4) 100%);
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(156, 39, 176, 0.5);
+    border-color: #ce93d8;
+}
+
+.column-visibility-btn i {
+    font-size: 20px;
+    color: #ce93d8;
+}
+
+.column-visibility-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: rgba(0, 30, 20, 0.98);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(156, 39, 176, 0.3);
+    border-radius: 12px;
+    min-width: 220px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(156, 39, 176, 0.2);
+    overflow: hidden;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.column-visibility-header {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(156, 39, 176, 0.2);
+    background: rgba(156, 39, 176, 0.1);
+}
+
+.column-visibility-header h4 {
+    color: #ce93d8;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.column-visibility-header h4 i {
+    font-size: 14px;
+}
+
+.column-visibility-actions {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(156, 39, 176, 0.15);
+    display: flex;
+    gap: 10px;
+}
+
+.column-visibility-actions button {
+    flex: 1;
+    background: rgba(156, 39, 176, 0.15);
+    border: 1px solid rgba(156, 39, 176, 0.3);
+    color: #ce93d8;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.column-visibility-actions button:hover {
+    background: rgba(156, 39, 176, 0.3);
+    transform: translateY(-1px);
+}
+
+.column-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 5px 0;
+}
+
+.column-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(156, 39, 176, 0.1);
+}
+
+.column-item:hover {
+    background: rgba(156, 39, 176, 0.15);
+}
+
+.column-item-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #ce93d8;
+}
+
+.column-item-label {
+    flex: 1;
+    font-size: 13px;
+    color: #e0f7e9;
+    cursor: pointer;
+    user-select: none;
+}
+
+.column-item-checkbox:checked + .column-item-label,
+.column-item-checkbox:checked ~ .column-item-label {
+    color: #ce93d8;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Column hidden styles */
+th.hidden-column,
+td.hidden-column {
+    display: none !important;
+}
 </style>
 </head>
 <body>
@@ -701,6 +857,27 @@
                 <p>Professional Purchases Tracking with Automated VAT Calculations</p>
             </div>
             <div class="header-sidebar-buttons">
+
+                <!-- Column Visibility Button (NEW) -->
+    <div class="column-visibility-container">
+        <button class="column-visibility-btn" id="columnVisibilityBtn">
+            <i class="fas fa-columns"></i>
+            <span>Show/Hide Columns</span>
+        </button>
+        <div class="column-visibility-dropdown" id="columnVisibilityDropdown" style="display: none;">
+            <div class="column-visibility-header">
+                <h4><i class="fas fa-eye-slash"></i> Toggle Column Visibility</h4>
+            </div>
+            <div class="column-visibility-actions">
+                <button id="showAllColumnsBtn"><i class="fas fa-eye"></i> Show All</button>
+                <button id="hideAllColumnsBtn"><i class="fas fa-eye-slash"></i> Hide All</button>
+            </div>
+            <div class="column-list" id="columnList">
+                <!-- Column list will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
                 <!-- Entry Counter Button -->
                 <div class="header-entry-counter" id="entryCounterBtn">
                     <i class="fas fa-list-ol"></i>
@@ -921,6 +1098,260 @@
 let currentPage = 1;
 let rowsPerPage = 25;
 
+// ===== LONG PRESS FUNCTIONALITY =====
+let longPressTimer = null;
+let isLongPressing = false;
+let longPressInterval = null;
+let addedRowsCount = 0;
+
+function startLongPress(button) {
+    if (longPressTimer) clearTimeout(longPressTimer);
+    
+    longPressTimer = setTimeout(() => {
+        if (!isLongPressing) {
+            isLongPressing = true;
+            addedRowsCount = 0;
+            
+            // Add visual feedback
+            button.classList.add('long-press-active');
+            
+            // Show toast notification
+            showLongPressToast('Adding rows continuously... Release to stop');
+            
+            // Start adding rows repeatedly
+            longPressInterval = setInterval(() => {
+                addNewRow();
+                addedRowsCount++;
+                
+                // Update toast with count every 5 rows
+                if (addedRowsCount % 5 === 0) {
+                    updateLongPressToast(`Added ${addedRowsCount} rows...`);
+                }
+            }, 200); // Add a new row every 200ms (5 rows per second)
+        }
+    }, 500); // 500ms delay to trigger long press
+}
+
+function stopLongPress(button) {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+    
+    if (isLongPressing) {
+        isLongPressing = false;
+        
+        if (longPressInterval) {
+            clearInterval(longPressInterval);
+            longPressInterval = null;
+        }
+        
+        // Remove visual feedback
+        button.classList.remove('long-press-active');
+        
+        // Show completion message
+        if (addedRowsCount > 0) {
+            showLongPressToast(`✓ Added ${addedRowsCount} new row${addedRowsCount !== 1 ? 's' : ''}!`, 3000, 'success');
+        } else {
+            hideLongPressToast();
+        }
+        
+        addedRowsCount = 0;
+        
+        // Update all stats after adding rows
+        updateAllStats();
+    }
+}
+
+function showLongPressToast(message, duration = 2000, type = 'info') {
+    const existingToast = document.querySelector('.long-press-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = 'long-press-toast';
+    
+    const icon = type === 'success' ? '✓' : '🔄';
+    toast.innerHTML = `<i>${icon}</i> ${message}`;
+    
+    if (type === 'success') {
+        toast.style.borderColor = '#00ff9d';
+        toast.style.color = '#00ff9d';
+    }
+    
+    document.body.appendChild(toast);
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.classList.add('fade-out');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, duration);
+    }
+}
+
+function updateLongPressToast(message) {
+    const toast = document.querySelector('.long-press-toast');
+    if (toast) {
+        toast.innerHTML = `<i>🔄</i> ${message}`;
+    }
+}
+
+function hideLongPressToast() {
+    const toast = document.querySelector('.long-press-toast');
+    if (toast) {
+        toast.remove();
+    }
+}
+
+// Add long press event listeners to Add Row button
+function initLongPressFeature() {
+    const addRowBtn = document.getElementById('addRowBtn');
+    if (addRowBtn) {
+        // Mouse events
+        addRowBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('mouseup', () => {
+            stopLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('mouseleave', () => {
+            stopLongPress(addRowBtn);
+        });
+        
+        // Touch events for mobile
+        addRowBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopLongPress(addRowBtn);
+        });
+        
+        addRowBtn.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            stopLongPress(addRowBtn);
+        });
+        
+        // Add tooltip to indicate long press functionality
+        addRowBtn.setAttribute('title', 'Click: Add 1 row | Long press: Continuously add multiple rows');
+        
+        // Add a small indicator icon
+        const icon = addRowBtn.querySelector('i');
+        if (icon) {
+            icon.style.transition = 'all 0.3s ease';
+        }
+        
+        // Add long press hint
+        const hintSpan = document.createElement('span');
+        hintSpan.className = 'long-press-hint';
+        hintSpan.innerHTML = '<small style="font-size: 9px; opacity: 0.6; margin-left: 5px;"></small>';
+        addRowBtn.appendChild(hintSpan);
+    }
+}
+
+// Also add the same functionality to the entry counter button (optional)
+function initEntryCounterLongPress() {
+    const entryCounterBtn = document.getElementById('entryCounterBtn');
+    if (entryCounterBtn) {
+        let counterLongPressTimer = null;
+        let counterIsLongPressing = false;
+        let counterLongPressInterval = null;
+        let counterAddedRows = 0;
+        
+        function startCounterLongPress(button) {
+            if (counterLongPressTimer) clearTimeout(counterLongPressTimer);
+            
+            counterLongPressTimer = setTimeout(() => {
+                if (!counterIsLongPressing) {
+                    counterIsLongPressing = true;
+                    counterAddedRows = 0;
+                    
+                    button.classList.add('long-press-active');
+                    showLongPressToast('Adding rows continuously... Release to stop');
+                    
+                    counterLongPressInterval = setInterval(() => {
+                        addNewRow();
+                        counterAddedRows++;
+                        
+                        if (counterAddedRows % 5 === 0) {
+                            updateLongPressToast(`Added ${counterAddedRows} rows...`);
+                        }
+                    }, 200);
+                }
+            }, 500);
+        }
+        
+        function stopCounterLongPress(button) {
+            if (counterLongPressTimer) {
+                clearTimeout(counterLongPressTimer);
+                counterLongPressTimer = null;
+            }
+            
+            if (counterIsLongPressing) {
+                counterIsLongPressing = false;
+                
+                if (counterLongPressInterval) {
+                    clearInterval(counterLongPressInterval);
+                    counterLongPressInterval = null;
+                }
+                
+                button.classList.remove('long-press-active');
+                
+                if (counterAddedRows > 0) {
+                    showLongPressToast(`✓ Added ${counterAddedRows} new row${counterAddedRows !== 1 ? 's' : ''}!`, 3000, 'success');
+                } else {
+                    hideLongPressToast();
+                }
+                
+                counterAddedRows = 0;
+                updateAllStats();
+            }
+        }
+        
+        entryCounterBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('mouseup', () => {
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('mouseleave', () => {
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            stopCounterLongPress(entryCounterBtn);
+        });
+        
+        entryCounterBtn.setAttribute('title', 'Click: Add 1 row | Long press: Continuously add multiple rows');
+    }
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
     // Set default date for report
@@ -939,6 +1370,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize table with one empty row
     addNewRow();
     updateAllStats();
+
+    // Initialize column visibility
+    initColumnVisibility();
+
+    // Initialize long press feature for Add Row button
+    initLongPressFeature();
+    
+    // Initialize long press for entry counter button (optional)
+    initEntryCounterLongPress();
     
     // Add event listeners for company info to save automatically
     document.querySelectorAll('.company-info-sidebar input').forEach(input => {
@@ -3581,6 +4021,219 @@ window.showToast = showToast;
 
 // Call addZoomIndicator after DOM is loaded
 addZoomIndicator();
+
+// ===== COLUMN VISIBILITY FUNCTIONALITY FOR PURCHASES =====
+function initColumnVisibility() {
+    const columnVisibilityBtn = document.getElementById('columnVisibilityBtn');
+    const columnVisibilityDropdown = document.getElementById('columnVisibilityDropdown');
+    const columnList = document.getElementById('columnList');
+    const showAllColumnsBtn = document.getElementById('showAllColumnsBtn');
+    const hideAllColumnsBtn = document.getElementById('hideAllColumnsBtn');
+    
+    // Define column names for Purchases table (matches table headers)
+    const columns = [
+        { index: 0, name: 'Date', key: 'date' },
+        { index: 1, name: 'Invoice Number', key: 'invoiceNumber' },
+        { index: 2, name: 'Invoice Type', key: 'invoiceType' },
+        { index: 3, name: 'Mode of Payment', key: 'paymentMode' },
+        { index: 4, name: 'TIN Number', key: 'tinNumber' },
+        { index: 5, name: 'Supplier Name', key: 'supplierName' },
+        { index: 6, name: 'Address', key: 'address' },
+        { index: 7, name: 'Gross Purchases', key: 'grossPurchases' },
+        { index: 8, name: 'Net Purchases', key: 'netPurchases' },
+        { index: 9, name: 'Input Tax', key: 'inputTax' },
+        { index: 10, name: 'Withholding Rate', key: 'withholdingRate' },
+        { index: 11, name: 'Withholding Amount', key: 'withholdingAmount' },
+        { index: 12, name: 'Gross - Withholding Tax', key: 'grossMinusWithholding' },
+        { index: 13, name: 'Remarks', key: 'remarks' },
+        { index: 14, name: 'Action', key: 'action' }
+    ];
+    
+    // Load saved column visibility from localStorage (use purchases-specific key)
+    let columnVisibility = JSON.parse(localStorage.getItem('purchasesColumnVisibility')) || {};
+    
+    // Function to populate column list dropdown
+    function populateColumnList() {
+        if (!columnList) return;
+        
+        columnList.innerHTML = '';
+        
+        columns.forEach(column => {
+            const isHidden = columnVisibility[column.key] || false;
+            
+            const columnItem = document.createElement('div');
+            columnItem.className = 'column-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'column-item-checkbox';
+            checkbox.id = `purchases_col_${column.key}`;
+            checkbox.checked = !isHidden; // Checked = visible, Unchecked = hidden
+            checkbox.dataset.columnKey = column.key;
+            checkbox.dataset.columnIndex = column.index;
+            
+            const label = document.createElement('label');
+            label.htmlFor = `purchases_col_${column.key}`;
+            label.className = 'column-item-label';
+            label.textContent = column.name;
+            
+            columnItem.appendChild(checkbox);
+            columnItem.appendChild(label);
+            
+            // Add click handler
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                const isChecked = this.checked;
+                const columnKey = this.dataset.columnKey;
+                const columnIndex = parseInt(this.dataset.columnIndex);
+                
+                // Update visibility
+                toggleColumnVisibility(columnIndex, !isChecked);
+                
+                // Save state
+                columnVisibility[columnKey] = !isChecked;
+                localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
+                
+                // Update pagination (re-render current page)
+                renderCurrentPage();
+            });
+            
+            columnList.appendChild(columnItem);
+        });
+    }
+    
+    // Function to toggle column visibility
+    function toggleColumnVisibility(columnIndex, hide) {
+        const table = document.getElementById('vatablePurchasesTable');
+        if (!table) return;
+        
+        // Get all headers and cells for this column
+        const headers = table.querySelectorAll('thead th');
+        const rows = document.querySelectorAll('#tableBody tr');
+        const footRows = document.querySelectorAll('#summaryRow');
+        
+        // Toggle header
+        if (headers[columnIndex]) {
+            if (hide) {
+                headers[columnIndex].classList.add('hidden-column');
+            } else {
+                headers[columnIndex].classList.remove('hidden-column');
+            }
+        }
+        
+        // Toggle data rows
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells[columnIndex]) {
+                if (hide) {
+                    cells[columnIndex].classList.add('hidden-column');
+                } else {
+                    cells[columnIndex].classList.remove('hidden-column');
+                }
+            }
+        });
+        
+        // Toggle summary row
+        footRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells[columnIndex]) {
+                if (hide) {
+                    cells[columnIndex].classList.add('hidden-column');
+                } else {
+                    cells[columnIndex].classList.remove('hidden-column');
+                }
+            }
+        });
+    }
+    
+    // Function to apply all saved column states
+    function applyColumnVisibility() {
+        columns.forEach(column => {
+            const isHidden = columnVisibility[column.key] || false;
+            toggleColumnVisibility(column.index, isHidden);
+        });
+    }
+    
+    // Show all columns
+    function showAllColumns() {
+        columns.forEach(column => {
+            columnVisibility[column.key] = false;
+            toggleColumnVisibility(column.index, false);
+        });
+        localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
+        
+        // Update checkboxes
+        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        
+        renderCurrentPage();
+        showToast('All columns are now visible', 'success');
+    }
+    
+    // Hide all columns
+    function hideAllColumns() {
+        columns.forEach(column => {
+            columnVisibility[column.key] = true;
+            toggleColumnVisibility(column.index, true);
+        });
+        localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
+        
+        // Update checkboxes
+        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        renderCurrentPage();
+        showToast('All columns are now hidden', 'info');
+    }
+    
+    // Toggle dropdown
+    function toggleDropdown() {
+        if (columnVisibilityDropdown.style.display === 'none') {
+            columnVisibilityDropdown.style.display = 'block';
+            // Close dropdown when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', closeDropdownOnClickOutside);
+            }, 0);
+        } else {
+            columnVisibilityDropdown.style.display = 'none';
+            document.removeEventListener('click', closeDropdownOnClickOutside);
+        }
+    }
+    
+    function closeDropdownOnClickOutside(e) {
+        const container = document.querySelector('.column-visibility-container');
+        if (container && !container.contains(e.target)) {
+            columnVisibilityDropdown.style.display = 'none';
+            document.removeEventListener('click', closeDropdownOnClickOutside);
+        }
+    }
+    
+    // Event listeners
+    if (columnVisibilityBtn) {
+        columnVisibilityBtn.addEventListener('click', toggleDropdown);
+    }
+    
+    if (showAllColumnsBtn) {
+        showAllColumnsBtn.addEventListener('click', showAllColumns);
+    }
+    
+    if (hideAllColumnsBtn) {
+        hideAllColumnsBtn.addEventListener('click', hideAllColumns);
+    }
+    
+    // Initialize
+    populateColumnList();
+    applyColumnVisibility();
+    
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && columnVisibilityDropdown.style.display === 'block') {
+            columnVisibilityDropdown.style.display = 'none';
+        }
+    });
+}
     </script>
 </body>
 </html>
