@@ -1596,3 +1596,433 @@ td.selected {
     transform: none;
     background: transparent;
 }
+
+/* Long press animation styles */
+.sidebar-btn.long-press-active {
+    background: linear-gradient(135deg, rgba(0, 255, 157, 0.4) 0%, rgba(0, 200, 120, 0.5) 100%);
+    transform: scale(0.98);
+    box-shadow: 0 0 25px rgba(0, 255, 157, 0.6);
+    animation: longPressPulse 0.3s ease-out;
+}
+
+@keyframes longPressPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+    }
+    50% {
+        transform: scale(0.98);
+        box-shadow: 0 0 30px rgba(0, 255, 157, 0.7);
+    }
+    100% {
+        transform: scale(0.98);
+        box-shadow: 0 0 25px rgba(0, 255, 157, 0.6);
+    }
+}
+
+/* Long press toast notification */
+.long-press-toast {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(0, 30, 20, 0.98);
+    border: 2px solid #ffaa00;
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: #ffaa00;
+    font-weight: 600;
+    z-index: 10001;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+    backdrop-filter: blur(10px);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.long-press-toast i {
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Better touch feedback for mobile long press */
+@media (hover: none) and (pointer: coarse) {
+    .sidebar-btn {
+        transition: all 0.1s ease;
+    }
+    
+    .sidebar-btn.long-press-active {
+        background: linear-gradient(135deg, rgba(0, 255, 157, 0.5) 0%, rgba(0, 200, 120, 0.6) 100%);
+        transform: scale(0.96);
+    }
+    
+    .long-press-hint {
+        display: inline-block !important;
+    }
+}
+
+.long-press-hint {
+    display: inline-block;
+    transition: opacity 0.3s ease;
+}
+
+@media (min-width: 769px) {
+    .long-press-hint {
+        opacity: 0.7;
+    }
+    
+    .sidebar-btn:hover .long-press-hint {
+        opacity: 1;
+    }
+}
+
+/* ===== HEADER BUTTONS SIZE ADAPTATION ===== */
+/* Base header button styles - slightly smaller by default */
+.header-sidebar-toggle,
+.header-entry-counter,
+.column-visibility-btn {
+    padding: 6px 12px !important;
+    gap: 6px !important;
+}
+
+.header-sidebar-toggle i,
+.header-entry-counter i,
+.column-visibility-btn i {
+    font-size: 14px !important;
+}
+
+.header-sidebar-toggle span,
+.header-entry-counter span,
+.column-visibility-btn span {
+    font-size: 11px !important;
+    font-weight: 500 !important;
+}
+
+/* Entry counter specific adjustments */
+.header-entry-counter #entryCount {
+    font-size: 13px !important;
+}
+
+/* Header text adjustments to fit with smaller buttons */
+.header-text h1 {
+    font-size: 24px !important;
+    margin-bottom: 2px !important;
+}
+
+.header-text p {
+    font-size: 12px !important;
+}
+
+/* Header container spacing */
+header {
+    padding: 12px 20px !important;
+    gap: 15px !important;
+}
+
+/* Logo container slightly smaller */
+.logo-container {
+    width: 70px !important;
+    height: 70px !important;
+}
+
+/* ===== ZOOM LEVEL ADAPTATIONS ===== */
+/* At 110% zoom - slightly reduce buttons */
+@media screen and (min-resolution: 110dpi) {
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 5px 10px !important;
+    }
+    
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        font-size: 10px !important;
+    }
+    
+    .header-sidebar-toggle i,
+    .header-entry-counter i,
+    .column-visibility-btn i {
+        font-size: 12px !important;
+    }
+    
+    .header-text h1 {
+        font-size: 22px !important;
+    }
+    
+    .header-text p {
+        font-size: 11px !important;
+    }
+    
+    .logo-container {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+
+/* At 125% zoom - more aggressive reduction */
+@media screen and (min-resolution: 120dpi) {
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 4px 8px !important;
+    }
+    
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        font-size: 9px !important;
+    }
+    
+    .header-sidebar-toggle i,
+    .header-entry-counter i,
+    .column-visibility-btn i {
+        font-size: 11px !important;
+    }
+    
+    .header-text h1 {
+        font-size: 20px !important;
+    }
+    
+    .header-text p {
+        font-size: 10px !important;
+    }
+    
+    .logo-container {
+        width: 55px !important;
+        height: 55px !important;
+    }
+    
+    header {
+        padding: 10px 15px !important;
+        gap: 12px !important;
+    }
+}
+
+/* At 150% zoom - compact mode */
+@media screen and (min-resolution: 144dpi) {
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 3px 6px !important;
+    }
+    
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        font-size: 8px !important;
+    }
+    
+    .header-sidebar-toggle i,
+    .header-entry-counter i,
+    .column-visibility-btn i {
+        font-size: 10px !important;
+    }
+    
+    .header-text h1 {
+        font-size: 18px !important;
+    }
+    
+    .header-text p {
+        font-size: 9px !important;
+    }
+    
+    .logo-container {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    
+    header {
+        padding: 8px 12px !important;
+        gap: 10px !important;
+    }
+    
+    .header-entry-counter #entryCount {
+        font-size: 11px !important;
+    }
+}
+
+/* At 175% zoom - minimal mode */
+@media screen and (min-resolution: 168dpi) {
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 2px 4px !important;
+    }
+    
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        font-size: 7px !important;
+        letter-spacing: 0px !important;
+    }
+    
+    .header-sidebar-toggle i,
+    .header-entry-counter i,
+    .column-visibility-btn i {
+        font-size: 9px !important;
+    }
+    
+    .header-text h1 {
+        font-size: 16px !important;
+    }
+    
+    .header-text p {
+        font-size: 8px !important;
+    }
+    
+    .logo-container {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    header {
+        padding: 6px 10px !important;
+        gap: 8px !important;
+    }
+}
+
+/* At 200% zoom - extreme compact mode */
+@media screen and (min-resolution: 192dpi) {
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 2px 3px !important;
+    }
+    
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        font-size: 6px !important;
+    }
+    
+    .header-sidebar-toggle i,
+    .header-entry-counter i,
+    .column-visibility-btn i {
+        font-size: 8px !important;
+    }
+    
+    .header-text h1 {
+        font-size: 14px !important;
+    }
+    
+    .header-text p {
+        font-size: 7px !important;
+    }
+    
+    .logo-container {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    
+    header {
+        padding: 4px 8px !important;
+        gap: 6px !important;
+    }
+    
+    .header-entry-counter #entryCount {
+        font-size: 10px !important;
+    }
+}
+
+/* Optional: Hide button text on very high zoom, show only icons */
+@media screen and (min-resolution: 200dpi) {
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        display: none !important;
+    }
+    
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 4px 8px !important;
+    }
+    
+    .header-sidebar-toggle i,
+    .header-entry-counter i,
+    .column-visibility-btn i {
+        font-size: 14px !important;
+        margin: 0 !important;
+    }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 6px 10px !important;
+    }
+    
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        font-size: 10px !important;
+    }
+    
+    .header-text h1 {
+        font-size: 18px !important;
+    }
+    
+    .header-text p {
+        font-size: 10px !important;
+    }
+    
+    .logo-container {
+        width: 55px !important;
+        height: 55px !important;
+    }
+}
+
+/* Very small mobile screens */
+@media (max-width: 480px) {
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        padding: 4px 6px !important;
+    }
+    
+    .header-sidebar-toggle span,
+    .header-entry-counter span,
+    .column-visibility-btn span {
+        font-size: 8px !important;
+    }
+    
+    .header-sidebar-toggle i,
+    .header-entry-counter i,
+    .column-visibility-btn i {
+        font-size: 12px !important;
+    }
+    
+    .header-text h1 {
+        font-size: 14px !important;
+    }
+    
+    .header-text p {
+        font-size: 8px !important;
+    }
+    
+    .logo-container {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    /* Stack header buttons vertically on very small screens */
+    .header-sidebar-buttons {
+        flex-direction: column !important;
+        gap: 5px !important;
+        width: 100% !important;
+    }
+    
+    .header-sidebar-toggle,
+    .header-entry-counter,
+    .column-visibility-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
