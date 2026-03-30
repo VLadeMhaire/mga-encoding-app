@@ -729,6 +729,12 @@ td.hidden-column {
                     <i class="fas fa-copyright"></i>
                     <span class="sidebar-btn-text">Hide Footer</span>
                 </button>
+
+                <!-- ADD THIS BUTTON HERE -->
+<button class="sidebar-btn toggle-btn" id="toggleCustomersMonitorBtn">
+    <i class="fas fa-address-card"></i>
+    <span class="sidebar-btn-text">Hide Customers List</span>
+</button>
                 
                 <div class="sidebar-divider"></div>
                 
@@ -1050,6 +1056,447 @@ td.hidden-column {
     </div>
 
     <script>
+// ============================================================
+// CUSTOMER NAME & TIN AUTO-FILL STORAGE SYSTEM (SALES)
+// With REGISTERED CUSTOMERS MONITOR SECTION (TOGGLEABLE VIA SIDEBAR BUTTON)
+// ============================================================
+
+(function() {
+    const STORAGE_KEY = 'VAT_CUSTOMER_TIN_MAP';
+    let customerDB = new Map();
+    let monitorVisible = true;
+    
+    function loadCustomerDB() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                customerDB = new Map(Object.entries(parsed));
+            } catch(e) { console.warn(e); }
+        }
+        // Load monitor visibility state
+        const savedVisibility = localStorage.getItem('customersMonitorVisible');
+        monitorVisible = savedVisibility !== null ? savedVisibility === 'true' : true;
+        updateMonitorDisplay();
+        updateToggleButton();
+    }
+    
+    function saveCustomerDB() {
+        const obj = Object.fromEntries(customerDB);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+        updateMonitorDisplay();
+    }
+    
+    function isNameConflict(name, tin) {
+        const cleanName = name.trim();
+        const existingTin = customerDB.get(`name:${cleanName}`);
+        return existingTin && existingTin !== tin.trim();
+    }
+    
+    function isTinConflict(tin, name) {
+        const cleanTin = tin.trim();
+        const existingName = customerDB.get(`tin:${cleanTin}`);
+        return existingName && existingName !== name.trim();
+    }
+    
+    function addCustomerPair(customerName, tinNumber) {
+        if (!customerName || !tinNumber) return false;
+        
+        const cleanName = customerName.trim();
+        const cleanTin = tinNumber.trim();
+        
+        if (cleanName === "" || cleanTin === "") return false;
+        
+        const existingTinForName = customerDB.get(`name:${cleanName}`);
+        const existingNameForTin = customerDB.get(`tin:${cleanTin}`);
+        
+        if (existingTinForName === cleanTin && existingNameForTin === cleanName) {
+            return true;
+        }
+        
+        if (existingTinForName && existingTinForName !== cleanTin) {
+            showWarningToast(`❌ "${cleanName}" already registered with TIN ${existingTinForName}. Cannot reassign.`);
+            return false;
+        }
+        
+        if (existingNameForTin && existingNameForTin !== cleanName) {
+            showWarningToast(`❌ TIN ${cleanTin} already registered to "${existingNameForTin}". Cannot reassign.`);
+            return false;
+        }
+        
+        customerDB.set(`name:${cleanName}`, cleanTin);
+        customerDB.set(`tin:${cleanTin}`, cleanName);
+        
+        saveCustomerDB();
+        showAutoFillFeedback(null, `✓ Saved: "${cleanName}" ↔ ${cleanTin}`);
+        return true;
+    }
+    
+    function lookupTinByName(name) {
+        if (!name) return null;
+        return customerDB.get(`name:${name.trim()}`) || null;
+    }
+    
+    function lookupNameByTin(tin) {
+        if (!tin) return null;
+        return customerDB.get(`tin:${tin.trim()}`) || null;
+    }
+    
+    function getAllPairs() {
+        const pairs = [];
+        for (let [key, value] of customerDB.entries()) {
+            if (key.startsWith('name:')) {
+                pairs.push({ name: key.slice(5), tin: value });
+            }
+        }
+        return pairs.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    function deletePair(name, tin) {
+        if (confirm(`Delete "${name}" (TIN: ${tin})? This cannot be undone.`)) {
+            customerDB.delete(`name:${name}`);
+            customerDB.delete(`tin:${tin}`);
+            saveCustomerDB();
+            showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
+        }
+    }
+    
+    function updateToggleButton() {
+        const toggleBtn = document.getElementById('toggleCustomersMonitorBtn');
+        if (!toggleBtn) return;
+        
+        const icon = toggleBtn.querySelector('i');
+        const textSpan = toggleBtn.querySelector('.sidebar-btn-text');
+        
+        if (monitorVisible) {
+            if (textSpan) textSpan.textContent = 'Hide Customers List';
+            if (icon) icon.className = 'fas fa-address-card';
+        } else {
+            if (textSpan) textSpan.textContent = 'Show Customers List';
+            if (icon) icon.className = 'fas fa-address-card';
+        }
+    }
+    
+    function toggleMonitorVisibility() {
+        monitorVisible = !monitorVisible;
+        localStorage.setItem('customersMonitorVisible', monitorVisible);
+        
+        const monitorSection = document.getElementById('registeredCustomersMonitor');
+        if (monitorSection) {
+            monitorSection.style.display = monitorVisible ? 'block' : 'none';
+        }
+        
+        updateToggleButton();
+        showAutoFillFeedback(null, monitorVisible ? 'Customers list visible' : 'Customers list hidden');
+    }
+    
+    function attachToggleButtonListener() {
+        const toggleBtn = document.getElementById('toggleCustomersMonitorBtn');
+        if (toggleBtn && !toggleBtn.hasAttribute('data-listener-attached')) {
+            toggleBtn.setAttribute('data-listener-attached', 'true');
+            toggleBtn.addEventListener('click', toggleMonitorVisibility);
+        }
+    }
+    
+    function updateMonitorDisplay() {
+        let monitorSection = document.getElementById('registeredCustomersMonitor');
+        const pairs = getAllPairs();
+        
+        if (!monitorSection) {
+            const tallySection = document.querySelector('.tally-section');
+            if (!tallySection) return;
+            
+            monitorSection = document.createElement('div');
+            monitorSection.id = 'registeredCustomersMonitor';
+            monitorSection.className = 'registered-monitor';
+            monitorSection.style.cssText = `
+                margin: 20px 30px;
+                background: linear-gradient(135deg, rgba(0, 40, 30, 0.85) 0%, rgba(0, 30, 25, 0.9) 100%);
+                border: 1px solid rgba(0, 255, 157, 0.3);
+                border-radius: 12px;
+                overflow: hidden;
+                flex-shrink: 0;
+                display: ${monitorVisible ? 'block' : 'none'};
+            `;
+            
+            const headerHtml = `
+                <div style="padding: 15px 20px; background: rgba(0, 255, 157, 0.1); border-bottom: 1px solid rgba(0, 255, 157, 0.3); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-address-card" style="color: #00ff9d; font-size: 20px;"></i>
+                        <h3 style="color: #00ff9d; margin: 0; font-weight: 600; text-shadow: 0 0 5px rgba(0,255,157,0.5);">REGISTERED CUSTOMERS</h3>
+                        <span id="customersCount" style="background: rgba(0,255,157,0.2); padding: 2px 10px; border-radius: 20px; font-size: 12px; color: #a7ffeb;">${pairs.length} customer(s)</span>
+                    </div>
+                    <button id="clearAllCustomersBtn" style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; color: #ff8888; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s;">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                </div>
+                <div id="customersListContainer" style="max-height: 300px; overflow-y: auto; padding: 10px;">
+                    <div style="text-align: center; padding: 40px; color: #80cbc4;">Loading customers...</div>
+                </div>
+            `;
+            monitorSection.innerHTML = headerHtml;
+            
+            const statsSection = document.querySelector('.stats');
+            if (statsSection) {
+                statsSection.parentNode.insertBefore(monitorSection, statsSection);
+            } else {
+                tallySection.parentNode.insertBefore(monitorSection, tallySection.nextSibling);
+            }
+            
+            const clearAllBtn = document.getElementById('clearAllCustomersBtn');
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', () => {
+                    if (confirm('⚠️ WARNING: This will delete ALL registered customers. Are you sure?')) {
+                        customerDB.clear();
+                        saveCustomerDB();
+                        showAutoFillFeedback(null, '🗑 All customers cleared');
+                    }
+                });
+            }
+        }
+        
+        // Update count badge
+        const countBadge = document.getElementById('customersCount');
+        if (countBadge) countBadge.textContent = `${pairs.length} customer(s)`;
+        
+        // Update the list
+        const container = document.getElementById('customersListContainer');
+        if (!container) return;
+        
+        if (pairs.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #80cbc4;">
+                    <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <p>No registered customers yet.</p>
+                    <p style="font-size: 12px;">Enter a Customer Name and TIN in the table to add them here.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+        pairs.forEach(pair => {
+            html += `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ff9d; transition: all 0.2s;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <i class="fas fa-user" style="color: #00ff9d; font-size: 16px;"></i>
+                            <span style="font-weight: 600; color: #e0f7e9;">${escapeHtml(pair.name)}</span>
+                            <span style="color: #80cbc4;">→</span>
+                            <span style="font-family: monospace; color: #a7ffeb;">${escapeHtml(pair.tin)}</span>
+                        </div>
+                    </div>
+                    <button onclick="window.deleteCustomerPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
+                            style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: all 0.2s;"
+                            onmouseover="this.style.background='rgba(255,85,85,0.4)'" 
+                            onmouseout="this.style.background='rgba(255,85,85,0.2)'">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function getRowFields(row) {
+        if (!row) return null;
+        const tinInput = row.querySelector('.tin-number');
+        const nameInput = row.querySelector('.customer-name');
+        return { tinInput, nameInput };
+    }
+    
+    function attachAutoFillToRow(row) {
+        if (!row) return;
+        const fields = getRowFields(row);
+        if (!fields.tinInput || !fields.nameInput) return;
+        if (row.hasAttribute('data-autofill-bound')) return;
+        row.setAttribute('data-autofill-bound', 'true');
+        
+        fields.nameInput.addEventListener('blur', function(e) {
+            const nameVal = this.value.trim();
+            if (nameVal === "") return;
+            const existingTin = lookupTinByName(nameVal);
+            if (existingTin && fields.tinInput && fields.tinInput.value.trim() === "") {
+                fields.tinInput.value = existingTin;
+                if (typeof formatTIN === 'function') formatTIN(fields.tinInput);
+                if (typeof validateTIN === 'function') validateTIN(fields.tinInput);
+                fields.tinInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled');
+            }
+        });
+        
+        fields.tinInput.addEventListener('blur', function(e) {
+            const tinVal = this.value.trim();
+            if (tinVal === "") return;
+            const existingName = lookupNameByTin(tinVal);
+            if (existingName && fields.nameInput && fields.nameInput.value.trim() === "") {
+                fields.nameInput.value = existingName;
+                fields.nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showAutoFillFeedback(fields.nameInput, '✓ Customer name auto-filled');
+            }
+        });
+        
+        function storeIfValidPair() {
+            const nameVal = fields.nameInput?.value.trim() || "";
+            const tinVal = fields.tinInput?.value.trim() || "";
+            if (nameVal !== "" && tinVal !== "") {
+                addCustomerPair(nameVal, tinVal);
+            }
+        }
+        
+        fields.nameInput.addEventListener('blur', storeIfValidPair);
+        fields.tinInput.addEventListener('blur', storeIfValidPair);
+    }
+    
+    function showAutoFillFeedback(element, message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e3a2f;
+            color: #9effcf;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #00ff9d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+            transition: opacity 0.2s;
+            pointer-events: none;
+            font-family: monospace;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 2500);
+        }, 2500);
+    }
+    
+    function showWarningToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #3a2a1e;
+            color: #ffaa66;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #ffaa00;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+            transition: opacity 0.2s;
+            pointer-events: none;
+            font-family: monospace;
+            max-width: 350px;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 3000);
+        }, 3000);
+    }
+    
+    function bindAutoFillToAllRows() {
+        const tableBody = document.getElementById('tableBody');
+        if (!tableBody) return;
+        tableBody.querySelectorAll('tr').forEach(row => attachAutoFillToRow(row));
+    }
+    
+    function observeNewRows() {
+        const tableBody = document.getElementById('tableBody');
+        if (!tableBody) return;
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1 && node.tagName === 'TR') attachAutoFillToRow(node);
+                    else if (node.nodeType === 1 && node.querySelectorAll) {
+                        node.querySelectorAll('tr').forEach(row => attachAutoFillToRow(row));
+                    }
+                });
+            });
+        });
+        observer.observe(tableBody, { childList: true, subtree: true });
+    }
+    
+    function enhanceExistingAddRow() {
+        if (typeof window.originalAddNewRow === 'undefined' && typeof addNewRow === 'function') {
+            window.originalAddNewRow = addNewRow;
+            window.addNewRow = function() {
+                const result = window.originalAddNewRow.apply(this, arguments);
+                setTimeout(() => {
+                    const tableBody = document.getElementById('tableBody');
+                    if (tableBody && tableBody.lastElementChild) attachAutoFillToRow(tableBody.lastElementChild);
+                }, 10);
+                return result;
+            };
+        }
+    }
+    
+    function exposeDebugTools() {
+        window.vatCustomerDB = {
+            list: () => getAllPairs(),
+            add: (name, tin) => addCustomerPair(name, tin),
+            clear: () => { customerDB.clear(); saveCustomerDB(); console.log('Customer DB cleared'); },
+            stats: () => ({ size: customerDB.size, pairs: getAllPairs().length })
+        };
+        console.log('[Sales AutoFill] Customer DB loaded. Use window.vatCustomerDB to inspect.');
+    }
+    
+    window.deleteCustomerPair = function(name, tin) {
+        customerDB.delete(`name:${name}`);
+        customerDB.delete(`tin:${tin}`);
+        saveCustomerDB();
+        showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
+    };
+    
+    function initAutoFillSystem() {
+        loadCustomerDB();
+        bindAutoFillToAllRows();
+        observeNewRows();
+        enhanceExistingAddRow();
+        exposeDebugTools();
+        attachToggleButtonListener();
+        
+        const clearBtn = document.getElementById('clearBtn');
+        if (clearBtn) clearBtn.addEventListener('click', () => setTimeout(bindAutoFillToAllRows, 50));
+        
+        const loadDataBtn = document.getElementById('loadDataBtn');
+        if (loadDataBtn) loadDataBtn.addEventListener('click', () => setTimeout(bindAutoFillToAllRows, 200));
+        
+        console.log('✅ Sales auto-fill active: Unique name-TIN pairs only. Monitor section with toggle button integrated.');
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAutoFillSystem);
+    } else {
+        initAutoFillSystem();
+    }
+    
+    window.addCustomerPair = addCustomerPair;
+    window.lookupTinByName = lookupTinByName;
+    window.lookupNameByTin = lookupNameByTin;
+    window.refreshAutoFillBindings = bindAutoFillToAllRows;
+    window.toggleCustomersMonitor = toggleMonitorVisibility;
+})();
+</script>
+
+    <script>
 
         // ===== LONG PRESS FUNCTIONALITY =====
 let longPressTimer = null;
@@ -1331,6 +1778,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize long press for entry counter button (optional)
     initEntryCounterLongPress();
+
+    initEnterKeyNavigation();
     
     // Add event listeners for company info to save automatically
     document.querySelectorAll('.company-info-sidebar input').forEach(input => {
@@ -1580,6 +2029,76 @@ document.addEventListener('DOMContentLoaded', function() {
     detectZoomAndAdjust();
     manageColumnVisibility();
 });
+
+// Add this function to your existing JavaScript code
+function initEnterKeyNavigation() {
+    // Add event listener to the table body for keydown events
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    tableBody.addEventListener('keydown', function(e) {
+        // Check if Enter key is pressed
+        if (e.key === 'Enter') {
+            // Get the currently focused element
+            const focusedElement = document.activeElement;
+            
+            // Check if the focused element is an input or select inside a table cell
+            if (focusedElement && (focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'SELECT')) {
+                // Get the parent cell (td)
+                const currentCell = focusedElement.closest('td');
+                if (!currentCell) return;
+                
+                // Get the current row
+                const currentRow = currentCell.parentElement;
+                if (!currentRow) return;
+                
+                // Get the next row
+                const nextRow = currentRow.nextElementSibling;
+                if (!nextRow) return;
+                
+                // Get the column index of the current cell
+                const columnIndex = Array.from(currentRow.children).indexOf(currentCell);
+                if (columnIndex === -1) return;
+                
+                // Get the cell in the same column in the next row
+                const nextCell = nextRow.children[columnIndex];
+                if (!nextCell) return;
+                
+                // Find the first focusable element in the next cell
+                let nextFocusable = nextCell.querySelector('input, select');
+                
+                // If no input/select in the same column, try to find any focusable element in the next row
+                if (!nextFocusable) {
+                    nextFocusable = nextRow.querySelector('input, select');
+                }
+                
+                if (nextFocusable) {
+                    // Prevent default Enter behavior (like form submission)
+                    e.preventDefault();
+                    
+                    // Focus on the next element
+                    nextFocusable.focus();
+                    
+                    // If it's an input, select its content for easy editing
+                    if (nextFocusable.tagName === 'INPUT' && nextFocusable.type !== 'checkbox' && nextFocusable.type !== 'radio') {
+                        nextFocusable.select();
+                    }
+                    
+                    // Add a visual flash effect to indicate movement
+                    nextFocusable.style.transition = 'box-shadow 0.1s ease';
+                    nextFocusable.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.5), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+                    setTimeout(() => {
+                        nextFocusable.style.boxShadow = '';
+                    }, 200);
+                }
+            }
+        }
+    });
+}
+
+// Call this function after DOM is loaded
+// Add this line inside your existing DOMContentLoaded event listener:
+// initEnterKeyNavigation();
 
 // Function to create subtle background effects
 function createBackgroundEffects() {
@@ -1904,6 +2423,24 @@ function addNewRow() {
     
     tableBody.appendChild(row);
     
+    // FIX: Apply current column visibility states to the new row
+    const columnVisibility = JSON.parse(localStorage.getItem('columnVisibility')) || {};
+    const columns = [
+        'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'tinNumber',
+        'customerName', 'address', 'grossSales', 'exemptSales', 'salesType',
+        'netSales', 'outputTax', 'withholdingRate', 'withholdingAmount',
+        'remarks', 'action'
+    ];
+    
+    const cells = row.querySelectorAll('td');
+    columns.forEach((key, index) => {
+        if (columnVisibility[key] === true && cells[index]) {
+            cells[index].classList.add('hidden-column');
+        } else if (cells[index]) {
+            cells[index].classList.remove('hidden-column');
+        }
+    });
+    
     // Add event listeners to the new row
     const editableInputs = row.querySelectorAll('.editable');
     editableInputs.forEach(input => {
@@ -2132,7 +2669,18 @@ function updateTotals() {
     if (totalWithholdingEl) totalWithholdingEl.textContent = totalWithholding.toFixed(2);
 }
 
-// Function to update summary row
+// Helper function to get the number of visible columns
+function getVisibleColumnCount() {
+    const headers = document.querySelectorAll('#yourTableId thead th'); // Update table ID
+    let visibleCount = 0;
+    headers.forEach(header => {
+        if (!header.classList.contains('hidden-column')) {
+            visibleCount++;
+        }
+    });
+    return visibleCount;
+}
+
 function updateSummaryRow() {
     let totalGrossSales = 0;
     let totalExemptSales = 0;
@@ -2142,35 +2690,64 @@ function updateSummaryRow() {
     
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
-        const grossSales = parseFloat(row.querySelector('.gross-sales')?.value) || 0;
-        const exemptSales = parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
-        const netSales = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
-        const outputTax = parseFloat(row.querySelector('.output-tax')?.textContent) || 0;
-        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
-        
-        totalGrossSales += grossSales;
-        totalExemptSales += exemptSales;
-        totalNetSales += netSales;
-        totalOutputTax += outputTax;
-        totalWithholding += withholdingAmount;
+        totalGrossSales += parseFloat(row.querySelector('.gross-sales')?.value) || 0;
+        totalExemptSales += parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
+        totalNetSales += parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+        totalOutputTax += parseFloat(row.querySelector('.output-tax')?.textContent) || 0;
+        totalWithholding += parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
     });
     
+    const visibleCount = getVisibleColumnCount();
     const summaryRow = document.getElementById('summaryRow');
+    
     if (summaryRow) {
-        summaryRow.innerHTML = `
-            <tr class="summary-row">
-                <td colspan="7" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
-                <td class="uneditable">${totalGrossSales.toFixed(2)}</td>
-                <td class="uneditable">${totalExemptSales.toFixed(2)}</td>
-                <td>-</td>
-                <td class="uneditable">${totalNetSales.toFixed(2)}</td>
-                <td class="uneditable">${totalOutputTax.toFixed(2)}</td>
-                <td>-</td>
-                <td class="uneditable">${totalWithholding.toFixed(2)}</td>
-                <td>-</td>
-                <td>-</td>
-            </tr>
-        `;
+        // Create cells based on which columns are visible
+        // We need to place total values in the correct column positions
+        let summaryCells = '';
+        
+        // Get all headers to know which columns are visible
+        const headers = document.querySelectorAll('#vatableTable thead th');
+        let colIndex = 0;
+        
+        headers.forEach((header, index) => {
+            if (!header.classList.contains('hidden-column')) {
+                // Determine what value to put in this cell based on the column index
+                switch(index) {
+                    case 0: // Date column
+                        summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+                        break;
+                    case 7: // Gross Sales column
+                        summaryCells += `<td class="uneditable">${totalGrossSales.toFixed(2)}</td>`;
+                        break;
+                    case 8: // Exempt Sales column
+                        summaryCells += `<td class="uneditable">${totalExemptSales.toFixed(2)}</td>`;
+                        break;
+                    case 10: // Net Sales column
+                        summaryCells += `<td class="uneditable">${totalNetSales.toFixed(2)}</td>`;
+                        break;
+                    case 11: // Output Tax column
+                        summaryCells += `<td class="uneditable">${totalOutputTax.toFixed(2)}</td>`;
+                        break;
+                    case 13: // Withholding Amount column
+                        summaryCells += `<td class="uneditable">${totalWithholding.toFixed(2)}</td>`;
+                        break;
+                    default:
+                        // For other columns, leave empty or show dash
+                        if (index === 0) {
+                            // Already handled
+                        } else if (index === 7 || index === 8 || index === 10 || index === 11 || index === 13) {
+                            // Already handled
+                        } else if (index === 14 || index === 15) {
+                            summaryCells += '<td>-</td>';
+                        } else {
+                            summaryCells += '<td></td>';
+                        }
+                        break;
+                }
+            }
+        });
+        
+        summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
     }
 }
 
@@ -2494,6 +3071,7 @@ function escapeHtml(text) {
 }
 
 // Function to export to Excel (XLS format) with improved design
+// ===== EXPORT FUNCTION WITH CUSTOMER NAME & TIN SUMMARY TABLE =====
 function exportToExcel() {
     // Validate required company info
     const companyName = document.getElementById('companyName')?.value.trim();
@@ -2537,11 +3115,16 @@ function exportToExcel() {
     let privateCount = 0;
     let governmentCount = 0;
     
+    // Collect customer summary data (Name + TIN with Net Sales totals)
+    const customerSummary = new Map();
+    
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
         const paymentMode = row.querySelector('.payment-mode')?.value;
         const salesType = row.querySelector('.sales-type')?.value;
         const netSales = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+        const customerName = row.querySelector('.customer-name')?.value || '';
+        const tinNumber = row.querySelector('.tin-number')?.value || '';
         
         if (paymentMode === 'Cash') {
             totalCashAmount += netSales;
@@ -2558,7 +3141,25 @@ function exportToExcel() {
             totalGovernmentAmount += netSales;
             governmentCount++;
         }
+        
+        // Build customer summary
+        if (customerName && tinNumber && netSales > 0) {
+            const key = `${customerName}|${tinNumber}`;
+            if (customerSummary.has(key)) {
+                customerSummary.set(key, customerSummary.get(key) + netSales);
+            } else {
+                customerSummary.set(key, netSales);
+            }
+        }
     });
+    
+    // Sort customers by total net sales (descending)
+    const sortedCustomers = Array.from(customerSummary.entries())
+        .map(([key, total]) => {
+            const [name, tin] = key.split('|');
+            return { name, tin, totalNetSales: total };
+        })
+        .sort((a, b) => b.totalNetSales - a.totalNetSales);
     
     let htmlContent = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
@@ -2733,6 +3334,32 @@ function exportToExcel() {
                     border-bottom: 1px solid #00cc7a;
                 }
                 
+                .customer-summary-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 15px;
+                    margin-bottom: 25px;
+                    background-color: #ffffff;
+                }
+                
+                .customer-summary-table th {
+                    background-color: #4caf50;
+                    color: white;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 10px;
+                    border: 1px solid #388e3c;
+                }
+                
+                .customer-summary-table td {
+                    padding: 8px 10px;
+                    border: 1px solid #dddddd;
+                }
+                
+                .customer-summary-table .numeric {
+                    text-align: right;
+                }
+                
                 .totals-section {
                     margin-top: 25px;
                     background-color: #f0f9f5;
@@ -2779,7 +3406,6 @@ function exportToExcel() {
                     background-color: #e6f7f0;
                 }
                 
-                /* Column widths */
                 .col-date { width: 80px; }
                 .col-invoice { width: 100px; }
                 .col-type { width: 80px; }
@@ -2856,55 +3482,42 @@ function exportToExcel() {
     let rowNumber = 1;
     
     rows.forEach(row => {
-        // Date
         const dateInput = row.querySelector('.date-input');
         const dateValue = dateInput ? dateInput.value : '';
         
-        // Invoice Number
         const invoiceInput = row.querySelector('.invoice-number');
         const invoiceValue = invoiceInput ? invoiceInput.value : '';
         
-        // Invoice Type
         const invoiceTypeSelect = row.querySelector('.invoice-type');
         const invoiceTypeValue = invoiceTypeSelect ? invoiceTypeSelect.value : '';
         
-        // Mode of Payment
         const paymentModeSelect = row.querySelector('.payment-mode');
         const paymentModeValue = paymentModeSelect ? paymentModeSelect.value : '';
         
-        // TIN Number
         const tinInput = row.querySelector('.tin-number');
         const tinValue = tinInput ? tinInput.value : '';
         
-        // Customer Name
         const customerInput = row.querySelector('.customer-name');
         const customerValue = customerInput ? customerInput.value : '';
         
-        // Address
         const addressInput = row.querySelector('.address');
         const addressValue = addressInput ? addressInput.value : '';
         
-        // Gross Sales
         const grossSalesInput = row.querySelector('.gross-sales');
         const grossSalesValue = grossSalesInput ? parseFloat(grossSalesInput.value) || 0 : 0;
         
-        // Exempt Sales
         const exemptSalesInput = row.querySelector('.exempt-sales');
         const exemptSalesValue = exemptSalesInput ? parseFloat(exemptSalesInput.value) || 0 : 0;
         
-        // Sales Type
         const salesTypeSelect = row.querySelector('.sales-type');
         const salesTypeValue = salesTypeSelect ? salesTypeSelect.value : '';
         
-        // Net Sales
         const netSalesDiv = row.querySelector('.net-sales');
         const netSalesValue = netSalesDiv ? parseFloat(netSalesDiv.textContent) || 0 : 0;
         
-        // Output Tax
         const outputTaxDiv = row.querySelector('.output-tax');
         const outputTaxValue = outputTaxDiv ? parseFloat(outputTaxDiv.textContent) || 0 : 0;
         
-        // Withholding Tax Rate
         const withholdingRateSelect = row.querySelector('.withholding-rate');
         let rateValue = '0%';
         if (withholdingRateSelect) {
@@ -2912,34 +3525,31 @@ function exportToExcel() {
             rateValue = (rate * 100) + '%';
         }
         
-        // Withholding Amount
         const withholdingAmountDiv = row.querySelector('.withholding-amount');
         const withholdingAmountValue = withholdingAmountDiv ? parseFloat(withholdingAmountDiv.textContent) || 0 : 0;
         
-        // Remarks
         const remarksInput = row.querySelector('.remarks');
         const remarksValue = remarksInput ? remarksInput.value : '';
         
-        // Alternate row background for readability
         const rowClass = rowNumber % 2 === 0 ? 'highlight' : '';
         
         htmlContent += `
             <tr class="${rowClass}">
-                <td class="date-cell">${dateValue}</td>
-                <td class="text-left">${invoiceValue}</td>
-                <td class="text-center">${invoiceTypeValue}</td>
-                <td class="text-center">${paymentModeValue}</td>
-                <td class="text-center">${tinValue}</td>
-                <td class="text-left">${customerValue}</td>
-                <td class="text-left">${addressValue}</td>
+                <td class="date-cell">${escapeHtml(dateValue)}</td>
+                <td class="text-left">${escapeHtml(invoiceValue)}</td>
+                <td class="text-center">${escapeHtml(invoiceTypeValue)}</td>
+                <td class="text-center">${escapeHtml(paymentModeValue)}</td>
+                <td class="text-center">${escapeHtml(tinValue)}</td>
+                <td class="text-left">${escapeHtml(customerValue)}</td>
+                <td class="text-left">${escapeHtml(addressValue)}</td>
                 <td class="currency numeric">${grossSalesValue.toFixed(2)}</td>
                 <td class="currency numeric">${exemptSalesValue.toFixed(2)}</td>
-                <td class="text-center">${salesTypeValue}</td>
+                <td class="text-center">${escapeHtml(salesTypeValue)}</td>
                 <td class="currency numeric">${netSalesValue.toFixed(2)}</td>
                 <td class="currency numeric">${outputTaxValue.toFixed(2)}</td>
                 <td class="text-center">${rateValue}</td>
                 <td class="currency numeric">${withholdingAmountValue.toFixed(2)}</td>
-                <td class="text-left">${remarksValue}</td>
+                <td class="text-left">${escapeHtml(remarksValue)}</td>
             </tr>
         `;
         
@@ -2962,6 +3572,45 @@ function exportToExcel() {
                         <td>-</td>
                     </tr>
                 </tfoot>
+            </table>
+            
+            <!-- CUSTOMER NAME & TIN SUMMARY TABLE -->
+            <div class="section-title">Customer Summary by TIN and Name</div>
+            <table class="customer-summary-table">
+                <thead>
+                    <tr>
+                        <th width="45%">Customer Name</th>
+                        <th width="30%">TIN Number</th>
+                        <th width="25%">Total Net Sales (₱)</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    if (sortedCustomers.length === 0) {
+        htmlContent += '<tr><td colspan="3" style="text-align: center;">No customer data available</td></tr>';
+    } else {
+        let customerTotalNetSales = 0;
+        sortedCustomers.forEach(customer => {
+            htmlContent += `
+                <tr>
+                    <td class="text-left">${escapeHtml(customer.name)}</td>
+                    <td class="text-center">${escapeHtml(customer.tin)}</td>
+                    <td class="currency numeric">${customer.totalNetSales.toFixed(2)}</td>
+                </tr>
+            `;
+            customerTotalNetSales += customer.totalNetSales;
+        });
+        htmlContent += `
+            <tr style="background-color: #fff2cc; font-weight: bold;">
+                <td class="text-right" colspan="2">TOTAL NET SALES (ALL CUSTOMERS):</td>
+                <td class="currency numeric">${customerTotalNetSales.toFixed(2)}</td>
+            </tr>
+        `;
+    }
+    
+    htmlContent += `
+                </tbody>
             </table>
             
             <div class="totals-section">
@@ -3039,13 +3688,19 @@ function exportToExcel() {
     link.click();
     document.body.removeChild(link);
     
-    // Clean up
     setTimeout(() => {
         URL.revokeObjectURL(url);
     }, 100);
     
-    // Show success message
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Color-coded sections\n• Financial summary\n• Payment & customer distribution\n• Readable column widths\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Customer Summary Table (Name + TIN with Net Sales totals)\n• Professional formatting\n• Financial summary\n• Payment & customer distribution\n• Print-ready layout`);
+}
+
+// Helper function for escaping HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Add event listeners to existing rows (if any)
