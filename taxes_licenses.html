@@ -1331,6 +1331,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize long press for entry counter button (optional)
     initEntryCounterLongPress();
+
+    initEnterKeyNavigation();
     
     // Add event listeners for company info to save automatically
     document.querySelectorAll('.company-info-sidebar input').forEach(input => {
@@ -1363,6 +1365,76 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add interactive cursor effect
     initCursorEffect();
 });
+
+// Add this function to your existing JavaScript code
+function initEnterKeyNavigation() {
+    // Add event listener to the table body for keydown events
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    tableBody.addEventListener('keydown', function(e) {
+        // Check if Enter key is pressed
+        if (e.key === 'Enter') {
+            // Get the currently focused element
+            const focusedElement = document.activeElement;
+            
+            // Check if the focused element is an input or select inside a table cell
+            if (focusedElement && (focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'SELECT')) {
+                // Get the parent cell (td)
+                const currentCell = focusedElement.closest('td');
+                if (!currentCell) return;
+                
+                // Get the current row
+                const currentRow = currentCell.parentElement;
+                if (!currentRow) return;
+                
+                // Get the next row
+                const nextRow = currentRow.nextElementSibling;
+                if (!nextRow) return;
+                
+                // Get the column index of the current cell
+                const columnIndex = Array.from(currentRow.children).indexOf(currentCell);
+                if (columnIndex === -1) return;
+                
+                // Get the cell in the same column in the next row
+                const nextCell = nextRow.children[columnIndex];
+                if (!nextCell) return;
+                
+                // Find the first focusable element in the next cell
+                let nextFocusable = nextCell.querySelector('input, select');
+                
+                // If no input/select in the same column, try to find any focusable element in the next row
+                if (!nextFocusable) {
+                    nextFocusable = nextRow.querySelector('input, select');
+                }
+                
+                if (nextFocusable) {
+                    // Prevent default Enter behavior (like form submission)
+                    e.preventDefault();
+                    
+                    // Focus on the next element
+                    nextFocusable.focus();
+                    
+                    // If it's an input, select its content for easy editing
+                    if (nextFocusable.tagName === 'INPUT' && nextFocusable.type !== 'checkbox' && nextFocusable.type !== 'radio') {
+                        nextFocusable.select();
+                    }
+                    
+                    // Add a visual flash effect to indicate movement
+                    nextFocusable.style.transition = 'box-shadow 0.1s ease';
+                    nextFocusable.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.5), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+                    setTimeout(() => {
+                        nextFocusable.style.boxShadow = '';
+                    }, 200);
+                }
+            }
+        }
+    });
+}
+
+// Call this function after DOM is loaded
+// Add this line inside your existing DOMContentLoaded event listener:
+// initEnterKeyNavigation();
 
 // ===== LOGO FUNCTIONS =====
 function loadLogo() {
@@ -1591,10 +1663,10 @@ function addNewRow() {
         <td>
             <input type="date" value="${today}" class="editable date-input">
         </td>
-        <td>
+         <td>
             <input type="text" class="editable reference-number" placeholder="REF-001">
         </td>
-        <td>
+         <td>
             <select class="editable tax-type">
                 <option value="">Select</option>
                 <option value="VAT">VAT</option>
@@ -1606,31 +1678,47 @@ function addNewRow() {
                 <option value="BPLO">Business Permit & Licensing Office (BPLO)</option>
                 <option value="OTHERS">OTHERS</option>
             </select>
-        </td>
-        <td>
+         </td>
+         <td>
             <select class="editable payment-mode">
                 <option value="">Select</option>
                 <option value="Cash">Cash</option>
                 <option value="Charge">Charge</option>
             </select>
-        </td>
-        <td>
+         </td>
+         <td>
             <input type="text" class="editable government-agency" placeholder="e.g., BIR, LGU, etc.">
-        </td>
-        <td>
+         </td>
+         <td>
             <input type="number" step="0.01" min="0" class="editable amount" placeholder="0.00">
-        </td>
-        <td>
+         </td>
+         <td>
             <input type="text" class="editable remarks" placeholder="Enter remarks">
-        </td>
-        <td>
+         </td>
+         <td>
             <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
                 <i class="fas fa-trash"></i>
             </button>
-        </td>
+         </td>
     `;
     
     tableBody.appendChild(row);
+    
+    // FIX: Apply current column visibility states to the new row
+    const columnVisibility = JSON.parse(localStorage.getItem('taxesLicensesColumnVisibility')) || {};
+    const columns = [
+        'date', 'referenceNumber', 'taxType', 'paymentMode',
+        'governmentAgency', 'amount', 'remarks', 'action'
+    ];
+    
+    const cells = row.querySelectorAll('td');
+    columns.forEach((key, index) => {
+        if (columnVisibility[key] === true && cells[index]) {
+            cells[index].classList.add('hidden-column');
+        } else if (cells[index]) {
+            cells[index].classList.remove('hidden-column');
+        }
+    });
     
     // Add event listeners to the new row
     const editableInputs = row.querySelectorAll('.editable');
@@ -1664,7 +1752,6 @@ function addNewRow() {
     
     updateAllStats();
 }
-
 function deleteRow(rowId) {
     const row = document.getElementById(rowId);
     if (row && confirm('Are you sure you want to delete this row?')) {
@@ -1812,25 +1899,49 @@ function updateTotals() {
     if (totalAmountEl) totalAmountEl.textContent = totalAmount.toFixed(2);
 }
 
+// Helper function to get the number of visible columns
+function getVisibleColumnCount() {
+    const headers = document.querySelectorAll('#yourTableId thead th'); // Update table ID
+    let visibleCount = 0;
+    headers.forEach(header => {
+        if (!header.classList.contains('hidden-column')) {
+            visibleCount++;
+        }
+    });
+    return visibleCount;
+}
+
 function updateSummaryRow() {
     let totalAmount = 0;
     
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
-        const amount = parseFloat(row.querySelector('.amount')?.value) || 0;
-        totalAmount += amount;
+        totalAmount += parseFloat(row.querySelector('.amount')?.value) || 0;
     });
     
+    const headers = document.querySelectorAll('#taxesLicensesTable thead th');
     const summaryRow = document.getElementById('summaryRow');
+    
     if (summaryRow) {
-        summaryRow.innerHTML = `
-            <tr class="summary-row">
-                <td colspan="5" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
-                <td class="uneditable">${totalAmount.toFixed(2)}</td>
-                <td>-</td>
-                <td>-</td>
-            </tr>
-        `;
+        let summaryCells = '';
+        
+        headers.forEach((header, index) => {
+            if (!header.classList.contains('hidden-column')) {
+                switch(index) {
+                    case 0:
+                        summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+                        break;
+                    case 5:
+                        summaryCells += `<td class="uneditable">${totalAmount.toFixed(2)}</td>`;
+                        break;
+                    default:
+                        summaryCells += '<td></td>';
+                        break;
+                }
+            }
+        });
+        
+        summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
     }
 }
 
