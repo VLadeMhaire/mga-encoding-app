@@ -1616,7 +1616,7 @@ function addNewRow() {
     const today = new Date().toISOString().split('T')[0];
     
     row.innerHTML = `
-        <td>
+        <tr>
             <input type="date" value="${today}" class="editable date-input">
         </td>
         <td>
@@ -1689,6 +1689,24 @@ function addNewRow() {
     `;
     
     tableBody.appendChild(row);
+    
+    // FIX: Apply current column visibility states to the new row
+    const columnVisibility = JSON.parse(localStorage.getItem('nonVatSalesColumnVisibility')) || {};
+    const columns = [
+        'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'tinNumber',
+        'customerName', 'address', 'grossSales', 'exemptSales', 'salesType',
+        'netSales', 'zeroRated', 'withholdingRate', 'withholdingAmount',
+        'remarks', 'action'
+    ];
+    
+    const cells = row.querySelectorAll('td');
+    columns.forEach((key, index) => {
+        if (columnVisibility[key] === true && cells[index]) {
+            cells[index].classList.add('hidden-column');
+        } else if (cells[index]) {
+            cells[index].classList.remove('hidden-column');
+        }
+    });
     
     // Add event listeners to the new row
     const editableInputs = row.querySelectorAll('.editable');
@@ -1928,6 +1946,18 @@ function updateTotals() {
     if (totalWithholdingEl) totalWithholdingEl.textContent = totalWithholding.toFixed(2);
 }
 
+// Helper function to get the number of visible columns
+function getVisibleColumnCount() {
+    const headers = document.querySelectorAll('#yourTableId thead th'); // Update table ID
+    let visibleCount = 0;
+    headers.forEach(header => {
+        if (!header.classList.contains('hidden-column')) {
+            visibleCount++;
+        }
+    });
+    return visibleCount;
+}
+
 function updateSummaryRow() {
     let totalGrossSales = 0;
     let totalExemptSales = 0;
@@ -1937,35 +1967,48 @@ function updateSummaryRow() {
     
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
-        const grossSales = parseFloat(row.querySelector('.gross-sales')?.value) || 0;
-        const exemptSales = parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
-        const netSales = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
-        const zeroRated = parseFloat(row.querySelector('.zero-rated')?.textContent) || 0;
-        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
-        
-        totalGrossSales += grossSales;
-        totalExemptSales += exemptSales;
-        totalNetSales += netSales;
-        totalZeroRated += zeroRated;
-        totalWithholding += withholdingAmount;
+        totalGrossSales += parseFloat(row.querySelector('.gross-sales')?.value) || 0;
+        totalExemptSales += parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
+        totalNetSales += parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+        totalZeroRated += parseFloat(row.querySelector('.zero-rated')?.textContent) || 0;
+        totalWithholding += parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
     });
     
+    const headers = document.querySelectorAll('#nonVatableTable thead th');
     const summaryRow = document.getElementById('summaryRow');
+    
     if (summaryRow) {
-        summaryRow.innerHTML = `
-            <tr class="summary-row">
-                <td colspan="7" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
-                <td class="uneditable">${totalGrossSales.toFixed(2)}</td>
-                <td class="uneditable">${totalExemptSales.toFixed(2)}</td>
-                <td>-</td>
-                <td class="uneditable">${totalNetSales.toFixed(2)}</td>
-                <td class="uneditable">${totalZeroRated.toFixed(2)}</td>
-                <td>-</td>
-                <td class="uneditable">${totalWithholding.toFixed(2)}</td>
-                <td>-</td>
-                <td>-</td>
-            </tr>
-        `;
+        let summaryCells = '';
+        
+        headers.forEach((header, index) => {
+            if (!header.classList.contains('hidden-column')) {
+                switch(index) {
+                    case 0:
+                        summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+                        break;
+                    case 7:
+                        summaryCells += `<td class="uneditable">${totalGrossSales.toFixed(2)}</td>`;
+                        break;
+                    case 8:
+                        summaryCells += `<td class="uneditable">${totalExemptSales.toFixed(2)}</td>`;
+                        break;
+                    case 10:
+                        summaryCells += `<td class="uneditable">${totalNetSales.toFixed(2)}</td>`;
+                        break;
+                    case 11:
+                        summaryCells += `<td class="uneditable">${totalZeroRated.toFixed(2)}</td>`;
+                        break;
+                    case 13:
+                        summaryCells += `<td class="uneditable">${totalWithholding.toFixed(2)}</td>`;
+                        break;
+                    default:
+                        summaryCells += '<td></td>';
+                        break;
+                }
+            }
+        });
+        
+        summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
     }
 }
 
