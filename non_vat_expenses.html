@@ -1511,6 +1511,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize long press for entry counter button (optional)
     initEntryCounterLongPress();
+
+    initEnterKeyNavigation();
     
     // Add event listeners for company info to save automatically
     document.querySelectorAll('.company-info-sidebar input').forEach(input => {
@@ -1543,6 +1545,76 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add interactive cursor effect
     initCursorEffect();
 });
+
+// Add this function to your existing JavaScript code
+function initEnterKeyNavigation() {
+    // Add event listener to the table body for keydown events
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    tableBody.addEventListener('keydown', function(e) {
+        // Check if Enter key is pressed
+        if (e.key === 'Enter') {
+            // Get the currently focused element
+            const focusedElement = document.activeElement;
+            
+            // Check if the focused element is an input or select inside a table cell
+            if (focusedElement && (focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'SELECT')) {
+                // Get the parent cell (td)
+                const currentCell = focusedElement.closest('td');
+                if (!currentCell) return;
+                
+                // Get the current row
+                const currentRow = currentCell.parentElement;
+                if (!currentRow) return;
+                
+                // Get the next row
+                const nextRow = currentRow.nextElementSibling;
+                if (!nextRow) return;
+                
+                // Get the column index of the current cell
+                const columnIndex = Array.from(currentRow.children).indexOf(currentCell);
+                if (columnIndex === -1) return;
+                
+                // Get the cell in the same column in the next row
+                const nextCell = nextRow.children[columnIndex];
+                if (!nextCell) return;
+                
+                // Find the first focusable element in the next cell
+                let nextFocusable = nextCell.querySelector('input, select');
+                
+                // If no input/select in the same column, try to find any focusable element in the next row
+                if (!nextFocusable) {
+                    nextFocusable = nextRow.querySelector('input, select');
+                }
+                
+                if (nextFocusable) {
+                    // Prevent default Enter behavior (like form submission)
+                    e.preventDefault();
+                    
+                    // Focus on the next element
+                    nextFocusable.focus();
+                    
+                    // If it's an input, select its content for easy editing
+                    if (nextFocusable.tagName === 'INPUT' && nextFocusable.type !== 'checkbox' && nextFocusable.type !== 'radio') {
+                        nextFocusable.select();
+                    }
+                    
+                    // Add a visual flash effect to indicate movement
+                    nextFocusable.style.transition = 'box-shadow 0.1s ease';
+                    nextFocusable.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.5), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+                    setTimeout(() => {
+                        nextFocusable.style.boxShadow = '';
+                    }, 200);
+                }
+            }
+        }
+    });
+}
+
+// Call this function after DOM is loaded
+// Add this line inside your existing DOMContentLoaded event listener:
+// initEnterKeyNavigation();
 
 // ===== LOGO FUNCTIONS =====
 function loadLogo() {
@@ -1833,13 +1905,13 @@ function addNewRow() {
     natureOptions += '</optgroup>';
     
     row.innerHTML = `
-        <td>
+        <tr>
             <input type="date" value="${today}" class="editable date-input">
         </td>
-        <td>
+         <td>
             <input type="text" class="editable invoice-number" placeholder="INV-001">
         </td>
-        <td>
+         <td>
             <select class="editable invoice-type">
                 <option value="">Select</option>
                 <option value="OR">OR</option>
@@ -1850,55 +1922,72 @@ function addNewRow() {
                 <option value="CR">CR</option>
                 <option value="OTHERS">OTHERS</option>
             </select>
-        </td>
-        <td>
+         </td>
+         <td>
             <select class="editable transaction-type">
                 <option value="">Select</option>
                 <option value="Goods">Goods</option>
                 <option value="Services">Services</option>
             </select>
-        </td>
+         </td>
         <td style="position: relative;">
             <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
             <div class="validation-message" style="display: none; position: absolute; bottom: -20px; left: 0; right: 0;">TIN must be 12 digits</div>
-        </td>
-        <td>
+         </td>
+         <td>
             <input type="text" class="editable supplier-name" placeholder="Supplier name">
-        </td>
-        <td>
+         </td>
+         <td>
             <input type="text" class="editable address" placeholder="Supplier address">
-        </td>
-        <td>
+         </td>
+         <td>
             <input type="number" step="0.01" min="0" class="editable gross-amount" placeholder="0.00">
-        </td>
-        <td>
+         </td>
+         <td>
             <select class="editable nature-expense">
                 ${natureOptions}
             </select>
-        </td>
-        <td>
+         </td>
+         <td>
             <div class="uneditable input-tax">0.00</div>
-        </td>
-        <td>
+         </td>
+         <td>
             <div class="uneditable withholding-rate">0%</div>
-        </td>
-        <td>
+         </td>
+         <td>
             <div class="uneditable withholding-tax">0.00</div>
-        </td>
-        <td>
+         </td>
+         <td>
             <div class="uneditable gross-minus-withholding">0.00</div>
-        </td>
-        <td>
+         </td>
+         <td>
             <input type="text" class="editable remarks" placeholder="Enter remarks">
-        </td>
-        <td>
+         </td>
+         <td>
             <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
                 <i class="fas fa-trash"></i>
             </button>
-        </td>
+         </td>
     `;
     
     tableBody.appendChild(row);
+    
+    // FIX: Apply current column visibility states to the new row
+    const columnVisibility = JSON.parse(localStorage.getItem('nonVatExpensesColumnVisibility')) || {};
+    const columns = [
+        'date', 'invoiceNumber', 'invoiceType', 'transactionType', 'tinNumber',
+        'supplierName', 'address', 'grossAmount', 'natureExpense', 'inputTax',
+        'withholdingRate', 'withholdingTax', 'grossMinusWithholding', 'remarks', 'action'
+    ];
+    
+    const cells = row.querySelectorAll('td');
+    columns.forEach((key, index) => {
+        if (columnVisibility[key] === true && cells[index]) {
+            cells[index].classList.add('hidden-column');
+        } else if (cells[index]) {
+            cells[index].classList.remove('hidden-column');
+        }
+    });
     
     // Add event listeners to the new row
     const editableInputs = row.querySelectorAll('.editable');
@@ -2159,6 +2248,18 @@ function updateTotals() {
     updateExpenseTally();
 }
 
+// Helper function to get the number of visible columns
+function getVisibleColumnCount() {
+    const headers = document.querySelectorAll('#yourTableId thead th'); // Update table ID
+    let visibleCount = 0;
+    headers.forEach(header => {
+        if (!header.classList.contains('hidden-column')) {
+            visibleCount++;
+        }
+    });
+    return visibleCount;
+}
+
 function updateSummaryRow() {
     let totalGrossAmount = 0;
     let totalInputTax = 0;
@@ -2167,32 +2268,44 @@ function updateSummaryRow() {
     
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
-        const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
-        const inputTax = parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
-        const withholdingTax = parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
-        const grossMinusWithholding = parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
-        
-        totalGrossAmount += grossAmount;
-        totalInputTax += inputTax;
-        totalWithholdingTax += withholdingTax;
-        totalGrossMinusWithholding += grossMinusWithholding;
+        totalGrossAmount += parseFloat(row.querySelector('.gross-amount')?.value) || 0;
+        totalInputTax += parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
+        totalWithholdingTax += parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
+        totalGrossMinusWithholding += parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
     });
     
+    const headers = document.querySelectorAll('#nonVatExpensesTable thead th');
     const summaryRow = document.getElementById('summaryRow');
+    
     if (summaryRow) {
-        summaryRow.innerHTML = `
-            <tr class="summary-row">
-                <td colspan="7" style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>
-                <td class="uneditable">${totalGrossAmount.toFixed(2)}</td>
-                <td>-</td>
-                <td class="uneditable">${totalInputTax.toFixed(2)}</td>
-                <td>-</td>
-                <td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>
-                <td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>
-                <td>-</td>
-                <td>-</td>
-            </tr>
-        `;
+        let summaryCells = '';
+        
+        headers.forEach((header, index) => {
+            if (!header.classList.contains('hidden-column')) {
+                switch(index) {
+                    case 0:
+                        summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+                        break;
+                    case 7:
+                        summaryCells += `<td class="uneditable">${totalGrossAmount.toFixed(2)}</td>`;
+                        break;
+                    case 9:
+                        summaryCells += `<td class="uneditable">${totalInputTax.toFixed(2)}</td>`;
+                        break;
+                    case 11:
+                        summaryCells += `<td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>`;
+                        break;
+                    case 12:
+                        summaryCells += `<td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>`;
+                        break;
+                    default:
+                        summaryCells += '<td></td>';
+                        break;
+                }
+            }
+        });
+        
+        summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
     }
 }
 
