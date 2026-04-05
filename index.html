@@ -2,1298 +2,400 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes">
-    <title>VAT Tracking System - Kiosk Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>VAT Tracking System - Welcome</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS Variables — BRIGHTER blue & red professional mix */
-        :root {
-            --base-font-size: 16px;
-            --scale-factor: 1;
-            --primary-blue: #1e88e5;
-            --primary-red: #e53935;
-            --accent-gradient: linear-gradient(145deg, #1e88e5, #e53935);
-            --secondary-dark: #0f1e2f;
-            --card-bg: rgba(25, 45, 65, 0.9);
-            --header-bg: linear-gradient(135deg, rgba(10, 35, 55, 0.95) 0%, rgba(55, 30, 40, 0.98) 100%);
-            --text-color: #f0f8ff;
-            --text-secondary: #c6e2ff;
-            --sidebar-bg: rgba(8, 24, 40, 0.98);
-            --sidebar-width: 280px;
-            --sidebar-collapsed-width: 80px;
-            --glow-blue: rgba(30, 136, 229, 0.8);
-            --glow-red: rgba(229, 57, 53, 0.8);
-            --border-mix: rgba(230, 100, 120, 0.4);
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', 'Arial', sans-serif;
         }
-        
-        html {
-            font-size: calc(var(--base-font-size) * var(--scale-factor));
-            overflow-x: hidden;
-            min-height: 100%;
-            scroll-behavior: smooth;
-        }
-        
+
         body {
-            background: linear-gradient(135deg, rgba(11, 26, 42, 0.82), rgba(26, 38, 53, 0.85)), url('retro.jpg') center/cover no-repeat fixed;
-            color: var(--text-color);
             min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
-            padding: clamp(10px, 2vw, 20px);
+            overflow: hidden;
             position: relative;
-            font-size: 1rem;
+        }
+
+        /* ========== MOVING STARRY SKY BACKGROUND ========== */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #020c15, #000000);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), margin-right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 1;
-            background-blend-mode: overlay;
+            justify-content: center;
+            overflow: hidden;
         }
         
-        body.sidebar-expanded {
-            margin-left: var(--sidebar-width);
+        .stars-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
         }
         
-        .container {
-            max-width: min(95vw, 1400px);
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            min-height: calc(100vh - clamp(20px, 4vw, 40px));
+        .mist-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            align-items: center;
-            position: relative;
-            transition: all 0.3s ease;
-            transform: scale(0.5);
-            transform-origin: top center;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(180, 210, 255, 0.06) 0%, rgba(80, 120, 180, 0.02) 60%, transparent 100%);
+            pointer-events: none;
+            z-index: 2;
+            animation: mistFloatSlow 20s ease-in-out infinite;
+        }
+        
+        .mist-layer-2 {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 200%;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            left: -15%;
-            opacity: 1;
-        }
-        
-        .floating-toggle {
-            position: fixed;
-            left: 20px;
-            top: 20px;
-            width: clamp(45px, 4vw, 60px);
-            height: clamp(45px, 4vw, 60px);
-            background: var(--sidebar-bg);
-            border: 2px solid var(--border-mix);
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(30, 136, 229, 0.5);
-            opacity: 1;
-        }
-        
-        .floating-toggle:hover {
-            background: rgba(30, 136, 229, 0.25);
-            transform: scale(1.1) rotate(180deg);
-            border-color: var(--primary-red);
-        }
-        
-        .floating-toggle:hover i {
-            transform: rotate(180deg);
-        }
-
-        .floating-toggle-right {
-            position: fixed;
-            right: 20px;
-            top: 20px;
-            width: clamp(45px, 4vw, 60px);
-            height: clamp(45px, 4vw, 60px);
-            background: var(--sidebar-bg);
-            border: 2px solid var(--border-mix);
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(229, 57, 53, 0.5);
-            opacity: 1;
-        }
-
-        .floating-toggle-right:hover {
-            background: rgba(229, 57, 53, 0.25);
-            transform: scale(1.1) rotate(180deg);
-            border-color: var(--primary-blue);
-        }
-
-        .floating-toggle-right:hover i {
-            transform: rotate(180deg);
-        }
-
-        .floating-toggle-right i {
-            font-size: clamp(1.25rem, 1.8vw, 1.5rem);
-            background: linear-gradient(145deg, var(--primary-red), var(--primary-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            box-shadow: 0 0 clamp(25px, 3vw, 40px) rgba(0, 0, 0, 0.8), 
-                        0 0 clamp(15px, 2vw, 25px) rgba(30, 136, 229, 0.4);
-            border-right: 2px solid var(--border-mix);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            transform: translateX(-100%);
-        }
-        
-        .sidebar.sidebar-visible {
-            transform: translateX(0);
-        }
-        
-        .sidebar.sidebar-collapsed {
-            transform: translateX(-100%);
-        }
-        
-        header {
-            display: flex;
-            align-items: center;
-            text-align: left;
-            padding: clamp(15px, 2vw, 25px);
-            margin-bottom: clamp(15px, 2vw, 20px);
-            background: var(--header-bg);
-            border-radius: clamp(15px, 2vw, 20px);
-            width: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1;
-            box-shadow: 0 clamp(2px, 0.4vw, 4px) clamp(8px, 1vw, 12px) rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-mix);
-        }
-        
-        .logo-container {
-            width: clamp(80px, 12vw, 120px);
-            height: clamp(80px, 12vw, 120px);
-            margin: 0;
-            margin-right: clamp(20px, 3vw, 40px);
-            background: rgba(20, 45, 65, 0.9);
-            border-radius: clamp(15px, 2vw, 20px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding: clamp(5px, 1vw, 10px);
-            flex-shrink: 0;
-            opacity: 1;
-            box-shadow: 0 0 clamp(5px, 1vw, 10px) rgba(30, 136, 229, 0.6);
-            border: clamp(1px, 0.2vw, 2px) solid rgba(229, 57, 53, 0.3);
-        }
-        
-        .logo-img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            opacity: 1;
-        }
-        
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: clamp(15px, 2vw, 25px);
-            width: 100%;
-            max-width: min(1200px, 95vw);
-            aspect-ratio: 1 / 1;
-            margin: 0 auto;
-            opacity: 1;
-        }
-        
-        .kiosk-button {
-            background: linear-gradient(145deg, var(--card-bg) 0%, rgba(35, 55, 75, 0.95) 100%);
-            border: none;
-            border-radius: clamp(12px, 1.5vw, 18px);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: var(--text-color);
-            position: relative;
-            overflow: hidden;
-            aspect-ratio: 1 / 1;
-            width: 100%;
-            height: 100%;
-            padding: clamp(10px, 1.5vw, 20px);
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            box-shadow: 0 clamp(2px, 0.4vw, 4px) clamp(6px, 1vw, 10px) rgba(0, 0, 0, 0.4);
-            border: clamp(1px, 0.15vw, 2px) solid var(--border-mix);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        @keyframes buttonFlowIn {
-            0% {
-                opacity: 0.5;
-                transform: scale(0.8) translateY(20px);
-                filter: blur(2px);
-            }
-            40% {
-                opacity: 1;
-                transform: scale(1.05) translateY(-5px);
-                filter: blur(0);
-            }
-            70% {
-                transform: scale(0.98) translateY(2px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-                filter: blur(0);
-            }
-        }
-        
-        .kiosk-button {
-            animation: buttonFlowIn 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
-            animation-delay: calc((var(--button-index) - 1) * 0.12s);
-        }
-        
-        .kiosk-button {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-        
-        .button-icon {
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            margin-bottom: clamp(8px, 1.2vw, 15px);
-            color: var(--primary-blue);
-            line-height: 1;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 0 5px rgba(30,136,229,0.5));
-        }
-        
-        .button-title {
-            font-size: clamp(0.875rem, 2vw, 1.25rem);
-            font-weight: 700;
-            margin-bottom: clamp(4px, 0.8vw, 8px);
-            color: #e2f0ff;
-            line-height: 1.2;
-            text-align: center;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        
-        .button-description {
-            font-size: clamp(0.65rem, 1.2vw, 0.85rem);
-            opacity: 0.85;
-            line-height: 1.3;
-            color: var(--text-secondary);
-            text-align: center;
-            width: 100%;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .button-badge {
-            position: absolute;
-            top: clamp(8px, 1.2vw, 12px);
-            right: clamp(8px, 1.2vw, 12px);
-            background: linear-gradient(145deg, var(--primary-blue), var(--primary-red));
-            color: white;
-            font-size: clamp(0.65rem, 1.2vw, 0.75rem);
-            font-weight: bold;
-            padding: clamp(2px, 0.4vw, 4px) clamp(6px, 1vw, 10px);
-            border-radius: clamp(12px, 1.5vw, 20px);
-            line-height: 1;
-            z-index: 2;
-            opacity: 1;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 12px rgba(229,57,53,0.7);
-        }
-        
-        .kiosk-button:nth-child(1) { --button-index: 1; }
-        .kiosk-button:nth-child(2) { --button-index: 2; }
-        .kiosk-button:nth-child(3) { --button-index: 3; }
-        .kiosk-button:nth-child(4) { --button-index: 4; }
-        .kiosk-button:nth-child(5) { --button-index: 5; }
-        .kiosk-button:nth-child(6) { --button-index: 6; }
-        .kiosk-button:nth-child(7) { --button-index: 7; }
-        .kiosk-button:nth-child(8) { --button-index: 8; }
-        .kiosk-button:nth-child(9) { --button-index: 9; }
-        
-        @keyframes containerScaleIn {
-            0% {
-                transform: scale(0.4) translateY(20px);
-                opacity: 0.8;
-                left: -15%;
-            }
-            60% {
-                transform: scale(0.52) translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0.5) translateY(0);
-                opacity: 1;
-                left: -15%;
-            }
-        }
-        
-        .container {
-            animation: containerScaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        
-        .header-text h1 {
-            font-size: clamp(1.5rem, 4vw, 2.625rem);
-            font-weight: 800;
-            margin-bottom: clamp(5px, 1vw, 10px);
-            background: linear-gradient(to right, #64b5f6, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            opacity: 1;
-            text-shadow: 0 0 10px rgba(30,136,229,0.3);
-        }
-        
-        .header-text p {
-            font-size: clamp(0.875rem, 2vw, 1.25rem);
-            opacity: 0.95;
-            color: var(--text-secondary);
-            max-width: min(90vw, 800px);
-            margin: 0;
-            line-height: 1.4;
-        }
-        
-        .dashboard-title {
-            text-align: center;
-            font-size: clamp(1.25rem, 3vw, 2rem);
-            margin: clamp(20px, 3vw, 30px) 0;
-            background: linear-gradient(145deg, var(--primary-blue), var(--primary-red));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            position: relative;
-            padding-bottom: clamp(10px, 1.5vw, 15px);
-            width: 100%;
-            opacity: 1;
-            text-shadow: 0 0 15px rgba(229,57,53,0.4);
-        }
-        
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            align-items: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .footer {
-            text-align: center;
-            padding: clamp(15px, 2vw, 25px);
-            margin-top: clamp(25px, 4vw, 40px);
-            color: #b8d6f0;
-            font-size: clamp(0.75rem, 1.5vw, 1rem);
-            border-top: 1px solid var(--border-mix);
-            background: rgba(15, 35, 50, 0.8);
-            border-radius: clamp(10px, 1.5vw, 15px);
-            box-shadow: 0 0 clamp(10px, 2vw, 20px) rgba(0, 0, 0, 0.4);
-            flex-shrink: 0;
-            width: 100%;
-            opacity: 1;
-        }
-        
-        .status-indicator {
-            width: clamp(8px, 1.2vw, 12px);
-            height: clamp(8px, 1.2vw, 12px);
-            border-radius: 50%;
-            background: var(--primary-blue);
-            opacity: 1;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 12px var(--primary-red);
-        }
-        
-        .system-status {
-            display: inline-flex;
-            align-items: center;
-            gap: clamp(5px, 1vw, 10px);
-            background: rgba(20, 45, 65, 0.8);
-            padding: clamp(5px, 0.8vw, 8px) clamp(15px, 2vw, 20px);
-            border-radius: clamp(15px, 2vw, 20px);
-            margin-top: clamp(5px, 1vw, 10px);
-            border: 1px solid var(--border-mix);
-            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-            opacity: 1;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); background: var(--primary-blue); }
-            50% { opacity: 0.8; transform: scale(1.1); background: var(--primary-red); }
-        }
-        
-        .kiosk-button {
-            box-shadow: 0 clamp(4px, 0.8vw, 8px) clamp(12px, 1.5vw, 20px) rgba(0, 0, 0, 0.5), 
-                        0 0 clamp(8px, 1.5vw, 15px) rgba(30, 136, 229, 0.3);
-            border-color: var(--border-mix);
-        }
-        
-        header {
-            box-shadow: 0 clamp(5px, 1vw, 10px) clamp(15px, 2vw, 30px) rgba(0, 0, 0, 0.6), 
-                        0 0 clamp(15px, 2vw, 30px) rgba(30, 136, 229, 0.25);
-        }
-        
-        .logo-container {
-            box-shadow: 0 0 clamp(10px, 2vw, 20px) rgba(30, 136, 229, 0.7), 
-                        inset 0 0 clamp(8px, 1.5vw, 15px) rgba(229, 57, 53, 0.3);
-        }
-        
-        .kiosk-button:hover, 
-        .kiosk-button:focus {
-            transform: translateY(clamp(-6px, -1vw, -10px)) scale(1.05) !important;
-            box-shadow: 0 clamp(12px, 2vw, 20px) clamp(20px, 3vw, 35px) rgba(0, 0, 0, 0.7), 
-                        0 0 clamp(20px, 3vw, 35px) rgba(30, 136, 229, 0.8),
-                        0 0 clamp(20px, 3vw, 35px) rgba(229, 57, 53, 0.6) !important;
-            border-color: rgba(229, 57, 53, 0.7) !important;
-            outline: none;
-        }
-        
-        .kiosk-button:hover .button-icon {
-            transform: scale(1.2);
-            text-shadow: 0 0 20px #1e88e5, 0 0 30px #e53935;
-            color: #ffffff;
-        }
-        
-        .kiosk-button:hover .button-title {
-            color: #ffffff;
-            text-shadow: 0 0 12px #1e88e5;
-        }
-        
-        .sidebar-header {
-            padding: clamp(20px, 2.5vw, 30px) clamp(15px, 2vw, 25px);
-            border-bottom: 1px solid var(--border-mix);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(15, 40, 55, 0.8);
-        }
-        
-        .sidebar-title {
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-            background: linear-gradient(145deg, #64b5f6, #ff8a80);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        
-        .sidebar-toggle {
-            background: rgba(30, 136, 229, 0.2);
-            border: 1px solid var(--border-mix);
-            color: var(--primary-blue);
-            width: clamp(35px, 3vw, 45px);
-            height: clamp(35px, 3vw, 45px);
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-        }
-        
-        .sidebar-toggle:hover {
-            background: rgba(229, 57, 53, 0.3);
-            transform: rotate(180deg);
-            color: var(--primary-red);
-        }
-        
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: clamp(15px, 2vw, 20px) 0;
-        }
-        
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: clamp(5px, 0.8vw, 10px);
-            padding: 0 clamp(10px, 1.5vw, 15px);
-        }
-        
-        .sidebar-btn {
-            display: flex;
-            align-items: center;
-            gap: clamp(12px, 1.5vw, 15px);
-            padding: clamp(12px, 1.5vw, 16px) clamp(15px, 2vw, 20px);
-            background: rgba(20, 45, 65, 0.7);
-            border: 1px solid var(--border-mix);
-            border-radius: 10px;
-            color: var(--text-color);
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .sidebar-btn:hover {
-            background: rgba(40, 70, 95, 0.8);
-            border-color: rgba(229, 57, 53, 0.6);
-            transform: translateX(8px);
-            box-shadow: 0 5px 20px rgba(30, 136, 229, 0.5);
-        }
-        
-        .sidebar-btn.active {
-            background: rgba(30, 136, 229, 0.25);
-            border-color: rgba(229, 57, 53, 0.7);
-            box-shadow: 0 5px 25px rgba(229, 57, 53, 0.5);
-        }
-        
-        .sidebar-btn i {
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-            color: var(--primary-blue);
-            width: clamp(20px, 2.5vw, 25px);
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 64, 1);
-        }
-        
-        .sidebar-btn:hover i {
-            transform: scale(1.2);
-            color: var(--primary-red);
-        }
-        
-        .sidebar-btn-text {
-            font-size: clamp(0.85rem, 1.2vw, 1rem);
-            font-weight: 500;
-            white-space: nowrap;
-            color: #d4edff;
-        }
-        
-        .sidebar-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary-blue), var(--primary-red), transparent);
-            margin: clamp(15px, 2vw, 20px) clamp(10px, 1.5vw, 15px);
-        }
-        
-        .sidebar-footer {
-            padding: clamp(15px, 2vw, 20px);
-            border-top: 1px solid var(--border-mix);
-            text-align: center;
-            font-size: clamp(0.75rem, 1vw, 0.85rem);
-            color: #b0d4f0;
-            background: rgba(8, 28, 40, 0.9);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-btn-text {
-            display: none;
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-title {
-            display: none;
-        }
-        
-        .sidebar.sidebar-collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-btn {
-            justify-content: center;
-            padding: clamp(12px, 1.5vw, 16px);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-toggle i {
-            transform: rotate(180deg);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-header {
-            justify-content: center;
-            padding: 15px;
-        }
-        
-        .floating-toggle i {
-            font-size: clamp(1.25rem, 1.8vw, 1.5rem);
-            background: linear-gradient(145deg, var(--primary-blue), var(--primary-red));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 50%, rgba(30, 136, 229, 0.12) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(229, 57, 53, 0.08) 0%, transparent 50%);
-            z-index: -1;
+            height: 200%;
+            background: repeating-linear-gradient(45deg, rgba(140, 200, 255, 0.03) 0px, rgba(140, 200, 255, 0.03) 3px, transparent 3px, transparent 20px);
             pointer-events: none;
-            animation: subtleGlow 6s ease-in-out infinite;
+            z-index: 2;
+            animation: mistDriftHorizontal 30s linear infinite;
         }
         
-        @keyframes subtleGlow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .kiosk-button::before {
-            content: '';
+        .mist-layer-3 {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(30, 136, 229, 0.15) 0%, rgba(229, 57, 53, 0.1) 100%);
+            background: radial-gradient(circle at 40% 60%, rgba(100, 160, 230, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 2;
+            animation: mistBreathing 10s ease-in-out infinite;
+        }
+        
+        @keyframes mistFloatSlow {
+            0% { opacity: 0.2; transform: scale(1) translateX(0) translateY(0); }
+            50% { opacity: 0.55; transform: scale(1.08) translateX(1%) translateY(1%); }
+            100% { opacity: 0.2; transform: scale(1) translateX(0) translateY(0); }
+        }
+        
+        @keyframes mistDriftHorizontal {
+            0% { transform: translateX(-20%) translateY(-10%) rotate(0deg); opacity: 0.2; }
+            50% { transform: translateX(0%) translateY(5%) rotate(1deg); opacity: 0.45; }
+            100% { transform: translateX(-20%) translateY(-10%) rotate(0deg); opacity: 0.2; }
+        }
+        
+        @keyframes mistBreathing {
+            0%, 100% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(1.1); }
+        }
+        
+        .welcome-content {
+            text-align: center;
+            animation: floatGlow 0.8s ease-out;
+            max-width: 85vw;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .welcome-logo {
+            width: min(180px, 35vw);
+            margin: 0 auto 25px auto;
+            filter: drop-shadow(0 0 20px rgba(30,136,229,0.8));
+            animation: logoPulse 1.2s infinite alternate;
+        }
+        
+        .welcome-logo img {
+            width: 100%;
+            border-radius: 35px;
+            background: rgba(30,136,229,0.15);
+            padding: 12px;
+            box-shadow: 0 0 30px rgba(229,57,53,0.5);
+        }
+        
+        .welcome-title {
+            font-size: clamp(1.8rem, 7vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #64b5f6, #ff8a80, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            animation: slideUpFade 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .welcome-sub {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            color: #c6e2ff;
+            margin-bottom: 35px;
             opacity: 0;
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s 0.3s forwards;
+            text-shadow: 0 0 10px rgba(30,136,229,0.5);
         }
         
-        .kiosk-button:hover::before {
-            opacity: 1;
-        }
-        
-        .kiosk-button:active {
-            transform: translateY(clamp(-2px, -0.4vw, -4px)) scale(1.02);
-            transition: transform 0.1s ease;
-        }
-        
-        .button-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-        }
-        
-        .kiosk-button:nth-child(1) { --glow-color: #1e88e5; }
-        .kiosk-button:nth-child(1) .button-icon { color: #42a5f5; }
-        .kiosk-button:nth-child(1) .button-badge { background: #1e88e5; }
-        .kiosk-button:nth-child(2) { --glow-color: #e53935; }
-        .kiosk-button:nth-child(2) .button-icon { color: #ef5350; }
-        .kiosk-button:nth-child(2) .button-badge { background: #e53935; }
-        .kiosk-button:nth-child(3) { --glow-color: #d32f6f; }
-        .kiosk-button:nth-child(3) .button-icon { color: #ec407a; }
-        .kiosk-button:nth-child(3) .button-badge { background: #d32f6f; }
-        .kiosk-button:nth-child(4) { --glow-color: #1976d2; }
-        .kiosk-button:nth-child(4) .button-icon { color: #42a5f5; }
-        .kiosk-button:nth-child(4) .button-badge { background: #1976d2; }
-        .kiosk-button:nth-child(5) { --glow-color: #f44336; }
-        .kiosk-button:nth-child(5) .button-icon { color: #e57373; }
-        .kiosk-button:nth-child(5) .button-badge { background: #f44336; }
-        .kiosk-button:nth-child(6) { --glow-color: #c2185b; }
-        .kiosk-button:nth-child(6) .button-icon { color: #d81b60; }
-        .kiosk-button:nth-child(6) .button-badge { background: #c2185b; }
-        .kiosk-button:nth-child(7) { --glow-color: #0d47a1; }
-        .kiosk-button:nth-child(7) .button-icon { color: #1e88e5; }
-        .kiosk-button:nth-child(7) .button-badge { background: #0d47a1; }
-        .kiosk-button:nth-child(8) { --glow-color: #b71c1c; }
-        .kiosk-button:nth-child(8) .button-icon { color: #e53935; }
-        .kiosk-button:nth-child(8) .button-badge { background: #b71c1c; }
-        .kiosk-button:nth-child(9) { --glow-color: #ad1457; }
-        .kiosk-button:nth-child(9) .button-icon { color: #d81b60; }
-        .kiosk-button:nth-child(9) .button-badge { background: #ad1457; }
-        
-        .kiosk-button::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(30, 136, 229, 0.2), rgba(229, 57, 53, 0.15), transparent);
-            transition: left 0.7s;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        .kiosk-button:hover::after {
-            left: 100%;
-        }
-        
-        .tax-license-icon-container {
-            width: clamp(50px, 8vw, 70px);
-            height: clamp(50px, 8vw, 70px);
-            margin-bottom: clamp(8px, 1.2vw, 15px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .tax-license-icon {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 8px rgba(30,136,229,0.8));
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        .kiosk-button:nth-child(8):hover .tax-license-icon {
-            filter: drop-shadow(0 0 18px rgba(229,57,53,0.9));
-            transform: scale(1.15);
-        }
-        
-        @media (max-width: 1024px) {
-            .grid-container { max-width: min(800px, 95vw); }
-            .button-description { -webkit-line-clamp: 2; }
-            .sidebar { width: 250px; }
-        }
-        @media (max-width: 768px) {
-            .grid-container { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); aspect-ratio: 2 / 2.5; }
-            .button-description { display: none; }
-        }
-        @media (max-width: 480px) {
-            .grid-container { grid-template-columns: 1fr; grid-template-rows: repeat(9, 1fr); aspect-ratio: 1 / 3; }
-        }
-
-        /* Right Sidebar - TIN LIBRARY with redesigned search (icon-only button inside field) */
-        .right-sidebar {
-            position: fixed;
-            right: 0;
-            top: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            box-shadow: 0 0 clamp(25px, 3vw, 40px) rgba(0, 0, 0, 0.8), 0 0 clamp(15px, 2vw, 25px) rgba(229, 57, 53, 0.4);
-            border-left: 2px solid var(--border-mix);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            transform: translateX(100%);
-        }
-
-        .right-sidebar.right-sidebar-visible {
-            transform: translateX(0);
-        }
-
-        .right-sidebar.right-sidebar-collapsed {
-            transform: translateX(100%);
-        }
-
-        .right-sidebar-header {
-            padding: clamp(20px, 2.5vw, 30px) clamp(15px, 2vw, 25px);
-            border-bottom: 1px solid var(--border-mix);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(15, 40, 55, 0.8);
-        }
-
-        .right-sidebar-toggle {
-            background: rgba(30, 136, 229, 0.2);
-            border: 1px solid var(--border-mix);
-            color: var(--primary-blue);
-            width: clamp(35px, 3vw, 45px);
-            height: clamp(35px, 3vw, 45px);
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-        }
-
-        .right-sidebar-toggle:hover {
-            background: rgba(229, 57, 53, 0.3);
-            transform: rotate(180deg);
-            color: var(--primary-red);
-        }
-
-        .tin-search-area {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-mix);
-        }
-        
-        .tin-search-box {
-            display: flex;
-            align-items: center;
-            background: rgba(20, 45, 65, 0.6);
-            border-radius: 40px;
-            padding: 5px 15px;
-            border: 1px solid var(--border-mix);
-            transition: all 0.2s ease;
-        }
-        
-        .tin-search-box:focus-within {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 8px rgba(30,136,229,0.5);
-        }
-        
-        .tin-search-box input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 12px 8px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-        }
-        
-        .tin-search-box input::placeholder {
-            color: #9bbcdb;
-        }
-        
-        .search-icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--primary-blue);
-            font-size: 1.25rem;
-            cursor: pointer;
-            padding: 8px 5px 8px 8px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .search-icon-btn:hover {
-            color: var(--primary-red);
-            transform: scale(1.1);
-            background: rgba(229,57,53,0.15);
-        }
-        
-        .tin-add-section {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-mix);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .tin-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .tin-input-group label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-        }
-        
-        .tin-input-group input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-mix);
-            padding: 10px 12px;
-            border-radius: 12px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-            transition: 0.2s;
-        }
-        
-        .tin-input-group input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 8px var(--glow-blue);
-        }
-        
-        .add-tin-btn {
+        .start-button {
             background: linear-gradient(145deg, #1e88e5, #e53935);
             border: none;
-            padding: 10px;
-            border-radius: 40px;
+            padding: 16px 48px;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: white;
-            font-weight: bold;
+            border-radius: 60px;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 6px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 25px rgba(30,136,229,0.6);
+            letter-spacing: 2px;
+            margin-top: 20px;
+            animation: portalGlow 1.8s infinite;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
         }
         
-        .add-tin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(229,57,53,0.5);
+        .start-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 45px rgba(229,57,53,0.9);
+            letter-spacing: 3px;
         }
         
-        .tin-list-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        @keyframes portalGlow {
+            0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(30,136,229,0.6); }
+            50% { box-shadow: 0 12px 35px rgba(0,0,0,0.5), 0 0 40px rgba(229,57,53,0.8); }
         }
         
-        /* UPDATED TIN CARD DESIGN - cleaner layout with buttons below TIN number */
-        .tin-card {
-            background: rgba(20, 45, 65, 0.7);
-            border-radius: 16px;
-            padding: 14px;
-            border: 1px solid var(--border-mix);
-            transition: all 0.2s;
-            backdrop-filter: blur(4px);
+        @keyframes floatGlow {
+            0% { transform: scale(0.7); opacity: 0; filter: blur(12px);}
+            80% { transform: scale(1.02);}
+            100% { transform: scale(1); opacity: 1; filter: blur(0);}
         }
         
-        .tin-card:hover {
-            background: rgba(40, 70, 95, 0.9);
-            transform: translateX(-4px);
-            border-color: var(--primary-red);
+        @keyframes logoPulse {
+            0% { filter: drop-shadow(0 0 5px #1e88e5); transform: scale(0.98);}
+            100% { filter: drop-shadow(0 0 28px #e53935); transform: scale(1.02);}
         }
         
-        .tin-number {
-            font-family: monospace;
-            font-size: 1rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #ffb74d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed rgba(255,255,200,0.2);
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px);}
+            to { opacity: 1; transform: translateY(0);}
         }
         
-        .tin-number span i {
-            margin-right: 6px;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
         }
         
-        .tin-name {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            word-break: break-word;
-            padding-left: 4px;
-        }
-        
-        .tin-name i {
-            margin-right: 8px;
-            color: var(--primary-blue);
-        }
-        
-        /* Action buttons container - placed below TIN number and name, full width */
-        .tin-actions-row {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 6px;
-            border-top: 1px solid rgba(255,255,240,0.1);
-            padding-top: 10px;
-        }
-        
-        .copy-icon, .delete-icon {
-            background: rgba(255,255,240,0.12);
-            padding: 6px 12px;
-            border-radius: 24px;
+        .audio-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
+            color: rgba(200,220,255,0.5);
+            z-index: 15;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        /* Loading spinner while redirecting */
+        .loading-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
             align-items: center;
-            gap: 6px;
-            font-weight: 500;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
         
-        .copy-icon:hover {
-            background: var(--primary-blue);
-            color: white;
-            transform: scale(1.02);
+        .loading-spinner.active {
+            opacity: 1;
+            visibility: visible;
         }
         
-        .delete-icon:hover {
-            background: var(--primary-red);
-            color: white;
-            transform: scale(1.02);
-        }
-        
-        .copy-icon i, .delete-icon i {
-            font-size: 0.7rem;
-        }
-        
-        .empty-message {
+        .spinner-content {
             text-align: center;
-            color: #9bbcdb;
-            padding: 30px 15px;
-            font-style: italic;
-            font-size: 0.85rem;
         }
         
-        .tin-list-container::-webkit-scrollbar {
-            width: 6px;
+        .spinner-circle {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(30,136,229,0.3);
+            border-top: 4px solid #e53935;
+            border-right: 4px solid #1e88e5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
         }
         
-        .tin-list-container::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        .tin-list-container::-webkit-scrollbar-thumb {
-            background: var(--primary-red);
-            border-radius: 10px;
-        }
-        
-        body.sidebar-right-expanded {
-            margin-right: var(--sidebar-width);
-        }
-        
-        @keyframes fadeOut {
-            0% { opacity: 1; transform: translateY(0); }
-            70% { opacity: 0.8; }
-            100% { opacity: 0; transform: translateY(10px); visibility: hidden; }
+        .spinner-text {
+            color: white;
+            font-size: 1rem;
+            letter-spacing: 1px;
         }
     </style>
 </head>
-<body id="mainBody">
-    <div class="floating-toggle" id="floatingToggle">
-        <i class="fas fa-bars"></i>
-    </div>
-    <div class="floating-toggle-right" id="floatingToggleRight">
-        <i class="fas fa-id-card"></i>
+<body>
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <canvas id="starsCanvas" class="stars-canvas"></canvas>
+        <div class="mist-layer"></div>
+        <div class="mist-layer-2"></div>
+        <div class="mist-layer-3"></div>
+        <div class="welcome-content">
+            <div class="welcome-logo">
+                <img src="MGAALogo.jpg" alt="MGAA Logo" onerror="this.src='https://via.placeholder.com/150/1e88e5/ffffff?text=MGAA'">
+            </div>
+            <div class="welcome-title">VAT TRACKING SYSTEM</div>
+            <div class="welcome-sub">Professional Kiosk Dashboard • Smart VAT Compliance</div>
+            <button class="start-button" id="startButton">OPEN PORTAL</button>
+        </div>
+        <div class="audio-hint"><i class="fas fa-volume-up"></i> elevator music</div>
     </div>
     
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Navigation</h2>
-            <button class="sidebar-toggle" id="sidebarToggle">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-        </div>
-        <div class="sidebar-content">
-            <nav class="sidebar-nav">
-                <a href="index.html" class="sidebar-btn active"><i class="fas fa-home"></i><span class="sidebar-btn-text">Dashboard</span></a>
-                <div class="sidebar-divider"></div>
-                <a href="tax_facts.html" class="sidebar-btn"><i class="fas fa-book"></i><span class="sidebar-btn-text">Tax Facts</span></a>
-                <a href="tax_calculator.html" class="sidebar-btn"><i class="fas fa-calculator"></i><span class="sidebar-btn-text">Tax Calculator</span></a>
-                <a href="compensation.html" class="sidebar-btn"><i class="fas fa-money-check-alt"></i><span class="sidebar-btn-text">Compensation</span></a>
-                <a href="tax_game.html" class="sidebar-btn"><i class="fas fa-gamepad"></i><span class="sidebar-btn-text">Tax Game</span></a>
-                <div class="sidebar-divider"></div>
-                <a href="quick_guide.html" class="sidebar-btn"><i class="fas fa-compass"></i><span class="sidebar-btn-text">Quick Guide</span></a>
-                <a href="#" class="sidebar-btn" id="helpBtn"><i class="fas fa-life-ring"></i><span class="sidebar-btn-text">Help & Support</span></a>
-            </nav>
-        </div>
-        <div class="sidebar-footer"><p>MGAA VAT System v2.0</p><p>© 2026 All Rights Reserved</p></div>
-    </div>
-
-    <!-- RIGHT SIDEBAR - TIN LIBRARY with redesigned card layout -->
-    <div class="right-sidebar" id="rightSidebar">
-        <div class="right-sidebar-header">
-            <h2 class="sidebar-title" style="background: linear-gradient(145deg, #ff8a80, #64b5f6); -webkit-background-clip:text;">Tin Library</h2>
-            <button class="right-sidebar-toggle" id="rightSidebarToggle"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        
-        <div class="tin-search-area">
-            <div class="tin-search-box">
-                <input type="text" id="tinSearchInput" placeholder="Search by name or TIN..." autocomplete="off">
-                <button class="search-icon-btn" id="searchTinBtn" aria-label="Search"><i class="fas fa-search"></i></button>
-            </div>
-        </div>
-        
-        <div class="tin-add-section">
-            <div class="tin-input-group"><label><i class="fas fa-user"></i> Unique Name</label><input type="text" id="tinNameInput" placeholder="e.g., John Santos, ABC Corp" autocomplete="off"></div>
-            <div class="tin-input-group"><label><i class="fas fa-hashtag"></i> 12-digit TIN (xxx-xxx-xxx-xxx)</label><input type="text" id="tinNumberInput" placeholder="123-456-789-012" maxlength="15" autocomplete="off"></div>
-            <button class="add-tin-btn" id="addTinBtn"><i class="fas fa-plus-circle"></i> Add to Library</button>
-        </div>
-        
-        <div class="tin-list-container" id="tinListContainer"><div class="empty-message"><i class="fas fa-database"></i> No TINs saved. Add your first TIN above.</div></div>
-        <div class="sidebar-footer" style="padding:12px; font-size:0.7rem; text-align:center;"><i class="fas fa-save"></i> Auto-saved in device</div>
-    </div>
-
-    <div class="container">
-        <header>
-            <div class="logo-container"><img src="MGAALogo.jpg" alt="MGAA Logo" class="logo-img" id="logoImage"></div>
-            <div class="header-text"><h1>VAT Tracking System</h1><p>Comprehensive Kiosk Interface for All VAT-Related Tracking Modules</p>
-                <div class="system-status" style="margin-top: 10px;"><i class="fas fa-info-circle" style="color: var(--primary-blue);"></i><span>New: Check the <a href="quick_guide.html" style="color: var(--primary-red); text-decoration: none; font-weight: 600;">Quick Guide</a> for detailed instructions!</span></div>
-            </div>
-        </header>
-        <div class="main-content"><h2 class="dashboard-title">Select Tracking Module</h2>
-            <div class="grid-container" id="gridContainer">
-                <a href="vatable_sales.html" class="kiosk-button vat-button"><div class="button-content"><div class="button-icon"><i class="fas fa-file-invoice-dollar"></i></div><div class="button-title">VAT Sales</div><div class="button-description">Track vatable sales with automated VAT calculations</div></div><div class="button-badge">VAT</div></a>
-                <a href="vatable_purchases.html" class="kiosk-button vat-button"><div class="button-content"><div class="button-icon"><i class="fas fa-shopping-cart"></i></div><div class="button-title">VAT Purchases</div><div class="button-description">Track vatable purchases with input tax calculations</div></div><div class="button-badge">VAT</div></a>
-                <a href="vatable_expenses.html" class="kiosk-button vat-button"><div class="button-content"><div class="button-icon"><i class="fas fa-money-bill-wave"></i></div><div class="button-title">VAT Expenses</div><div class="button-description">Track vatable expenses with automated VAT calculations</div></div><div class="button-badge">VAT</div></a>
-                <a href="non_vat_sales.html" class="kiosk-button non-vat-button"><div class="button-content"><div class="button-icon"><i class="fas fa-file-invoice"></i></div><div class="button-title">Non-VAT Sales</div><div class="button-description">Track sales that are exempt from VAT</div></div><div class="button-badge">Non-VAT</div></a>
-                <a href="non_vat_purchases.html" class="kiosk-button non-vat-button"><div class="button-content"><div class="button-icon"><i class="fas fa-shopping-basket"></i></div><div class="button-title">Non-VAT Purchases</div><div class="button-description">Track purchases that are exempt from VAT</div></div><div class="button-badge">Non-VAT</div></a>
-                <a href="non_vat_expenses.html" class="kiosk-button non-vat-button"><div class="button-content"><div class="button-icon"><i class="fas fa-receipt"></i></div><div class="button-title">Non-VAT Expenses</div><div class="button-description">Track expenses that are exempt from VAT</div></div><div class="button-badge">Non-VAT</div></a>
-                <a href="capex.html" class="kiosk-button other-button"><div class="button-content"><div class="button-icon"><i class="fas fa-building"></i></div><div class="button-title">Capital Expenditures</div><div class="button-description">Track asset acquisitions with VAT calculations</div></div><div class="button-badge">CAPEX</div></a>
-                <a href="taxes_licenses.html" class="kiosk-button other-button"><div class="button-content"><div class="tax-license-icon-container"><svg class="tax-license-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="40" width="60" height="40" rx="5" fill="#e53935" stroke="#1e88e5" stroke-width="3"/><rect x="30" y="30" width="40" height="10" rx="3" fill="#ef5350" stroke="#1e88e5" stroke-width="2"/><rect x="40" y="20" width="20" height="10" rx="3" fill="#ff8a80" stroke="#1e88e5" stroke-width="2"/><rect x="25" y="40" width="5" height="40" fill="#e53935" stroke="#1e88e5" stroke-width="2"/><rect x="70" y="40" width="5" height="40" fill="#e53935" stroke="#1e88e5" stroke-width="2"/><rect x="48" y="50" width="4" height="15" rx="1" fill="#ffcdd2" stroke="#1e88e5" stroke-width="1"/><rect x="32" y="50" width="8" height="8" rx="1" fill="#ffebee" stroke="#1e88e5" stroke-width="1"/><rect x="60" y="50" width="8" height="8" rx="1" fill="#ffebee" stroke="#1e88e5" stroke-width="1"/><rect x="15" y="65" width="12" height="15" rx="2" fill="#ffcdd2" stroke="#1e88e5" stroke-width="2"/><rect x="18" y="62" width="12" height="15" rx="2" fill="#ef9a9a" stroke="#1e88e5" stroke-width="2"/><rect x="21" y="59" width="12" height="15" rx="2" fill="#e53935" stroke="#1e88e5" stroke-width="2"/><circle cx="80" cy="65" r="8" fill="none" stroke="#1e88e5" stroke-width="3"/><path d="M77 65 L80 68 L83 62" stroke="#1e88e5" stroke-width="3" fill="none"/><path d="M80 25 L82 27 L80 29 L78 27 Z" fill="#1e88e5"/><text x="80" y="25" text-anchor="middle" fill="#1e88e5" font-size="8" font-weight="bold">₱</text></svg></div><div class="button-title">Taxes & Licenses</div><div class="button-description">Track tax payments and government license fees</div></div><div class="button-badge">GOV</div></a>
-                <a href="purchase_returns.html" class="kiosk-button other-button"><div class="button-content"><div class="button-icon"><i class="fas fa-undo-alt"></i></div><div class="button-title">Purchase Returns</div><div class="button-description">Track purchase returns with VAT adjustments</div></div><div class="button-badge">RETURNS</div></a>
-            </div>
-        </div>
-        <div class="footer"><p>© 2026 MGAA VAT Tracking System | Professional VAT-Compliant Tracking System</p><p>Kiosk Interface v2.0 | Designed for Touch Screen Use</p>
-            <div class="system-status"><div class="status-indicator"></div><span id="statusText">System Status: Online | All Modules Available</span></div>
-            <div style="margin-top: 10px; font-size: 0.9rem;"><a href="quick_guide.html" style="color: var(--primary-red); text-decoration: none; font-weight: 600;"><i class="fas fa-compass"></i> Quick Guide</a> <span style="margin: 0 10px; color: var(--border-mix);">|</span><a href="#" id="helpLink" style="color: var(--primary-blue); text-decoration: none;"><i class="fas fa-question-circle"></i> Help</a></div>
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-content">
+            <div class="spinner-circle"></div>
+            <div class="spinner-text">Opening Portal...</div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const logoImage = document.getElementById('logoImage');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const floatingToggle = document.getElementById('floatingToggle');
-            const body = document.getElementById('mainBody');
-            const helpLink = document.getElementById('helpLink');
-            
-            if(helpLink) helpLink.addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'quick_guide.html'; });
-            
-            let isSidebarOpen = false;
-            function setBodyMargin() { isSidebarOpen ? body.classList.add('sidebar-expanded') : body.classList.remove('sidebar-expanded'); }
-            function toggleSidebar() { isSidebarOpen = !isSidebarOpen; if(isSidebarOpen) { sidebar.classList.remove('sidebar-collapsed'); sidebar.classList.add('sidebar-visible'); } else { sidebar.classList.remove('sidebar-visible'); sidebar.classList.add('sidebar-collapsed'); } setBodyMargin(); }
-            sidebarToggle.addEventListener('click', toggleSidebar);
-            floatingToggle.addEventListener('click', toggleSidebar);
-            setTimeout(() => { isSidebarOpen = true; sidebar.classList.add('sidebar-visible'); setBodyMargin(); }, 100);
-            
-            if(logoImage) logoImage.onerror = function() { this.src = 'https://via.placeholder.com/150/1e88e5/ffffff?text=MGAA'; };
-            
-            // TIN Library logic
-            let tinEntries = [];
-            function loadTinLibrary() {
-                const stored = localStorage.getItem('tin_library_data');
-                if(stored) { try { tinEntries = JSON.parse(stored); } catch(e) { tinEntries = []; } }
-                if(!tinEntries || !tinEntries.length) {
-                    tinEntries = [
-                        { id: Date.now()+1, name: "Maria Dela Cruz", tin: "123-456-789-012" },
-                        { id: Date.now()+2, name: "Ramon Enterprises", tin: "987-654-321-001" },
-                        { id: Date.now()+3, name: "VAT Solutions Inc", tin: "456-789-123-555" }
-                    ];
-                    saveTinLibrary();
-                }
-                renderTinList();
-            }
-            function saveTinLibrary() { localStorage.setItem('tin_library_data', JSON.stringify(tinEntries)); }
-            function addTinEntry(name, tinRaw) {
-                let cleanTin = tinRaw.replace(/-/g, '');
-                if(cleanTin.length !== 12 || !/^\d+$/.test(cleanTin)) { alert("Invalid TIN: Must be exactly 12 digits (xxx-xxx-xxx-xxx)"); return false; }
-                const formattedTin = cleanTin.slice(0,3)+'-'+cleanTin.slice(3,6)+'-'+cleanTin.slice(6,9)+'-'+cleanTin.slice(9,12);
-                const nameTrim = name.trim();
-                if(nameTrim === "") { alert("Please enter a unique name."); return false; }
-                if(tinEntries.some(entry => entry.name.toLowerCase() === nameTrim.toLowerCase())) { alert("Name already exists!"); return false; }
-                tinEntries.push({ id: Date.now(), name: nameTrim, tin: formattedTin });
-                saveTinLibrary();
-                renderTinList();
-                return true;
-            }
-            
-            function renderTinList(filterText = "") {
-                const container = document.getElementById('tinListContainer');
-                if(!container) return;
+            // ========== MOVING STARRY SKY ANIMATION ==========
+            const canvas = document.getElementById('starsCanvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let stars = [];
+                let width, height;
+                let driftX = 0;
                 
-                let filtered = [...tinEntries];
-                if(filterText && filterText.trim() !== "") {
-                    const lowerFilter = filterText.toLowerCase();
-                    filtered = tinEntries.filter(entry => 
-                        entry.name.toLowerCase().includes(lowerFilter) || 
-                        entry.tin.includes(lowerFilter)
-                    );
+                function resizeCanvas() {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                    initStars();
                 }
                 
-                if(filtered.length === 0) {
-                    container.innerHTML = `<div class="empty-message"><i class="fas fa-search"></i> No matching TIN entries.</div>`;
+                function initStars() {
+                    stars = [];
+                    const starCount = Math.floor((width * height) / 2800);
+                    for (let i = 0; i < starCount; i++) {
+                        stars.push({
+                            x: Math.random() * width * 1.5,
+                            y: Math.random() * height,
+                            radius: Math.random() * 2.2 + 0.6,
+                            alpha: Math.random() * 0.8 + 0.2,
+                            twinkleSpeed: 0.3 + Math.random() * 2,
+                            phase: Math.random() * Math.PI * 2,
+                            parallax: 0.3 + Math.random() * 0.7
+                        });
+                    }
+                }
+                
+                let time = 0;
+                function drawStars() {
+                    if (!ctx) return;
+                    ctx.clearRect(0, 0, width, height);
+                    time += 0.018;
+                    driftX = (driftX + 0.15) % (width * 0.5);
+                    
+                    for (let star of stars) {
+                        const twinkle = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(time * star.twinkleSpeed + star.phase));
+                        const opacity = Math.min(1, star.alpha * twinkle);
+                        let driftOffset = (driftX * star.parallax) % (width * 1.2);
+                        let starX = (star.x + driftOffset) % (width * 1.2);
+                        if (starX > width) starX = starX - width;
+                        
+                        ctx.beginPath();
+                        ctx.arc(starX, star.y, star.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(255, 245, 210, ${opacity * 0.95})`;
+                        ctx.fill();
+                        
+                        if (opacity > 0.7 && star.radius > 1.2) {
+                            ctx.shadowBlur = 6;
+                            ctx.shadowColor = `rgba(255, 200, 120, ${opacity * 0.5})`;
+                            ctx.fill();
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+                    requestAnimationFrame(drawStars);
+                }
+                
+                window.addEventListener('resize', () => resizeCanvas());
+                resizeCanvas();
+                drawStars();
+            }
+            
+            // ========== MUSIC PLAYER FOR elevator.mp3 ==========
+            let audioPlayer = null;
+            
+            function playElevatorMusic() {
+                if (audioPlayer) {
+                    if (!audioPlayer.paused) return;
+                    audioPlayer.currentTime = 0;
+                    audioPlayer.play().catch(e => console.log("Audio play failed:", e));
                     return;
                 }
-                
-                // Updated card layout: TIN number at top, name below, action buttons at bottom row
-                container.innerHTML = filtered.map(entry => `
-                    <div class="tin-card" data-id="${entry.id}">
-                        <div class="tin-number">
-                            <span><i class="fas fa-hashtag" style="color:#ffb74d;"></i> ${escapeHtml(entry.tin)}</span>
-                        </div>
-                        <div class="tin-name">
-                            <i class="fas fa-user-circle"></i> ${escapeHtml(entry.name)}
-                        </div>
-                        <div class="tin-actions-row">
-                            <span class="copy-icon" data-tin="${entry.tin}" title="Copy TIN">
-                                <i class="fas fa-copy"></i> Copy
-                            </span>
-                            <span class="delete-icon" data-id="${entry.id}" data-name="${escapeHtml(entry.name)}" title="Delete TIN">
-                                <i class="fas fa-trash-alt"></i> Delete
-                            </span>
-                        </div>
-                    </div>
-                `).join('');
-                
-                document.querySelectorAll('.copy-icon').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const tinToCopy = el.getAttribute('data-tin');
-                        navigator.clipboard.writeText(tinToCopy).then(() => {
-                            const original = el.innerHTML;
-                            el.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                            setTimeout(() => { el.innerHTML = original; }, 1500);
-                        });
-                    });
-                });
-                
-                document.querySelectorAll('.delete-icon').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseInt(el.getAttribute('data-id'));
-                        deleteTinEntry(id);
-                    });
+                audioPlayer = new Audio('startup.mp3');
+                audioPlayer.loop = true;
+                audioPlayer.volume = 0.5;
+                audioPlayer.play().catch(e => {
+                    console.log("Auto-play may be blocked. User interaction should allow playback.");
                 });
             }
             
-            function deleteTinEntry(id) {
-                const entry = tinEntries.find(e => e.id === id);
-                const name = entry ? entry.name : 'this TIN';
-                if(confirm(`Delete "${name}" from your TIN library? This cannot be undone.`)) {
-                    tinEntries = tinEntries.filter(entry => entry.id !== id);
-                    saveTinLibrary();
-                    const searchInput = document.getElementById('tinSearchInput');
-                    renderTinList(searchInput ? searchInput.value : '');
-                    showTempMessage('TIN deleted successfully!');
+            // ========== REDIRECT TO DASHBOARD WITH MUSIC ==========
+            const startButton = document.getElementById('startButton');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const welcomeOverlay = document.getElementById('welcomeOverlay');
+            
+            function redirectToDashboard() {
+                // Play elevator music
+                playElevatorMusic();
+                
+                // Show loading spinner
+                loadingSpinner.classList.add('active');
+                
+                // Fade out welcome content smoothly
+                const welcomeContent = document.querySelector('.welcome-content');
+                if (welcomeContent) {
+                    welcomeContent.style.transition = 'opacity 0.5s ease';
+                    welcomeContent.style.opacity = '0';
                 }
+                
+                // Small delay to let the fade effect play, then redirect
+                setTimeout(() => {
+                    window.location.href = 'index2.html';
+                }, 600);
             }
             
-            function showTempMessage(msg) {
-                const tempMsg = document.createElement('div');
-                tempMsg.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#1e88e5; color:white; padding:10px 20px; border-radius:8px; z-index:9999; animation:fadeOut 2s forwards;';
-                tempMsg.innerHTML = msg;
-                document.body.appendChild(tempMsg);
-                setTimeout(() => tempMsg.remove(), 2000);
+            if (startButton) {
+                startButton.addEventListener('click', redirectToDashboard);
             }
             
-            function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
-            
-            const searchBtn = document.getElementById('searchTinBtn');
-            const searchInput = document.getElementById('tinSearchInput');
-            function performSearch() { renderTinList(searchInput.value); }
-            if(searchBtn) searchBtn.addEventListener('click', performSearch);
-            if(searchInput) searchInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') performSearch(); });
-            
-            const addBtn = document.getElementById('addTinBtn');
-            const nameInput = document.getElementById('tinNameInput');
-            const tinNumberInput = document.getElementById('tinNumberInput');
-            if(addBtn) addBtn.addEventListener('click', () => { if(addTinEntry(nameInput.value.trim(), tinNumberInput.value.trim())) { tinNumberInput.value = ''; nameInput.value = ''; searchInput.value = ''; renderTinList(''); } });
-            if(tinNumberInput) tinNumberInput.addEventListener('input', function(e) { let val = e.target.value.replace(/-/g, '').replace(/\D/g, '').slice(0,12); let formatted = ''; if(val.length > 0) formatted = val.slice(0,3); if(val.length >= 4) formatted += '-' + val.slice(3,6); if(val.length >= 7) formatted += '-' + val.slice(6,9); if(val.length >= 10) formatted += '-' + val.slice(9,12); e.target.value = formatted; });
-            
-            const rightSidebar = document.getElementById('rightSidebar');
-            const rightToggleBtn = document.getElementById('rightSidebarToggle');
-            const floatingRight = document.getElementById('floatingToggleRight');
-            let isRightOpen = false;
-            function updateRightSidebarState(open) { isRightOpen = open; if(open) { rightSidebar.classList.remove('right-sidebar-collapsed'); rightSidebar.classList.add('right-sidebar-visible'); } else { rightSidebar.classList.remove('right-sidebar-visible'); rightSidebar.classList.add('right-sidebar-collapsed'); } if(isRightOpen) body.classList.add('sidebar-right-expanded'); else body.classList.remove('sidebar-right-expanded'); }
-            if(rightToggleBtn) rightToggleBtn.addEventListener('click', () => updateRightSidebarState(!isRightOpen));
-            if(floatingRight) floatingRight.addEventListener('click', () => updateRightSidebarState(!isRightOpen));
-            loadTinLibrary();
-            setTimeout(() => { updateRightSidebarState(true); }, 120);
+            // Optional: Preload dashboard for faster navigation
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = 'index2.html';
+            document.head.appendChild(link);
         });
     </script>
 </body>

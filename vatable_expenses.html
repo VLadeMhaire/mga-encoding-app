@@ -8,768 +8,1085 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-    /* REMOVED the automatic scaling - no more transform: scale(0.5) */
-    
-    .container {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    /* Make table wrapper take maximum available space */
-    .table-wrapper {
-        flex: 1 1 auto;
-        min-height: 400px;
-        overflow: auto !important;
-        position: relative;
-        direction: rtl; /* This moves the vertical scrollbar to the left */
-    }
-    
-    /* Reset direction for the table itself to keep content LTR */
-    .table-wrapper table {
-        direction: ltr;
-        width: 100%;
-        min-width: 1500px;
-        border-collapse: collapse;
-        table-layout: auto;
-    }
-    
-    /* Adjust scrollbar styling for left-side scrollbar */
-    .table-wrapper::-webkit-scrollbar {
-        width: 14px;
-        height: 12px;
-        background: rgba(0, 30, 20, 0.95);
-    }
-    
-    .table-wrapper::-webkit-scrollbar-track {
-        background: rgba(0, 30, 20, 0.9);
-        border-right: 1px solid rgba(0, 255, 157, 0.2);
-    }
-    
-    .table-wrapper::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #00ff9d, #00cc7a);
-        border-radius: 7px;
-        border: 2px solid rgba(0, 30, 20, 0.9);
-        min-height: 40px;
-    }
-    
-    .table-wrapper::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #00ffaa, #00dd88);
-        box-shadow: 0 0 10px #00ff9d;
-    }
-    
-    /* Make table headers sticky with better visibility */
-    thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: linear-gradient(135deg, rgba(0, 40, 25, 0.98) 0%, rgba(0, 60, 35, 0.98) 100%);
-    }
-    
-    /* Responsive header text that wraps at high zoom */
-    th {
-        padding: 15px 8px;
-        text-align: left;
-        font-weight: 600;
-        font-size: clamp(11px, 1vw, 14px);
-        border-right: 1px solid rgba(0, 255, 157, 0.2);
-        position: relative;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        word-break: break-word;
-        hyphens: auto;
-        line-height: 1.3;
-        vertical-align: middle;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
-        white-space: normal;
-        min-width: 80px;
-    }
-    
-    /* Responsive cell content */
-    td {
-        padding: 12px 8px;
-        border-right: 1px solid rgba(0, 255, 157, 0.1);
-        font-size: clamp(12px, 0.9vw, 14px);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        vertical-align: middle;
-        color: #e0f7e9;
-        white-space: nowrap;
-        max-width: 200px;
-    }
-    
-    /* Allow cells with long content to wrap at high zoom */
-    @media screen and (max-width: 1400px) {
-        td {
-            white-space: normal;
-            word-break: break-word;
-            min-width: 100px;
-        }
-    }
-    
-    /* Responsive inputs */
-    input, select, .uneditable {
-        width: 100%;
-        padding: 8px 6px;
-        border: 1px solid rgba(0, 255, 157, 0.3);
-        border-radius: 4px;
-        font-size: clamp(11px, 0.9vw, 13px);
-        background: rgba(15, 30, 25, 0.8);
-        color: #e0f7e9;
-        box-sizing: border-box;
-    }
-    
-    /* Style for nature expense input with datalist */
-    .nature-expense-input {
-        width: 100%;
-        padding: 8px 6px;
-        border: 1px solid rgba(0, 255, 157, 0.3);
-        border-radius: 4px;
-        font-size: clamp(11px, 0.9vw, 13px);
-        background: rgba(15, 30, 25, 0.8);
-        color: #e0f7e9;
-        box-sizing: border-box;
-        transition: all 0.2s ease;
-    }
-    
-    .nature-expense-input:focus {
-        outline: none;
-        border-color: #00ff9d;
-        box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.2);
-    }
-    
-    /* Style for the datalist options */
-    datalist option {
-        background: rgba(10, 25, 20, 0.98);
-        color: #e0f7e9;
-        padding: 8px;
-    }
-    
-    /* Ensure delete button fits */
-    .delete-btn {
-        padding: 6px 8px;
-        font-size: clamp(11px, 0.9vw, 13px);
-        white-space: nowrap;
-    }
-    
-    /* Column-specific responsive widths - Adjusted for Expenses columns */
-    th:nth-child(1), td:nth-child(1) { min-width: 90px; } /* Date */
-    th:nth-child(2), td:nth-child(2) { min-width: 110px; } /* Invoice Number */
-    th:nth-child(3), td:nth-child(3) { min-width: 90px; } /* Invoice Type */
-    th:nth-child(4), td:nth-child(4) { min-width: 100px; } /* Transaction Type */
-    th:nth-child(5), td:nth-child(5) { min-width: 140px; } /* TIN Number */
-    th:nth-child(6), td:nth-child(6) { min-width: 150px; } /* Supplier Name */
-    th:nth-child(7), td:nth-child(7) { min-width: 160px; } /* Address */
-    th:nth-child(8), td:nth-child(8) { min-width: 120px; } /* Gross Amount */
-    th:nth-child(9), td:nth-child(9) { min-width: 180px; } /* Nature of Expense */
-    th:nth-child(10), td:nth-child(10) { min-width: 110px; } /* Net Expenses */
-    th:nth-child(11), td:nth-child(11) { min-width: 100px; } /* Input Tax */
-    th:nth-child(12), td:nth-child(12) { min-width: 100px; } /* Withholding Rate */
-    th:nth-child(13), td:nth-child(13) { min-width: 110px; } /* Withholding Tax */
-    th:nth-child(14), td:nth-child(14) { min-width: 130px; } /* Gross - Withholding Tax */
-    th:nth-child(15), td:nth-child(15) { min-width: 130px; } /* Remarks */
-    th:nth-child(16), td:nth-child(16) { min-width: 70px; } /* Action */
-    
-    /* Zoom level specific adjustments */
-    @media screen and (min-resolution: 120dpi) { /* 125% zoom */
-        th { font-size: 12px; padding: 12px 6px; }
-        td { font-size: 12px; padding: 10px 6px; }
-        input, select { font-size: 11px; padding: 6px 4px; }
-    }
-    
-    @media screen and (min-resolution: 144dpi) { /* 150% zoom */
-        th { font-size: 11px; padding: 10px 4px; }
-        td { font-size: 11px; padding: 8px 4px; }
-        input, select { font-size: 10px; padding: 5px 3px; }
-        th:nth-child(1), td:nth-child(1) { min-width: 80px; }
-        th:nth-child(2), td:nth-child(2) { min-width: 90px; }
-    }
-    
-    @media screen and (min-resolution: 168dpi) { /* 175% zoom */
-        th { font-size: 10px; padding: 8px 3px; letter-spacing: 0.3px; }
-        td { font-size: 10px; padding: 6px 3px; }
-        input, select { font-size: 9px; padding: 4px 2px; }
-    }
-    
-    @media screen and (min-resolution: 192dpi) { /* 200% zoom */
-        th { font-size: 9px; padding: 6px 2px; letter-spacing: 0.2px; }
-        td { font-size: 9px; padding: 5px 2px; }
-        input, select { font-size: 8px; padding: 3px 2px; }
-        .delete-btn { padding: 4px 5px; }
-    }
-    
-    /* Hidden state styles */
-    .company-info-section.hidden,
-    .stats.hidden,
-    .tally-section.hidden,
-    .footer.hidden {
-        display: none !important;
-    }
-    
-    /* Focus mode - when other sections are hidden, table takes full space */
-    body.table-focus-mode .company-info-section,
-    body.table-focus-mode .stats,
-    body.table-focus-mode .tally-section,
-    body.table-focus-mode .footer {
-        display: none !important;
-    }
-    
-    body.table-focus-mode .container {
-        height: 100vh;
-        margin: 0;
-        border-radius: 0;
-    }
-    
-    body.table-focus-mode .table-wrapper {
-        height: calc(100vh - 80px);
-    }
-    
-    /* Text truncation with ellipsis for very narrow columns */
-    .text-truncate {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    /* Validation message styling */
-    .validation-message {
-        display: none;
-        color: #ff6666;
-        font-size: 10px;
-        margin-top: 2px;
-        position: absolute;
-        background: rgba(0, 30, 20, 0.9);
-        padding: 2px 5px;
-        border-radius: 3px;
-        border: 1px solid #ff6666;
-        z-index: 100;
-    }
-    
-    td {
-        position: relative;
-    }
-    
-    /* Expense category tally styling */
-    .tally-section .tally-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 15px;
-    }
-    
-    .tally-item.services {
-        border-left: 4px solid #00b3ff;
-    }
-    
-    .tally-item.goods {
-        border-left: 4px solid #ff9900;
-    }
-    
-    .tally-item.rental {
-        border-left: 4px solid #9d00ff;
-    }
-    
-    .tally-item .tally-details {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 5px;
-    }
-    
-    .tally-item .tally-amount {
-        font-size: 18px;
-        font-weight: 700;
-        color: #00ff9d;
-        text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
-    }
-    
-    .tally-item .tally-count {
-        font-size: 12px;
-        color: #80cbc4;
-        background: rgba(0, 40, 30, 0.5);
-        padding: 3px 10px;
-        border-radius: 12px;
-        border: 1px solid rgba(0, 255, 157, 0.2);
-    }
-    
-    .tally-item .tally-rate {
-        font-size: 11px;
-        color: #00ff9d;
-        background: rgba(0, 255, 157, 0.1);
-        padding: 2px 8px;
-        border-radius: 10px;
-        margin-top: 8px;
-        display: inline-block;
-        border: 1px solid rgba(0, 255, 157, 0.2);
-    }
+    /* ==============================================
+   ZEPHYR COLOR THEME - Vatable Expenses
+   Soft Blue/Cyan accents with cool tones
+============================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
+}
 
-    /* ===== IMPROVED PAGINATION CONTROLS DESIGN ===== */
-    .pagination-controls {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 25px;
-        background: linear-gradient(135deg, rgba(0, 30, 20, 0.97) 0%, rgba(0, 45, 30, 0.98) 100%);
-        border-top: 2px solid rgba(0, 255, 157, 0.3);
-        border-bottom: 1px solid rgba(0, 255, 157, 0.2);
-        flex-shrink: 0;
-        box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 255, 157, 0.2);
-        gap: 20px;
-        flex-wrap: wrap;
-        position: relative;
-        backdrop-filter: blur(5px);
-    }
+body {
+    background: linear-gradient(135deg, #0e1a2b 0%, #0a1220 100%);
+    color: #d4eaff;
+    min-height: 100vh;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
 
-    .pagination-controls::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #00ff9d, #00ff9d, #00ff9d, transparent);
-        filter: blur(2px);
-        opacity: 0.6;
-    }
+/* Animated background grid – soft cyan */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(100, 200, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(100, 200, 255, 0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridFloatZephyr 20s linear infinite;
+}
 
-    .pagination-controls::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 10%;
-        right: 10%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #00ff9d, transparent);
-        opacity: 0.3;
-    }
+@keyframes gridFloatZephyr {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50px); }
+}
 
-    .pagination-info {
-        color: #a7ffeb;
-        font-size: 14px;
-        font-weight: 500;
-        background: rgba(0, 40, 25, 0.6);
-        padding: 8px 20px;
-        border-radius: 30px;
-        border: 1px solid rgba(0, 255, 157, 0.3);
-        box-shadow: 0 0 20px rgba(0, 255, 157, 0.1), inset 0 0 10px rgba(0, 255, 157, 0.1);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        letter-spacing: 0.3px;
-        backdrop-filter: blur(5px);
-    }
+/* SIDEBAR ADJUSTMENTS */
+body.left-sidebar-expanded .container {
+    transform: translateX(280px);
+    width: calc(100% - 280px);
+}
+body.right-sidebar-expanded .container {
+    transform: translateX(-280px);
+    width: calc(100% - 280px);
+}
+body.left-sidebar-expanded.right-sidebar-expanded .container {
+    transform: translateX(280px);
+    width: calc(100% - 560px);
+}
 
-    .pagination-info i {
-        color: #00ff9d;
-        font-size: 16px;
-        text-shadow: 0 0 10px #00ff9d;
-    }
+/* MAIN CONTAINER – glass morphism zephyr */
+.container {
+    max-width: 100%;
+    margin: 0px;
+    margin-top: 20px;
+    background: rgba(16, 28, 40, 0.78);
+    border-radius: 24px;
+    box-shadow: 0 0 50px rgba(80, 180, 255, 0.15), 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+    border: 1px solid rgba(80, 180, 255, 0.35);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
 
-    .pagination-info span {
-        color: #00ff9d;
-        font-weight: 700;
-        margin: 0 3px;
-        text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
-    }
+/* HEADER – deep blue gradient */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, rgba(20, 45, 65, 0.95) 0%, rgba(15, 35, 55, 0.97) 100%);
+    border-bottom: 1px solid rgba(80, 180, 255, 0.35);
+    flex-shrink: 0;
+}
 
-    .pagination-buttons {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-        background: rgba(0, 30, 20, 0.5);
-        padding: 5px;
-        border-radius: 40px;
-        border: 1px solid rgba(0, 255, 157, 0.2);
-        backdrop-filter: blur(5px);
-    }
+.logo-container {
+    width: 60px;
+    height: 60px;
+    background: rgba(25, 50, 70, 0.9);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid rgba(80, 180, 255, 0.5);
+}
 
-    .pagination-btn {
-        background: transparent;
-        border: none;
-        color: #a7ffeb;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.25s ease;
-        font-size: 16px;
-        position: relative;
-        border: 1px solid transparent;
-    }
+.header-text {
+    flex: 1;
+    text-align: center;
+}
+.header-text h1 {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(80, 180, 255, 0.5);
+    color: #c5e8ff;
+    letter-spacing: 1px;
+}
+.header-text p {
+    font-size: 0.7rem;
+    opacity: 0.85;
+    color: #a8d0f0;
+}
 
-    .pagination-btn:hover:not(:disabled) {
-        background: rgba(0, 255, 157, 0.15);
-        color: #00ff9d;
-        border-color: rgba(0, 255, 157, 0.4);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 255, 157, 0.2);
-    }
+/* HEADER BUTTONS – cyan accents */
+.header-sidebar-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.header-sidebar-toggle, .header-entry-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(80, 180, 255, 0.15) 0%, rgba(60, 150, 220, 0.25) 100%);
+    border: 1px solid rgba(80, 180, 255, 0.5);
+    border-radius: 40px;
+    padding: 6px 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: #a8d8ff;
+    font-weight: 600;
+    font-size: 0.75rem;
+    backdrop-filter: blur(4px);
+}
 
-    .pagination-btn:disabled {
-        opacity: 0.25;
-        cursor: not-allowed;
-    }
+/* Column visibility button - soft pink accent (keeping original style) */
+.column-visibility-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(255, 140, 160, 0.15) 0%, rgba(219, 112, 147, 0.25) 100%);
+    border: 1px solid rgba(255, 140, 160, 0.55);
+    border-radius: 40px;
+    padding: 6px 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: #ffb7c5;
+    font-weight: 600;
+    font-size: 0.75rem;
+    backdrop-filter: blur(4px);
+}
 
-    .pagination-page-indicator {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(0, 40, 25, 0.7);
-        padding: 4px 12px 4px 16px;
-        border-radius: 40px;
-        border: 1px solid rgba(0, 255, 157, 0.3);
-        box-shadow: inset 0 0 15px rgba(0, 20, 15, 0.8);
-    }
+.column-visibility-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(255, 140, 160, 0.45);
+    border-color: #ffb7c5;
+    background: linear-gradient(135deg, rgba(255, 140, 160, 0.25) 0%, rgba(219, 112, 147, 0.35) 100%);
+}
 
-    .pagination-page-number {
-        color: #00ff9d;
-        font-size: 16px;
-        font-weight: 700;
-        min-width: 40px;
-        text-align: center;
-        text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
-        background: transparent;
-        border: none;
-        padding: 6px 0;
-    }
+.column-visibility-btn i {
+    font-size: 14px;
+    color: #ffb7c5;
+}
 
-    .pagination-page-number:focus {
-        outline: none;
-    }
+.header-sidebar-toggle:hover, .header-entry-counter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(80, 180, 255, 0.45);
+    border-color: #80ccff;
+}
 
-    /* Remove spinner from number input */
-    .pagination-page-number::-webkit-inner-spin-button,
-    .pagination-page-number::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
+.header-sidebar-toggle i, .header-entry-counter i {
+    font-size: 14px;
+}
 
-    .pagination-page-number[type=number] {
-        -moz-appearance: textfield;
-    }
+.header-entry-counter #entryCount {
+    font-weight: 800;
+    font-size: 1rem;
+    margin-left: 2px;
+    text-shadow: 0 0 5px rgba(80, 180, 255, 0.5);
+}
+.header-entry-counter {
+    color: #a8d8ff;
+    border-color: rgba(80, 180, 255, 0.5);
+}
 
-    .pagination-total-pages {
-        color: #80cbc4;
-        font-size: 14px;
-        font-weight: 500;
-        padding-left: 8px;
-        border-left: 1px solid rgba(0, 255, 157, 0.3);
-    }
-
-    .pagination-total-pages span {
-        color: #00ff9d;
-        font-weight: 700;
-        margin-left: 4px;
-    }
-
-    .pagination-select {
-        background: rgba(0, 40, 25, 0.8);
-        border: 1px solid rgba(0, 255, 157, 0.3);
-        color: #a7ffeb;
-        padding: 8px 32px 8px 16px;
-        border-radius: 30px;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300ff9d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-        background-repeat: no-repeat;
-        background-position: right 14px center;
-        background-size: 12px;
-        transition: all 0.25s ease;
-        box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
-        backdrop-filter: blur(5px);
-    }
-
-    .pagination-select:hover {
-        border-color: #00ff9d;
-        background-color: rgba(0, 60, 35, 0.9);
-        box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
-    }
-
-    .pagination-select:focus {
-        outline: none;
-        border-color: #00ff9d;
-        box-shadow: 0 0 25px rgba(0, 255, 157, 0.3);
-    }
-
-    .pagination-left-section,
-    .pagination-right-section {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    /* Elegant divider between sections */
-    .pagination-divider {
-        width: 1px;
-        height: 30px;
-        background: linear-gradient(to bottom, transparent, rgba(0, 255, 157, 0.3), transparent);
-        margin: 0 5px;
-    }
-
-    @media (max-width: 1024px) {
-        .pagination-controls {
-            flex-direction: column;
-            align-items: stretch;
-            padding: 15px;
-        }
-        
-        .pagination-left-section,
-        .pagination-right-section {
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .pagination-divider {
-            display: none;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .pagination-buttons {
-            flex-wrap: wrap;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            padding: 0;
-        }
-        
-        .pagination-info {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .pagination-select {
-            width: 100%;
-        }
-    }
-
-    /* Smooth animations for page changes */
-    @keyframes pageFadeIn {
-        from {
-            opacity: 0.7;
-            transform: translateY(5px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .table-wrapper tbody tr {
-        animation: pageFadeIn 0.3s ease;
-    }
-
-    /* Enhanced active page indicator */
-    .pagination-page-indicator {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .pagination-page-indicator::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(135deg, #00ff9d, #00b36b);
-        border-radius: 42px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: -1;
-    }
-
-    .pagination-page-indicator:focus-within::before {
-        opacity: 0.2;
-    }
-
-    /* Nature of Expense input styling */
-    .nature-expense-input {
-        font-family: 'Segoe UI', 'Arial', sans-serif;
-        transition: all 0.2s ease;
-    }
-    
-    .nature-expense-input:focus {
-        outline: none;
-        border-color: #00ff9d;
-        box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.2);
-    }
-    
-    /* Category-specific visual indicator for input values */
-    .nature-expense-input[data-category="services"] {
-        border-left: 3px solid #7b68ee;
-    }
-    
-    .nature-expense-input[data-category="goods"] {
-        border-left: 3px solid #ffa500;
-    }
-    
-    .nature-expense-input[data-category="rental"] {
-        border-left: 3px solid #32cd32;
-    }
-
-    /* Column Visibility Dropdown Styles - For Expenses Page */
+/* ===== PINK THEME DROPDOWN (matching original) ===== */
 .column-visibility-container {
     position: relative;
     display: inline-block;
 }
-
-.column-visibility-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, rgba(233, 30, 99, 0.2) 0%, rgba(216, 27, 96, 0.3) 100%);
-    border: 2px solid rgba(233, 30, 99, 0.5);
-    border-radius: 10px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 0 15px rgba(233, 30, 99, 0.3);
-    white-space: nowrap;
-    color: #ff80ab;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.column-visibility-btn:hover {
-    background: linear-gradient(135deg, rgba(233, 30, 99, 0.3) 0%, rgba(233, 30, 99, 0.4) 100%);
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(233, 30, 99, 0.5);
-    border-color: #ff80ab;
-}
-
-.column-visibility-btn i {
-    font-size: 20px;
-    color: #ff80ab;
-}
-
 .column-visibility-dropdown {
     position: absolute;
     top: 100%;
     right: 0;
     margin-top: 10px;
-    background: rgba(0, 30, 20, 0.98);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(233, 30, 99, 0.3);
-    border-radius: 12px;
+    background: rgba(20, 35, 50, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 140, 160, 0.45);
+    border-radius: 16px;
     min-width: 240px;
     z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(233, 30, 99, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     animation: dropdownFadeIn 0.2s ease;
 }
-
 @keyframes dropdownFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 .column-visibility-header {
-    padding: 12px 15px;
-    border-bottom: 1px solid rgba(233, 30, 99, 0.2);
-    background: rgba(233, 30, 99, 0.1);
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 140, 160, 0.25);
+    background: rgba(255, 140, 160, 0.12);
 }
-
 .column-visibility-header h4 {
-    color: #ff80ab;
-    font-size: 14px;
+    color: #ffb7c5;
+    font-size: 13px;
     font-weight: 600;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
 }
-
-.column-visibility-header h4 i {
-    font-size: 14px;
-}
-
 .column-visibility-actions {
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(233, 30, 99, 0.15);
+    border-bottom: 1px solid rgba(255, 140, 160, 0.2);
     display: flex;
     gap: 10px;
 }
-
 .column-visibility-actions button {
     flex: 1;
-    background: rgba(233, 30, 99, 0.15);
-    border: 1px solid rgba(233, 30, 99, 0.3);
-    color: #ff80ab;
-    padding: 6px 10px;
-    border-radius: 6px;
+    background: rgba(255, 140, 160, 0.18);
+    border: 1px solid rgba(255, 140, 160, 0.4);
+    color: #ffb7c5;
+    padding: 6px 12px;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
-
 .column-visibility-actions button:hover {
-    background: rgba(233, 30, 99, 0.3);
+    background: rgba(255, 140, 160, 0.35);
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 140, 160, 0.4);
+    border-color: #ffb7c5;
 }
-
 .column-list {
     max-height: 450px;
     overflow-y: auto;
-    padding: 5px 0;
+    padding: 8px 0;
 }
-
 .column-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 15px;
+    padding: 10px 16px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(233, 30, 99, 0.1);
+    transition: background 0.15s;
 }
-
 .column-item:hover {
-    background: rgba(233, 30, 99, 0.15);
+    background: rgba(255, 140, 160, 0.18);
 }
-
 .column-item-checkbox {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
-    accent-color: #ff80ab;
+    accent-color: #ffb7c5;
 }
-
 .column-item-label {
     flex: 1;
-    font-size: 13px;
-    color: #e0f7e9;
+    font-size: 12px;
+    color: #d4eaff;
     cursor: pointer;
-    user-select: none;
 }
 
-.column-item-checkbox:checked + .column-item-label,
-.column-item-checkbox:checked ~ .column-item-label {
-    color: #ff80ab;
-    text-decoration: line-through;
-    opacity: 0.7;
-}
-
-/* Column hidden styles */
+/* HIDDEN COLUMN CLASS */
 th.hidden-column,
 td.hidden-column {
     display: none !important;
+}
+
+/* TABLE WRAPPER */
+.table-wrapper {
+    flex: 1;
+    min-height: 400px;
+    overflow: auto !important;
+    position: relative;
+    direction: rtl;
+    background: rgba(12, 22, 35, 0.45);
+}
+.table-wrapper table {
+    direction: ltr;
+    width: 100%;
+    min-width: 1500px;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+/* SCROLLBAR – cyan glow */
+.table-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: rgba(16, 30, 45, 0.95);
+}
+.table-wrapper::-webkit-scrollbar-track {
+    background: rgba(16, 30, 45, 0.9);
+    border-radius: 10px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #5ba0d0, #3a7bb5);
+    border-radius: 10px;
+}
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #70b0e0, #4a8bc5);
+    box-shadow: 0 0 8px #5ba0d0;
+}
+
+/* TABLE HEADER - ZEPHYR THEME */
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(135deg, rgba(25, 55, 80, 0.98) 0%, rgba(20, 45, 70, 0.98) 100%);
+    backdrop-filter: blur(8px);
+}
+th {
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.7rem;
+    border-right: 1px solid rgba(80, 180, 255, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #c5e8ff;
+    text-shadow: 0 0 4px rgba(80, 180, 255, 0.4);
+    white-space: nowrap;
+    min-width: 70px;
+    transition: all 0.2s;
+}
+@media (max-width: 1200px) {
+    th {
+        white-space: normal;
+        word-break: break-word;
+        min-width: 65px;
+        font-size: 0.65rem;
+        padding: 8px 6px;
+    }
+}
+td {
+    padding: 0;
+    border-right: 1px solid rgba(80, 180, 255, 0.1);
+    vertical-align: middle;
+    height: 48px;
+}
+
+/* ROW ANIMATION */
+tbody tr {
+    transition: all 0.2s ease;
+    background: rgba(18, 35, 50, 0.7);
+    animation: rowGlowIn 0.25s ease-out;
+}
+@keyframes rowGlowIn {
+    from { opacity: 0; transform: translateX(-5px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+tbody tr:hover {
+    background: linear-gradient(90deg, rgba(50, 100, 140, 0.5) 0%, rgba(40, 85, 120, 0.6) 100%);
+}
+
+/* TABLE CELLS FORM ELEMENTS */
+td input, td select, td .uneditable, td button {
+    width: 100%;
+    height: 100%;
+    min-height: 48px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 0.75rem;
+    background: transparent;
+    color: #d4eaff;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+td input:focus, td select:focus {
+    outline: none;
+    background-color: rgba(80, 180, 255, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(80, 180, 255, 0.45);
+}
+td .uneditable {
+    background: rgba(15, 30, 45, 0.55);
+    color: #a8d8ff;
+    font-weight: 600;
+    text-align: right;
+    font-family: monospace;
+}
+td button.delete-btn {
+    color: #88aacc;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+td button.delete-btn:hover {
+    background: rgba(136, 170, 204, 0.2);
+    transform: scale(1.05);
+}
+
+/* Nature of Expense input with datalist */
+.nature-expense-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: none;
+    font-size: 0.75rem;
+    background: transparent;
+    color: #d4eaff;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+.nature-expense-input:focus {
+    outline: none;
+    background-color: rgba(80, 180, 255, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(80, 180, 255, 0.45);
+}
+datalist option {
+    background: rgba(18, 35, 50, 0.98);
+    color: #d4eaff;
+    padding: 8px;
+}
+
+/* SUMMARY/TOTALS ROW – ENHANCED CYAN DESIGN */
+tfoot tr.summary-row {
+    background: linear-gradient(135deg, rgba(45, 100, 140, 0.96) 0%, rgba(35, 85, 120, 0.98) 100%);
+    border-top: 2px solid #5ba0d0;
+    border-bottom: 2px solid #5ba0d0;
+    position: relative;
+}
+tfoot tr.summary-row td {
+    padding: 10px 8px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(80, 180, 255, 0.5);
+    border-right: 1px solid rgba(80, 180, 255, 0.3);
+}
+tfoot tr.summary-row td:first-child {
+    text-align: right;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #b0dcff;
+    font-size: 0.85rem;
+}
+tfoot tr.summary-row td .uneditable {
+    background: transparent;
+    color: #cceeff;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(80, 180, 255, 0.4);
+}
+
+/* PAGINATION CONTROLS - CYAN THEME */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, rgba(16, 28, 40, 0.96) 0%, rgba(20, 35, 50, 0.98) 100%);
+    border-top: 1px solid rgba(80, 180, 255, 0.35);
+    flex-shrink: 0;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.pagination-info {
+    color: #c5e8ff;
+    font-size: 0.75rem;
+    background: rgba(30, 65, 90, 0.6);
+    padding: 5px 18px;
+    border-radius: 30px;
+    border: 1px solid rgba(80, 180, 255, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.pagination-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    background: rgba(16, 28, 40, 0.5);
+    padding: 4px 12px;
+    border-radius: 40px;
+}
+.pagination-btn {
+    background: transparent;
+    border: none;
+    color: #c5e8ff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+}
+.pagination-btn:hover:not(:disabled) {
+    background: rgba(80, 180, 255, 0.25);
+    color: #a8d8ff;
+    transform: translateY(-1px);
+}
+.pagination-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.pagination-page-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(30, 65, 90, 0.7);
+    padding: 4px 14px;
+    border-radius: 30px;
+}
+.pagination-page-number {
+    color: #a8d8ff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    min-width: 35px;
+    text-align: center;
+}
+.pagination-select {
+    background: rgba(30, 65, 90, 0.7);
+    border: 1px solid rgba(80, 180, 255, 0.45);
+    color: #c5e8ff;
+    padding: 5px 28px 5px 14px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    appearance: none;
+}
+
+/* STATS SECTION - CYAN CARDS */
+.stats {
+    padding: 14px 24px;
+    background: linear-gradient(90deg, rgba(16, 28, 40, 0.88) 0%, rgba(20, 35, 50, 0.92) 100%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(80, 180, 255, 0.3);
+}
+.stat-item {
+    flex: 1;
+    min-width: 140px;
+    background: rgba(16, 28, 40, 0.7);
+    border-radius: 20px;
+    padding: 10px 14px;
+    text-align: center;
+    border: 1px solid rgba(80, 180, 255, 0.35);
+    transition: all 0.2s ease;
+}
+.stat-item:hover {
+    transform: translateY(-3px);
+    border-color: #5ba0d0;
+    box-shadow: 0 8px 20px rgba(80, 180, 255, 0.25);
+}
+.stat-label {
+    font-size: 0.65rem;
+    opacity: 0.85;
+    margin-bottom: 4px;
+    color: #b0dcff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #a8d8ff;
+    text-shadow: 0 0 6px rgba(80, 180, 255, 0.4);
+}
+
+/* TALLY SECTION - CYAN */
+.tally-section {
+    padding: 16px 24px;
+    background: rgba(16, 28, 40, 0.7);
+    border-top: 1px solid rgba(80, 180, 255, 0.3);
+    flex-shrink: 0;
+}
+.tally-section h3 {
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #a8d8ff;
+}
+.tally-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 14px;
+}
+.tally-item {
+    background: rgba(12, 25, 38, 0.88);
+    border: 1px solid rgba(80, 180, 255, 0.35);
+    border-radius: 20px;
+    padding: 14px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+.tally-item:hover {
+    transform: translateY(-3px);
+    border-color: #5ba0d0;
+}
+.tally-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #5ba0d0, #3a7bb5);
+}
+.tally-category {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #b0dcff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.tally-amount {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #a8d8ff;
+}
+.tally-count {
+    font-size: 0.65rem;
+    background: rgba(30, 65, 90, 0.7);
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+.tally-rate {
+    font-size: 0.65rem;
+    margin-top: 8px;
+    display: inline-block;
+    background: rgba(80, 180, 255, 0.18);
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+.tally-total {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(40, 85, 120, 0.9) 0%, rgba(30, 70, 100, 0.88) 100%);
+    border: 1px solid #5ba0d0;
+}
+.tally-total .tally-amount {
+    font-size: 1.3rem;
+}
+
+/* Category-specific styles */
+.tally-item.services {
+    border-left: 4px solid #5ba0d0;
+}
+.tally-item.goods {
+    border-left: 4px solid #70b0e0;
+}
+.tally-item.rental {
+    border-left: 4px solid #3a7bb5;
+}
+
+/* REGISTERED SUPPLIERS MONITOR */
+.registered-monitor {
+    margin: 16px 24px;
+    background: linear-gradient(135deg, rgba(25, 60, 85, 0.92) 0%, rgba(20, 50, 75, 0.96) 100%);
+    border: 1px solid rgba(80, 180, 255, 0.5);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 12px;
+    color: #7a9bc0;
+    font-size: 0.65rem;
+    border-top: 1px solid rgba(80, 180, 255, 0.25);
+    background: rgba(12, 22, 35, 0.88);
+    flex-shrink: 0;
+}
+
+/* HIDDEN STATES */
+.stats.hidden, .tally-section.hidden, .footer.hidden {
+    display: none !important;
+}
+body.table-focus-mode .stats,
+body.table-focus-mode .tally-section,
+body.table-focus-mode .footer {
+    display: none !important;
+}
+
+/* SELECT MULTIPLE MODE */
+.select-multiple-mode {
+    cursor: crosshair !important;
+}
+.select-multiple-mode .table-wrapper td {
+    user-select: none !important;
+    cursor: crosshair !important;
+}
+.select-multiple-mode .table-wrapper input,
+.select-multiple-mode .table-wrapper select,
+.select-multiple-mode .table-wrapper button {
+    pointer-events: none !important;
+    opacity: 0.7;
+}
+td.selected {
+    background-color: rgba(80, 180, 255, 0.35) !important;
+    outline: 1px solid #5ba0d0;
+    outline-offset: -1px;
+}
+.selection-toolbar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(16, 28, 40, 0.98);
+    border: 1px solid #5ba0d0;
+    border-radius: 50px;
+    padding: 8px 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 10000;
+    backdrop-filter: blur(12px);
+    animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+    from { transform: translateX(-50%) translateY(100%); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .pagination-controls { flex-direction: column; align-items: stretch; }
+    .stats { flex-direction: column; }
+    .tally-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    .container { margin: 10px; height: calc(100vh - 20px); }
+    header { flex-wrap: wrap; gap: 10px; }
+    .header-text h1 { font-size: 1rem; }
+    .header-sidebar-buttons { flex-wrap: wrap; justify-content: center; }
+    .stat-value { font-size: 1rem; }
+    .column-visibility-actions { flex-direction: column; }
+}
+
+/* LONG PRESS */
+.sidebar-btn.long-press-active {
+    animation: longPressRipple 0.25s ease-out forwards;
+    background: rgba(80, 180, 255, 0.35);
+}
+@keyframes longPressRipple {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.97); box-shadow: 0 0 0 5px rgba(80, 180, 255, 0.3); }
+    100% { transform: scale(0.97); }
+}
+
+/* Counter pulse */
+@keyframes counterPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); text-shadow: 0 0 10px #5ba0d0; }
+    100% { transform: scale(1); }
+}
+.header-entry-counter #entryCount.pulse {
+    animation: counterPulse 0.3s ease;
+}
+
+/* ===== IMPROVED NATURE OF EXPENSE STYLES ===== */
+.nature-expense-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.nature-expense-input {
+    width: 100%;
+    padding: 6px 10px;
+    padding-right: 30px;
+    border: none;
+    font-size: 0.75rem;
+    background: transparent;
+    color: #d4eaff;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+
+.nature-expense-input:focus {
+    outline: none;
+    background-color: rgba(80, 180, 255, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(80, 180, 255, 0.45);
+}
+
+/* Category type indicators */
+.nature-expense-input[data-category="services"] {
+    border-left: 3px solid #5ba0d0;
+    background: linear-gradient(90deg, rgba(91, 160, 208, 0.08), transparent);
+}
+.nature-expense-input[data-category="goods"] {
+    border-left: 3px solid #70b0e0;
+    background: linear-gradient(90deg, rgba(112, 176, 224, 0.08), transparent);
+}
+.nature-expense-input[data-category="rental"] {
+    border-left: 3px solid #3a7bb5;
+    background: linear-gradient(90deg, rgba(58, 123, 181, 0.08), transparent);
+}
+
+/* Category badge */
+.category-badge {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-weight: 600;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.category-badge.services {
+    background: rgba(91, 160, 208, 0.25);
+    color: #a8d8ff;
+    border: 1px solid #5ba0d0;
+}
+.category-badge.goods {
+    background: rgba(112, 176, 224, 0.25);
+    color: #b8e0ff;
+    border: 1px solid #70b0e0;
+}
+.category-badge.rental {
+    background: rgba(58, 123, 181, 0.25);
+    color: #8ec8ff;
+    border: 1px solid #3a7bb5;
+}
+
+/* Rate preview tooltip */
+.rate-preview {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: rgba(20, 45, 65, 0.95);
+    border: 1px solid #5ba0d0;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 10px;
+    color: #a8d8ff;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+/* Custom dropdown for suggestions */
+.expense-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(16, 28, 40, 0.98);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(80, 180, 255, 0.35);
+    border-radius: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    margin-top: 2px;
+}
+
+.suggestion-group {
+    border-bottom: 1px solid rgba(80, 180, 255, 0.15);
+}
+
+.suggestion-group-header {
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(80, 180, 255, 0.1);
+    color: #5ba0d0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-left: 3px solid transparent;
+}
+
+.suggestion-item:hover,
+.suggestion-item.selected {
+    background: rgba(80, 180, 255, 0.15);
+    border-left-color: #5ba0d0;
+}
+
+.suggestion-name {
+    font-size: 12px;
+    color: #d4eaff;
+    flex: 1;
+}
+
+.suggestion-rate {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 12px;
+    background: rgba(80, 180, 255, 0.15);
+    color: #a8d8ff;
+    font-weight: 600;
+}
+
+.suggestion-recent {
+    font-size: 9px;
+    color: #ffb7c5;
+    background: rgba(255, 140, 160, 0.15);
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.no-suggestions {
+    padding: 20px;
+    text-align: center;
+    color: #88aacc;
+    font-size: 11px;
+}
+
+.recent-section {
+    border-bottom: 1px solid rgba(80, 180, 255, 0.2);
+    background: rgba(80, 180, 255, 0.05);
+}
+
+.recent-section .suggestion-group-header {
+    background: rgba(80, 180, 255, 0.08);
+}
+
+/* ===== FIXES FOR NATURE OF EXPENSE DROPDOWN ===== */
+
+/* Ensure the nature cell has proper z-index context */
+td:has(.nature-expense-container) {
+    position: relative !important;
+    z-index: 10 !important;
+    overflow: visible !important;
+}
+
+.nature-expense-container {
+    position: relative !important;
+    z-index: 100 !important;
+    overflow: visible !important;
+}
+
+.nature-expense-container .expense-suggestions {
+    position: fixed !important;
+    top: auto !important;
+    left: auto !important;
+    min-width: 300px !important;
+    max-width: 400px !important;
+    background: rgba(16, 28, 40, 0.98) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(80, 180, 255, 0.5) !important;
+    border-radius: 12px !important;
+    max-height: 320px !important;
+    overflow-y: auto !important;
+    z-index: 10000 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(80, 180, 255, 0.2) !important;
+    margin-top: 4px !important;
+}
+
+/* For table wrapper - ensure overflow doesn't clip the dropdown */
+.table-wrapper {
+    overflow: visible !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+}
+
+/* Fix for row hover z-index */
+tbody tr {
+    position: relative;
+    z-index: 1;
+}
+
+tbody tr:hover {
+    z-index: 5;
+}
+
+/* Make sure the container allows overflow */
+.container {
+    overflow: visible !important;
+}
+
+/* Ensure suggestions are above everything */
+.expense-suggestions {
+    z-index: 10001 !important;
+}
+
+/* Style for when input is focused */
+.nature-expense-input:focus {
+    position: relative;
+    z-index: 10001;
+}
+
+/* Enhanced suggestion items */
+.suggestion-item {
+    padding: 10px 14px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    border-left: 3px solid transparent !important;
+}
+
+.suggestion-item:hover {
+    background: rgba(80, 180, 255, 0.2) !important;
+    border-left-color: #5ba0d0 !important;
+}
+
+.suggestion-item.selected {
+    background: rgba(80, 180, 255, 0.25) !important;
+    border-left-color: #5ba0d0 !important;
+}
+
+.suggestion-name {
+    font-size: 13px !important;
+    color: #d4eaff !important;
+    flex: 1 !important;
+}
+
+.suggestion-rate {
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+    border-radius: 20px !important;
+    background: rgba(80, 180, 255, 0.2) !important;
+    color: #a8d8ff !important;
+    font-weight: 600 !important;
+}
+
+.suggestion-recent {
+    font-size: 10px !important;
+    color: #ffb7c5 !important;
+    background: rgba(255, 140, 160, 0.15) !important;
+    padding: 3px 8px !important;
+    border-radius: 20px !important;
+}
+
+.suggestion-group-header {
+    padding: 10px 14px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    background: rgba(80, 180, 255, 0.12) !important;
+    color: #7ab8e0 !important;
 }
 </style>
 </head>
@@ -786,7 +1103,7 @@ td.hidden-column {
         <div class="sidebar-content">
             <nav class="sidebar-nav">
                 <!-- Dashboard Link -->
-                <a href="index.html" class="sidebar-btn">
+                <a href="index2.html" class="sidebar-btn">
                     <i class="fas fa-home"></i>
                     <span class="sidebar-btn-text">Dashboard</span>
                 </a>
@@ -883,7 +1200,7 @@ td.hidden-column {
                 <div class="sidebar-divider"></div>
                 
                 <!-- Navigation Links -->
-                <a href="index.html" class="sidebar-btn">
+                <a href="index2.html" class="sidebar-btn">
                     <i class="fas fa-arrow-left"></i>
                     <span class="sidebar-btn-text">Back to Dashboard</span>
                 </a>
@@ -1591,54 +1908,112 @@ const expenseCategories = {
     "Rental": 0.05
 };
 
-// List of expense categories for datalist suggestions
-const expenseCategoryList = [
-    // Services (2%)
-    "REPAIRS AND MAINTENANCE-LABOR",
-    "MEALS AND ACCOMMODATION – SERVICES",
-    "REPRESENTATIONS – SERVICES",
-    "ELECTRICITY AND WATER",
-    "COMMUNICATION EXPENSE",
-    "FREIGHT AND COURIER",
-    "TRAVEL AND TRANSPORTATION",
-    "ADVERTISING AND MARKETING",
-    "SECURITY SERVICES",
-    "INSURANCE",
-    "SEMINAR AND TRAINING",
-    "MEDICAL EXPENSES – SERVICES",
-    "PROFESSIONAL FEES",
-    "CLEANING SERVICES",
-    "OTHERS - SERVICES",
-    // Goods (1%)
-    "REPAIRS AND MAINTENANCE-MATERIALS",
-    "MEALS AND ALLOWANCES – GOODS",
-    "REPRESENTATIONS – GOODS",
-    "FUEL AND OIL",
-    "OFFICE SUPPLIES",
-    "UNIFORMS",
-    "MEDICAL EXPENSES – GOODS",
-    "CLEANING SUPPLIES",
-    "OTHERS - GOODS",
-    // Rental (5%)
-    "Rental"
+// Grouped categories for display
+const categoryGroups = [
+    {
+        name: "SERVICES (2% Withholding Tax)",
+        icon: "fa-cogs",
+        categories: [
+            "REPAIRS AND MAINTENANCE-LABOR",
+            "MEALS AND ACCOMMODATION – SERVICES",
+            "REPRESENTATIONS – SERVICES",
+            "ELECTRICITY AND WATER",
+            "COMMUNICATION EXPENSE",
+            "FREIGHT AND COURIER",
+            "TRAVEL AND TRANSPORTATION",
+            "ADVERTISING AND MARKETING",
+            "SECURITY SERVICES",
+            "INSURANCE",
+            "SEMINAR AND TRAINING",
+            "MEDICAL EXPENSES – SERVICES",
+            "PROFESSIONAL FEES",
+            "CLEANING SERVICES",
+            "OTHERS - SERVICES"
+        ]
+    },
+    {
+        name: "GOODS (1% Withholding Tax)",
+        icon: "fa-boxes",
+        categories: [
+            "REPAIRS AND MAINTENANCE-MATERIALS",
+            "MEALS AND ALLOWANCES – GOODS",
+            "REPRESENTATIONS – GOODS",
+            "FUEL AND OIL",
+            "OFFICE SUPPLIES",
+            "UNIFORMS",
+            "MEDICAL EXPENSES – GOODS",
+            "CLEANING SUPPLIES",
+            "OTHERS - GOODS"
+        ]
+    },
+    {
+        name: "RENTAL (5% Withholding Tax)",
+        icon: "fa-building",
+        categories: ["Rental"]
+    }
 ];
 
-// Helper function to get category type from expense value
+// Store recently used expenses (max 5)
+let recentExpenses = [];
+
+// Load recent expenses from localStorage
+function loadRecentExpenses() {
+    const stored = localStorage.getItem('expenses_recent_categories');
+    if (stored) {
+        try {
+            recentExpenses = JSON.parse(stored);
+        } catch(e) { console.warn(e); }
+    }
+    if (recentExpenses.length > 5) recentExpenses = recentExpenses.slice(0, 5);
+}
+
+// Save recent expenses to localStorage
+function saveRecentExpenses() {
+    localStorage.setItem('expenses_recent_categories', JSON.stringify(recentExpenses));
+}
+
+// Add to recent expenses
+function addToRecentExpenses(category) {
+    if (!category || category.trim() === "") return;
+    const index = recentExpenses.indexOf(category);
+    if (index !== -1) recentExpenses.splice(index, 1);
+    recentExpenses.unshift(category);
+    if (recentExpenses.length > 5) recentExpenses.pop();
+    saveRecentExpenses();
+}
+
+// Get category type for styling
 function getCategoryType(expenseValue) {
     if (!expenseValue) return null;
     if (expenseValue === "Rental") return "rental";
-    if (expenseValue.includes("SERVICES") || expenseValue === "Rental") return "services";
-    return "goods";
+    if (expenseCategories[expenseValue] === 0.02) return "services";
+    if (expenseCategories[expenseValue] === 0.01) return "goods";
+    if (expenseValue.includes("SERVICES") || expenseValue.includes("LABOR") || 
+        expenseValue.includes("ELECTRICITY") || expenseValue.includes("WATER") ||
+        expenseValue.includes("COMMUNICATION") || expenseValue.includes("FREIGHT") ||
+        expenseValue.includes("TRAVEL") || expenseValue.includes("ADVERTISING") ||
+        expenseValue.includes("SECURITY") || expenseValue.includes("INSURANCE") ||
+        expenseValue.includes("SEMINAR") || expenseValue.includes("TRAINING") ||
+        expenseValue.includes("MEDICAL") || expenseValue.includes("PROFESSIONAL") ||
+        expenseValue.includes("CLEANING")) {
+        return "services";
+    } else if (expenseValue.includes("GOODS") || expenseValue.includes("MATERIALS") ||
+               expenseValue.includes("ALLOWANCES") || expenseValue.includes("FUEL") ||
+               expenseValue.includes("OIL") || expenseValue.includes("OFFICE") ||
+               expenseValue.includes("SUPPLIES") || expenseValue.includes("UNIFORMS")) {
+        return "goods";
+    } else if (expenseValue.includes("RENTAL") || expenseValue.includes("RENT")) {
+        return "rental";
+    }
+    return null;
 }
 
-// Helper function to get withholding rate from expense value
+// Get withholding rate from expense value (improved)
 function getWithholdingRateFromExpense(expenseValue) {
     if (!expenseValue) return 0;
-    // Check if exact match exists in categories
     if (expenseCategories[expenseValue] !== undefined) {
         return expenseCategories[expenseValue];
     }
-    // Try fuzzy matching for partial matches
     const expenseUpper = expenseValue.toUpperCase();
     if (expenseUpper.includes("SERVICES") || expenseUpper.includes("LABOR") || 
         expenseUpper.includes("ELECTRICITY") || expenseUpper.includes("WATER") ||
@@ -1658,6 +2033,302 @@ function getWithholdingRateFromExpense(expenseValue) {
         return 0.05;
     }
     return 0;
+}
+
+// Filter categories based on search text
+function filterCategories(searchText) {
+    if (!searchText || searchText.trim() === "") {
+        return { groups: categoryGroups, recent: recentExpenses };
+    }
+    
+    const searchLower = searchText.toLowerCase().trim();
+    const filteredGroups = [];
+    
+    for (const group of categoryGroups) {
+        const filteredCats = group.categories.filter(cat => 
+            cat.toLowerCase().includes(searchLower)
+        );
+        if (filteredCats.length > 0) {
+            filteredGroups.push({
+                ...group,
+                categories: filteredCats
+            });
+        }
+    }
+    
+    const filteredRecent = recentExpenses.filter(cat => 
+        cat.toLowerCase().includes(searchLower)
+    );
+    
+    return { groups: filteredGroups, recent: filteredRecent };
+}
+
+// Create enhanced nature of expense cell
+function createNatureExpenseCell(rowId, initialValue = '', rateCallback, row) {
+    const container = document.createElement('div');
+    container.className = 'nature-expense-container';
+    container.style.position = 'relative';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'editable nature-expense-input';
+    input.placeholder = 'Enter or select nature of expense';
+    input.value = initialValue;
+    input.autocomplete = 'off';
+    
+    if (initialValue) {
+        const catType = getCategoryType(initialValue);
+        if (catType) input.setAttribute('data-category', catType);
+    }
+    
+    const badge = document.createElement('div');
+    badge.className = 'category-badge';
+    badge.style.display = 'none';
+    
+    let suggestionsDiv = null;
+    let currentSelectedIndex = -1;
+    let currentFilteredItems = [];
+    
+    function updateBadge() {
+        const val = input.value;
+        const catType = getCategoryType(val);
+        if (catType) {
+            input.setAttribute('data-category', catType);
+            badge.className = `category-badge ${catType}`;
+            let rate = '';
+            if (catType === 'services') rate = '2%';
+            else if (catType === 'goods') rate = '1%';
+            else if (catType === 'rental') rate = '5%';
+            badge.innerHTML = `<i class="fas ${catType === 'services' ? 'fa-cogs' : catType === 'goods' ? 'fa-box' : 'fa-building'}"></i> ${rate}`;
+            badge.style.display = 'flex';
+        } else {
+            input.removeAttribute('data-category');
+            badge.style.display = 'none';
+        }
+    }
+    
+    function showSuggestions() {
+    if (suggestionsDiv) suggestionsDiv.remove();
+    
+    const searchText = input.value;
+    const { groups, recent } = filterCategories(searchText);
+    
+    const hasRecent = recent.length > 0 && (!searchText || searchText.trim() !== "");
+    const hasGroups = groups.some(g => g.categories.length > 0);
+    
+    if (!hasRecent && !hasGroups) {
+        suggestionsDiv = document.createElement('div');
+        suggestionsDiv.className = 'expense-suggestions';
+        suggestionsDiv.innerHTML = '<div class="no-suggestions"><i class="fas fa-search"></i> No matching categories found</div>';
+        // Position using fixed positioning
+        const rect = input.getBoundingClientRect();
+        suggestionsDiv.style.position = 'fixed';
+        suggestionsDiv.style.top = (rect.bottom + 5) + 'px';
+        suggestionsDiv.style.left = rect.left + 'px';
+        suggestionsDiv.style.width = Math.max(rect.width, 300) + 'px';
+        document.body.appendChild(suggestionsDiv);
+        return;
+    }
+    
+    suggestionsDiv = document.createElement('div');
+    suggestionsDiv.className = 'expense-suggestions';
+    currentFilteredItems = [];
+    
+    if (hasRecent && (!searchText || searchText.trim() === "")) {
+        const recentSection = document.createElement('div');
+        recentSection.className = 'suggestion-group recent-section';
+        recentSection.innerHTML = `
+            <div class="suggestion-group-header">
+                <i class="fas fa-history"></i> RECENTLY USED
+            </div>
+        `;
+        const recentList = document.createElement('div');
+        recent.forEach(cat => {
+            const rate = getWithholdingRateFromExpense(cat);
+            const ratePercent = (rate * 100).toFixed(0) + '%';
+            const item = document.createElement('div');
+            item.className = 'suggestion-item';
+            item.innerHTML = `
+                <span class="suggestion-name">${escapeHtml(cat)}</span>
+                <span class="suggestion-recent"><i class="fas fa-clock"></i> Recent</span>
+                <span class="suggestion-rate">${ratePercent}</span>
+            `;
+            item.addEventListener('click', () => selectCategory(cat));
+            recentList.appendChild(item);
+            currentFilteredItems.push({ element: item, value: cat });
+        });
+        recentSection.appendChild(recentList);
+        suggestionsDiv.appendChild(recentSection);
+    }
+    
+    for (const group of groups) {
+        if (group.categories.length === 0) continue;
+        const groupSection = document.createElement('div');
+        groupSection.className = 'suggestion-group';
+        groupSection.innerHTML = `
+            <div class="suggestion-group-header">
+                <i class="fas ${group.icon}"></i> ${group.name}
+            </div>
+        `;
+        const groupList = document.createElement('div');
+        for (const cat of group.categories) {
+            const rate = expenseCategories[cat] || getWithholdingRateFromExpense(cat);
+            const ratePercent = (rate * 100).toFixed(0) + '%';
+            const item = document.createElement('div');
+            item.className = 'suggestion-item';
+            item.innerHTML = `
+                <span class="suggestion-name">${escapeHtml(cat)}</span>
+                <span class="suggestion-rate">${ratePercent}</span>
+            `;
+            item.addEventListener('click', () => selectCategory(cat));
+            groupList.appendChild(item);
+            currentFilteredItems.push({ element: item, value: cat });
+        }
+        groupSection.appendChild(groupList);
+        suggestionsDiv.appendChild(groupSection);
+    }
+    
+    // Position using fixed positioning relative to input
+    const rect = input.getBoundingClientRect();
+    suggestionsDiv.style.position = 'fixed';
+    suggestionsDiv.style.top = (rect.bottom + 5) + 'px';
+    suggestionsDiv.style.left = rect.left + 'px';
+    suggestionsDiv.style.width = Math.max(rect.width, 320) + 'px';
+    
+    document.body.appendChild(suggestionsDiv);
+    currentSelectedIndex = -1;
+    
+    // Add scroll to top
+    suggestionsDiv.scrollTop = 0;
+}
+    
+    function hideSuggestions() {
+    if (suggestionsDiv && suggestionsDiv.parentNode) {
+        suggestionsDiv.remove();
+        suggestionsDiv = null;
+    }
+    currentSelectedIndex = -1;
+    currentFilteredItems = [];
+}
+    
+    function selectCategory(value) {
+    input.value = value;
+    addToRecentExpenses(value);
+    updateBadge();
+    hideSuggestions();
+    if (rateCallback) rateCallback(value);
+    const event = new Event('input', { bubbles: true });
+    input.dispatchEvent(event);
+    const changeEvent = new Event('change', { bubbles: true });
+    input.dispatchEvent(changeEvent);
+}
+    
+    let ratePreview = null;
+    function showRatePreview() {
+        if (ratePreview) ratePreview.remove();
+        const val = input.value;
+        if (!val) return;
+        const rate = getWithholdingRateFromExpense(val);
+        if (rate === 0) return;
+        const ratePercent = (rate * 100).toFixed(0);
+        ratePreview = document.createElement('div');
+        ratePreview.className = 'rate-preview';
+        ratePreview.innerHTML = `<i class="fas fa-percent"></i> Withholding Tax: ${ratePercent}%`;
+        container.appendChild(ratePreview);
+        setTimeout(() => {
+            if (ratePreview) ratePreview.remove();
+        }, 2000);
+    }
+    
+    input.addEventListener('input', function(e) {
+        updateBadge();
+        showSuggestions();
+        if (rateCallback) rateCallback(input.value);
+    });
+    
+    input.addEventListener('focus', function() {
+        if (input.value) showSuggestions();
+    });
+    
+    input.addEventListener('blur', function() {
+        setTimeout(() => hideSuggestions(), 200);
+        const val = input.value;
+        if (val) {
+            addToRecentExpenses(val);
+            if (rateCallback) rateCallback(val);
+        }
+        updateBadge();
+    });
+    
+    input.addEventListener('keydown', function(e) {
+        if (!suggestionsDiv) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                showSuggestions();
+            }
+            return;
+        }
+        
+        switch(e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                if (currentFilteredItems.length > 0) {
+                    if (currentSelectedIndex >= 0) {
+                        currentFilteredItems[currentSelectedIndex].element.classList.remove('selected');
+                    }
+                    currentSelectedIndex++;
+                    if (currentSelectedIndex >= currentFilteredItems.length) {
+                        currentSelectedIndex = 0;
+                    }
+                    currentFilteredItems[currentSelectedIndex].element.classList.add('selected');
+                    currentFilteredItems[currentSelectedIndex].element.scrollIntoView({ block: 'nearest' });
+                }
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                if (currentFilteredItems.length > 0) {
+                    if (currentSelectedIndex >= 0) {
+                        currentFilteredItems[currentSelectedIndex].element.classList.remove('selected');
+                    }
+                    currentSelectedIndex--;
+                    if (currentSelectedIndex < 0) {
+                        currentSelectedIndex = currentFilteredItems.length - 1;
+                    }
+                    currentFilteredItems[currentSelectedIndex].element.classList.add('selected');
+                    currentFilteredItems[currentSelectedIndex].element.scrollIntoView({ block: 'nearest' });
+                }
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (currentSelectedIndex >= 0 && currentFilteredItems[currentSelectedIndex]) {
+                    selectCategory(currentFilteredItems[currentSelectedIndex].value);
+                } else if (input.value.trim()) {
+                    hideSuggestions();
+                    if (rateCallback) rateCallback(input.value);
+                    addToRecentExpenses(input.value);
+                }
+                break;
+            case 'Escape':
+                e.preventDefault();
+                hideSuggestions();
+                break;
+        }
+    });
+    
+    container.appendChild(input);
+    container.appendChild(badge);
+    updateBadge();
+    
+    return container;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ===== PAGINATION VARIABLES =====
@@ -1935,6 +2606,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize table with one empty row
     addNewRow();
+
+    // Load recent expenses from storage
+loadRecentExpenses();
+
     updateAllStats();
 
     // Initialize column visibility
@@ -2269,9 +2944,6 @@ function addNewRow() {
     // Set current date as default
     const today = new Date().toISOString().split('T')[0];
     
-    // Create datalist for nature of expense suggestions
-    let datalistId = 'natureExpenseList_' + Date.now();
-    
     row.innerHTML = `
         <td>
             <input type="date" value="${today}" class="editable date-input">
@@ -2311,12 +2983,7 @@ function addNewRow() {
         <td>
             <input type="number" step="0.01" min="0" class="editable gross-amount" placeholder="0.00">
         </td>
-        <td>
-            <input type="text" list="${datalistId}" class="editable nature-expense-input" placeholder="Enter or select nature of expense">
-            <datalist id="${datalistId}">
-                ${expenseCategoryList.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-            </datalist>
-        </td>
+        <td id="nature-cell-${rowId}" style="position: relative;"></td>
         <td>
             <div class="uneditable net-expenses">0.00</div>
         </td>
@@ -2344,6 +3011,16 @@ function addNewRow() {
     
     tableBody.appendChild(row);
     
+    // Create enhanced nature of expense component - MOVED INSIDE THE FUNCTION
+    const natureCell = document.getElementById(`nature-cell-${rowId}`);
+    if (natureCell) {
+        const natureComponent = createNatureExpenseCell(rowId, '', (value) => {
+            updateCalculations(row);
+            updateAllStats();
+        }, row);
+        natureCell.appendChild(natureComponent);
+    }
+    
     // FIX: Apply current column visibility states to the new row
     const columnVisibility = JSON.parse(localStorage.getItem('expensesColumnVisibility')) || {};
     const columns = [
@@ -2362,8 +3039,8 @@ function addNewRow() {
         }
     });
     
-    // Add event listeners to the new row
-    const editableInputs = row.querySelectorAll('.editable');
+    // Add event listeners to the new row (excluding nature input since it's handled by component)
+    const editableInputs = row.querySelectorAll('.editable:not(.nature-expense-input)');
     editableInputs.forEach(input => {
         input.addEventListener('input', function() {
             updateCalculations(row);
@@ -2375,29 +3052,6 @@ function addNewRow() {
             updateAllStats();
         });
     });
-    
-    // Special handling for Nature of Expense input - update visual indicator
-    const natureInput = row.querySelector('.nature-expense-input');
-    if (natureInput) {
-        natureInput.addEventListener('input', function() {
-            const value = this.value;
-            const categoryType = getCategoryType(value);
-            if (categoryType === 'services') {
-                this.setAttribute('data-category', 'services');
-            } else if (categoryType === 'goods') {
-                this.setAttribute('data-category', 'goods');
-            } else if (categoryType === 'rental') {
-                this.setAttribute('data-category', 'rental');
-            } else {
-                this.removeAttribute('data-category');
-            }
-            updateCalculations(row);
-        });
-        
-        natureInput.addEventListener('change', function() {
-            updateCalculations(row);
-        });
-    }
     
     // Special handling for TIN input
     const tinInput = row.querySelector('.tin-number');
@@ -2700,60 +3354,73 @@ function updateExpenseTally() {
     
     const rows = document.querySelectorAll('#tableBody tr');
     
-    // Create a map to store tally data
+    // Create a map to store tally data - only for categories that have actual data
     const expenseTally = {};
     let totalGrossAmount = 0;
     let totalRows = 0;
     
-    // Initialize categories with zero values
-    Object.keys(expenseCategories).forEach(category => {
-        expenseTally[category] = {
-            count: 0,
-            totalGrossAmount: 0,
-            totalNetExpenses: 0,
-            totalWithholdingTax: 0,
-            rate: expenseCategories[category]
-        };
-    });
-    
-    // Process each row
+    // Process each row - only add to tally if a nature of expense is actually entered
     rows.forEach(row => {
         const grossAmountInput = row.querySelector('.gross-amount');
         const natureExpenseInput = row.querySelector('.nature-expense-input');
         
         if (grossAmountInput && natureExpenseInput) {
             const grossAmount = parseFloat(grossAmountInput.value) || 0;
-            const natureExpense = natureExpenseInput.value;
+            const natureExpense = natureExpenseInput.value.trim();
             
-            // Find matching category (exact match or partial match)
-            let matchedCategory = null;
-            if (expenseCategories[natureExpense] !== undefined) {
-                matchedCategory = natureExpense;
-            } else {
-                // Try fuzzy matching
-                const expenseUpper = natureExpense.toUpperCase();
-                for (const [category, rate] of Object.entries(expenseCategories)) {
-                    if (expenseUpper.includes(category.toUpperCase()) || category.toUpperCase().includes(expenseUpper)) {
-                        matchedCategory = category;
-                        break;
+            // ONLY process if nature of expense is NOT empty
+            if (natureExpense !== "") {
+                // Find matching category (exact match or partial match)
+                let matchedCategory = null;
+                if (expenseCategories[natureExpense] !== undefined) {
+                    matchedCategory = natureExpense;
+                } else {
+                    // Try fuzzy matching
+                    const expenseUpper = natureExpense.toUpperCase();
+                    for (const [category, rate] of Object.entries(expenseCategories)) {
+                        if (expenseUpper.includes(category.toUpperCase()) || category.toUpperCase().includes(expenseUpper)) {
+                            matchedCategory = category;
+                            break;
+                        }
                     }
                 }
-            }
-            
-            if (matchedCategory && expenseTally[matchedCategory]) {
-                expenseTally[matchedCategory].count++;
-                expenseTally[matchedCategory].totalGrossAmount += grossAmount;
                 
-                // Calculate net expenses for this row
-                const netExpenses = grossAmount / 1.12;
-                expenseTally[matchedCategory].totalNetExpenses += netExpenses;
+                // If no match found, use "OTHERS - SERVICES" or "OTHERS - GOODS" based on guess
+                if (!matchedCategory) {
+                    const expenseUpper = natureExpense.toUpperCase();
+                    if (expenseUpper.includes("GOODS") || expenseUpper.includes("MATERIALS") || expenseUpper.includes("SUPPLIES")) {
+                        matchedCategory = "OTHERS - GOODS";
+                    } else {
+                        matchedCategory = "OTHERS - SERVICES";
+                    }
+                }
                 
-                // Calculate withholding tax for this row
-                const withholdingTax = netExpenses * expenseTally[matchedCategory].rate;
-                expenseTally[matchedCategory].totalWithholdingTax += withholdingTax;
-                
-                totalGrossAmount += grossAmount;
-                totalRows++;
+                if (matchedCategory) {
+                    // Initialize category if not exists
+                    if (!expenseTally[matchedCategory]) {
+                        expenseTally[matchedCategory] = {
+                            count: 0,
+                            totalGrossAmount: 0,
+                            totalNetExpenses: 0,
+                            totalWithholdingTax: 0,
+                            rate: expenseCategories[matchedCategory] || 0.02
+                        };
+                    }
+                    
+                    expenseTally[matchedCategory].count++;
+                    expenseTally[matchedCategory].totalGrossAmount += grossAmount;
+                    
+                    // Calculate net expenses for this row
+                    const netExpenses = grossAmount / 1.12;
+                    expenseTally[matchedCategory].totalNetExpenses += netExpenses;
+                    
+                    // Calculate withholding tax for this row
+                    const withholdingTax = netExpenses * expenseTally[matchedCategory].rate;
+                    expenseTally[matchedCategory].totalWithholdingTax += withholdingTax;
+                    
+                    totalGrossAmount += grossAmount;
+                    totalRows++;
+                }
             }
         }
     });
@@ -2761,12 +3428,12 @@ function updateExpenseTally() {
     // Clear and rebuild tally display
     tallyGrid.innerHTML = '';
     
-    // Sort categories by total amount (descending)
+    // Sort categories by total amount (descending) - ONLY categories with actual data
     const sortedCategories = Object.keys(expenseTally)
-        .filter(category => expenseTally[category].count > 0)
+        .filter(category => expenseTally[category].count > 0 && expenseTally[category].totalGrossAmount > 0)
         .sort((a, b) => expenseTally[b].totalGrossAmount - expenseTally[a].totalGrossAmount);
     
-    // Add tally items for each category with expenses
+    // Add tally items for each category that has actual expense data
     sortedCategories.forEach(category => {
         const data = expenseTally[category];
         
@@ -2797,7 +3464,7 @@ function updateExpenseTally() {
                 <div class="tally-count">${data.count} ${data.count === 1 ? 'item' : 'items'}</div>
             </div>
             <div class="tally-rate">Withholding: ${ratePercentage}%</div>
-            <div style="margin-top: 8px; font-size: 11px; color: #80cbc4;">
+            <div style="margin-top: 8px; font-size: 11px; color: #cca866;">
                 Net: ₱ ${data.totalNetExpenses.toFixed(2)} | W/Tax: ₱ ${data.totalWithholdingTax.toFixed(2)}
             </div>
         `;
@@ -2805,7 +3472,7 @@ function updateExpenseTally() {
         tallyGrid.appendChild(tallyItem);
     });
     
-    // Add total tally item
+    // Add total tally item only if there are actual expense entries
     if (totalRows > 0) {
         const totalItem = document.createElement('div');
         totalItem.className = 'tally-item tally-total';
@@ -2818,22 +3485,23 @@ function updateExpenseTally() {
                 <div class="tally-amount">₱ ${totalGrossAmount.toFixed(2)}</div>
                 <div class="tally-count">${totalRows} ${totalRows === 1 ? 'row' : 'rows'}</div>
             </div>
-            <div style="margin-top: 8px; font-size: 12px; color: #80ffd4; font-weight: 500;">
+            <div style="margin-top: 8px; font-size: 12px; color: #ffd580; font-weight: 500;">
                 Summarized across ${sortedCategories.length} expense categories
             </div>
         `;
         tallyGrid.appendChild(totalItem);
     } else {
-        // Show empty state
+        // Show empty state message when no expenses entered yet
         const emptyItem = document.createElement('div');
         emptyItem.className = 'tally-item tally-total';
         emptyItem.innerHTML = `
             <div class="tally-category">
                 <i class="fas fa-info-circle"></i>
-                NO EXPENSE DATA
+                NO EXPENSE DATA YET
             </div>
-            <div style="color: #80cbc4; font-size: 14px; text-align: center; padding: 10px 0;">
-                Add expenses to see category totals here
+            <div style="color: #cca866; font-size: 14px; text-align: center; padding: 10px 0;">
+                <i class="fas fa-pen-alt" style="margin-right: 8px;"></i>
+                Enter a Nature of Expense and Gross Amount to see category totals here
             </div>
         `;
         tallyGrid.appendChild(emptyItem);
@@ -2983,11 +3651,12 @@ function addRowFromData(rowData) {
     const row = document.createElement('tr');
     row.id = rowId;
     
-    // Create datalist for nature of expense suggestions
-    let datalistId = 'natureExpenseList_' + Date.now();
+    // Set current date as default if no date provided
+    const today = new Date().toISOString().split('T')[0];
+    const rowDate = rowData.date || today;
     
     row.innerHTML = `
-        <td><input type="date" value="${rowData.date || ''}" class="editable date-input"></td>
+        <td><input type="date" value="${escapeHtml(rowDate)}" class="editable date-input"></td>
         <td><input type="text" value="${escapeHtml(rowData.invoiceNumber || '')}" class="editable invoice-number" placeholder="INV-001"></td>
         <td>
             <select class="editable invoice-type">
@@ -3000,40 +3669,45 @@ function addRowFromData(rowData) {
                 <option value="CR" ${rowData.invoiceType === 'CR' ? 'selected' : ''}>CR</option>
                 <option value="OTHERS" ${rowData.invoiceType === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
             </select>
-         </td>
-         <td>
+          </div>
+          <td>
             <select class="editable transaction-type">
                 <option value="">Select</option>
                 <option value="Goods" ${rowData.transactionType === 'Goods' ? 'selected' : ''}>Goods</option>
                 <option value="Services" ${rowData.transactionType === 'Services' ? 'selected' : ''}>Services</option>
             </select>
-         </td>
+          </td>
         <td style="position: relative;">
             <input type="text" value="${escapeHtml(rowData.tinNumber || '')}" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
             <div class="validation-message" style="display: none; position: absolute; bottom: -20px; left: 0; right: 0;">TIN must be 12 digits</div>
-         </td>
-         <td><input type="text" value="${escapeHtml(rowData.supplierName || '')}" class="editable supplier-name" placeholder="Supplier name"></td>
-         <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></td>
-         <td><input type="number" step="0.01" min="0" value="${rowData.grossAmount || ''}" class="editable gross-amount" placeholder="0.00"></td>
-         <td>
-            <input type="text" list="${datalistId}" value="${escapeHtml(rowData.natureExpense || '')}" class="editable nature-expense-input" placeholder="Enter or select nature of expense">
-            <datalist id="${datalistId}">
-                ${expenseCategoryList.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-            </datalist>
-         </td>
-         <td><div class="uneditable net-expenses">0.00</div></td>
-         <td><div class="uneditable input-tax">0.00</div></td>
-         <td><div class="uneditable withholding-rate">0%</div></td>
-         <td><div class="uneditable withholding-tax">0.00</div></td>
-         <td><div class="uneditable gross-minus-withholding">0.00</div></td>
-         <td><input type="text" value="${escapeHtml(rowData.remarks || '')}" class="editable remarks" placeholder="Enter remarks"></td>
-         <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></td>
+          </td>
+          <td><input type="text" value="${escapeHtml(rowData.supplierName || '')}" class="editable supplier-name" placeholder="Supplier name"></td>
+          <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></td>
+          <td><input type="number" step="0.01" min="0" value="${rowData.grossAmount || ''}" class="editable gross-amount" placeholder="0.00"></td>
+        <td id="nature-cell-${rowId}" style="position: relative;"></td>
+          <td><div class="uneditable net-expenses">0.00</div></td>
+          <td><div class="uneditable input-tax">0.00</div></td>
+          <td><div class="uneditable withholding-rate">0%</div></td>
+          <td><div class="uneditable withholding-tax">0.00</div></td>
+          <td><div class="uneditable gross-minus-withholding">0.00</div></td>
+          <td><input type="text" value="${escapeHtml(rowData.remarks || '')}" class="editable remarks" placeholder="Enter remarks"></td>
+          <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></td>
     `;
     
     tableBody.appendChild(row);
     
-    // Add event listeners
-    const editableInputs = row.querySelectorAll('.editable');
+    // Create enhanced nature of expense component with saved value
+    const natureCell = document.getElementById(`nature-cell-${rowId}`);
+    if (natureCell) {
+        const natureComponent = createNatureExpenseCell(rowId, rowData.natureExpense || '', (value) => {
+            updateCalculations(row);
+            updateAllStats();
+        }, row);
+        natureCell.appendChild(natureComponent);
+    }
+    
+    // Add event listeners to editable inputs (excluding nature input since it's handled by component)
+    const editableInputs = row.querySelectorAll('.editable:not(.nature-expense-input)');
     editableInputs.forEach(input => {
         input.addEventListener('input', function() {
             updateCalculations(row);
@@ -3045,40 +3719,31 @@ function addRowFromData(rowData) {
         });
     });
     
-    // Special handling for Nature of Expense input
-    const natureInput = row.querySelector('.nature-expense-input');
-    if (natureInput) {
-        natureInput.addEventListener('input', function() {
-            const value = this.value;
-            const categoryType = getCategoryType(value);
-            if (categoryType === 'services') {
-                this.setAttribute('data-category', 'services');
-            } else if (categoryType === 'goods') {
-                this.setAttribute('data-category', 'goods');
-            } else if (categoryType === 'rental') {
-                this.setAttribute('data-category', 'rental');
-            } else {
-                this.removeAttribute('data-category');
-            }
-            updateCalculations(row);
+    // Format TIN input
+    const tinInput = row.querySelector('.tin-number');
+    if (tinInput) {
+        tinInput.addEventListener('input', function(e) {
+            formatTIN(e.target);
         });
-        
-        // Set initial category attribute
-        if (natureInput.value) {
-            const categoryType = getCategoryType(natureInput.value);
-            if (categoryType) {
-                natureInput.setAttribute('data-category', categoryType);
-            }
+        tinInput.addEventListener('blur', function(e) {
+            validateTIN(e.target);
+        });
+        // Format existing TIN value
+        if (tinInput.value) {
+            formatTIN(tinInput);
+            validateTIN(tinInput);
         }
     }
     
-    // Format TIN input
-    const tinInput = row.querySelector('.tin-number');
-    tinInput.addEventListener('input', function(e) {
-        formatTIN(e.target);
-    });
-    tinInput.addEventListener('blur', function(e) {
-        validateTIN(e.target);
+    // Add neon effect to inputs on focus
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+        });
+        input.addEventListener('blur', function() {
+            this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+        });
     });
     
     // Trigger calculations for this row
