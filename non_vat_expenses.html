@@ -996,6 +996,11 @@ td.selected {
                     <i class="fas fa-plus-circle"></i>
                     <span class="sidebar-btn-text">Add New Row</span>
                 </button>
+
+                <button class="sidebar-btn" id="addBatchRowsBtn">
+    <i class="fas fa-layer-group"></i>
+    <span class="sidebar-btn-text">Add Multiple Rows</span>
+</button>
                 
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
@@ -1042,6 +1047,11 @@ td.selected {
                     <i class="fas fa-copyright"></i>
                     <span class="sidebar-btn-text">Hide Footer</span>
                 </button>
+
+                <button class="sidebar-btn toggle-btn" id="toggleSuppliersMonitorBtn">
+    <i class="fas fa-truck"></i>
+    <span class="sidebar-btn-text">Hide Suppliers List</span>
+</button>
                 
                 <div class="sidebar-divider"></div>
                 
@@ -1356,6 +1366,7 @@ let isLongPressing = false;
 let longPressInterval = null;
 let addedRowsCount = 0;
 
+// ===== UPDATED LONG PRESS WITH BATCH ADD =====
 function startLongPress(button) {
     if (longPressTimer) clearTimeout(longPressTimer);
     
@@ -1364,24 +1375,19 @@ function startLongPress(button) {
             isLongPressing = true;
             addedRowsCount = 0;
             
-            // Add visual feedback
             button.classList.add('long-press-active');
-            
-            // Show toast notification
             showLongPressToast('Adding rows continuously... Release to stop');
             
-            // Start adding rows repeatedly
             longPressInterval = setInterval(() => {
-                addNewRow();
-                addedRowsCount++;
+                addMultipleRows(5);
+                addedRowsCount += 5;
                 
-                // Update toast with count every 5 rows
-                if (addedRowsCount % 5 === 0) {
+                if (addedRowsCount % 20 === 0) {
                     updateLongPressToast(`Added ${addedRowsCount} rows...`);
                 }
-            }, 200); // Add a new row every 200ms (5 rows per second)
+            }, 250);
         }
-    }, 500); // 500ms delay to trigger long press
+    }, 500);
 }
 
 function stopLongPress(button) {
@@ -2167,6 +2173,210 @@ function addNewRow() {
     updateAllStats();
 }
 
+// ===== OPTIMIZED BATCH ADD ROWS (NON-VAT EXPENSES) =====
+function addMultipleRows(count) {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    if (count > 5000) {
+        if (!confirm(`Adding ${count} rows may take a few seconds. Continue?`)) {
+            return;
+        }
+    }
+    
+    const startTime = performance.now();
+    const fragment = document.createDocumentFragment();
+    const rows = [];
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Build nature options HTML once for reuse
+    let natureOptions = '<option value="" disabled selected>— Select Nature of Expense —</option>';
+    
+    // 0% - No Withholding category
+    natureOptions += '<optgroup label="━━━━ 0% WITHHOLDING (No Tax) ━━━━" style="color: #b77eff;">';
+    const zeroPercentOptions = [
+        "SALARIES AND WAGES", "SSS/PHILHEALTH/PAG-IBIG", "INTERMENT FEE", "PRINTING AND REPRODUCTION"
+    ];
+    zeroPercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" style="color: #c5a3ff;">◆ ${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // 1% Withholding category
+    natureOptions += '<optgroup label="━━━━ 1% WITHHOLDING ━━━━" style="color: #ffaa66;">';
+    const onePercentOptions = [
+        "REPAIRS AND MAINTENANCE- MATERIALS", "MEALS AND ACCOMMODATION - GOODS",
+        "REPRESENTATION- GOODS", "OTHERS - GOODS", "FUEL AND OIL", "OFFICE SUPPLIES",
+        "UNIFORMS", "MEDICAL EXPENSE - GOODS", "CLEANING SUPPLIES"
+    ];
+    onePercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" style="color: #ffcc88;">● ${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // 2% Withholding category
+    natureOptions += '<optgroup label="━━━━ 2% WITHHOLDING ━━━━" style="color: #66aaff;">';
+    const twoPercentOptions = [
+        "REPAIRS AND MAINTENANCE- LABOR", "MEALS AND ACCOMMODATION - SERVICES",
+        "REPRESENTATION - SERVICES", "OTHERS - SERVICES", "ELECTRICITY AND WATER",
+        "COMMUNICATION EXPENSE", "FREIGHT AND COURIER", "TRAVEL AND TRANSPORTATION",
+        "CLEANING SERVICES", "COMMISSION FEE", "SERVICES CHARGE", "ADVERTISING AND MARKETING",
+        "SECURITY SERVICES", "INSURANCE", "SEMINAR AND TRAINING", "MEDICAL EXPENSE - SERVICES",
+        "PROFESSIONAL FEES"
+    ];
+    twoPercentOptions.forEach(opt => {
+        natureOptions += `<option value="${opt}" style="color: #88ccff;">■ ${opt}</option>`;
+    });
+    natureOptions += '</optgroup>';
+    
+    // 5% Withholding category
+    natureOptions += '<optgroup label="━━━━ 5% WITHHOLDING ━━━━" style="color: #55dd88;">';
+    natureOptions += '<option value="RENTAL" style="color: #88ffaa;">★ RENTAL</option>';
+    natureOptions += '</optgroup>';
+    
+    for (let i = 0; i < count; i++) {
+        const rowId = 'row_' + Date.now() + '_' + i + '_' + Math.random();
+        const row = document.createElement('tr');
+        row.id = rowId;
+        
+        row.innerHTML = `
+            <td><input type="date" value="${today}" class="editable date-input"></td>
+            <td><input type="text" class="editable invoice-number" placeholder="INV-001"></td>
+            <td>
+                <select class="editable invoice-type">
+                    <option value="">Select</option>
+                    <option value="OR">OR</option>
+                    <option value="SI">SI</option>
+                    <option value="DR">DR</option>
+                    <option value="AR">AR</option>
+                    <option value="TR">TR</option>
+                    <option value="CR">CR</option>
+                    <option value="OTHERS">OTHERS</option>
+                </select>
+            </div>
+            </td>
+            <td>
+                <select class="editable transaction-type">
+                    <option value="">Select</option>
+                    <option value="Goods">Goods</option>
+                    <option value="Services">Services</option>
+                </select>
+            </div>
+            </td>
+            <td style="position: relative;">
+                <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+                <div class="validation-message" style="display: none;"></div>
+            </div>
+            </td>
+            <td><input type="text" class="editable supplier-name" placeholder="Supplier name"></div>
+            <tr>
+            <td><input type="text" class="editable address" placeholder="Supplier address"></div>
+            </tr>
+            <td><input type="number" step="0.01" min="0" class="editable gross-amount" placeholder="0.00"></div>
+            </tr>
+            <td><select class="editable nature-expense">${natureOptions}</select></div>
+            </tr>
+            <td><div class="uneditable input-tax">0.00</div></div>
+            </tr>
+            <td><div class="uneditable withholding-rate">0%</div></div>
+            <tr>
+            <td><div class="uneditable withholding-tax">0.00</div></div>
+            </tr>
+            <td><div class="uneditable gross-minus-withholding">0.00</div></div>
+            <tr>
+            <td><input type="text" class="editable remarks" placeholder="Enter remarks"></div>
+            </tr>
+            <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></div>
+            </tr>
+        `;
+        
+        rows.push(row);
+        fragment.appendChild(row);
+    }
+    
+    // Single DOM update
+    tableBody.appendChild(fragment);
+    
+    // Apply column visibility and attach listeners
+    const columnVisibility = JSON.parse(localStorage.getItem('nonVatExpensesColumnVisibility')) || {};
+    const columns = [
+        'date', 'invoiceNumber', 'invoiceType', 'transactionType', 'tinNumber',
+        'supplierName', 'address', 'grossAmount', 'natureExpense', 'inputTax',
+        'withholdingRate', 'withholdingTax', 'grossMinusWithholding', 'remarks', 'action'
+    ];
+    
+    for (const row of rows) {
+        // Apply column visibility
+        const cells = row.querySelectorAll('td');
+        columns.forEach((key, index) => {
+            if (columnVisibility[key] === true && cells[index]) {
+                cells[index].classList.add('hidden-column');
+            }
+        });
+        
+        // Attach event listeners
+        const editableInputs = row.querySelectorAll('.editable');
+        editableInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                updateCalculations(row);
+                scheduleStatsUpdate();
+            });
+            input.addEventListener('change', function() {
+                updateCalculations(row);
+                scheduleStatsUpdate();
+            });
+        });
+        
+        // Nature of Expense class
+        const natureExpenseSelect = row.querySelector('.nature-expense');
+        if (natureExpenseSelect) {
+            natureExpenseSelect.addEventListener('change', function() {
+                if (this.value) this.classList.add('has-value');
+                else this.classList.remove('has-value');
+            });
+        }
+        
+        // TIN formatting
+        const tinInput = row.querySelector('.tin-number');
+        if (tinInput) {
+            tinInput.addEventListener('input', (e) => formatTIN(e.target));
+            tinInput.addEventListener('blur', (e) => validateTIN(e.target));
+        }
+        
+        // Focus effects
+        const inputs = row.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+            });
+            input.addEventListener('blur', function() {
+                this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+            });
+        });
+    }
+    
+    // Update pagination
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    // Single stats update
+    updateAllStats();
+    
+    const endTime = performance.now();
+    console.log(`Added ${count} rows in ${(endTime - startTime).toFixed(2)}ms`);
+    showToast(`✅ Added ${count} rows successfully!`, 'success');
+}
+
+// ===== DEBOUNCED STATS UPDATE =====
+let statsTimeout;
+
+function scheduleStatsUpdate() {
+    if (statsTimeout) clearTimeout(statsTimeout);
+    statsTimeout = setTimeout(() => updateAllStats(), 100);
+}
+
 function deleteRow(rowId) {
     const row = document.getElementById(rowId);
     if (row && confirm('Are you sure you want to delete this row?')) {
@@ -2847,7 +3057,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ===== EXPORT FUNCTION =====
+// ===== EXPORT FUNCTION WITH EXPENSES TRANSACTIONS ON TOP =====
 function exportToExcel() {
     // Validate required company info
     const companyName = document.getElementById('companyName')?.value.trim();
@@ -2885,6 +3095,34 @@ function exportToExcel() {
     const totalInputTax = parseFloat(document.getElementById('totalInputTax')?.textContent) || 0;
     const totalWithholdingTax = parseFloat(document.getElementById('totalWithholdingTax')?.textContent) || 0;
     const netPayable = parseFloat(document.getElementById('netPayable')?.textContent) || 0;
+    
+    // Collect supplier summary data (Name + TIN with Gross Amount totals)
+    const supplierSummary = new Map();
+    const rows = document.querySelectorAll('#tableBody tr');
+    
+    rows.forEach(row => {
+        const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
+        const supplierName = row.querySelector('.supplier-name')?.value || '';
+        const tinNumber = row.querySelector('.tin-number')?.value || '';
+        
+        // Build supplier summary
+        if (supplierName && tinNumber && grossAmount > 0) {
+            const key = `${supplierName}|${tinNumber}`;
+            if (supplierSummary.has(key)) {
+                supplierSummary.set(key, supplierSummary.get(key) + grossAmount);
+            } else {
+                supplierSummary.set(key, grossAmount);
+            }
+        }
+    });
+    
+    // Sort suppliers by total gross amount (descending)
+    const sortedSuppliers = Array.from(supplierSummary.entries())
+        .map(([key, total]) => {
+            const [name, tin] = key.split('|');
+            return { name, tin, totalGrossAmount: total };
+        })
+        .sort((a, b) => b.totalGrossAmount - a.totalGrossAmount);
     
     let htmlContent = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
@@ -3059,6 +3297,32 @@ function exportToExcel() {
                     border-bottom: 1px solid #00cc7a;
                 }
                 
+                .supplier-summary-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 15px;
+                    margin-bottom: 25px;
+                    background-color: #ffffff;
+                }
+                
+                .supplier-summary-table th {
+                    background-color: #4caf50;
+                    color: white;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 10px;
+                    border: 1px solid #388e3c;
+                }
+                
+                .supplier-summary-table td {
+                    padding: 8px 10px;
+                    border: 1px solid #dddddd;
+                }
+                
+                .supplier-summary-table .numeric {
+                    text-align: right;
+                }
+                
                 .totals-section {
                     margin-top: 25px;
                     background-color: #f0f9f5;
@@ -3105,7 +3369,6 @@ function exportToExcel() {
                     background-color: #e6f7f0;
                 }
                 
-                /* Tally section styles */
                 .tally-section {
                     margin-top: 25px;
                     background-color: #f8fcf9;
@@ -3147,10 +3410,6 @@ function exportToExcel() {
                     border-top: 2px solid #00cc7a;
                 }
                 
-                .tally-total-row td {
-                    border-top: 2px solid #00cc7a;
-                }
-                
                 .tally-header {
                     background-color: #006837;
                     color: white;
@@ -3159,16 +3418,6 @@ function exportToExcel() {
                     padding: 10px;
                     border-radius: 5px;
                     margin-bottom: 15px;
-                }
-                
-                .tally-count {
-                    text-align: center;
-                }
-                
-                .tally-rate {
-                    text-align: center;
-                    color: #006837;
-                    font-weight: 600;
                 }
             </style>
             <title>Non-VAT Expenses Report - ${formattedDate}</title>
@@ -3179,137 +3428,122 @@ function exportToExcel() {
             <div class="company-header">
                 <table class="company-info-table">
                     <tr>
-                        <td class="company-label">Company Name:</td>
-                        <td class="company-value">${companyName}</td>
-                        <td class="company-label">TIN Number:</td>
-                        <td class="company-value">${companyTIN}</td>
-                    </tr>
-                    <tr>
-                        <td class="company-label">Address:</td>
-                        <td class="company-value">${companyAddress}</td>
-                        <td class="company-label">Line of Business:</td>
-                        <td class="company-value">${lineOfBusiness}</td>
-                    </tr>
-                    <tr>
-                        <td class="company-label">Telephone:</td>
-                        <td class="company-value">${document.getElementById('telephone')?.value.trim() || 'N/A'}</td>
-                        <td class="company-label">Report Date:</td>
-                        <td class="company-value">${document.getElementById('reportDate')?.value || ''}</td>
-                    </tr>
-                    <tr>
-                        <td class="company-label">Authorized Employee:</td>
-                        <td class="company-value">${authorizedEmployee}</td>
-                        <td class="company-label">Email:</td>
-                        <td class="company-value">${document.getElementById('email')?.value.trim() || 'N/A'}</td>
-                    </tr>
-                </table>
-            </div>
+                        <td class="company-label">Company Name:<\/td>
+                        <td class="company-value">${escapeHtml(companyName)}<\/td>
+                        <td class="company-label">TIN Number:<\/td>
+                        <td class="company-value">${escapeHtml(companyTIN)}<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="company-label">Address:<\/td>
+                        <td class="company-value">${escapeHtml(companyAddress)}<\/td>
+                        <td class="company-label">Line of Business:<\/td>
+                        <td class="company-value">${escapeHtml(lineOfBusiness)}<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="company-label">Telephone:<\/td>
+                        <td class="company-value">${escapeHtml(document.getElementById('telephone')?.value.trim() || 'N/A')}<\/td>
+                        <td class="company-label">Report Date:<\/td>
+                        <td class="company-value">${escapeHtml(document.getElementById('reportDate')?.value || '')}<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="company-label">Authorized Employee:<\/td>
+                        <td class="company-value">${escapeHtml(authorizedEmployee)}<\/td>
+                        <td class="company-label">Email:<\/td>
+                        <td class="company-value">${escapeHtml(document.getElementById('email')?.value.trim() || 'N/A')}<\/td>
+                     <\/tr>
+                 <\/table>
+            <\/div>
             
-            <div class="section-title">Expenses Transactions</div>
+            <!-- EXPENSES TRANSACTIONS TABLE (MOVED TO TOP) -->
+            <div class="section-title">Expenses Transactions<\/div>
             
             <table class="data-table">
                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Invoice Number</th>
-                        <th>Invoice Type</th>
-                        <th>Transaction Type</th>
-                        <th>TIN Number</th>
-                        <th>Supplier Name</th>
-                        <th>Address</th>
-                        <th>Gross Amount</th>
-                        <th>Nature of Expense</th>
-                        <th>Input Tax</th>
-                        <th>W/Tax Rate</th>
-                        <th>Withholding Tax</th>
-                        <th>Gross - W/Tax</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
+                     <tr>
+                        <th>Date<\/th>
+                        <th>Invoice Number<\/th>
+                        <th>Invoice Type<\/th>
+                        <th>Transaction Type<\/th>
+                        <th>TIN Number<\/th>
+                        <th>Supplier Name<\/th>
+                        <th>Address<\/th>
+                        <th>Gross Amount<\/th>
+                        <th>Nature of Expense<\/th>
+                        <th>Input Tax<\/th>
+                        <th>W/Tax Rate<\/th>
+                        <th>Withholding Tax<\/th>
+                        <th>Gross - W/Tax<\/th>
+                        <th>Remarks<\/th>
+                     <\/tr>
+                <\/thead>
                 <tbody>
     `;
     
     // Add data rows
-    const rows = document.querySelectorAll('#tableBody tr');
     let rowNumber = 1;
     
     rows.forEach(row => {
-        // Date
         const dateInput = row.querySelector('.date-input');
         const dateValue = dateInput ? dateInput.value : '';
         
-        // Invoice Number
         const invoiceInput = row.querySelector('.invoice-number');
         const invoiceValue = invoiceInput ? invoiceInput.value : '';
         
-        // Invoice Type
         const invoiceTypeSelect = row.querySelector('.invoice-type');
         const invoiceTypeValue = invoiceTypeSelect ? invoiceTypeSelect.value : '';
         
-        // Transaction Type
         const transactionTypeSelect = row.querySelector('.transaction-type');
         const transactionTypeValue = transactionTypeSelect ? transactionTypeSelect.value : '';
         
-        // TIN Number
         const tinInput = row.querySelector('.tin-number');
         const tinValue = tinInput ? tinInput.value : '';
         
-        // Supplier Name
         const supplierInput = row.querySelector('.supplier-name');
         const supplierValue = supplierInput ? supplierInput.value : '';
         
-        // Address
         const addressInput = row.querySelector('.address');
         const addressValue = addressInput ? addressInput.value : '';
         
-        // Gross Amount
         const grossAmountInput = row.querySelector('.gross-amount');
         const grossAmountValue = grossAmountInput ? parseFloat(grossAmountInput.value) || 0 : 0;
         
-        // Nature of Expense
         const natureExpenseSelect = row.querySelector('.nature-expense');
         const natureExpenseValue = natureExpenseSelect ? natureExpenseSelect.value : '';
         
-        // Input Tax
         const inputTaxDiv = row.querySelector('.input-tax');
         const inputTaxValue = inputTaxDiv ? parseFloat(inputTaxDiv.textContent) || 0 : 0;
         
-        // Withholding Tax Rate
         const withholdingRateDiv = row.querySelector('.withholding-rate');
         const withholdingRateValue = withholdingRateDiv ? withholdingRateDiv.textContent : '0%';
         
-        // Withholding Tax
         const withholdingTaxDiv = row.querySelector('.withholding-tax');
         const withholdingTaxValue = withholdingTaxDiv ? parseFloat(withholdingTaxDiv.textContent) || 0 : 0;
         
-        // Gross - Withholding Tax
         const grossMinusWithholdingDiv = row.querySelector('.gross-minus-withholding');
         const grossMinusWithholdingValue = grossMinusWithholdingDiv ? parseFloat(grossMinusWithholdingDiv.textContent) || 0 : 0;
         
-        // Remarks
         const remarksInput = row.querySelector('.remarks');
         const remarksValue = remarksInput ? remarksInput.value : '';
         
-        // Alternate row background for readability
         const rowClass = rowNumber % 2 === 0 ? 'highlight' : '';
         
         htmlContent += `
             <tr class="${rowClass}">
-                <td class="date-cell">${dateValue}</td>
-                <td class="text-left">${invoiceValue}</td>
-                <td class="text-center">${invoiceTypeValue}</td>
-                <td class="text-center">${transactionTypeValue}</td>
-                <td class="text-center">${tinValue}</td>
-                <td class="text-left">${supplierValue}</td>
-                <td class="text-left">${addressValue}</td>
-                <td class="currency numeric">${grossAmountValue.toFixed(2)}</td>
-                <td class="text-left">${natureExpenseValue}</td>
-                <td class="currency numeric">${inputTaxValue.toFixed(2)}</td>
-                <td class="text-center">${withholdingRateValue}</td>
-                <td class="currency numeric">${withholdingTaxValue.toFixed(2)}</td>
-                <td class="currency numeric">${grossMinusWithholdingValue.toFixed(2)}</td>
-                <td class="text-left">${remarksValue}</td>
-            </tr>
+                <td class="date-cell">${escapeHtml(dateValue)}<\/td>
+                <td class="text-left">${escapeHtml(invoiceValue)}<\/td>
+                <td class="text-center">${escapeHtml(invoiceTypeValue)}<\/td>
+                <td class="text-center">${escapeHtml(transactionTypeValue)}<\/td>
+                <td class="text-center">${escapeHtml(tinValue)}<\/td>
+                <td class="text-left">${escapeHtml(supplierValue)}<\/td>
+                <td class="text-left">${escapeHtml(addressValue)}<\/td>
+                <td class="currency numeric">${grossAmountValue.toFixed(2)}<\/td>
+                <td class="text-left">${escapeHtml(natureExpenseValue)}<\/td>
+                <td class="currency numeric">${inputTaxValue.toFixed(2)}<\/td>
+                <td class="text-center">${escapeHtml(withholdingRateValue)}<\/td>
+                <td class="currency numeric">${withholdingTaxValue.toFixed(2)}<\/td>
+                <td class="currency numeric">${grossMinusWithholdingValue.toFixed(2)}<\/td>
+                <td class="text-left">${escapeHtml(remarksValue)}<\/td>
+             <\/tr>
         `;
         
         rowNumber++;
@@ -3317,37 +3551,76 @@ function exportToExcel() {
     
     // Add summary row
     htmlContent += `
-                </tbody>
+                <\/tbody>
                 <tfoot>
                     <tr class="summary-row">
-                        <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:</td>
-                        <td class="currency numeric" style="font-weight: bold;">${totalGrossAmount.toFixed(2)}</td>
-                        <td>-</td>
-                        <td class="currency numeric" style="font-weight: bold;">${totalInputTax.toFixed(2)}</td>
-                        <td>-</td>
-                        <td class="currency numeric" style="font-weight: bold;">${totalWithholdingTax.toFixed(2)}</td>
-                        <td class="currency numeric" style="font-weight: bold;">${netPayable.toFixed(2)}</td>
-                        <td>-</td>
-                    </tr>
-                </tfoot>
-            </table>
+                        <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:<\/td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalGrossAmount.toFixed(2)}<\/td>
+                        <td class="text-center">-<\/td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalInputTax.toFixed(2)}<\/td>
+                        <td class="text-center">-<\/td>
+                        <td class="currency numeric" style="font-weight: bold;">${totalWithholdingTax.toFixed(2)}<\/td>
+                        <td class="currency numeric" style="font-weight: bold;">${netPayable.toFixed(2)}<\/td>
+                        <td class="text-center">-<\/td>
+                     <\/tr>
+                <\/tfoot>
+             <\/table>
+            
+            <!-- SUPPLIER NAME & TIN SUMMARY TABLE -->
+            <div class="section-title">Supplier Summary by TIN and Name<\/div>
+            <table class="supplier-summary-table">
+                <thead>
+                     <tr>
+                        <th width="45%">Supplier Name<\/th>
+                        <th width="30%">TIN Number<\/th>
+                        <th width="25%">Total Gross Amount (₱)<\/th>
+                     <\/tr>
+                <\/thead>
+                <tbody>
+    `;
+    
+    if (sortedSuppliers.length === 0) {
+        htmlContent += '<tr><td colspan="3" style="text-align: center;">No supplier data available<\/td><\/tr>';
+    } else {
+        let supplierTotalGrossAmount = 0;
+        sortedSuppliers.forEach(supplier => {
+            htmlContent += `
+                 <tr>
+                    <td class="text-left">${escapeHtml(supplier.name)}<\/td>
+                    <td class="text-center">${escapeHtml(supplier.tin)}<\/td>
+                    <td class="currency numeric">${supplier.totalGrossAmount.toFixed(2)}<\/td>
+                 <\/tr>
+            `;
+            supplierTotalGrossAmount += supplier.totalGrossAmount;
+        });
+        htmlContent += `
+            <tr style="background-color: #fff2cc; font-weight: bold;">
+                <td class="text-right" colspan="2">TOTAL GROSS AMOUNT (ALL SUPPLIERS):<\/td>
+                <td class="currency numeric">${supplierTotalGrossAmount.toFixed(2)}<\/td>
+             <\/tr>
+        `;
+    }
+    
+    htmlContent += `
+                <\/tbody>
+             <\/table>
             
             <!-- EXPENSE CATEGORY TALLY SECTION -->
             <div class="tally-section">
                 <div class="tally-header">
                     EXPENSE CATEGORY TALLY SUMMARY
-                </div>
+                <\/div>
                 
                 <table class="tally-table">
                     <thead>
                         <tr>
-                            <th width="40%">Nature of Expense</th>
-                            <th width="10%">W/Tax Rate</th>
-                            <th width="10%">Item Count</th>
-                            <th width="20%">Total Gross Amount</th>
-                            <th width="20%">Total Withholding Tax</th>
-                        </tr>
-                    </thead>
+                            <th width="40%">Nature of Expense<\/th>
+                            <th width="12%">W/Tax Rate<\/th>
+                            <th width="10%">Item Count<\/th>
+                            <th width="20%">Total Gross Amount<\/th>
+                            <th width="18%">Total Withholding Tax<\/th>
+                         <\/tr>
+                    <\/thead>
                     <tbody>
     `;
     
@@ -3360,68 +3633,120 @@ function exportToExcel() {
         const data = expenseTally[category];
         const displayCategory = category.replace(/–/g, '-').replace(/ {2,}/g, ' ');
         const ratePercentage = (data.rate * 100).toFixed(0);
+        const rateDisplay = data.rate === 0 ? '0%' : `${ratePercentage}%`;
         
         tallyTotalGross += data.totalGrossAmount;
         tallyTotalWithholdingTax += data.totalWithholdingTax;
         tallyTotalItems += data.count;
         
         htmlContent += `
-            <tr>
-                <td class="tally-category">${displayCategory}</td>
-                <td class="tally-rate">${ratePercentage}%</td>
-                <td class="tally-count">${data.count}</td>
-                <td class="currency numeric">${data.totalGrossAmount.toFixed(2)}</td>
-                <td class="currency numeric">${data.totalWithholdingTax.toFixed(2)}</td>
-            </tr>
+             <tr>
+                <td class="tally-category">${escapeHtml(displayCategory)}<\/td>
+                <td class="tally-rate">${rateDisplay}<\/td>
+                <td class="tally-count">${data.count}<\/td>
+                <td class="currency numeric">${data.totalGrossAmount.toFixed(2)}<\/td>
+                <td class="currency numeric">${data.totalWithholdingTax.toFixed(2)}<\/td>
+             <\/tr>
         `;
     });
     
     // Add total row for tally
     htmlContent += `
                         <tr class="tally-total-row">
-                            <td colspan="2" class="text-right" style="font-weight: bold;">TOTAL:</td>
-                            <td class="text-center" style="font-weight: bold;">${tallyTotalItems}</td>
-                            <td class="currency numeric" style="font-weight: bold;">${tallyTotalGross.toFixed(2)}</td>
-                            <td class="currency numeric" style="font-weight: bold;">${tallyTotalWithholdingTax.toFixed(2)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            <td colspan="2" class="text-right" style="font-weight: bold;">TOTAL:<\/td>
+                            <td class="text-center" style="font-weight: bold;">${tallyTotalItems}<\/td>
+                            <td class="currency numeric" style="font-weight: bold;">${tallyTotalGross.toFixed(2)}<\/td>
+                            <td class="currency numeric" style="font-weight: bold;">${tallyTotalWithholdingTax.toFixed(2)}<\/td>
+                         <\/tr>
+                    <\/tbody>
+                 <\/table>
+            <\/div>
             
+            <!-- FINANCIAL SUMMARY -->
             <div class="totals-section">
-                <div class="section-title">Financial Summary</div>
+                <div class="section-title">Financial Summary<\/div>
                 <table class="totals-table">
-                    <tr>
-                        <td class="total-label">Total Gross Amount:</td>
-                        <td class="total-value">₱ ${totalGrossAmount.toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                        <td class="total-label">Total Input Tax (0%):</td>
-                        <td class="total-value">₱ ${totalInputTax.toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                        <td class="total-label">Total Withholding Tax:</td>
-                        <td class="total-value">₱ ${totalWithholdingTax.toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                        <td class="total-label" style="border-top: 1px solid #00cc7a; padding-top: 10px;">Net Amount Payable:</td>
+                     <tr>
+                        <td class="total-label">Total Gross Amount:<\/td>
+                        <td class="total-value">₱ ${totalGrossAmount.toFixed(2)}<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="total-label">Total Input Tax (0% - Non-VAT):<\/td>
+                        <td class="total-value">₱ ${totalInputTax.toFixed(2)}<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="total-label">Total Withholding Tax:<\/td>
+                        <td class="total-value">₱ ${totalWithholdingTax.toFixed(2)}<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="total-label" style="border-top: 1px solid #00cc7a; padding-top: 10px;">Net Amount Payable:<\/td>
                         <td class="total-value" style="border-top: 1px solid #00cc7a; padding-top: 10px; font-size: 11pt; color: #006837;">
                             ₱ ${netPayable.toFixed(2)}
-                        </td>
-                    </tr>
-                </table>
-            </div>
+                         <\/td>
+                     <\/tr>
+                 <\/table>
+            <\/div>
+            
+            <!-- WITHHOLDING TAX DISTRIBUTION SUMMARY -->
+            <div class="totals-section" style="margin-top: 15px;">
+                <div class="section-title">Withholding Tax Distribution Summary<\/div>
+                <table class="totals-table">
+    `;
+    
+    // Calculate withholding tax distribution by rate
+    let zeroPercentTotal = 0, zeroPercentCount = 0;
+    let onePercentTotal = 0, onePercentCount = 0;
+    let twoPercentTotal = 0, twoPercentCount = 0;
+    let fivePercentTotal = 0, fivePercentCount = 0;
+    
+    sortedCategories.forEach(category => {
+        const data = expenseTally[category];
+        if (data.rate === 0) {
+            zeroPercentTotal += data.totalWithholdingTax;
+            zeroPercentCount += data.count;
+        } else if (data.rate === 0.01) {
+            onePercentTotal += data.totalWithholdingTax;
+            onePercentCount += data.count;
+        } else if (data.rate === 0.02) {
+            twoPercentTotal += data.totalWithholdingTax;
+            twoPercentCount += data.count;
+        } else if (data.rate === 0.05) {
+            fivePercentTotal += data.totalWithholdingTax;
+            fivePercentCount += data.count;
+        }
+    });
+    
+    htmlContent += `
+                    <tr>
+                        <td class="total-label">0% Withholding Tax (Exempt):<\/td>
+                        <td class="total-value">₱ ${zeroPercentTotal.toFixed(2)} (${zeroPercentCount} transaction${zeroPercentCount !== 1 ? 's' : ''})<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="total-label">1% Withholding Tax:<\/td>
+                        <td class="total-value">₱ ${onePercentTotal.toFixed(2)} (${onePercentCount} transaction${onePercentCount !== 1 ? 's' : ''})<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="total-label">2% Withholding Tax:<\/td>
+                        <td class="total-value">₱ ${twoPercentTotal.toFixed(2)} (${twoPercentCount} transaction${twoPercentCount !== 1 ? 's' : ''})<\/td>
+                     <\/tr>
+                     <tr>
+                        <td class="total-label">5% Withholding Tax:<\/td>
+                        <td class="total-value">₱ ${fivePercentTotal.toFixed(2)} (${fivePercentCount} transaction${fivePercentCount !== 1 ? 's' : ''})<\/td>
+                     <\/tr>
+                 <\/table>
+            <\/div>
             
             <div class="footer">
-                <p>Report generated on ${formattedDate} at ${formattedTime}</p>
-                <p>Number of Expense Categories: ${sortedCategories.length}</p>
-                <p>Total Transactions: ${rowNumber - 1} items across ${sortedCategories.length} categories</p>
-                <p>Authorized by: ${authorizedEmployee} | Prepared by: Non-VAT Expenses Data Tracker System</p>
-                <p>This is a computer-generated report. No signature is required.</p>
-                <p>© ${new Date().getFullYear()} Non-VAT Expenses Data Tracker - Professional Expenses Tracking System</p>
-            </div>
-        </body>
-        </html>
+                <p>Report generated on ${formattedDate} at ${formattedTime}<\/p>
+                <p>Number of Expense Categories: ${sortedCategories.length}<\/p>
+                <p>Total Transactions: ${rowNumber - 1} items across ${sortedCategories.length} categories<\/p>
+                <p>Number of Unique Suppliers: ${sortedSuppliers.length}<\/p>
+                <p>Authorized by: ${escapeHtml(authorizedEmployee)} | Prepared by: Non-VAT Expenses Data Tracker System<\/p>
+                <p>This is a computer-generated report. No signature is required.<\/p>
+                <p>© ${new Date().getFullYear()} Non-VAT Expenses Data Tracker - Professional Expenses Tracking System<\/p>
+            <\/div>
+        <\/body>
+        <\/html>
     `;
     
     // Create download link for XLS file
@@ -3435,13 +3760,11 @@ function exportToExcel() {
     link.click();
     document.body.removeChild(link);
     
-    // Clean up
     setTimeout(() => {
         URL.revokeObjectURL(url);
     }, 100);
     
-    // Show success message
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Detailed transactions\n• Expense category tally\n• Financial summary\n• ${sortedCategories.length} expense categories analyzed\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Detailed Expenses Transactions Table\n• Supplier Summary Table (Name + TIN with Gross Amount totals)\n• Expense Category Tally with Withholding Tax breakdown\n• Withholding Tax Distribution Summary (0%, 1%, 2%, 5%)\n• Financial summary\n• Professional formatting\n• Print-ready layout`);
 }
 
 // Helper function to calculate expense tally for export
@@ -3607,6 +3930,22 @@ function initButtonListeners() {
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
     const selectMultipleBtn = document.getElementById('selectMultipleBtn');
     const entryCounterBtn = document.getElementById('entryCounterBtn');
+    // Add batch rows button listener
+const addBatchRowsBtn = document.getElementById('addBatchRowsBtn');
+
+if (addBatchRowsBtn) {
+    addBatchRowsBtn.addEventListener('click', function() {
+        const count = prompt('How many rows would you like to add?', '10');
+        const numCount = parseInt(count);
+        if (numCount && numCount > 0 && numCount <= 5000) {
+            addMultipleRows(numCount);
+        } else if (numCount > 5000) {
+            alert('Maximum 5000 rows at a time to prevent performance issues.');
+        } else {
+            alert('Please enter a valid number (1-5000).');
+        }
+    });
+}
     
     // Add event listeners to sidebar buttons
     if (addRowBtn) {
@@ -4852,5 +5191,257 @@ function initColumnVisibility() {
     });
 }
     </script>
+
+    <script>
+// ============================================================
+// SUPPLIER NAME & TIN AUTO-FILL STORAGE SYSTEM (NON-VAT EXPENSES)
+// ============================================================
+
+(function() {
+    const STORAGE_KEY = 'NONVAT_EXPENSES_SUPPLIER_TIN_MAP';
+    let supplierDB = new Map();
+    let monitorVisible = true;
+    
+    function loadSupplierDB() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                supplierDB = new Map(Object.entries(parsed));
+            } catch(e) { console.warn(e); }
+        }
+        const savedVisibility = localStorage.getItem('nonVatExpensesSuppliersMonitorVisible');
+        monitorVisible = savedVisibility !== null ? savedVisibility === 'true' : true;
+        updateMonitorDisplay();
+    }
+    
+    function saveSupplierDB() {
+        const obj = Object.fromEntries(supplierDB);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+        updateMonitorDisplay();
+    }
+    
+    function addSupplierPair(supplierName, tinNumber) {
+        if (!supplierName || !tinNumber) return false;
+        
+        const cleanName = supplierName.trim();
+        const cleanTin = tinNumber.trim();
+        
+        if (cleanName === "" || cleanTin === "") return false;
+        
+        const existingTinForName = supplierDB.get(`name:${cleanName}`);
+        const existingNameForTin = supplierDB.get(`tin:${cleanTin}`);
+        
+        if (existingTinForName === cleanTin && existingNameForTin === cleanName) {
+            return true;
+        }
+        
+        if (existingTinForName && existingTinForName !== cleanTin) {
+            showWarningToast(`❌ Supplier "${cleanName}" already registered with TIN ${existingTinForName}`);
+            return false;
+        }
+        
+        if (existingNameForTin && existingNameForTin !== cleanName) {
+            showWarningToast(`❌ TIN ${cleanTin} already registered to "${existingNameForTin}"`);
+            return false;
+        }
+        
+        supplierDB.set(`name:${cleanName}`, cleanTin);
+        supplierDB.set(`tin:${cleanTin}`, cleanName);
+        
+        saveSupplierDB();
+        showAutoFillFeedback(null, `✓ Saved: "${cleanName}" ↔ ${cleanTin}`);
+        return true;
+    }
+    
+    function lookupTinByName(name) {
+        if (!name) return null;
+        return supplierDB.get(`name:${name.trim()}`) || null;
+    }
+    
+    function lookupNameByTin(tin) {
+        if (!tin) return null;
+        return supplierDB.get(`tin:${tin.trim()}`) || null;
+    }
+    
+    function getAllPairs() {
+        const pairs = [];
+        for (let [key, value] of supplierDB.entries()) {
+            if (key.startsWith('name:')) {
+                pairs.push({ name: key.slice(5), tin: value });
+            }
+        }
+        return pairs.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    function updateMonitorDisplay() {
+        let monitorSection = document.getElementById('registeredNonVatExpensesSuppliersMonitor');
+        const pairs = getAllPairs();
+        
+        if (!monitorSection) {
+            const tallySection = document.querySelector('.tally-section');
+            if (!tallySection) return;
+            
+            monitorSection = document.createElement('div');
+            monitorSection.id = 'registeredNonVatExpensesSuppliersMonitor';
+            monitorSection.className = 'registered-monitor';
+            monitorSection.style.cssText = `
+                margin: 20px 30px;
+                background: linear-gradient(135deg, rgba(0, 40, 30, 0.85) 0%, rgba(0, 30, 25, 0.9) 100%);
+                border: 1px solid rgba(0, 255, 157, 0.3);
+                border-radius: 12px;
+                overflow: hidden;
+                flex-shrink: 0;
+                display: ${monitorVisible ? 'block' : 'none'};
+            `;
+            
+            monitorSection.innerHTML = `
+                <div style="padding: 15px 20px; background: rgba(0, 255, 157, 0.1); border-bottom: 1px solid rgba(0, 255, 157, 0.3); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-truck" style="color: #00ff9d; font-size: 20px;"></i>
+                        <h3 style="color: #00ff9d; margin: 0; font-weight: 600;">REGISTERED SUPPLIERS (NON-VAT EXPENSES)</h3>
+                        <span id="nonVatExpensesSuppliersCount" style="background: rgba(0,255,157,0.2); padding: 2px 10px; border-radius: 20px; font-size: 12px;">${pairs.length} supplier(s)</span>
+                    </div>
+                    <button id="clearAllNonVatExpensesSuppliersBtn" style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; color: #ff8888; padding: 6px 15px; border-radius: 20px; cursor: pointer;">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                </div>
+                <div id="nonVatExpensesSuppliersListContainer" style="max-height: 300px; overflow-y: auto; padding: 10px;">
+                    <div style="text-align: center; padding: 40px; color: #80cbc4;">Loading suppliers...</div>
+                </div>
+            `;
+            
+            const statsSection = document.querySelector('.stats');
+            if (statsSection) {
+                statsSection.parentNode.insertBefore(monitorSection, statsSection);
+            } else {
+                tallySection.parentNode.insertBefore(monitorSection, tallySection.nextSibling);
+            }
+            
+            document.getElementById('clearAllNonVatExpensesSuppliersBtn')?.addEventListener('click', () => {
+                if (confirm('Delete ALL registered suppliers?')) {
+                    supplierDB.clear();
+                    saveSupplierDB();
+                    showAutoFillFeedback(null, '🗑 All suppliers cleared');
+                }
+            });
+        }
+        
+        document.getElementById('nonVatExpensesSuppliersCount').textContent = `${pairs.length} supplier(s)`;
+        
+        const container = document.getElementById('nonVatExpensesSuppliersListContainer');
+        if (!container) return;
+        
+        if (pairs.length === 0) {
+            container.innerHTML = `<div style="text-align: center; padding: 40px; color: #80cbc4;"><i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px;"></i><p>No registered suppliers yet.</p><p style="font-size: 12px;">Enter a Supplier Name and TIN to add them here.</p></div>`;
+            return;
+        }
+        
+        let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+        pairs.forEach(pair => {
+            html += `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ff9d;">
+                    <div><i class="fas fa-truck" style="color: #00ff9d;"></i> <strong>${escapeHtml(pair.name)}</strong> → ${escapeHtml(pair.tin)}</div>
+                    <button onclick="window.deleteNonVatExpensesSupplierPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer;"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    function attachAutoFillToRow(row) {
+        if (!row) return;
+        if (row.hasAttribute('data-autofill-bound')) return;
+        
+        const tinInput = row.querySelector('.tin-number');
+        const nameInput = row.querySelector('.supplier-name');
+        if (!tinInput || !nameInput) return;
+        
+        row.setAttribute('data-autofill-bound', 'true');
+        
+        nameInput.addEventListener('blur', () => {
+            const nameVal = nameInput.value.trim();
+            if (nameVal) {
+                const existingTin = lookupTinByName(nameVal);
+                if (existingTin && !tinInput.value.trim()) {
+                    tinInput.value = existingTin;
+                    formatTIN(tinInput);
+                    validateTIN(tinInput);
+                    showAutoFillFeedback(tinInput, '✓ TIN auto-filled');
+                }
+            }
+        });
+        
+        tinInput.addEventListener('blur', () => {
+            const tinVal = tinInput.value.trim();
+            if (tinVal) {
+                const existingName = lookupNameByTin(tinVal);
+                if (existingName && !nameInput.value.trim()) {
+                    nameInput.value = existingName;
+                    showAutoFillFeedback(nameInput, '✓ Supplier name auto-filled');
+                }
+            }
+        });
+        
+        const storePair = () => {
+            const nameVal = nameInput.value.trim();
+            const tinVal = tinInput.value.trim();
+            if (nameVal && tinVal) addSupplierPair(nameVal, tinVal);
+        };
+        
+        nameInput.addEventListener('blur', storePair);
+        tinInput.addEventListener('blur', storePair);
+    }
+    
+    function bindAutoFillToAllRows() {
+        document.querySelectorAll('#tableBody tr').forEach(row => attachAutoFillToRow(row));
+    }
+    
+    function observeNewRows() {
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) {
+                        if (node.tagName === 'TR') attachAutoFillToRow(node);
+                        node.querySelectorAll?.('tr').forEach(row => attachAutoFillToRow(row));
+                    }
+                });
+            });
+        });
+        observer.observe(document.getElementById('tableBody'), { childList: true, subtree: true });
+    }
+    
+    window.deleteNonVatExpensesSupplierPair = function(name, tin) {
+        supplierDB.delete(`name:${name}`);
+        supplierDB.delete(`tin:${tin}`);
+        saveSupplierDB();
+        showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
+    };
+    
+    function initAutoFill() {
+        loadSupplierDB();
+        bindAutoFillToAllRows();
+        observeNewRows();
+        
+        // Enhance addMultipleRows to bind auto-fill
+        if (typeof addMultipleRows === 'function') {
+            const originalAddMultipleRows = addMultipleRows;
+            window.addMultipleRows = function(count) {
+                originalAddMultipleRows(count);
+                setTimeout(bindAutoFillToAllRows, 100);
+            };
+        }
+        
+        console.log('✅ Non-VAT Expenses auto-fill active');
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAutoFill);
+    } else {
+        initAutoFill();
+    }
+})();
+</script>
 </body>
 </html>

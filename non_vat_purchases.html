@@ -824,6 +824,11 @@ td.selected {
                     <i class="fas fa-plus-circle"></i>
                     <span class="sidebar-btn-text">Add New Row</span>
                 </button>
+
+                <button class="sidebar-btn" id="addBatchRowsBtn">
+    <i class="fas fa-layer-group"></i>
+    <span class="sidebar-btn-text">Add Multiple Rows</span>
+</button>
                 
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
@@ -870,6 +875,11 @@ td.selected {
                     <i class="fas fa-copyright"></i>
                     <span class="sidebar-btn-text">Hide Footer</span>
                 </button>
+
+                <button class="sidebar-btn toggle-btn" id="toggleSuppliersMonitorBtn">
+    <i class="fas fa-building"></i>
+    <span class="sidebar-btn-text">Hide Suppliers List</span>
+</button>
                 
                 <div class="sidebar-divider"></div>
                 
@@ -1217,6 +1227,7 @@ let isLongPressing = false;
 let longPressInterval = null;
 let addedRowsCount = 0;
 
+// ===== UPDATED LONG PRESS WITH BATCH ADD =====
 function startLongPress(button) {
     if (longPressTimer) clearTimeout(longPressTimer);
     
@@ -1225,24 +1236,19 @@ function startLongPress(button) {
             isLongPressing = true;
             addedRowsCount = 0;
             
-            // Add visual feedback
             button.classList.add('long-press-active');
-            
-            // Show toast notification
             showLongPressToast('Adding rows continuously... Release to stop');
             
-            // Start adding rows repeatedly
             longPressInterval = setInterval(() => {
-                addNewRow();
-                addedRowsCount++;
+                addMultipleRows(5);  // Add 5 rows at a time
+                addedRowsCount += 5;
                 
-                // Update toast with count every 5 rows
-                if (addedRowsCount % 5 === 0) {
+                if (addedRowsCount % 20 === 0) {
                     updateLongPressToast(`Added ${addedRowsCount} rows...`);
                 }
-            }, 200); // Add a new row every 200ms (5 rows per second)
+            }, 250);
         }
-    }, 500); // 500ms delay to trigger long press
+    }, 500);
 }
 
 function stopLongPress(button) {
@@ -1374,7 +1380,7 @@ function initLongPressFeature() {
     }
 }
 
-// Also add the same functionality to the entry counter button (optional)
+// ===== UPDATED COUNTER LONG PRESS WITH BATCH ADD =====
 function initEntryCounterLongPress() {
     const entryCounterBtn = document.getElementById('entryCounterBtn');
     if (entryCounterBtn) {
@@ -1395,13 +1401,13 @@ function initEntryCounterLongPress() {
                     showLongPressToast('Adding rows continuously... Release to stop');
                     
                     counterLongPressInterval = setInterval(() => {
-                        addNewRow();
-                        counterAddedRows++;
+                        addMultipleRows(5);
+                        counterAddedRows += 5;
                         
-                        if (counterAddedRows % 5 === 0) {
+                        if (counterAddedRows % 20 === 0) {
                             updateLongPressToast(`Added ${counterAddedRows} rows...`);
                         }
-                    }, 200);
+                    }, 250);
                 }
             }, 500);
         }
@@ -1948,6 +1954,162 @@ function addNewRow() {
     renderCurrentPage();
     
     updateAllStats();
+}
+
+// ===== OPTIMIZED BATCH ADD ROWS (NON-VAT PURCHASES) =====
+function addMultipleRows(count) {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    if (count > 5000) {
+        if (!confirm(`Adding ${count} rows may take a few seconds. Continue?`)) {
+            return;
+        }
+    }
+    
+    const startTime = performance.now();
+    const fragment = document.createDocumentFragment();
+    const rows = [];
+    const today = new Date().toISOString().split('T')[0];
+    
+    for (let i = 0; i < count; i++) {
+        const rowId = 'row_' + Date.now() + '_' + i + '_' + Math.random();
+        const row = document.createElement('tr');
+        row.id = rowId;
+        
+        row.innerHTML = `
+            <td><input type="date" value="${today}" class="editable date-input"></td>
+            <td><input type="text" class="editable invoice-number" placeholder="INV-001"></td>
+            <td>
+                <select class="editable invoice-type">
+                    <option value="">Select</option>
+                    <option value="OR">OR</option>
+                    <option value="SI">SI</option>
+                    <option value="DR">DR</option>
+                    <option value="AR">AR</option>
+                    <option value="TR">TR</option>
+                    <option value="CR">CR</option>
+                    <option value="OTHERS">OTHERS</option>
+                </select>
+            </div>
+            </td>
+            <td>
+                <select class="editable payment-mode">
+                    <option value="">Select</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Charge">Charge</option>
+                </select>
+            </div>
+            </div>
+            <td style="position: relative;">
+                <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+                <div class="validation-message" style="display: none;"></div>
+            </div>
+            </td>
+            <td><input type="text" class="editable supplier-name" placeholder="Supplier name"></div>
+            </div>
+            <td><input type="text" class="editable address" placeholder="Supplier address"></div>
+            </div>
+            <td><input type="number" step="0.01" min="0" class="editable gross-purchases" placeholder="0.00"></div>
+            </div>
+            <td>
+                <select class="editable withholding-rate">
+                    <option value="0">0%</option>
+                    <option value="0.01">1%</option>
+                    <option value="0.02">2%</option>
+                    <option value="0.05">5%</option>
+                </select>
+            </div>
+            </div>
+            <td><div class="uneditable withholding-amount">0.00</div></div>
+            </div>
+            <td><div class="uneditable net-amount">0.00</div></div>
+            </div>
+            <td><input type="text" class="editable remarks" placeholder="Enter remarks"></div>
+            </div>
+            <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></div>
+            </div>
+        `;
+        
+        rows.push(row);
+        fragment.appendChild(row);
+    }
+    
+    // Single DOM update
+    tableBody.appendChild(fragment);
+    
+    // Apply column visibility and attach listeners to all new rows
+    const columnVisibility = JSON.parse(localStorage.getItem('nonVatPurchasesColumnVisibility')) || {};
+    const columns = [
+        'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'tinNumber',
+        'supplierName', 'address', 'grossPurchases', 'withholdingRate',
+        'withholdingAmount', 'netAmount', 'remarks', 'action'
+    ];
+    
+    for (const row of rows) {
+        // Apply column visibility
+        const cells = row.querySelectorAll('td');
+        columns.forEach((key, index) => {
+            if (columnVisibility[key] === true && cells[index]) {
+                cells[index].classList.add('hidden-column');
+            }
+        });
+        
+        // Attach event listeners
+        const editableInputs = row.querySelectorAll('.editable');
+        editableInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                updateCalculations(row);
+                scheduleStatsUpdate();
+            });
+            input.addEventListener('change', function() {
+                updateCalculations(row);
+                scheduleStatsUpdate();
+            });
+        });
+        
+        // TIN formatting
+        const tinInput = row.querySelector('.tin-number');
+        if (tinInput) {
+            tinInput.addEventListener('input', (e) => formatTIN(e.target));
+            tinInput.addEventListener('blur', (e) => validateTIN(e.target));
+        }
+        
+        // Focus effects
+        const inputs = row.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
+            });
+            input.addEventListener('blur', function() {
+                this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
+            });
+        });
+    }
+    
+    // Update pagination
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    // Single stats update
+    updateAllStats();
+    
+    const endTime = performance.now();
+    console.log(`Added ${count} rows in ${(endTime - startTime).toFixed(2)}ms`);
+    
+    if (typeof showToast === 'function') {
+        showToast(`✅ Added ${count} rows successfully!`, 'success');
+    }
+}
+
+// ===== DEBOUNCED STATS UPDATE =====
+let statsTimeout;
+
+function scheduleStatsUpdate() {
+    if (statsTimeout) clearTimeout(statsTimeout);
+    statsTimeout = setTimeout(() => updateAllStats(), 100);
 }
 
 function deleteRow(rowId) {
@@ -2510,7 +2672,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ===== EXPORT FUNCTION =====
+// ===== EXPORT FUNCTION WITH SUPPLIER NAME & TIN SUMMARY TABLE =====
 function exportToExcel() {
     // Validate required company info
     const companyName = document.getElementById('companyName')?.value.trim();
@@ -2542,6 +2704,34 @@ function exportToExcel() {
     const totalWithholding = parseFloat(document.getElementById('totalWithholding')?.textContent) || 0;
     const netPayable = parseFloat(document.getElementById('netPayable')?.textContent) || 0;
     
+    // Collect supplier summary data (Name + TIN with Gross Purchases totals)
+    const supplierSummary = new Map();
+    
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach(row => {
+        const grossPurchases = parseFloat(row.querySelector('.gross-purchases')?.value) || 0;
+        const supplierName = row.querySelector('.supplier-name')?.value || '';
+        const tinNumber = row.querySelector('.tin-number')?.value || '';
+        
+        // Build supplier summary
+        if (supplierName && tinNumber && grossPurchases > 0) {
+            const key = `${supplierName}|${tinNumber}`;
+            if (supplierSummary.has(key)) {
+                supplierSummary.set(key, supplierSummary.get(key) + grossPurchases);
+            } else {
+                supplierSummary.set(key, grossPurchases);
+            }
+        }
+    });
+    
+    // Sort suppliers by total gross purchases (descending)
+    const sortedSuppliers = Array.from(supplierSummary.entries())
+        .map(([key, total]) => {
+            const [name, tin] = key.split('|');
+            return { name, tin, totalGrossPurchases: total };
+        })
+        .sort((a, b) => b.totalGrossPurchases - a.totalGrossPurchases);
+    
     // Calculate tally data for export
     let totalCashAmount = 0;
     let totalChargeAmount = 0;
@@ -2556,7 +2746,6 @@ function exportToExcel() {
     let fivePercentCount = 0;
     let zeroPercentCount = 0;
     
-    const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
         const paymentMode = row.querySelector('.payment-mode')?.value;
         const withholdingRate = parseFloat(row.querySelector('.withholding-rate')?.value) || 0;
@@ -2759,6 +2948,32 @@ function exportToExcel() {
                     border-bottom: 1px solid #00cc7a;
                 }
                 
+                .supplier-summary-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 15px;
+                    margin-bottom: 25px;
+                    background-color: #ffffff;
+                }
+                
+                .supplier-summary-table th {
+                    background-color: #4caf50;
+                    color: white;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 10px;
+                    border: 1px solid #388e3c;
+                }
+                
+                .supplier-summary-table td {
+                    padding: 8px 10px;
+                    border: 1px solid #dddddd;
+                }
+                
+                .supplier-summary-table .numeric {
+                    text-align: right;
+                }
+                
                 .totals-section {
                     margin-top: 25px;
                     background-color: #f0f9f5;
@@ -2814,29 +3029,29 @@ function exportToExcel() {
                 <table class="company-info-table">
                     <tr>
                         <td class="company-label">Company Name:</td>
-                        <td class="company-value">${companyName}</td>
+                        <td class="company-value">${escapeHtml(companyName)}</td>
                         <td class="company-label">TIN Number:</td>
-                        <td class="company-value">${companyTIN}</td>
+                        <td class="company-value">${escapeHtml(companyTIN)}</td>
                     </tr>
                     <tr>
                         <td class="company-label">Address:</td>
-                        <td class="company-value">${companyAddress}</td>
+                        <td class="company-value">${escapeHtml(companyAddress)}</td>
                         <td class="company-label">Line of Business:</td>
-                        <td class="company-value">${lineOfBusiness}</td>
+                        <td class="company-value">${escapeHtml(lineOfBusiness)}</td>
                     </tr>
-                    <tr>
+                     <tr>
                         <td class="company-label">Telephone:</td>
-                        <td class="company-value">${document.getElementById('telephone')?.value.trim() || 'N/A'}</td>
+                        <td class="company-value">${escapeHtml(document.getElementById('telephone')?.value.trim() || 'N/A')}</td>
                         <td class="company-label">Report Date:</td>
-                        <td class="company-value">${document.getElementById('reportDate')?.value || ''}</td>
+                        <td class="company-value">${escapeHtml(document.getElementById('reportDate')?.value || '')}</td>
                     </tr>
-                    <tr>
+                     <tr>
                         <td class="company-label">Authorized Employee:</td>
-                        <td class="company-value">${authorizedEmployee}</td>
+                        <td class="company-value">${escapeHtml(authorizedEmployee)}</td>
                         <td class="company-label">Email:</td>
-                        <td class="company-value">${document.getElementById('email')?.value.trim() || 'N/A'}</td>
+                        <td class="company-value">${escapeHtml(document.getElementById('email')?.value.trim() || 'N/A')}</td>
                     </tr>
-                </table>
+                 </table>
             </div>
             
             <div class="section-title">Non-Vatable Purchases Transactions</div>
@@ -2922,19 +3137,19 @@ function exportToExcel() {
         
         htmlContent += `
             <tr class="${rowClass}">
-                <td class="date-cell">${dateValue}</td>
-                <td class="text-left">${invoiceValue}</td>
-                <td class="text-center">${invoiceTypeValue}</td>
-                <td class="text-center">${paymentModeValue}</td>
-                <td class="text-center">${tinValue}</td>
-                <td class="text-left">${supplierValue}</td>
-                <td class="text-left">${addressValue}</td>
+                <td class="date-cell">${escapeHtml(dateValue)}</td>
+                <td class="text-left">${escapeHtml(invoiceValue)}</td>
+                <td class="text-center">${escapeHtml(invoiceTypeValue)}</td>
+                <td class="text-center">${escapeHtml(paymentModeValue)}</td>
+                <td class="text-center">${escapeHtml(tinValue)}</td>
+                <td class="text-left">${escapeHtml(supplierValue)}</td>
+                <td class="text-left">${escapeHtml(addressValue)}</td>
                 <td class="currency numeric">${grossPurchasesValue.toFixed(2)}</td>
-                <td class="text-center">${rateValue}</td>
+                <td class="text-center">${escapeHtml(rateValue)}</td>
                 <td class="currency numeric">${withholdingAmountValue.toFixed(2)}</td>
                 <td class="currency numeric">${netAmountValue.toFixed(2)}</td>
-                <td class="text-left">${remarksValue}</td>
-            </tr>
+                <td class="text-left">${escapeHtml(remarksValue)}</td>
+             </tr>
         `;
         
         rowNumber++;
@@ -2948,67 +3163,106 @@ function exportToExcel() {
                     <tr class="summary-row">
                         <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalGrossPurchases.toFixed(2)}</td>
-                        <td>-</td>
+                        <td class="text-center">-</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalWithholding.toFixed(2)}</td>
                         <td class="currency numeric" style="font-weight: bold;">${totalNetAmount.toFixed(2)}</td>
-                        <td>-</td>
-                    </tr>
+                        <td class="text-center">-</td>
+                     </tr>
                 </tfoot>
-            </table>
+             </table>
+            
+            <!-- SUPPLIER NAME & TIN SUMMARY TABLE -->
+            <div class="section-title">Supplier Summary by TIN and Name</div>
+            <table class="supplier-summary-table">
+                <thead>
+                    <tr>
+                        <th width="45%">Supplier Name</th>
+                        <th width="30%">TIN Number</th>
+                        <th width="25%">Total Gross Purchases (₱)</th>
+                     </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    if (sortedSuppliers.length === 0) {
+        htmlContent += '<tr><td colspan="3" style="text-align: center;">No supplier data available</td></tr>';
+    } else {
+        let supplierTotalGrossPurchases = 0;
+        sortedSuppliers.forEach(supplier => {
+            htmlContent += `
+                 <tr>
+                    <td class="text-left">${escapeHtml(supplier.name)}</td>
+                    <td class="text-center">${escapeHtml(supplier.tin)}</td>
+                    <td class="currency numeric">${supplier.totalGrossPurchases.toFixed(2)}</td>
+                 </tr>
+            `;
+            supplierTotalGrossPurchases += supplier.totalGrossPurchases;
+        });
+        htmlContent += `
+            <tr style="background-color: #fff2cc; font-weight: bold;">
+                <td class="text-right" colspan="2">TOTAL GROSS PURCHASES (ALL SUPPLIERS):</td>
+                <td class="currency numeric">${supplierTotalGrossPurchases.toFixed(2)}</td>
+             </tr>
+        `;
+    }
+    
+    htmlContent += `
+                </tbody>
+             </table>
             
             <div class="totals-section">
                 <div class="section-title">Financial Summary</div>
                 <table class="totals-table">
-                    <tr>
+                     <tr>
                         <td class="total-label">Total Gross Purchases:</td>
                         <td class="total-value">₱ ${totalGrossPurchases.toFixed(2)}</td>
-                    </tr>
-                    <tr>
+                     </tr>
+                     <tr>
                         <td class="total-label">Total Withholding Tax:</td>
                         <td class="total-value">₱ ${totalWithholding.toFixed(2)}</td>
-                    </tr>
-                    <tr>
+                     </tr>
+                     <tr>
                         <td class="total-label" style="border-top: 1px solid #00cc7a; padding-top: 10px;">Net Amount Payable:</td>
                         <td class="total-value" style="border-top: 1px solid #00cc7a; padding-top: 10px; font-size: 11pt; color: #006837;">
                             ₱ ${netPayable.toFixed(2)}
-                        </td>
-                    </tr>
-                </table>
+                         </td>
+                     </tr>
+                 </table>
             </div>
             
             <div class="totals-section" style="margin-top: 15px;">
                 <div class="section-title">Payment & Withholding Tax Distribution</div>
                 <table class="totals-table">
-                    <tr>
+                     <tr>
                         <td class="total-label">Cash Purchases:</td>
                         <td class="total-value">₱ ${totalCashAmount.toFixed(2)} (${cashCount} transaction${cashCount !== 1 ? 's' : ''})</td>
-                    </tr>
-                    <tr>
+                     </tr>
+                     <tr>
                         <td class="total-label">Charge Purchases:</td>
                         <td class="total-value">₱ ${totalChargeAmount.toFixed(2)} (${chargeCount} transaction${chargeCount !== 1 ? 's' : ''})</td>
-                    </tr>
-                    <tr>
+                     </tr>
+                     <tr>
                         <td class="total-label">1% Withholding Tax:</td>
                         <td class="total-value">₱ ${totalOnePercent.toFixed(2)} (${onePercentCount} transaction${onePercentCount !== 1 ? 's' : ''})</td>
-                    </tr>
-                    <tr>
+                     </tr>
+                     <tr>
                         <td class="total-label">2% Withholding Tax:</td>
                         <td class="total-value">₱ ${totalTwoPercent.toFixed(2)} (${twoPercentCount} transaction${twoPercentCount !== 1 ? 's' : ''})</td>
-                    </tr>
-                    <tr>
+                     </tr>
+                     <tr>
                         <td class="total-label">5% Withholding Tax:</td>
                         <td class="total-value">₱ ${totalFivePercent.toFixed(2)} (${fivePercentCount} transaction${fivePercentCount !== 1 ? 's' : ''})</td>
-                    </tr>
-                    <tr>
+                     </tr>
+                     <tr>
                         <td class="total-label">0% Withholding Tax:</td>
                         <td class="total-value">₱ ${totalZeroPercent.toFixed(2)} (${zeroPercentCount} transaction${zeroPercentCount !== 1 ? 's' : ''})</td>
-                    </tr>
-                </table>
+                     </tr>
+                 </table>
             </div>
             
             <div class="footer">
                 <p>Report generated on ${formattedDate} at ${formattedTime}</p>
-                <p>Authorized by: ${authorizedEmployee} | Prepared by: Non-Vatable Purchases Data Tracker System</p>
+                <p>Authorized by: ${escapeHtml(authorizedEmployee)} | Prepared by: Non-Vatable Purchases Data Tracker System</p>
                 <p>This is a computer-generated report. No signature is required.</p>
                 <p>© ${new Date().getFullYear()} Non-Vatable Purchases Data Tracker - Professional Non-VAT Purchases Tracking System</p>
             </div>
@@ -3033,7 +3287,7 @@ function exportToExcel() {
     }, 100);
     
     // Show success message
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Professional formatting\n• Company header\n• Color-coded sections\n• Financial summary\n• Payment & withholding tax distribution\n• Readable column widths\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Supplier Summary Table (Name + TIN with Gross Purchases totals)\n• Professional formatting\n• Financial summary\n• Payment & withholding tax distribution\n• Readable column widths\n• Print-ready layout`);
 }
 
 // ===== SIDEBAR FUNCTIONALITY =====
@@ -3161,6 +3415,22 @@ function initButtonListeners() {
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
     const selectMultipleBtn = document.getElementById('selectMultipleBtn');
     const entryCounterBtn = document.getElementById('entryCounterBtn');
+    // Add batch rows button listener
+const addBatchRowsBtn = document.getElementById('addBatchRowsBtn');
+
+if (addBatchRowsBtn) {
+    addBatchRowsBtn.addEventListener('click', function() {
+        const count = prompt('How many rows would you like to add?', '10');
+        const numCount = parseInt(count);
+        if (numCount && numCount > 0 && numCount <= 5000) {
+            addMultipleRows(numCount);
+        } else if (numCount > 5000) {
+            alert('Maximum 5000 rows at a time to prevent performance issues.');
+        } else {
+            alert('Please enter a valid number (1-5000).');
+        }
+    });
+}
     
     // Add event listeners to sidebar buttons
     if (addRowBtn) {
@@ -4402,5 +4672,464 @@ function initColumnVisibility() {
     });
 }
     </script>
+
+    <script>
+// ============================================================
+// SUPPLIER NAME & TIN AUTO-FILL STORAGE SYSTEM (NON-VAT PURCHASES)
+// With REGISTERED SUPPLIERS MONITOR SECTION (TOGGLEABLE VIA SIDEBAR BUTTON)
+// ============================================================
+
+(function() {
+    const STORAGE_KEY = 'NONVAT_SUPPLIER_TIN_MAP';
+    let supplierDB = new Map();
+    let monitorVisible = true;
+    
+    function loadSupplierDB() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                supplierDB = new Map(Object.entries(parsed));
+            } catch(e) { console.warn(e); }
+        }
+        const savedVisibility = localStorage.getItem('nonVatSuppliersMonitorVisible');
+        monitorVisible = savedVisibility !== null ? savedVisibility === 'true' : true;
+        updateMonitorDisplay();
+        updateToggleButton();
+    }
+    
+    function saveSupplierDB() {
+        const obj = Object.fromEntries(supplierDB);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+        updateMonitorDisplay();
+    }
+    
+    function isNameConflict(name, tin) {
+        const cleanName = name.trim();
+        const existingTin = supplierDB.get(`name:${cleanName}`);
+        return existingTin && existingTin !== tin.trim();
+    }
+    
+    function isTinConflict(tin, name) {
+        const cleanTin = tin.trim();
+        const existingName = supplierDB.get(`tin:${cleanTin}`);
+        return existingName && existingName !== name.trim();
+    }
+    
+    function addSupplierPair(supplierName, tinNumber) {
+        if (!supplierName || !tinNumber) return false;
+        
+        const cleanName = supplierName.trim();
+        const cleanTin = tinNumber.trim();
+        
+        if (cleanName === "" || cleanTin === "") return false;
+        
+        const existingTinForName = supplierDB.get(`name:${cleanName}`);
+        const existingNameForTin = supplierDB.get(`tin:${cleanTin}`);
+        
+        if (existingTinForName === cleanTin && existingNameForTin === cleanName) {
+            return true;
+        }
+        
+        if (existingTinForName && existingTinForName !== cleanTin) {
+            showWarningToast(`❌ Supplier "${cleanName}" already registered with TIN ${existingTinForName}. Cannot reassign.`);
+            return false;
+        }
+        
+        if (existingNameForTin && existingNameForTin !== cleanName) {
+            showWarningToast(`❌ TIN ${cleanTin} already registered to "${existingNameForTin}". Cannot reassign.`);
+            return false;
+        }
+        
+        supplierDB.set(`name:${cleanName}`, cleanTin);
+        supplierDB.set(`tin:${cleanTin}`, cleanName);
+        
+        saveSupplierDB();
+        showAutoFillFeedback(null, `✓ Saved: "${cleanName}" ↔ ${cleanTin}`);
+        return true;
+    }
+    
+    function lookupTinByName(name) {
+        if (!name) return null;
+        return supplierDB.get(`name:${name.trim()}`) || null;
+    }
+    
+    function lookupNameByTin(tin) {
+        if (!tin) return null;
+        return supplierDB.get(`tin:${tin.trim()}`) || null;
+    }
+    
+    function getAllPairs() {
+        const pairs = [];
+        for (let [key, value] of supplierDB.entries()) {
+            if (key.startsWith('name:')) {
+                pairs.push({ name: key.slice(5), tin: value });
+            }
+        }
+        return pairs.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    function deletePair(name, tin) {
+        if (confirm(`Delete supplier "${name}" (TIN: ${tin})? This cannot be undone.`)) {
+            supplierDB.delete(`name:${name}`);
+            supplierDB.delete(`tin:${tin}`);
+            saveSupplierDB();
+            showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
+        }
+    }
+    
+    function updateToggleButton() {
+        const toggleBtn = document.getElementById('toggleSuppliersMonitorBtn');
+        if (!toggleBtn) return;
+        
+        const icon = toggleBtn.querySelector('i');
+        const textSpan = toggleBtn.querySelector('.sidebar-btn-text');
+        
+        if (monitorVisible) {
+            if (textSpan) textSpan.textContent = 'Hide Suppliers List';
+            if (icon) icon.className = 'fas fa-building';
+        } else {
+            if (textSpan) textSpan.textContent = 'Show Suppliers List';
+            if (icon) icon.className = 'fas fa-building';
+        }
+    }
+    
+    function toggleMonitorVisibility() {
+        monitorVisible = !monitorVisible;
+        localStorage.setItem('nonVatSuppliersMonitorVisible', monitorVisible);
+        
+        const monitorSection = document.getElementById('registeredNonVatSuppliersMonitor');
+        if (monitorSection) {
+            monitorSection.style.display = monitorVisible ? 'block' : 'none';
+        }
+        
+        updateToggleButton();
+        showAutoFillFeedback(null, monitorVisible ? 'Suppliers list visible' : 'Suppliers list hidden');
+    }
+    
+    function attachToggleButtonListener() {
+        const toggleBtn = document.getElementById('toggleSuppliersMonitorBtn');
+        if (toggleBtn && !toggleBtn.hasAttribute('data-listener-attached')) {
+            toggleBtn.setAttribute('data-listener-attached', 'true');
+            toggleBtn.addEventListener('click', toggleMonitorVisibility);
+        }
+    }
+    
+    function updateMonitorDisplay() {
+        let monitorSection = document.getElementById('registeredNonVatSuppliersMonitor');
+        const pairs = getAllPairs();
+        
+        if (!monitorSection) {
+            const tallySection = document.querySelector('.tally-section');
+            if (!tallySection) return;
+            
+            monitorSection = document.createElement('div');
+            monitorSection.id = 'registeredNonVatSuppliersMonitor';
+            monitorSection.className = 'registered-monitor';
+            monitorSection.style.cssText = `
+                margin: 20px 30px;
+                background: linear-gradient(135deg, rgba(0, 40, 30, 0.85) 0%, rgba(0, 30, 25, 0.9) 100%);
+                border: 1px solid rgba(0, 255, 157, 0.3);
+                border-radius: 12px;
+                overflow: hidden;
+                flex-shrink: 0;
+                display: ${monitorVisible ? 'block' : 'none'};
+            `;
+            
+            const headerHtml = `
+                <div style="padding: 15px 20px; background: rgba(0, 255, 157, 0.1); border-bottom: 1px solid rgba(0, 255, 157, 0.3); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-building" style="color: #00ff9d; font-size: 20px;"></i>
+                        <h3 style="color: #00ff9d; margin: 0; font-weight: 600; text-shadow: 0 0 5px rgba(0,255,157,0.5);">REGISTERED SUPPLIERS (NON-VAT)</h3>
+                        <span id="nonVatSuppliersCount" style="background: rgba(0,255,157,0.2); padding: 2px 10px; border-radius: 20px; font-size: 12px; color: #a7ffeb;">${pairs.length} supplier(s)</span>
+                    </div>
+                    <button id="clearAllNonVatSuppliersBtn" style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; color: #ff8888; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s;">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                </div>
+                <div id="nonVatSuppliersListContainer" style="max-height: 300px; overflow-y: auto; padding: 10px;">
+                    <div style="text-align: center; padding: 40px; color: #80cbc4;">Loading suppliers...</div>
+                </div>
+            `;
+            monitorSection.innerHTML = headerHtml;
+            
+            const statsSection = document.querySelector('.stats');
+            if (statsSection) {
+                statsSection.parentNode.insertBefore(monitorSection, statsSection);
+            } else {
+                tallySection.parentNode.insertBefore(monitorSection, tallySection.nextSibling);
+            }
+            
+            const clearAllBtn = document.getElementById('clearAllNonVatSuppliersBtn');
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', () => {
+                    if (confirm('⚠️ WARNING: This will delete ALL registered suppliers. Are you sure?')) {
+                        supplierDB.clear();
+                        saveSupplierDB();
+                        showAutoFillFeedback(null, '🗑 All suppliers cleared');
+                    }
+                });
+            }
+        }
+        
+        const countBadge = document.getElementById('nonVatSuppliersCount');
+        if (countBadge) countBadge.textContent = `${pairs.length} supplier(s)`;
+        
+        const container = document.getElementById('nonVatSuppliersListContainer');
+        if (!container) return;
+        
+        if (pairs.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #80cbc4;">
+                    <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <p>No registered suppliers yet.</p>
+                    <p style="font-size: 12px;">Enter a Supplier Name and TIN in the table to add them here.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+        pairs.forEach(pair => {
+            html += `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ff9d; transition: all 0.2s;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <i class="fas fa-truck" style="color: #00ff9d; font-size: 16px;"></i>
+                            <span style="font-weight: 600; color: #e0f7e9;">${escapeHtml(pair.name)}</span>
+                            <span style="color: #80cbc4;">→</span>
+                            <span style="font-family: monospace; color: #a7ffeb;">${escapeHtml(pair.tin)}</span>
+                        </div>
+                    </div>
+                    <button onclick="window.deleteNonVatSupplierPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
+                            style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: all 0.2s;"
+                            onmouseover="this.style.background='rgba(255,85,85,0.4)'" 
+                            onmouseout="this.style.background='rgba(255,85,85,0.2)'">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function getRowFields(row) {
+        if (!row) return null;
+        const tinInput = row.querySelector('.tin-number');
+        const nameInput = row.querySelector('.supplier-name');
+        return { tinInput, nameInput };
+    }
+    
+    function attachAutoFillToRow(row) {
+        if (!row) return;
+        const fields = getRowFields(row);
+        if (!fields.tinInput || !fields.nameInput) return;
+        if (row.hasAttribute('data-autofill-bound')) return;
+        row.setAttribute('data-autofill-bound', 'true');
+        
+        fields.nameInput.addEventListener('blur', function(e) {
+            const nameVal = this.value.trim();
+            if (nameVal === "") return;
+            const existingTin = lookupTinByName(nameVal);
+            if (existingTin && fields.tinInput && fields.tinInput.value.trim() === "") {
+                fields.tinInput.value = existingTin;
+                if (typeof formatTIN === 'function') formatTIN(fields.tinInput);
+                if (typeof validateTIN === 'function') validateTIN(fields.tinInput);
+                fields.tinInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled');
+            }
+        });
+        
+        fields.tinInput.addEventListener('blur', function(e) {
+            const tinVal = this.value.trim();
+            if (tinVal === "") return;
+            const existingName = lookupNameByTin(tinVal);
+            if (existingName && fields.nameInput && fields.nameInput.value.trim() === "") {
+                fields.nameInput.value = existingName;
+                fields.nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showAutoFillFeedback(fields.nameInput, '✓ Supplier name auto-filled');
+            }
+        });
+        
+        function storeIfValidPair() {
+            const nameVal = fields.nameInput?.value.trim() || "";
+            const tinVal = fields.tinInput?.value.trim() || "";
+            if (nameVal !== "" && tinVal !== "") {
+                addSupplierPair(nameVal, tinVal);
+            }
+        }
+        
+        fields.nameInput.addEventListener('blur', storeIfValidPair);
+        fields.tinInput.addEventListener('blur', storeIfValidPair);
+    }
+    
+    function showAutoFillFeedback(element, message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e3a2f;
+            color: #9effcf;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #00ff9d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+            transition: opacity 0.2s;
+            pointer-events: none;
+            font-family: monospace;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 2500);
+        }, 2500);
+    }
+    
+    function showWarningToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #3a2a1e;
+            color: #ffaa66;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            border-left: 4px solid #ffaa00;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+            transition: opacity 0.2s;
+            pointer-events: none;
+            font-family: monospace;
+            max-width: 350px;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 3000);
+        }, 3000);
+    }
+    
+    function bindAutoFillToAllRows() {
+        const tableBody = document.getElementById('tableBody');
+        if (!tableBody) return;
+        tableBody.querySelectorAll('tr').forEach(row => attachAutoFillToRow(row));
+    }
+    
+    function observeNewRows() {
+        const tableBody = document.getElementById('tableBody');
+        if (!tableBody) return;
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1 && node.tagName === 'TR') attachAutoFillToRow(node);
+                    else if (node.nodeType === 1 && node.querySelectorAll) {
+                        node.querySelectorAll('tr').forEach(row => attachAutoFillToRow(row));
+                    }
+                });
+            });
+        });
+        observer.observe(tableBody, { childList: true, subtree: true });
+    }
+    
+    function enhanceExistingAddRow() {
+        if (typeof window.originalAddNewRow === 'undefined' && typeof addNewRow === 'function') {
+            window.originalAddNewRow = addNewRow;
+            window.addNewRow = function() {
+                const result = window.originalAddNewRow.apply(this, arguments);
+                setTimeout(() => {
+                    const tableBody = document.getElementById('tableBody');
+                    if (tableBody && tableBody.lastElementChild) attachAutoFillToRow(tableBody.lastElementChild);
+                }, 10);
+                return result;
+            };
+        }
+    }
+    
+    function enhanceAddMultipleRows() {
+        if (typeof window.originalAddMultipleRows === 'undefined' && typeof addMultipleRows === 'function') {
+            window.originalAddMultipleRows = addMultipleRows;
+            window.addMultipleRows = function(count) {
+                const result = window.originalAddMultipleRows.apply(this, arguments);
+                setTimeout(() => {
+                    const tableBody = document.getElementById('tableBody');
+                    if (tableBody) {
+                        tableBody.querySelectorAll('tr').forEach(row => {
+                            if (!row.hasAttribute('data-autofill-bound')) {
+                                attachAutoFillToRow(row);
+                            }
+                        });
+                    }
+                }, 50);
+                return result;
+            };
+        }
+    }
+    
+    function exposeDebugTools() {
+        window.nonVatSupplierDB = {
+            list: () => getAllPairs(),
+            add: (name, tin) => addSupplierPair(name, tin),
+            clear: () => { supplierDB.clear(); saveSupplierDB(); console.log('Non-VAT Supplier DB cleared'); },
+            stats: () => ({ size: supplierDB.size, pairs: getAllPairs().length })
+        };
+        console.log('[Non-VAT Purchases AutoFill] Supplier DB loaded. Use window.nonVatSupplierDB to inspect.');
+    }
+    
+    window.deleteNonVatSupplierPair = function(name, tin) {
+        supplierDB.delete(`name:${name}`);
+        supplierDB.delete(`tin:${tin}`);
+        saveSupplierDB();
+        showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
+    };
+    
+    function initAutoFillSystem() {
+        loadSupplierDB();
+        bindAutoFillToAllRows();
+        observeNewRows();
+        enhanceExistingAddRow();
+        enhanceAddMultipleRows();
+        exposeDebugTools();
+        attachToggleButtonListener();
+        
+        const clearBtn = document.getElementById('clearBtn');
+        if (clearBtn) clearBtn.addEventListener('click', () => setTimeout(bindAutoFillToAllRows, 50));
+        
+        const loadDataBtn = document.getElementById('loadDataBtn');
+        if (loadDataBtn) loadDataBtn.addEventListener('click', () => setTimeout(bindAutoFillToAllRows, 200));
+        
+        console.log('✅ Non-VAT Purchases auto-fill active: Unique supplier name-TIN pairs only. Monitor section with toggle button integrated.');
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAutoFillSystem);
+    } else {
+        initAutoFillSystem();
+    }
+    
+    window.addNonVatSupplierPair = addSupplierPair;
+    window.lookupNonVatSupplierTinByName = lookupTinByName;
+    window.lookupNonVatSupplierNameByTin = lookupNameByTin;
+    window.refreshNonVatAutoFillBindings = bindAutoFillToAllRows;
+    window.toggleNonVatSuppliersMonitor = toggleMonitorVisibility;
+})();
+</script>
 </body>
 </html>
