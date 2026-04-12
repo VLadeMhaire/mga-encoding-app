@@ -1088,6 +1088,11 @@ tbody tr:hover {
     background: rgba(80, 180, 255, 0.12) !important;
     color: #7ab8e0 !important;
 }
+
+/* Performance optimization for pagination */
+tr.page-hidden {
+    display: none !important;
+}
 </style>
 </head>
 <body>
@@ -1123,6 +1128,12 @@ tbody tr:hover {
                     <i class="fas fa-plus-circle"></i>
                     <span class="sidebar-btn-text">Add New Row</span>
                 </button>
+
+                <!-- Add this button after the existing addRowBtn -->
+<button class="sidebar-btn" id="addBatchRowsBtn">
+    <i class="fas fa-layer-group"></i>
+    <span class="sidebar-btn-text">Add Multiple Rows</span>
+</button>
                 
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
@@ -1809,16 +1820,9 @@ tbody tr:hover {
     
     function enhanceExistingAddRow() {
         if (typeof window.originalAddNewRow === 'undefined' && typeof addNewRow === 'function') {
-            window.originalAddNewRow = addNewRow;
-            window.addNewRow = function() {
-                const result = window.originalAddNewRow.apply(this, arguments);
-                setTimeout(() => {
-                    const tableBody = document.getElementById('tableBody');
-                    if (tableBody && tableBody.lastElementChild) attachAutoFillToRow(tableBody.lastElementChild);
-                }, 10);
-                return result;
-            };
-        }
+    window.originalAddNewRow = addNewRow;
+}
+window.addNewRow = addNewRow;
     }
     
     function exposeDebugTools() {
@@ -2341,6 +2345,7 @@ let isLongPressing = false;
 let longPressInterval = null;
 let addedRowsCount = 0;
 
+// ===== FIX LONG PRESS TO USE BATCH ADD (PRESERVES DROPDOWN) =====
 function startLongPress(button) {
     if (longPressTimer) clearTimeout(longPressTimer);
     
@@ -2349,24 +2354,22 @@ function startLongPress(button) {
             isLongPressing = true;
             addedRowsCount = 0;
             
-            // Add visual feedback
             button.classList.add('long-press-active');
+            if (typeof showLongPressToast === 'function') {
+                showLongPressToast('Adding rows continuously... Release to stop');
+            }
             
-            // Show toast notification
-            showLongPressToast('Adding rows continuously... Release to stop');
-            
-            // Start adding rows repeatedly
             longPressInterval = setInterval(() => {
-                addNewRow();
-                addedRowsCount++;
+                // Add 3 rows at a time (reduced from 5 to ensure dropdown initialization)
+                addMultipleRows(3);
+                addedRowsCount += 3;
                 
-                // Update toast with count every 5 rows
-                if (addedRowsCount % 5 === 0) {
+                if (addedRowsCount % 15 === 0 && typeof updateLongPressToast === 'function') {
                     updateLongPressToast(`Added ${addedRowsCount} rows...`);
                 }
-            }, 200); // Add a new row every 200ms (5 rows per second)
+            }, 250);
         }
-    }, 500); // 500ms delay to trigger long press
+    }, 500);
 }
 
 function stopLongPress(button) {
@@ -2519,13 +2522,13 @@ function initEntryCounterLongPress() {
                     showLongPressToast('Adding rows continuously... Release to stop');
                     
                     counterLongPressInterval = setInterval(() => {
-                        addNewRow();
-                        counterAddedRows++;
-                        
-                        if (counterAddedRows % 5 === 0) {
-                            updateLongPressToast(`Added ${counterAddedRows} rows...`);
-                        }
-                    }, 200);
+    addMultipleRows(5);  // Add 5 rows at a time
+    counterAddedRows += 5;
+    
+    if (counterAddedRows % 20 === 0) {
+        updateLongPressToast(`Added ${counterAddedRows} rows...`);
+    }
+}, 300);
                 }
             }, 500);
         }
@@ -2911,41 +2914,38 @@ function updatePagination() {
 
 function renderCurrentPage() {
     const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
     const allRows = Array.from(tableBody.children);
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = Math.min(startIndex + rowsPerPage, allRows.length);
-
-    // Hide all rows first
-    allRows.forEach(row => {
-        row.style.display = 'none';
-    });
-
-    // Show only rows for current page
-    for (let i = startIndex; i < endIndex; i++) {
-        if (allRows[i]) {
-            allRows[i].style.display = '';
+    
+    // Use CSS class for hiding instead of inline styles
+    for (let i = 0; i < allRows.length; i++) {
+        if (i >= startIndex && i < endIndex) {
+            allRows[i].classList.remove('page-hidden');
+        } else {
+            allRows[i].classList.add('page-hidden');
         }
     }
-
+    
     updatePagination();
 }
 
 // ===== TABLE ROW FUNCTIONS =====
+// ===== OPTIMIZED ADD NEW ROW (WITH NATURE DROPDOWN) =====
 function addNewRow() {
     const tableBody = document.getElementById('tableBody');
     if (!tableBody) return;
     
-    const rowCount = tableBody.children.length + 1;
-    const rowId = 'row_' + Date.now() + '_' + rowCount;
+    const rowId = 'row_' + Date.now() + '_' + Math.random();
+    const today = new Date().toISOString().split('T')[0];
     
     const row = document.createElement('tr');
     row.id = rowId;
     
-    // Set current date as default
-    const today = new Date().toISOString().split('T')[0];
-    
     row.innerHTML = `
-        <td>
+        <tr>
             <input type="date" value="${today}" class="editable date-input">
         </td>
         <td>
@@ -2962,6 +2962,7 @@ function addNewRow() {
                 <option value="CR">CR</option>
                 <option value="OTHERS">OTHERS</option>
             </select>
+        </div>
         </td>
         <td>
             <select class="editable transaction-type">
@@ -2969,59 +2970,226 @@ function addNewRow() {
                 <option value="Goods">Goods</option>
                 <option value="Services">Services</option>
             </select>
+        </div>
         </td>
         <td style="position: relative;">
             <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
-            <div class="validation-message" style="display: none; position: absolute; bottom: -20px; left: 0; right: 0;"></div>
+            <div class="validation-message" style="display: none;"></div>
+        </div>
         </td>
-        <td>
-            <input type="text" class="editable supplier-name" placeholder="Supplier name">
+        <td><input type="text" class="editable supplier-name" placeholder="Supplier name"></div>
         </td>
-        <td>
-            <input type="text" class="editable address" placeholder="Supplier address">
+        <td><input type="text" class="editable address" placeholder="Supplier address"></div>
         </td>
-        <td>
-            <input type="number" step="0.01" min="0" class="editable gross-amount" placeholder="0.00">
+        <td><input type="number" step="0.01" min="0" class="editable gross-amount" placeholder="0.00" value=""></div>
         </td>
-        <td id="nature-cell-${rowId}" style="position: relative;"></td>
-        <td>
-            <div class="uneditable net-expenses">0.00</div>
+        <td id="nature-cell-${rowId}" style="position: relative;"></div>
         </td>
-        <td>
-            <div class="uneditable input-tax">0.00</div>
+        <td><div class="uneditable net-expenses">0.00</div></div>
         </td>
-        <td>
-            <div class="uneditable withholding-rate">0%</div>
+        <td><div class="uneditable input-tax">0.00</div></div>
         </td>
-         <td>
-            <div class="uneditable withholding-tax">0.00</div>
-         </td>
-         <td>
-            <div class="uneditable gross-minus-withholding">0.00</div>
-         </td>
-         <td>
-            <input type="text" class="editable remarks" placeholder="Enter remarks">
-         </td>
-         <td>
-            <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
-                <i class="fas fa-trash"></i>
-            </button>
-         </td>
+        <td><div class="uneditable withholding-rate">0%</div></div>
+        </td>
+        <td><div class="uneditable withholding-tax">0.00</div></div>
+        </td>
+        <td><div class="uneditable gross-minus-withholding">0.00</div></div>
+        </td>
+        <td><input type="text" class="editable remarks" placeholder="Enter remarks"></div>
+        </td>
+        <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></div>
+        </td>
     `;
     
     tableBody.appendChild(row);
     
-    // Create enhanced nature of expense component - MOVED INSIDE THE FUNCTION
+    // Create enhanced nature of expense component
     const natureCell = document.getElementById(`nature-cell-${rowId}`);
     if (natureCell) {
         const natureComponent = createNatureExpenseCell(rowId, '', (value) => {
             updateCalculations(row);
-            updateAllStats();
+            scheduleStatsUpdate();
         }, row);
         natureCell.appendChild(natureComponent);
     }
     
-    // FIX: Apply current column visibility states to the new row
+    // Attach event listeners
+    attachRowEventListeners(row);
+    
+    // Apply column visibility
+    applyColumnVisibilityToRow(row);
+    
+    // Update pagination
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    scheduleStatsUpdate();
+    
+    // Bind auto-fill for supplier
+    if (typeof attachAutoFillToRow === 'function') {
+        attachAutoFillToRow(row);
+    }
+    
+    return row;
+}
+
+// ===== LIGHTWEIGHT ROW EVENT LISTENERS =====
+function attachRowEventListeners(row) {
+    if (!row) return;
+    if (row.hasAttribute('data-listeners-attached')) return;
+    row.setAttribute('data-listeners-attached', 'true');
+    
+    // Gross amount listener
+    const grossInput = row.querySelector('.gross-amount');
+    if (grossInput) {
+        grossInput.addEventListener('input', () => {
+            updateCalculations(row);
+            scheduleStatsUpdate();
+        });
+    }
+    
+    // TIN formatting
+    const tinInput = row.querySelector('.tin-number');
+    if (tinInput) {
+        tinInput.addEventListener('input', (e) => formatTIN(e.target));
+        tinInput.addEventListener('blur', (e) => validateTIN(e.target));
+    }
+    
+    // Other editable inputs (excluding nature expense which has its own)
+    const editableInputs = row.querySelectorAll('.editable:not(.gross-amount):not(.tin-number):not(.nature-expense-input)');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', () => scheduleStatsUpdate());
+        input.addEventListener('change', () => scheduleStatsUpdate());
+    });
+}
+
+// ===== BATCH ADD ROWS FUNCTION =====
+// ===== OPTIMIZED BATCH ADD ROWS (WITH NATURE DROPDOWN) =====
+function addMultipleRows(count) {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    if (count > 5000) {
+        if (!confirm(`Adding ${count} rows may take a few seconds. Continue?`)) {
+            return;
+        }
+    }
+    
+    const today = new Date().toISOString().split('T')[0];
+    const startTime = performance.now();
+    const fragment = document.createDocumentFragment();
+    const rows = [];
+    
+    for (let i = 0; i < count; i++) {
+        const rowId = 'row_' + Date.now() + '_' + i + '_' + Math.random();
+        const row = document.createElement('tr');
+        row.id = rowId;
+        
+        row.innerHTML = `
+            <td>
+                <input type="date" value="${today}" class="editable date-input">
+            </div>
+            <td>
+                <input type="text" class="editable invoice-number" placeholder="INV-001">
+            </div>
+            <td>
+                <select class="editable invoice-type">
+                    <option value="">Select</option>
+                    <option value="OR">OR</option>
+                    <option value="SI">SI</option>
+                    <option value="DR">DR</option>
+                    <option value="AR">AR</option>
+                    <option value="TR">TR</option>
+                    <option value="CR">CR</option>
+                    <option value="OTHERS">OTHERS</option>
+                </select>
+            </div>
+            </td>
+            <td>
+                <select class="editable transaction-type">
+                    <option value="">Select</option>
+                    <option value="Goods">Goods</option>
+                    <option value="Services">Services</option>
+                </select>
+            </div>
+            </td>
+            <td style="position: relative;">
+                <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+                <div class="validation-message" style="display: none;"></div>
+            </div>
+            </td>
+            <td><input type="text" class="editable supplier-name" placeholder="Supplier name"></div>
+            </td>
+            <td><input type="text" class="editable address" placeholder="Supplier address"></div>
+            </td>
+            <td><input type="number" step="0.01" min="0" class="editable gross-amount" placeholder="0.00" value=""></div>
+            </td>
+            <td id="nature-cell-${rowId}" style="position: relative;"></div>
+            </td>
+            <td><div class="uneditable net-expenses">0.00</div></div>
+            </td>
+            <td><div class="uneditable input-tax">0.00</div></div>
+            </td>
+            <td><div class="uneditable withholding-rate">0%</div></div>
+            </td>
+            <td><div class="uneditable withholding-tax">0.00</div></div>
+            </td>
+            <td><div class="uneditable gross-minus-withholding">0.00</div></div>
+            </td>
+            <td><input type="text" class="editable remarks" placeholder="Enter remarks"></div>
+            </td>
+            <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></div>
+            </td>
+        `;
+        
+        rows.push({ row, rowId });
+        fragment.appendChild(row);
+    }
+    
+    // Single DOM insertion
+    tableBody.appendChild(fragment);
+    
+    // Create nature components and attach listeners in batch
+    for (const { row, rowId } of rows) {
+        // Create enhanced nature of expense component
+        const natureCell = document.getElementById(`nature-cell-${rowId}`);
+        if (natureCell) {
+            const natureComponent = createNatureExpenseCell(rowId, '', (value) => {
+                updateCalculations(row);
+                scheduleStatsUpdate();
+            }, row);
+            natureCell.appendChild(natureComponent);
+        }
+        
+        attachRowEventListeners(row);
+        applyColumnVisibilityToRow(row);
+        
+        if (typeof attachAutoFillToRow === 'function') {
+            attachAutoFillToRow(row);
+        }
+    }
+    
+    // Update pagination
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    // Single stats update at the end
+    updateAllStats();
+    
+    const endTime = performance.now();
+    console.log(`Added ${count} rows in ${(endTime - startTime).toFixed(2)}ms`);
+    
+    if (typeof showToast === 'function') {
+        showToast(`✅ Added ${count} rows successfully!`, 'success');
+    }
+}
+
+// ===== APPLY COLUMN VISIBILITY TO A SINGLE ROW =====
+function applyColumnVisibilityToRow(row) {
     const columnVisibility = JSON.parse(localStorage.getItem('expensesColumnVisibility')) || {};
     const columns = [
         'date', 'invoiceNumber', 'invoiceType', 'transactionType', 'tinNumber',
@@ -3038,52 +3206,25 @@ function addNewRow() {
             cells[index].classList.remove('hidden-column');
         }
     });
-    
-    // Add event listeners to the new row (excluding nature input since it's handled by component)
-    const editableInputs = row.querySelectorAll('.editable:not(.nature-expense-input)');
-    editableInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            updateCalculations(row);
-            updateAllStats();
-        });
-        
-        input.addEventListener('change', function() {
-            updateCalculations(row);
-            updateAllStats();
-        });
-    });
-    
-    // Special handling for TIN input
-    const tinInput = row.querySelector('.tin-number');
-    if (tinInput) {
-        tinInput.addEventListener('input', function(e) {
-            formatTIN(e.target);
-        });
-        
-        tinInput.addEventListener('blur', function(e) {
-            validateTIN(e.target);
-        });
-    }
-    
-    // Add neon effect to new row inputs on focus
-    const inputs = row.querySelectorAll('input, select');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
-        });
-        
-        input.addEventListener('blur', function() {
-            this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
-        });
-    });
-    
-    // Update pagination for new row
-    const totalRows = tableBody.children.length;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
-    currentPage = totalPages; // Go to last page to see new row
-    renderCurrentPage();
-    
-    updateAllStats();
+}
+
+// Helper function for loading toast
+function showLoadingToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
+    toast.style.background = 'rgba(0, 30, 20, 0.98)';
+    toast.style.borderColor = '#ffaa00';
+    document.body.appendChild(toast);
+    return toast;
+}
+
+// ===== SCHEDULED STATS UPDATE FOR BATCH OPERATIONS =====
+let statsTimeout = null;
+
+function scheduleStatsUpdate() {
+    if (statsTimeout) clearTimeout(statsTimeout);
+    statsTimeout = setTimeout(() => updateAllStats(), 100);
 }
 
 function deleteRow(rowId) {
@@ -3124,10 +3265,14 @@ function clearAllData() {
     }
 }
 
-// ===== CALCULATION FUNCTIONS =====
+// ===== OPTIMIZED UPDATE CALCULATIONS (USES NATURE INPUT) =====
 function updateCalculations(row) {
+    if (!row) return;
+    
     const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
-    const natureExpense = row.querySelector('.nature-expense-input')?.value;
+    // Get nature expense from the enhanced input (with .nature-expense-input class)
+    const natureInput = row.querySelector('.nature-expense-input');
+    const natureExpense = natureInput?.value || '';
     
     // Calculate net expenses: Gross Amount / 1.12
     const netExpenses = grossAmount / 1.12;
@@ -3156,8 +3301,6 @@ function updateCalculations(row) {
     const grossMinusWithholding = grossAmount - withholdingTax;
     const grossMinusWithholdingEl = row.querySelector('.gross-minus-withholding');
     if (grossMinusWithholdingEl) grossMinusWithholdingEl.textContent = grossMinusWithholding.toFixed(2);
-    
-    updateAllStats();
 }
 
 // ===== TIN FORMATTING FUNCTIONS =====
@@ -3207,22 +3350,63 @@ function validateTIN(input) {
     }
 }
 
-// ===== UPDATE FUNCTIONS =====
+// Performance optimization caches
+let cachedElements = {
+    totalGrossAmount: null,
+    totalNetExpenses: null,
+    totalInputTax: null,
+    totalWithholdingTax: null,
+    netPayable: null,
+    entryCount: null,
+    tallyGrid: null,
+    tableBody: null
+};
+let statsUpdateTimeout = null;
+let lastTallyHash = null;
+let tallyUpdateTimeout = null;
+let batchUpdateScheduled = false;
+
+// ===== OPTIMIZED UPDATE ALL STATS =====
+let statsUpdateScheduled = false;
+
 function updateAllStats() {
-    updateRowCount();
-    updateTotals();
-    updateSummaryRow();
-    updateExpenseTally();
+    if (statsUpdateScheduled) return;
+    statsUpdateScheduled = true;
+    
+    requestAnimationFrame(() => {
+        // Cache DOM elements on first run
+        if (!cachedElements.totalGrossAmount) {
+            cachedElements.totalGrossAmount = document.getElementById('totalGrossAmount');
+            cachedElements.totalNetExpenses = document.getElementById('totalNetExpenses');
+            cachedElements.totalInputTax = document.getElementById('totalInputTax');
+            cachedElements.totalWithholdingTax = document.getElementById('totalWithholdingTax');
+            cachedElements.netPayable = document.getElementById('netPayable');
+            cachedElements.entryCount = document.getElementById('entryCount');
+            cachedElements.tallyGrid = document.getElementById('expenseTally');
+            cachedElements.tableBody = document.getElementById('tableBody');
+        }
+        
+        updateRowCount();
+        calculateAndUpdateTotals();
+        
+        statsUpdateScheduled = false;
+    });
 }
 
+// ===== UPDATE ROW COUNT WITH PULSE ANIMATION =====
 function updateRowCount() {
-    const tableBody = document.getElementById('tableBody');
-    const rowCount = tableBody ? tableBody.children.length : 0;
-    const rowCountEl = document.getElementById('rowCount');
-    if (rowCountEl) rowCountEl.textContent = rowCount;
+    const count = cachedElements.tableBody ? cachedElements.tableBody.children.length : 0;
     
-    // Update entry counter
-    updateEntryCounter();
+    if (cachedElements.entryCount) {
+        cachedElements.entryCount.classList.add('pulse');
+        cachedElements.entryCount.textContent = count;
+        
+        setTimeout(() => {
+            if (cachedElements.entryCount) {
+                cachedElements.entryCount.classList.remove('pulse');
+            }
+        }, 300);
+    }
 }
 
 function updateEntryCounter() {
@@ -3257,255 +3441,267 @@ function updateEntryCounter() {
 }
 
 function updateTotals() {
-    let totalGrossAmount = 0;
-    let totalNetExpenses = 0;
-    let totalInputTax = 0;
-    let totalWithholdingTax = 0;
-    let totalGrossMinusWithholding = 0;
-    
-    const rows = document.querySelectorAll('#tableBody tr');
-    rows.forEach(row => {
-        const grossAmount = parseFloat(row.querySelector('.gross-amount')?.value) || 0;
-        const netExpenses = parseFloat(row.querySelector('.net-expenses')?.textContent) || 0;
-        const inputTax = parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
-        const withholdingTax = parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
-        const grossMinusWithholding = parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
-        
-        totalGrossAmount += grossAmount;
-        totalNetExpenses += netExpenses;
-        totalInputTax += inputTax;
-        totalWithholdingTax += withholdingTax;
-        totalGrossMinusWithholding += grossMinusWithholding;
-    });
-    
-    const totalGrossAmountEl = document.getElementById('totalGrossAmount');
-    const totalNetExpensesEl = document.getElementById('totalNetExpenses');
-    const totalInputTaxEl = document.getElementById('totalInputTax');
-    const totalWithholdingTaxEl = document.getElementById('totalWithholdingTax');
-    const netPayableEl = document.getElementById('netPayable');
-    
-    if (totalGrossAmountEl) totalGrossAmountEl.textContent = totalGrossAmount.toFixed(2);
-    if (totalNetExpensesEl) totalNetExpensesEl.textContent = totalNetExpenses.toFixed(2);
-    if (totalInputTaxEl) totalInputTaxEl.textContent = totalInputTax.toFixed(2);
-    if (totalWithholdingTaxEl) totalWithholdingTaxEl.textContent = totalWithholdingTax.toFixed(2);
-    if (netPayableEl) netPayableEl.textContent = totalGrossMinusWithholding.toFixed(2);
-    
-    // Update the expense tally
-    updateExpenseTally();
+    calculateAndUpdateTotals();
 }
 
+// ===== OPTIMIZED CALCULATE TOTALS (USES REQUESTANIMATIONFRAME) =====
+let totalsTimeout = null;
+
+function calculateAndUpdateTotals() {
+    if (totalsTimeout) cancelAnimationFrame(totalsTimeout);
+    
+    totalsTimeout = requestAnimationFrame(() => {
+        const rows = cachedElements.tableBody ? cachedElements.tableBody.children : [];
+        const rowCount = rows.length;
+        
+        if (rowCount === 0) {
+            if (cachedElements.totalGrossAmount) cachedElements.totalGrossAmount.textContent = '0.00';
+            if (cachedElements.totalNetExpenses) cachedElements.totalNetExpenses.textContent = '0.00';
+            if (cachedElements.totalInputTax) cachedElements.totalInputTax.textContent = '0.00';
+            if (cachedElements.totalWithholdingTax) cachedElements.totalWithholdingTax.textContent = '0.00';
+            if (cachedElements.netPayable) cachedElements.netPayable.textContent = '0.00';
+            updateSummaryRow();
+            updateExpenseTally();
+            return;
+        }
+        
+        let totalGrossAmount = 0;
+        let totalNetExpenses = 0;
+        let totalInputTax = 0;
+        let totalWithholdingTax = 0;
+        let totalGrossMinusWithholding = 0;
+        
+        // Fast loop
+        for (let i = 0; i < rowCount; i++) {
+            const row = rows[i];
+            const grossAmountEl = row.querySelector('.gross-amount');
+            const netExpensesEl = row.querySelector('.net-expenses');
+            const inputTaxEl = row.querySelector('.input-tax');
+            const withholdingTaxEl = row.querySelector('.withholding-tax');
+            const grossMinusEl = row.querySelector('.gross-minus-withholding');
+            
+            totalGrossAmount += grossAmountEl ? (parseFloat(grossAmountEl.value) || 0) : 0;
+            totalNetExpenses += netExpensesEl ? (parseFloat(netExpensesEl.textContent) || 0) : 0;
+            totalInputTax += inputTaxEl ? (parseFloat(inputTaxEl.textContent) || 0) : 0;
+            totalWithholdingTax += withholdingTaxEl ? (parseFloat(withholdingTaxEl.textContent) || 0) : 0;
+            totalGrossMinusWithholding += grossMinusEl ? (parseFloat(grossMinusEl.textContent) || 0) : 0;
+        }
+        
+        if (cachedElements.totalGrossAmount) cachedElements.totalGrossAmount.textContent = totalGrossAmount.toFixed(2);
+        if (cachedElements.totalNetExpenses) cachedElements.totalNetExpenses.textContent = totalNetExpenses.toFixed(2);
+        if (cachedElements.totalInputTax) cachedElements.totalInputTax.textContent = totalInputTax.toFixed(2);
+        if (cachedElements.totalWithholdingTax) cachedElements.totalWithholdingTax.textContent = totalWithholdingTax.toFixed(2);
+        if (cachedElements.netPayable) cachedElements.netPayable.textContent = totalGrossMinusWithholding.toFixed(2);
+        
+        updateSummaryRow();
+        updateExpenseTally();
+    });
+}
+
+// ===== OPTIMIZED SUMMARY ROW UPDATE =====
 function updateSummaryRow() {
+    const summaryRow = document.getElementById('summaryRow');
+    if (!summaryRow) return;
+    
+    const rows = cachedElements.tableBody ? cachedElements.tableBody.children : [];
+    const headers = document.querySelectorAll('#vatableExpensesTable thead th');
+    
     let totalGrossAmount = 0;
     let totalNetExpenses = 0;
     let totalInputTax = 0;
     let totalWithholdingTax = 0;
     let totalGrossMinusWithholding = 0;
     
-    const rows = document.querySelectorAll('#tableBody tr');
-    rows.forEach(row => {
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
         totalGrossAmount += parseFloat(row.querySelector('.gross-amount')?.value) || 0;
         totalNetExpenses += parseFloat(row.querySelector('.net-expenses')?.textContent) || 0;
         totalInputTax += parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
         totalWithholdingTax += parseFloat(row.querySelector('.withholding-tax')?.textContent) || 0;
         totalGrossMinusWithholding += parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
-    });
-    
-    const headers = document.querySelectorAll('#vatableExpensesTable thead th');
-    const summaryRow = document.getElementById('summaryRow');
-    
-    if (summaryRow) {
-        let summaryCells = '';
-        
-        headers.forEach((header, index) => {
-            if (!header.classList.contains('hidden-column')) {
-                switch(index) {
-                    case 0:
-                        summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
-                        break;
-                    case 7:
-                        summaryCells += `<td class="uneditable">${totalGrossAmount.toFixed(2)}</td>`;
-                        break;
-                    case 9:
-                        summaryCells += `<td class="uneditable">${totalNetExpenses.toFixed(2)}</td>`;
-                        break;
-                    case 10:
-                        summaryCells += `<td class="uneditable">${totalInputTax.toFixed(2)}</td>`;
-                        break;
-                    case 12:
-                        summaryCells += `<td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>`;
-                        break;
-                    case 13:
-                        summaryCells += `<td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>`;
-                        break;
-                    default:
-                        summaryCells += '<td></td>';
-                        break;
-                }
-            }
-        });
-        
-        summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
     }
+    
+    let summaryCells = '';
+    
+    for (let i = 0; i < headers.length; i++) {
+        if (!headers[i].classList.contains('hidden-column')) {
+            switch(i) {
+                case 0:
+                    summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+                    break;
+                case 7:
+                    summaryCells += `<td class="uneditable">${totalGrossAmount.toFixed(2)}</td>`;
+                    break;
+                case 9:
+                    summaryCells += `<td class="uneditable">${totalNetExpenses.toFixed(2)}</td>`;
+                    break;
+                case 10:
+                    summaryCells += `<td class="uneditable">${totalInputTax.toFixed(2)}</td>`;
+                    break;
+                case 12:
+                    summaryCells += `<td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>`;
+                    break;
+                case 13:
+                    summaryCells += `<td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>`;
+                    break;
+                default:
+                    summaryCells += '<td></td>';
+                    break;
+            }
+        }
+    }
+    
+    summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
 }
 
 function updateExpenseTally() {
-    const tallyGrid = document.getElementById('expenseTally');
-    if (!tallyGrid) return;
+    if (tallyUpdateTimeout) cancelAnimationFrame(tallyUpdateTimeout);
     
-    const rows = document.querySelectorAll('#tableBody tr');
-    
-    // Create a map to store tally data - only for categories that have actual data
-    const expenseTally = {};
-    let totalGrossAmount = 0;
-    let totalRows = 0;
-    
-    // Process each row - only add to tally if a nature of expense is actually entered
-    rows.forEach(row => {
-        const grossAmountInput = row.querySelector('.gross-amount');
-        const natureExpenseInput = row.querySelector('.nature-expense-input');
+    tallyUpdateTimeout = requestAnimationFrame(() => {
+        if (!cachedElements.tallyGrid) {
+            cachedElements.tallyGrid = document.getElementById('expenseTally');
+            if (!cachedElements.tallyGrid) return;
+        }
         
-        if (grossAmountInput && natureExpenseInput) {
-            const grossAmount = parseFloat(grossAmountInput.value) || 0;
-            const natureExpense = natureExpenseInput.value.trim();
+        const rows = cachedElements.tableBody ? cachedElements.tableBody.children : [];
+        const expenseTally = new Map();
+        let totalGrossAmount = 0;
+        let totalRows = 0;
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const grossAmountInput = row.querySelector('.gross-amount');
+            // Use .nature-expense-input (the enhanced dropdown input)
+            const natureInput = row.querySelector('.nature-expense-input');
             
-            // ONLY process if nature of expense is NOT empty
-            if (natureExpense !== "") {
-                // Find matching category (exact match or partial match)
-                let matchedCategory = null;
-                if (expenseCategories[natureExpense] !== undefined) {
-                    matchedCategory = natureExpense;
-                } else {
-                    // Try fuzzy matching
-                    const expenseUpper = natureExpense.toUpperCase();
-                    for (const [category, rate] of Object.entries(expenseCategories)) {
-                        if (expenseUpper.includes(category.toUpperCase()) || category.toUpperCase().includes(expenseUpper)) {
-                            matchedCategory = category;
-                            break;
+            if (grossAmountInput && natureInput) {
+                const grossAmount = parseFloat(grossAmountInput.value) || 0;
+                const natureExpense = natureInput.value.trim();
+                
+                if (natureExpense !== "" && grossAmount > 0) {
+                    let matchedCategory = null;
+                    
+                    if (expenseCategories[natureExpense] !== undefined) {
+                        matchedCategory = natureExpense;
+                    } else {
+                        const expenseUpper = natureExpense.toUpperCase();
+                        for (const [category] of Object.entries(expenseCategories)) {
+                            if (expenseUpper.includes(category.toUpperCase()) || category.toUpperCase().includes(expenseUpper)) {
+                                matchedCategory = category;
+                                break;
+                            }
                         }
                     }
-                }
-                
-                // If no match found, use "OTHERS - SERVICES" or "OTHERS - GOODS" based on guess
-                if (!matchedCategory) {
-                    const expenseUpper = natureExpense.toUpperCase();
-                    if (expenseUpper.includes("GOODS") || expenseUpper.includes("MATERIALS") || expenseUpper.includes("SUPPLIES")) {
-                        matchedCategory = "OTHERS - GOODS";
-                    } else {
-                        matchedCategory = "OTHERS - SERVICES";
-                    }
-                }
-                
-                if (matchedCategory) {
-                    // Initialize category if not exists
-                    if (!expenseTally[matchedCategory]) {
-                        expenseTally[matchedCategory] = {
-                            count: 0,
-                            totalGrossAmount: 0,
-                            totalNetExpenses: 0,
-                            totalWithholdingTax: 0,
-                            rate: expenseCategories[matchedCategory] || 0.02
-                        };
+                    
+                    if (!matchedCategory) {
+                        const expenseUpper = natureExpense.toUpperCase();
+                        matchedCategory = (expenseUpper.includes("GOODS") || expenseUpper.includes("MATERIALS") || expenseUpper.includes("SUPPLIES")) 
+                            ? "OTHERS - GOODS" 
+                            : "OTHERS - SERVICES";
                     }
                     
-                    expenseTally[matchedCategory].count++;
-                    expenseTally[matchedCategory].totalGrossAmount += grossAmount;
-                    
-                    // Calculate net expenses for this row
-                    const netExpenses = grossAmount / 1.12;
-                    expenseTally[matchedCategory].totalNetExpenses += netExpenses;
-                    
-                    // Calculate withholding tax for this row
-                    const withholdingTax = netExpenses * expenseTally[matchedCategory].rate;
-                    expenseTally[matchedCategory].totalWithholdingTax += withholdingTax;
-                    
-                    totalGrossAmount += grossAmount;
-                    totalRows++;
+                    if (matchedCategory) {
+                        let data = expenseTally.get(matchedCategory);
+                        if (!data) {
+                            data = {
+                                count: 0,
+                                totalGrossAmount: 0,
+                                totalNetExpenses: 0,
+                                totalWithholdingTax: 0,
+                                rate: expenseCategories[matchedCategory] || 0.02
+                            };
+                            expenseTally.set(matchedCategory, data);
+                        }
+                        
+                        data.count++;
+                        data.totalGrossAmount += grossAmount;
+                        const netExpenses = grossAmount / 1.12;
+                        data.totalNetExpenses += netExpenses;
+                        data.totalWithholdingTax += netExpenses * data.rate;
+                        
+                        totalGrossAmount += grossAmount;
+                        totalRows++;
+                    }
                 }
             }
         }
-    });
-    
-    // Clear and rebuild tally display
-    tallyGrid.innerHTML = '';
-    
-    // Sort categories by total amount (descending) - ONLY categories with actual data
-    const sortedCategories = Object.keys(expenseTally)
-        .filter(category => expenseTally[category].count > 0 && expenseTally[category].totalGrossAmount > 0)
-        .sort((a, b) => expenseTally[b].totalGrossAmount - expenseTally[a].totalGrossAmount);
-    
-    // Add tally items for each category that has actual expense data
-    sortedCategories.forEach(category => {
-        const data = expenseTally[category];
         
-        // Determine category type for styling
-        let categoryType = '';
-        if (category.includes('SERVICES') || category === 'Rental') {
-            categoryType = category === 'Rental' ? 'rental' : 'services';
-        } else {
-            categoryType = 'goods';
+        // Check if data changed (hash comparison)
+        const tallyHash = JSON.stringify([...expenseTally.entries()]);
+        if (lastTallyHash === tallyHash && cachedElements.tallyGrid.innerHTML !== '') {
+            return;
+        }
+        lastTallyHash = tallyHash;
+        
+        // Build HTML (same as before)
+        const sortedCategories = [...expenseTally.entries()]
+            .filter(([_, data]) => data.count > 0 && data.totalGrossAmount > 0)
+            .sort((a, b) => b[1].totalGrossAmount - a[1].totalGrossAmount);
+        
+        let html = '';
+        
+        for (const [category, data] of sortedCategories) {
+            let categoryType = '';
+            if (category.includes('SERVICES') || category === 'Rental') {
+                categoryType = category === 'Rental' ? 'rental' : 'services';
+            } else {
+                categoryType = 'goods';
+            }
+            
+            const ratePercentage = (data.rate * 100).toFixed(0);
+            const displayCategory = category.replace(/–/g, '-').replace(/ {2,}/g, ' ');
+            
+            html += `
+                <div class="tally-item ${categoryType}">
+                    <div class="tally-category">
+                        <i class="fas ${categoryType === 'services' ? 'fa-cogs' : categoryType === 'goods' ? 'fa-box' : 'fa-building'}"></i>
+                        ${escapeHtml(displayCategory)}
+                    </div>
+                    <div class="tally-details">
+                        <div class="tally-amount">₱ ${data.totalGrossAmount.toFixed(2)}</div>
+                        <div class="tally-count">${data.count} ${data.count === 1 ? 'item' : 'items'}</div>
+                    </div>
+                    <div class="tally-rate">Withholding: ${ratePercentage}%</div>
+                    <div style="margin-top: 8px; font-size: 11px; color: #cca866;">
+                        Net: ₱ ${data.totalNetExpenses.toFixed(2)} | W/Tax: ₱ ${data.totalWithholdingTax.toFixed(2)}
+                    </div>
+                </div>
+            `;
         }
         
-        const tallyItem = document.createElement('div');
-        tallyItem.className = `tally-item ${categoryType}`;
+        if (totalRows > 0) {
+            html += `
+                <div class="tally-item tally-total">
+                    <div class="tally-category">
+                        <i class="fas fa-chart-bar"></i>
+                        TOTAL ALL CATEGORIES
+                    </div>
+                    <div class="tally-details">
+                        <div class="tally-amount">₱ ${totalGrossAmount.toFixed(2)}</div>
+                        <div class="tally-count">${totalRows} ${totalRows === 1 ? 'row' : 'rows'}</div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 12px; color: #ffd580; font-weight: 500;">
+                        Summarized across ${sortedCategories.length} expense categories
+                    </div>
+                </div>
+            `;
+        } else {
+            html = `
+                <div class="tally-item tally-total">
+                    <div class="tally-category">
+                        <i class="fas fa-info-circle"></i>
+                        NO EXPENSE DATA YET
+                    </div>
+                    <div style="color: #cca866; font-size: 14px; text-align: center; padding: 10px 0;">
+                        <i class="fas fa-pen-alt" style="margin-right: 8px;"></i>
+                        Enter a Nature of Expense and Gross Amount to see category totals here
+                    </div>
+                </div>
+            `;
+        }
         
-        // Format category name for display
-        const displayCategory = category.replace(/–/g, '-').replace(/ {2,}/g, ' ');
-        
-        // Get rate percentage
-        const ratePercentage = (data.rate * 100).toFixed(0);
-        
-        tallyItem.innerHTML = `
-            <div class="tally-category">
-                <i class="fas ${categoryType === 'services' ? 'fa-cogs' : categoryType === 'goods' ? 'fa-box' : 'fa-building'}"></i>
-                ${displayCategory}
-            </div>
-            <div class="tally-details">
-                <div class="tally-amount">₱ ${data.totalGrossAmount.toFixed(2)}</div>
-                <div class="tally-count">${data.count} ${data.count === 1 ? 'item' : 'items'}</div>
-            </div>
-            <div class="tally-rate">Withholding: ${ratePercentage}%</div>
-            <div style="margin-top: 8px; font-size: 11px; color: #cca866;">
-                Net: ₱ ${data.totalNetExpenses.toFixed(2)} | W/Tax: ₱ ${data.totalWithholdingTax.toFixed(2)}
-            </div>
-        `;
-        
-        tallyGrid.appendChild(tallyItem);
+        cachedElements.tallyGrid.innerHTML = html;
     });
-    
-    // Add total tally item only if there are actual expense entries
-    if (totalRows > 0) {
-        const totalItem = document.createElement('div');
-        totalItem.className = 'tally-item tally-total';
-        totalItem.innerHTML = `
-            <div class="tally-category">
-                <i class="fas fa-chart-bar"></i>
-                TOTAL ALL CATEGORIES
-            </div>
-            <div class="tally-details">
-                <div class="tally-amount">₱ ${totalGrossAmount.toFixed(2)}</div>
-                <div class="tally-count">${totalRows} ${totalRows === 1 ? 'row' : 'rows'}</div>
-            </div>
-            <div style="margin-top: 8px; font-size: 12px; color: #ffd580; font-weight: 500;">
-                Summarized across ${sortedCategories.length} expense categories
-            </div>
-        `;
-        tallyGrid.appendChild(totalItem);
-    } else {
-        // Show empty state message when no expenses entered yet
-        const emptyItem = document.createElement('div');
-        emptyItem.className = 'tally-item tally-total';
-        emptyItem.innerHTML = `
-            <div class="tally-category">
-                <i class="fas fa-info-circle"></i>
-                NO EXPENSE DATA YET
-            </div>
-            <div style="color: #cca866; font-size: 14px; text-align: center; padding: 10px 0;">
-                <i class="fas fa-pen-alt" style="margin-right: 8px;"></i>
-                Enter a Nature of Expense and Gross Amount to see category totals here
-            </div>
-        `;
-        tallyGrid.appendChild(emptyItem);
-    }
 }
 
 // ===== NEW: SAVE/LOAD FUNCTIONS =====
@@ -4438,23 +4634,12 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Helper function to calculate expense tally for export
+// ===== FIXED: CALCULATE EXPENSE TALLY FOR EXPORT (ONLY SHOWS CATEGORIES WITH DATA) =====
 function calculateExpenseTallyForExport() {
     const rows = document.querySelectorAll('#tableBody tr');
     const expenseTally = {};
     
-    // Initialize categories with zero values
-    Object.keys(expenseCategories).forEach(category => {
-        expenseTally[category] = {
-            count: 0,
-            totalGrossAmount: 0,
-            totalNetExpenses: 0,
-            totalWithholdingTax: 0,
-            rate: expenseCategories[category]
-        };
-    });
-    
-    // Process each row
+    // Process each row - only add categories that have actual data
     rows.forEach(row => {
         const grossAmountInput = row.querySelector('.gross-amount');
         const natureExpenseInput = row.querySelector('.nature-expense-input');
@@ -4463,13 +4648,16 @@ function calculateExpenseTallyForExport() {
             const grossAmount = parseFloat(grossAmountInput.value) || 0;
             const natureExpense = natureExpenseInput.value;
             
+            // Skip if no nature expense or gross amount is zero
+            if (!natureExpense || natureExpense.trim() === "" || grossAmount === 0) return;
+            
             // Find matching category
             let matchedCategory = null;
             if (expenseCategories[natureExpense] !== undefined) {
                 matchedCategory = natureExpense;
             } else {
                 const expenseUpper = natureExpense.toUpperCase();
-                for (const [category, rate] of Object.entries(expenseCategories)) {
+                for (const [category] of Object.entries(expenseCategories)) {
                     if (expenseUpper.includes(category.toUpperCase()) || category.toUpperCase().includes(expenseUpper)) {
                         matchedCategory = category;
                         break;
@@ -4477,7 +4665,26 @@ function calculateExpenseTallyForExport() {
                 }
             }
             
-            if (matchedCategory && expenseTally[matchedCategory]) {
+            if (!matchedCategory) {
+                const expenseUpper = natureExpense.toUpperCase();
+                matchedCategory = (expenseUpper.includes("GOODS") || expenseUpper.includes("MATERIALS") || expenseUpper.includes("SUPPLIES")) 
+                    ? "OTHERS - GOODS" 
+                    : "OTHERS - SERVICES";
+            }
+            
+            if (matchedCategory) {
+                if (!expenseTally[matchedCategory]) {
+                    expenseTally[matchedCategory] = {
+                        count: 0,
+                        totalGrossAmount: 0,
+                        totalNetExpenses: 0,
+                        totalWithholdingTax: 0,
+                        rate: expenseCategories[matchedCategory] || 
+                               (matchedCategory.includes("SERVICES") ? 0.02 : 
+                                matchedCategory.includes("GOODS") ? 0.01 : 0.05)
+                    };
+                }
+                
                 expenseTally[matchedCategory].count++;
                 expenseTally[matchedCategory].totalGrossAmount += grossAmount;
                 
@@ -4618,6 +4825,24 @@ function initButtonListeners() {
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
     const selectMultipleBtn = document.getElementById('selectMultipleBtn');
     const entryCounterBtn = document.getElementById('entryCounterBtn');
+
+    // Add batch rows button listener - ADD THIS TO YOUR initButtonListeners FUNCTION
+const addBatchRowsBtn = document.getElementById('addBatchRowsBtn');
+
+
+if (addBatchRowsBtn) {
+    addBatchRowsBtn.addEventListener('click', function() {
+        const count = prompt('How many rows would you like to add?', '10');
+        const numCount = parseInt(count);
+        if (numCount && numCount > 0 && numCount <= 5000) {
+            addMultipleRows(numCount);
+        } else if (numCount > 5000) {
+            alert('Maximum 5000 rows at a time to prevent performance issues.');
+        } else {
+            alert('Please enter a valid number (1-5000).');
+        }
+    });
+}
     
     // Add event listeners to sidebar buttons
     if (addRowBtn) {

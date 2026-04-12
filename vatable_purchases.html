@@ -824,6 +824,12 @@ td.selected {
                     <i class="fas fa-plus-circle"></i>
                     <span class="sidebar-btn-text">Add New Row</span>
                 </button>
+
+                <!-- Add this button right after -->
+<button class="sidebar-btn" id="addBatchRowsBtn">
+    <i class="fas fa-layer-group"></i>
+    <span class="sidebar-btn-text">Add Multiple Rows</span>
+</button>
                 
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
@@ -1666,6 +1672,7 @@ let isLongPressing = false;
 let longPressInterval = null;
 let addedRowsCount = 0;
 
+// ===== FIXED LONG PRESS (OPTIMIZED BATCH FOR PURCHASES) =====
 function startLongPress(button) {
     if (longPressTimer) clearTimeout(longPressTimer);
     
@@ -1674,24 +1681,22 @@ function startLongPress(button) {
             isLongPressing = true;
             addedRowsCount = 0;
             
-            // Add visual feedback
             button.classList.add('long-press-active');
+            if (typeof showLongPressToast === 'function') {
+                showLongPressToast('Adding rows continuously... Release to stop');
+            }
             
-            // Show toast notification
-            showLongPressToast('Adding rows continuously... Release to stop');
-            
-            // Start adding rows repeatedly
             longPressInterval = setInterval(() => {
-                addNewRow();
-                addedRowsCount++;
+                // Add 5 rows at a time for smooth performance
+                addMultipleRows(5);
+                addedRowsCount += 5;
                 
-                // Update toast with count every 5 rows
-                if (addedRowsCount % 5 === 0) {
+                if (addedRowsCount % 20 === 0 && typeof updateLongPressToast === 'function') {
                     updateLongPressToast(`Added ${addedRowsCount} rows...`);
                 }
-            }, 200); // Add a new row every 200ms (5 rows per second)
+            }, 250);
         }
-    }, 500); // 500ms delay to trigger long press
+    }, 500);
 }
 
 function stopLongPress(button) {
@@ -1844,13 +1849,13 @@ function initEntryCounterLongPress() {
                     showLongPressToast('Adding rows continuously... Release to stop');
                     
                     counterLongPressInterval = setInterval(() => {
-                        addNewRow();
-                        counterAddedRows++;
-                        
-                        if (counterAddedRows % 5 === 0) {
-                            updateLongPressToast(`Added ${counterAddedRows} rows...`);
-                        }
-                    }, 200);
+    addMultipleRows(10);
+    counterAddedRows += 10;
+    
+    if (counterAddedRows % 20 === 0) {
+        updateLongPressToast(`Added ${counterAddedRows} rows...`);
+    }
+}, 300);
                 }
             }, 500);
         }
@@ -2256,91 +2261,113 @@ function renderCurrentPage() {
 }
 
 // Function to add a new row
+// ===== OPTIMIZED ADD NEW ROW (PURCHASES) =====
 function addNewRow() {
     const tableBody = document.getElementById('tableBody');
     if (!tableBody) return;
     
-    const rowCount = tableBody.children.length + 1;
-    const rowId = 'row_' + Date.now() + '_' + rowCount;
+    const row = createPurchasesRow();
+    tableBody.appendChild(row);
     
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    scheduleStatsUpdate();
+}
+
+// ===== CREATE A SINGLE ROW FOR PURCHASES (REUSED FOR BATCH) =====
+function createPurchasesRow(rowData = null) {
+    const rowId = 'row_' + Date.now() + '_' + Math.random();
     const row = document.createElement('tr');
     row.id = rowId;
     
-    // Set current date as default
     const today = new Date().toISOString().split('T')[0];
+    const dateValue = rowData?.date || today;
+    const invoiceNumber = rowData?.invoiceNumber || '';
+    const invoiceType = rowData?.invoiceType || '';
+    const paymentMode = rowData?.paymentMode || '';
+    const tinNumber = rowData?.tinNumber || '';
+    const supplierName = rowData?.supplierName || '';
+    const address = rowData?.address || '';
+    const grossPurchases = rowData?.grossPurchases || '';
+    const withholdingRate = rowData?.withholdingRate || '0';
+    const remarks = rowData?.remarks || '';
     
     row.innerHTML = `
+        <td><input type="date" value="${dateValue}" class="editable date-input"></td>
+        <td><input type="text" value="${escapeHtml(invoiceNumber)}" class="editable invoice-number" placeholder="INV-001"></td>
         <td>
-            <input type="date" value="${today}" class="editable date-input">
-        </td>
-         <td>
-            <input type="text" class="editable invoice-number" placeholder="INV-001">
-         </td>
-         <td>
             <select class="editable invoice-type">
                 <option value="">Select</option>
-                <option value="OR">OR</option>
-                <option value="SI">SI</option>
-                <option value="DR">DR</option>
-                <option value="AR">AR</option>
-                <option value="TR">TR</option>
-                <option value="CR">CR</option>
-                <option value="OTHERS">OTHERS</option>
+                <option value="OR" ${invoiceType === 'OR' ? 'selected' : ''}>OR</option>
+                <option value="SI" ${invoiceType === 'SI' ? 'selected' : ''}>SI</option>
+                <option value="DR" ${invoiceType === 'DR' ? 'selected' : ''}>DR</option>
+                <option value="AR" ${invoiceType === 'AR' ? 'selected' : ''}>AR</option>
+                <option value="TR" ${invoiceType === 'TR' ? 'selected' : ''}>TR</option>
+                <option value="CR" ${invoiceType === 'CR' ? 'selected' : ''}>CR</option>
+                <option value="OTHERS" ${invoiceType === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
             </select>
-         </td>
-         <td>
+        </td>
+        <td>
             <select class="editable payment-mode">
                 <option value="">Select</option>
-                <option value="Cash">Cash</option>
-                <option value="Charge">Charge</option>
+                <option value="Cash" ${paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+                <option value="Charge" ${paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
             </select>
-         </td>
+        </td>
         <td style="position: relative;">
-            <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
-            <div class="validation-message" style="display: none; position: absolute; bottom: -20px; left: 0; right: 0;">TIN must be 12 digits</div>
-         </td>
-         <td>
-            <input type="text" class="editable supplier-name" placeholder="Supplier name">
-         </td>
-         <td>
-            <input type="text" class="editable address" placeholder="Supplier address">
-         </td>
-         <td>
-            <input type="number" step="0.01" min="0" class="editable gross-purchases" placeholder="0.00">
-         </td>
-         <td>
-            <div class="uneditable net-purchases">0.00</div>
-         </td>
-         <td>
-            <div class="uneditable input-tax">0.00</div>
-         </td>
-         <td>
+            <input type="text" value="${escapeHtml(tinNumber)}" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+            <div class="validation-message" style="display: none;"></div>
+        </td>
+        <td><input type="text" value="${escapeHtml(supplierName)}" class="editable supplier-name" placeholder="Supplier name"></td>
+        <td><input type="text" value="${escapeHtml(address)}" class="editable address" placeholder="Supplier address"></td>
+        <td><input type="number" step="0.01" min="0" value="${grossPurchases}" class="editable gross-purchases" placeholder="0.00"></td>
+        <td><div class="uneditable net-purchases">0.00</div></td>
+        <td><div class="uneditable input-tax">0.00</div></td>
+        <td>
             <select class="editable withholding-rate">
-                <option value="0">0%</option>
-                <option value="0.01">1%</option>
-                <option value="0.02">2%</option>
-                <option value="0.05">5%</option>
+                <option value="0" ${withholdingRate === '0' ? 'selected' : ''}>0%</option>
+                <option value="0.01" ${withholdingRate === '0.01' ? 'selected' : ''}>1%</option>
+                <option value="0.02" ${withholdingRate === '0.02' ? 'selected' : ''}>2%</option>
+                <option value="0.05" ${withholdingRate === '0.05' ? 'selected' : ''}>5%</option>
             </select>
-         </td>
-         <td>
-            <div class="uneditable withholding-amount">0.00</div>
-         </td>
-         <td>
-            <div class="uneditable gross-minus-withholding">0.00</div>
-         </td>
-         <td>
-            <input type="text" class="editable remarks" placeholder="Enter remarks">
-         </td>
-         <td>
-            <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
-                <i class="fas fa-trash"></i>
-            </button>
-         </td>
+        </td>
+        <td><div class="uneditable withholding-amount">0.00</div></td>
+        <td><div class="uneditable gross-minus-withholding">0.00</div></td>
+        <td><input type="text" value="${escapeHtml(remarks)}" class="editable remarks" placeholder="Enter remarks"></td>
+        <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></td>
     `;
     
-    tableBody.appendChild(row);
+    attachPurchasesRowListeners(row);
+    return row;
+}
+
+// ===== ATTACH LISTENERS FOR PURCHASES ROW (REUSED FOR BATCH) =====
+function attachPurchasesRowListeners(row) {
+    if (row.hasAttribute('data-listeners-attached')) return;
+    row.setAttribute('data-listeners-attached', 'true');
     
-    // FIX: Apply current column visibility states to the new row
+    const editableInputs = row.querySelectorAll('.editable');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            scheduleStatsUpdate();
+        });
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            scheduleStatsUpdate();
+        });
+    });
+    
+    const tinInput = row.querySelector('.tin-number');
+    if (tinInput) {
+        tinInput.addEventListener('input', (e) => formatTIN(e.target));
+        tinInput.addEventListener('blur', (e) => validateTIN(e.target));
+    }
+    
+    // Apply column visibility
     const columnVisibility = JSON.parse(localStorage.getItem('purchasesColumnVisibility')) || {};
     const columns = [
         'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'tinNumber',
@@ -2348,61 +2375,65 @@ function addNewRow() {
         'withholdingRate', 'withholdingAmount', 'grossMinusWithholding',
         'remarks', 'action'
     ];
-    
     const cells = row.querySelectorAll('td');
     columns.forEach((key, index) => {
         if (columnVisibility[key] === true && cells[index]) {
             cells[index].classList.add('hidden-column');
-        } else if (cells[index]) {
-            cells[index].classList.remove('hidden-column');
         }
     });
     
-    // Add event listeners to the new row
-    const editableInputs = row.querySelectorAll('.editable');
-    editableInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            updateCalculations(row);
-            updateAllStats();
-        });
-        
-        input.addEventListener('change', function() {
-            updateCalculations(row);
-            updateAllStats();
-        });
-    });
+    if (typeof attachAutoFillToRow === 'function') {
+        attachAutoFillToRow(row);
+    }
+}
+
+// ===== OPTIMIZED BATCH ADD ROWS (PURCHASES) =====
+function addMultipleRows(count) {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
     
-    // Special handling for TIN input
-    const tinInput = row.querySelector('.tin-number');
-    if (tinInput) {
-        tinInput.addEventListener('input', function(e) {
-            formatTIN(e.target);
-        });
-        
-        tinInput.addEventListener('blur', function(e) {
-            validateTIN(e.target);
-        });
+    if (count > 5000) {
+        if (!confirm(`Adding ${count} rows may take a few seconds. Continue?`)) {
+            return;
+        }
     }
     
-    // Add neon effect to new row inputs on focus
-    const inputs = row.querySelectorAll('input, select');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
-        });
-        
-        input.addEventListener('blur', function() {
-            this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
-        });
-    });
+    const startTime = performance.now();
+    const fragment = document.createDocumentFragment();
+    const rows = [];
     
-    // Update pagination for new row
+    for (let i = 0; i < count; i++) {
+        const row = createPurchasesRow();
+        rows.push(row);
+        fragment.appendChild(row);
+    }
+    
+    // Single DOM update
+    tableBody.appendChild(fragment);
+    
+    // Update pagination
     const totalRows = tableBody.children.length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
-    currentPage = totalPages; // Go to last page to see new row
+    currentPage = totalPages;
     renderCurrentPage();
     
+    // Single stats update
     updateAllStats();
+    
+    const endTime = performance.now();
+    console.log(`Added ${count} rows in ${(endTime - startTime).toFixed(2)}ms`);
+    
+    if (typeof showToast === 'function') {
+        showToast(`✅ Added ${count} rows successfully!`, 'success');
+    }
+}
+
+// ===== DEBOUNCED STATS UPDATE =====
+let statsTimeout;
+
+function scheduleStatsUpdate() {
+    if (statsTimeout) clearTimeout(statsTimeout);
+    statsTimeout = setTimeout(() => updateAllStats(), 100);
 }
 
 function deleteRow(rowId) {
@@ -2518,21 +2549,26 @@ function validateTIN(input) {
     }
 }
 
-// ===== UPDATE FUNCTIONS =====
+// ===== OPTIMIZED UPDATE ALL STATS =====
+let statsUpdateScheduled = false;
+
 function updateAllStats() {
-    updateRowCount();
-    updateTotals();
-    updateSummaryRow();
-    updateTallySections();
+    if (statsUpdateScheduled) return;
+    statsUpdateScheduled = true;
+    
+    requestAnimationFrame(() => {
+        updateRowCount();
+        updateTotals();
+        updateSummaryRow();
+        updateTallySections();
+        statsUpdateScheduled = false;
+    });
 }
 
+// ===== OPTIMIZED UPDATE ROW COUNT =====
 function updateRowCount() {
     const tableBody = document.getElementById('tableBody');
     const rowCount = tableBody ? tableBody.children.length : 0;
-    const rowCountEl = document.getElementById('rowCount');
-    if (rowCountEl) rowCountEl.textContent = rowCount;
-    
-    // Update entry counter
     updateEntryCounter();
 }
 
@@ -2542,18 +2578,15 @@ function updateEntryCounter() {
     const entryCountSpan = document.getElementById('entryCount');
     
     if (entryCountSpan) {
-        // Add pulse animation
         entryCountSpan.classList.add('pulse');
-        
-        // Update the count
         entryCountSpan.textContent = count;
         
-        // Remove animation after it completes
         setTimeout(() => {
-            entryCountSpan.classList.remove('pulse');
+            if (entryCountSpan) {
+                entryCountSpan.classList.remove('pulse');
+            }
         }, 300);
         
-        // Update the button tooltip with additional info
         const counterBtn = document.getElementById('entryCounterBtn');
         if (counterBtn) {
             if (count === 0) {
@@ -2567,39 +2600,44 @@ function updateEntryCounter() {
     }
 }
 
+// ===== OPTIMIZED UPDATE TOTALS =====
+let totalsTimeout = null;
+
 function updateTotals() {
-    let totalGrossPurchases = 0;
-    let totalNetPurchases = 0;
-    let totalInputTax = 0;
-    let totalWithholding = 0;
-    let totalGrossMinusWithholding = 0;
+    if (totalsTimeout) cancelAnimationFrame(totalsTimeout);
     
-    const rows = document.querySelectorAll('#tableBody tr');
-    rows.forEach(row => {
-        const grossPurchases = parseFloat(row.querySelector('.gross-purchases')?.value) || 0;
-        const netPurchases = parseFloat(row.querySelector('.net-purchases')?.textContent) || 0;
-        const inputTax = parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
-        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
-        const grossMinusWithholding = parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
+    totalsTimeout = requestAnimationFrame(() => {
+        let totalGrossPurchases = 0;
+        let totalNetPurchases = 0;
+        let totalInputTax = 0;
+        let totalWithholding = 0;
+        let totalGrossMinusWithholding = 0;
         
-        totalGrossPurchases += grossPurchases;
-        totalNetPurchases += netPurchases;
-        totalInputTax += inputTax;
-        totalWithholding += withholdingAmount;
-        totalGrossMinusWithholding += grossMinusWithholding;
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            totalGrossPurchases += parseFloat(row.querySelector('.gross-purchases')?.value) || 0;
+            totalNetPurchases += parseFloat(row.querySelector('.net-purchases')?.textContent) || 0;
+            totalInputTax += parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
+            totalWithholding += parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
+            totalGrossMinusWithholding += parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
+        }
+        
+        const elements = {
+            totalGrossPurchases: document.getElementById('totalGrossPurchases'),
+            totalNetPurchases: document.getElementById('totalNetPurchases'),
+            totalInputTax: document.getElementById('totalInputTax'),
+            totalWithholding: document.getElementById('totalWithholding'),
+            netPayable: document.getElementById('netPayable')
+        };
+        
+        if (elements.totalGrossPurchases) elements.totalGrossPurchases.textContent = totalGrossPurchases.toFixed(2);
+        if (elements.totalNetPurchases) elements.totalNetPurchases.textContent = totalNetPurchases.toFixed(2);
+        if (elements.totalInputTax) elements.totalInputTax.textContent = totalInputTax.toFixed(2);
+        if (elements.totalWithholding) elements.totalWithholding.textContent = totalWithholding.toFixed(2);
+        if (elements.netPayable) elements.netPayable.textContent = totalGrossMinusWithholding.toFixed(2);
     });
-    
-    const totalGrossPurchasesEl = document.getElementById('totalGrossPurchases');
-    const totalNetPurchasesEl = document.getElementById('totalNetPurchases');
-    const totalInputTaxEl = document.getElementById('totalInputTax');
-    const totalWithholdingEl = document.getElementById('totalWithholding');
-    const netPayableEl = document.getElementById('netPayable');
-    
-    if (totalGrossPurchasesEl) totalGrossPurchasesEl.textContent = totalGrossPurchases.toFixed(2);
-    if (totalNetPurchasesEl) totalNetPurchasesEl.textContent = totalNetPurchases.toFixed(2);
-    if (totalInputTaxEl) totalInputTaxEl.textContent = totalInputTax.toFixed(2);
-    if (totalWithholdingEl) totalWithholdingEl.textContent = totalWithholding.toFixed(2);
-    if (netPayableEl) netPayableEl.textContent = totalGrossMinusWithholding.toFixed(2);
 }
 
 // Helper function to get the number of visible columns
@@ -2614,6 +2652,7 @@ function getVisibleColumnCount() {
     return visibleCount;
 }
 
+// ===== OPTIMIZED UPDATE SUMMARY ROW =====
 function updateSummaryRow() {
     let totalGrossPurchases = 0;
     let totalNetPurchases = 0;
@@ -2622,13 +2661,15 @@ function updateSummaryRow() {
     let totalGrossMinusWithholding = 0;
     
     const rows = document.querySelectorAll('#tableBody tr');
-    rows.forEach(row => {
+    
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
         totalGrossPurchases += parseFloat(row.querySelector('.gross-purchases')?.value) || 0;
         totalNetPurchases += parseFloat(row.querySelector('.net-purchases')?.textContent) || 0;
         totalInputTax += parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
         totalWithholding += parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
         totalGrossMinusWithholding += parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
-    });
+    }
     
     const headers = document.querySelectorAll('#vatablePurchasesTable thead th');
     const summaryRow = document.getElementById('summaryRow');
@@ -2636,9 +2677,9 @@ function updateSummaryRow() {
     if (summaryRow) {
         let summaryCells = '';
         
-        headers.forEach((header, index) => {
-            if (!header.classList.contains('hidden-column')) {
-                switch(index) {
+        for (let i = 0; i < headers.length; i++) {
+            if (!headers[i].classList.contains('hidden-column')) {
+                switch(i) {
                     case 0:
                         summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
                         break;
@@ -2662,113 +2703,115 @@ function updateSummaryRow() {
                         break;
                 }
             }
-        });
+        }
         
         summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
     }
 }
 
+// ===== OPTIMIZED UPDATE TALLY SECTIONS =====
+let tallyUpdateTimeout = null;
+
 function updateTallySections() {
-    let totalCashAmount = 0;
-    let totalChargeAmount = 0;
-    let totalOnePercent = 0;
-    let totalTwoPercent = 0;
-    let totalFivePercent = 0;
-    let totalZeroPercent = 0;
+    if (tallyUpdateTimeout) cancelAnimationFrame(tallyUpdateTimeout);
     
-    let cashCount = 0;
-    let chargeCount = 0;
-    let onePercentCount = 0;
-    let twoPercentCount = 0;
-    let fivePercentCount = 0;
-    let zeroPercentCount = 0;
-    
-    const rows = document.querySelectorAll('#tableBody tr');
-    
-    rows.forEach(row => {
-        const paymentMode = row.querySelector('.payment-mode')?.value;
-        const withholdingRate = parseFloat(row.querySelector('.withholding-rate')?.value) || 0;
-        const netPurchases = parseFloat(row.querySelector('.net-purchases')?.textContent) || 0;
-        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
+    tallyUpdateTimeout = requestAnimationFrame(() => {
+        let totalCashAmount = 0;
+        let totalChargeAmount = 0;
+        let totalOnePercent = 0;
+        let totalTwoPercent = 0;
+        let totalFivePercent = 0;
+        let totalZeroPercent = 0;
         
-        // Count by payment mode
-        if (paymentMode === 'Cash') {
-            totalCashAmount += netPurchases;
-            cashCount++;
-        } else if (paymentMode === 'Charge') {
-            totalChargeAmount += netPurchases;
-            chargeCount++;
+        let cashCount = 0;
+        let chargeCount = 0;
+        let onePercentCount = 0;
+        let twoPercentCount = 0;
+        let fivePercentCount = 0;
+        let zeroPercentCount = 0;
+        
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const paymentMode = row.querySelector('.payment-mode')?.value;
+            const withholdingRate = parseFloat(row.querySelector('.withholding-rate')?.value) || 0;
+            const netPurchases = parseFloat(row.querySelector('.net-purchases')?.textContent) || 0;
+            const withholdingAmount = parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
+            
+            if (paymentMode === 'Cash') {
+                totalCashAmount += netPurchases;
+                cashCount++;
+            } else if (paymentMode === 'Charge') {
+                totalChargeAmount += netPurchases;
+                chargeCount++;
+            }
+            
+            if (withholdingRate === 0.01) {
+                totalOnePercent += withholdingAmount;
+                onePercentCount++;
+            } else if (withholdingRate === 0.02) {
+                totalTwoPercent += withholdingAmount;
+                twoPercentCount++;
+            } else if (withholdingRate === 0.05) {
+                totalFivePercent += withholdingAmount;
+                fivePercentCount++;
+            } else if (withholdingRate === 0) {
+                totalZeroPercent += netPurchases;
+                zeroPercentCount++;
+            }
         }
         
-        // Count by withholding tax rate
-        if (withholdingRate === 0.01) { // 1%
-            totalOnePercent += withholdingAmount;
-            onePercentCount++;
-        } else if (withholdingRate === 0.02) { // 2%
-            totalTwoPercent += withholdingAmount;
-            twoPercentCount++;
-        } else if (withholdingRate === 0.05) { // 5%
-            totalFivePercent += withholdingAmount;
-            fivePercentCount++;
-        } else if (withholdingRate === 0) { // 0%
-            totalZeroPercent += netPurchases; // Use net purchases for 0% rate
-            zeroPercentCount++;
-        }
+        // Update DOM elements
+        const elements = {
+            totalCashAmount: document.getElementById('totalCashAmount'),
+            totalChargeAmount: document.getElementById('totalChargeAmount'),
+            totalOnePercent: document.getElementById('totalOnePercent'),
+            totalTwoPercent: document.getElementById('totalTwoPercent'),
+            totalFivePercent: document.getElementById('totalFivePercent'),
+            totalZeroPercent: document.getElementById('totalZeroPercent'),
+            cashCount: document.getElementById('cashCount'),
+            chargeCount: document.getElementById('chargeCount'),
+            onePercentCount: document.getElementById('onePercentCount'),
+            twoPercentCount: document.getElementById('twoPercentCount'),
+            fivePercentCount: document.getElementById('fivePercentCount'),
+            zeroPercentCount: document.getElementById('zeroPercentCount'),
+            cashPercentage: document.getElementById('cashPercentage'),
+            chargePercentage: document.getElementById('chargePercentage'),
+            totalTallyAmount: document.getElementById('totalTallyAmount'),
+            totalTallyCount: document.getElementById('totalTallyCount'),
+            totalWithholdingTally: document.getElementById('totalWithholdingTally')
+        };
+        
+        if (elements.totalCashAmount) elements.totalCashAmount.textContent = totalCashAmount.toFixed(2);
+        if (elements.totalChargeAmount) elements.totalChargeAmount.textContent = totalChargeAmount.toFixed(2);
+        if (elements.totalOnePercent) elements.totalOnePercent.textContent = totalOnePercent.toFixed(2);
+        if (elements.totalTwoPercent) elements.totalTwoPercent.textContent = totalTwoPercent.toFixed(2);
+        if (elements.totalFivePercent) elements.totalFivePercent.textContent = totalFivePercent.toFixed(2);
+        if (elements.totalZeroPercent) elements.totalZeroPercent.textContent = totalZeroPercent.toFixed(2);
+        
+        if (elements.cashCount) elements.cashCount.textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`;
+        if (elements.chargeCount) elements.chargeCount.textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`;
+        if (elements.onePercentCount) elements.onePercentCount.textContent = `${onePercentCount} transaction${onePercentCount !== 1 ? 's' : ''}`;
+        if (elements.twoPercentCount) elements.twoPercentCount.textContent = `${twoPercentCount} transaction${twoPercentCount !== 1 ? 's' : ''}`;
+        if (elements.fivePercentCount) elements.fivePercentCount.textContent = `${fivePercentCount} transaction${fivePercentCount !== 1 ? 's' : ''}`;
+        if (elements.zeroPercentCount) elements.zeroPercentCount.textContent = `${zeroPercentCount} transaction${zeroPercentCount !== 1 ? 's' : ''}`;
+        
+        const totalTallyAmount = totalCashAmount + totalChargeAmount;
+        const totalTransactions = rows.length;
+        
+        const cashPercentage = totalTallyAmount > 0 ? ((totalCashAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+        const chargePercentage = totalTallyAmount > 0 ? ((totalChargeAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+        
+        if (elements.cashPercentage) elements.cashPercentage.textContent = `${cashPercentage}% of total`;
+        if (elements.chargePercentage) elements.chargePercentage.textContent = `${chargePercentage}% of total`;
+        
+        if (elements.totalTallyAmount) elements.totalTallyAmount.textContent = `₱ ${totalTallyAmount.toFixed(2)}`;
+        if (elements.totalTallyCount) elements.totalTallyCount.textContent = `${totalTransactions} total transaction${totalTransactions !== 1 ? 's' : ''}`;
+        
+        const totalWithholding = parseFloat(document.getElementById('totalWithholding')?.textContent) || 0;
+        if (elements.totalWithholdingTally) elements.totalWithholdingTally.textContent = totalWithholding.toFixed(2);
     });
-    
-    // Update DOM elements
-    const totalCashAmountEl = document.getElementById('totalCashAmount');
-    const totalChargeAmountEl = document.getElementById('totalChargeAmount');
-    const totalOnePercentEl = document.getElementById('totalOnePercent');
-    const totalTwoPercentEl = document.getElementById('totalTwoPercent');
-    const totalFivePercentEl = document.getElementById('totalFivePercent');
-    const totalZeroPercentEl = document.getElementById('totalZeroPercent');
-    
-    if (totalCashAmountEl) totalCashAmountEl.textContent = totalCashAmount.toFixed(2);
-    if (totalChargeAmountEl) totalChargeAmountEl.textContent = totalChargeAmount.toFixed(2);
-    if (totalOnePercentEl) totalOnePercentEl.textContent = totalOnePercent.toFixed(2);
-    if (totalTwoPercentEl) totalTwoPercentEl.textContent = totalTwoPercent.toFixed(2);
-    if (totalFivePercentEl) totalFivePercentEl.textContent = totalFivePercent.toFixed(2);
-    if (totalZeroPercentEl) totalZeroPercentEl.textContent = totalZeroPercent.toFixed(2);
-    
-    const cashCountEl = document.getElementById('cashCount');
-    const chargeCountEl = document.getElementById('chargeCount');
-    const onePercentCountEl = document.getElementById('onePercentCount');
-    const twoPercentCountEl = document.getElementById('twoPercentCount');
-    const fivePercentCountEl = document.getElementById('fivePercentCount');
-    const zeroPercentCountEl = document.getElementById('zeroPercentCount');
-    
-    if (cashCountEl) cashCountEl.textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`;
-    if (chargeCountEl) chargeCountEl.textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`;
-    if (onePercentCountEl) onePercentCountEl.textContent = `${onePercentCount} transaction${onePercentCount !== 1 ? 's' : ''}`;
-    if (twoPercentCountEl) twoPercentCountEl.textContent = `${twoPercentCount} transaction${twoPercentCount !== 1 ? 's' : ''}`;
-    if (fivePercentCountEl) fivePercentCountEl.textContent = `${fivePercentCount} transaction${fivePercentCount !== 1 ? 's' : ''}`;
-    if (zeroPercentCountEl) zeroPercentCountEl.textContent = `${zeroPercentCount} transaction${zeroPercentCount !== 1 ? 's' : ''}`;
-    
-    // Calculate percentages
-    const totalTallyAmount = totalCashAmount + totalChargeAmount;
-    const totalTransactions = rows.length;
-    
-    const cashPercentage = totalTallyAmount > 0 ? ((totalCashAmount / totalTallyAmount) * 100).toFixed(1) : 0;
-    const chargePercentage = totalTallyAmount > 0 ? ((totalChargeAmount / totalTallyAmount) * 100).toFixed(1) : 0;
-    
-    // Update payment mode percentages
-    const cashPercentageEl = document.getElementById('cashPercentage');
-    const chargePercentageEl = document.getElementById('chargePercentage');
-    
-    if (cashPercentageEl) cashPercentageEl.textContent = `${cashPercentage}% of total`;
-    if (chargePercentageEl) chargePercentageEl.textContent = `${chargePercentage}% of total`;
-    
-    // Update summary
-    const totalTallyAmountEl = document.getElementById('totalTallyAmount');
-    const totalTallyCountEl = document.getElementById('totalTallyCount');
-    const totalWithholdingTallyEl = document.getElementById('totalWithholdingTally');
-    
-    if (totalTallyAmountEl) totalTallyAmountEl.textContent = `₱ ${totalTallyAmount.toFixed(2)}`;
-    if (totalTallyCountEl) totalTallyCountEl.textContent = `${totalTransactions} total transaction${totalTransactions !== 1 ? 's' : ''}`;
-    
-    const totalWithholding = parseFloat(document.getElementById('totalWithholding')?.textContent) || 0;
-    if (totalWithholdingTallyEl) totalWithholdingTallyEl.textContent = totalWithholding.toFixed(2);
 }
 
 // ===== NEW: SAVE/LOAD FUNCTIONS =====
@@ -3748,6 +3791,22 @@ function initButtonListeners() {
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
     const selectMultipleBtn = document.getElementById('selectMultipleBtn');
     const entryCounterBtn = document.getElementById('entryCounterBtn');
+    // Add batch rows button listener - ADD THIS TO initButtonListeners
+const addBatchRowsBtn = document.getElementById('addBatchRowsBtn');
+
+if (addBatchRowsBtn) {
+    addBatchRowsBtn.addEventListener('click', function() {
+        const count = prompt('How many rows would you like to add?', '10');
+        const numCount = parseInt(count);
+        if (numCount && numCount > 0 && numCount <= 5000) {
+            addMultipleRows(numCount);
+        } else if (numCount > 5000) {
+            alert('Maximum 5000 rows at a time to prevent performance issues.');
+        } else {
+            alert('Please enter a valid number (1-5000).');
+        }
+    });
+}
     
     // Add event listeners to sidebar buttons
     if (addRowBtn) {

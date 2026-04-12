@@ -786,6 +786,12 @@ td.selected {
                     <i class="fas fa-plus-circle"></i>
                     <span class="sidebar-btn-text">Add New Row</span>
                 </button>
+
+                <!-- Add this button after the existing addRowBtn -->
+<button class="sidebar-btn" id="addBatchRowsBtn">
+    <i class="fas fa-layer-group"></i>
+    <span class="sidebar-btn-text">Add Multiple Rows</span>
+</button>
                 
                 <button class="sidebar-btn" id="exportBtn">
                     <i class="fas fa-file-excel"></i>
@@ -1607,6 +1613,7 @@ let isLongPressing = false;
 let longPressInterval = null;
 let addedRowsCount = 0;
 
+// ===== FIXED LONG PRESS (OPTIMIZED BATCH) =====
 function startLongPress(button) {
     if (longPressTimer) clearTimeout(longPressTimer);
     
@@ -1615,24 +1622,22 @@ function startLongPress(button) {
             isLongPressing = true;
             addedRowsCount = 0;
             
-            // Add visual feedback
             button.classList.add('long-press-active');
+            if (typeof showLongPressToast === 'function') {
+                showLongPressToast('Adding rows continuously... Release to stop');
+            }
             
-            // Show toast notification
-            showLongPressToast('Adding rows continuously... Release to stop');
-            
-            // Start adding rows repeatedly
             longPressInterval = setInterval(() => {
-                addNewRow();
-                addedRowsCount++;
+                // Add 5 rows at a time for smooth performance
+                addMultipleRows(5);
+                addedRowsCount += 5;
                 
-                // Update toast with count every 5 rows
-                if (addedRowsCount % 5 === 0) {
+                if (addedRowsCount % 20 === 0 && typeof updateLongPressToast === 'function') {
                     updateLongPressToast(`Added ${addedRowsCount} rows...`);
                 }
-            }, 200); // Add a new row every 200ms (5 rows per second)
+            }, 250);
         }
-    }, 500); // 500ms delay to trigger long press
+    }, 500);
 }
 
 function stopLongPress(button) {
@@ -1785,13 +1790,13 @@ function initEntryCounterLongPress() {
                     showLongPressToast('Adding rows continuously... Release to stop');
                     
                     counterLongPressInterval = setInterval(() => {
-                        addNewRow();
-                        counterAddedRows++;
-                        
-                        if (counterAddedRows % 5 === 0) {
-                            updateLongPressToast(`Added ${counterAddedRows} rows...`);
-                        }
-                    }, 200);
+    addMultipleRows(10);
+    counterAddedRows += 10;
+    
+    if (counterAddedRows % 20 === 0) {
+        updateLongPressToast(`Added ${counterAddedRows} rows...`);
+    }
+}, 300);
                 }
             }, 500);
         }
@@ -2028,6 +2033,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearInfoBtn = document.getElementById('clearInfoBtn');
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
     const selectMultipleBtn = document.getElementById('selectMultipleBtn');
+    // Add batch rows button listener
+const addBatchRowsBtn = document.getElementById('addBatchRowsBtn');
+
+if (addBatchRowsBtn) {
+    addBatchRowsBtn.addEventListener('click', function() {
+        const count = prompt('How many rows would you like to add?', '10');
+        const numCount = parseInt(count);
+        if (numCount && numCount > 0 && numCount <= 5000) {
+            addMultipleRows(numCount);
+        } else if (numCount > 5000) {
+            alert('Maximum 5000 rows at a time to prevent performance issues.');
+        } else {
+            alert('Please enter a valid number (1-5000).');
+        }
+    });
+}
     
     // Add event listeners to sidebar buttons
     if (addRowBtn) {
@@ -2439,94 +2460,120 @@ function renderCurrentPage() {
 }
 
 // Function to add a new row
+// ===== OPTIMIZED ADD NEW ROW (SALES) =====
 function addNewRow() {
     const tableBody = document.getElementById('tableBody');
     if (!tableBody) return;
     
-    const rowCount = tableBody.children.length + 1;
-    const rowId = 'row_' + Date.now() + '_' + rowCount;
+    const row = createSalesRow();
+    tableBody.appendChild(row);
     
+    // Update pagination
+    const totalRows = tableBody.children.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    // Debounced stats update
+    scheduleStatsUpdate();
+}
+
+// ===== CREATE A SINGLE ROW (REUSED FOR BATCH OPERATIONS) =====
+function createSalesRow(rowData = null) {
+    const rowId = 'row_' + Date.now() + '_' + Math.random();
     const row = document.createElement('tr');
     row.id = rowId;
     
-    // Set current date as default
     const today = new Date().toISOString().split('T')[0];
+    const dateValue = rowData?.date || today;
+    const invoiceNumber = rowData?.invoiceNumber || '';
+    const invoiceType = rowData?.invoiceType || '';
+    const paymentMode = rowData?.paymentMode || '';
+    const tinNumber = rowData?.tinNumber || '';
+    const customerName = rowData?.customerName || '';
+    const address = rowData?.address || '';
+    const grossSales = rowData?.grossSales || '';
+    const exemptSales = rowData?.exemptSales || '';
+    const salesType = rowData?.salesType || '';
+    const withholdingRate = rowData?.withholdingRate || '0';
+    const remarks = rowData?.remarks || '';
     
     row.innerHTML = `
-        <td>
-            <input type="date" value="${today}" class="editable date-input">
-        </td>
-        <td>
-            <input type="text" class="editable invoice-number" placeholder="INV-001">
-        </td>
+        <td><input type="date" value="${dateValue}" class="editable date-input"></td>
+        <td><input type="text" value="${escapeHtml(invoiceNumber)}" class="editable invoice-number" placeholder="INV-001"></td>
         <td>
             <select class="editable invoice-type">
                 <option value="">Select</option>
-                <option value="Cash">Cash</option>
-                <option value="Charge">Charge</option>
-                <option value="Billing">Billing</option>
-                <option value="Service">Service</option>
+                <option value="Cash" ${invoiceType === 'Cash' ? 'selected' : ''}>Cash</option>
+                <option value="Charge" ${invoiceType === 'Charge' ? 'selected' : ''}>Charge</option>
+                <option value="Billing" ${invoiceType === 'Billing' ? 'selected' : ''}>Billing</option>
+                <option value="Service" ${invoiceType === 'Service' ? 'selected' : ''}>Service</option>
             </select>
         </td>
         <td>
             <select class="editable payment-mode">
                 <option value="">Select</option>
-                <option value="Cash">Cash</option>
-                <option value="Charge">Charge</option>
+                <option value="Cash" ${paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+                <option value="Charge" ${paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
             </select>
         </td>
-        <td>
-            <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
-        </td>
-        <td>
-            <input type="text" class="editable customer-name" placeholder="Customer name">
-        </td>
-        <td>
-            <input type="text" class="editable address" placeholder="Customer address">
-        </td>
-        <td>
-            <input type="number" step="0.01" min="0" class="editable gross-sales" placeholder="0.00">
-        </td>
-        <td>
-            <input type="number" step="0.01" min="0" class="editable exempt-sales" placeholder="0.00">
-        </td>
+        <td><input type="text" value="${escapeHtml(tinNumber)}" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000"></td>
+        <td><input type="text" value="${escapeHtml(customerName)}" class="editable customer-name" placeholder="Customer name"></td>
+        <td><input type="text" value="${escapeHtml(address)}" class="editable address" placeholder="Customer address"></td>
+        <td><input type="number" step="0.01" min="0" value="${grossSales}" class="editable gross-sales" placeholder="0.00"></td>
+        <td><input type="number" step="0.01" min="0" value="${exemptSales}" class="editable exempt-sales" placeholder="0.00"></td>
         <td>
             <select class="editable sales-type">
                 <option value="">Select</option>
-                <option value="Private">Private</option>
-                <option value="Government">Government</option>
+                <option value="Private" ${salesType === 'Private' ? 'selected' : ''}>Private</option>
+                <option value="Government" ${salesType === 'Government' ? 'selected' : ''}>Government</option>
             </select>
         </td>
-        <td>
-            <div class="uneditable net-sales">0.00</div>
-        </td>
-        <td>
-            <div class="uneditable output-tax">0.00</div>
-        </td>
+        <td><div class="uneditable net-sales">0.00</div></td>
+        <td><div class="uneditable output-tax">0.00</div></td>
         <td>
             <select class="editable withholding-rate">
-                <option value="0">0%</option>
-                <option value="0.01">1%</option>
-                <option value="0.02">2%</option>
-                <option value="0.05">5%</option>
+                <option value="0" ${withholdingRate === '0' ? 'selected' : ''}>0%</option>
+                <option value="0.01" ${withholdingRate === '0.01' ? 'selected' : ''}>1%</option>
+                <option value="0.02" ${withholdingRate === '0.02' ? 'selected' : ''}>2%</option>
+                <option value="0.05" ${withholdingRate === '0.05' ? 'selected' : ''}>5%</option>
             </select>
         </td>
-        <td>
-            <div class="uneditable withholding-amount">0.00</div>
-        </td>
-        <td>
-            <input type="text" class="editable remarks" placeholder="Enter remarks">
-        </td>
-        <td>
-            <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row">
-                <i class="fas fa-trash"></i>
-            </button>
-        </td>
+        <td><div class="uneditable withholding-amount">0.00</div></td>
+        <td><input type="text" value="${escapeHtml(remarks)}" class="editable remarks" placeholder="Enter remarks"></td>
+        <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></td>
     `;
     
-    tableBody.appendChild(row);
+    // Attach lightweight event listeners
+    attachSalesRowListeners(row);
     
-    // FIX: Apply current column visibility states to the new row
+    return row;
+}
+
+// ===== ATTACH LISTENERS TO A ROW (REUSED FOR BATCH) =====
+function attachSalesRowListeners(row) {
+    if (row.hasAttribute('data-listeners-attached')) return;
+    row.setAttribute('data-listeners-attached', 'true');
+    
+    const editableInputs = row.querySelectorAll('.editable');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            scheduleStatsUpdate();
+        });
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            scheduleStatsUpdate();
+        });
+    });
+    
+    const tinInput = row.querySelector('.tin-number');
+    if (tinInput) {
+        tinInput.addEventListener('input', (e) => formatTIN(e.target));
+        tinInput.addEventListener('blur', (e) => validateTIN(e.target));
+    }
+    
+    // Apply column visibility
     const columnVisibility = JSON.parse(localStorage.getItem('columnVisibility')) || {};
     const columns = [
         'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'tinNumber',
@@ -2534,59 +2581,66 @@ function addNewRow() {
         'netSales', 'outputTax', 'withholdingRate', 'withholdingAmount',
         'remarks', 'action'
     ];
-    
     const cells = row.querySelectorAll('td');
     columns.forEach((key, index) => {
         if (columnVisibility[key] === true && cells[index]) {
             cells[index].classList.add('hidden-column');
-        } else if (cells[index]) {
-            cells[index].classList.remove('hidden-column');
         }
     });
     
-    // Add event listeners to the new row
-    const editableInputs = row.querySelectorAll('.editable');
-    editableInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            updateCalculations(row);
-            updateAllStats();
-        });
-        
-        input.addEventListener('change', function() {
-            updateCalculations(row);
-            updateAllStats();
-        });
-    });
+    // Auto-fill binding
+    if (typeof attachAutoFillToRow === 'function') {
+        attachAutoFillToRow(row);
+    }
+}
+
+// ===== OPTIMIZED BATCH ADD ROWS (SALES) =====
+function addMultipleRows(count) {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
     
-    // Special handling for TIN input
-    const tinInput = row.querySelector('.tin-number');
-    tinInput.addEventListener('input', function(e) {
-        formatTIN(e.target);
-    });
+    if (count > 5000) {
+        if (!confirm(`Adding ${count} rows may take a few seconds. Continue?`)) {
+            return;
+        }
+    }
     
-    tinInput.addEventListener('blur', function(e) {
-        validateTIN(e.target);
-    });
+    const startTime = performance.now();
+    const fragment = document.createDocumentFragment();
+    const rows = [];
     
-    // Add neon effect to new row inputs on focus
-    const inputs = row.querySelectorAll('input, select');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.style.boxShadow = '0 0 0 3px rgba(0, 255, 157, 0.3), inset 0 0 15px rgba(0, 255, 157, 0.2)';
-        });
-        
-        input.addEventListener('blur', function() {
-            this.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
-        });
-    });
+    for (let i = 0; i < count; i++) {
+        const row = createSalesRow();
+        rows.push(row);
+        fragment.appendChild(row);
+    }
     
-    // Update pagination for new row
+    // Single DOM update
+    tableBody.appendChild(fragment);
+    
+    // Update pagination
     const totalRows = tableBody.children.length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
-    currentPage = totalPages; // Go to last page to see new row
+    currentPage = totalPages;
     renderCurrentPage();
     
+    // Single stats update
     updateAllStats();
+    
+    const endTime = performance.now();
+    console.log(`Added ${count} rows in ${(endTime - startTime).toFixed(2)}ms`);
+    
+    if (typeof showToast === 'function') {
+        showToast(`✅ Added ${count} rows successfully!`, 'success');
+    }
+}
+
+// ===== DEBOUNCED STATS UPDATE =====
+let statsTimeout;
+
+function scheduleStatsUpdate() {
+    if (statsTimeout) clearTimeout(statsTimeout);
+    statsTimeout = setTimeout(() => updateAllStats(), 100);
 }
 
 // Function to delete a row
@@ -2617,17 +2671,27 @@ function deleteRow(rowId) {
     }
 }
 
-// Update all stats (row count, totals, tally, summary)
-function updateAllStats() {
-    updateRowCount();
-    updateTotals();
-    updateSummaryRow();
-    updateTallySections();
-}
+// ===== OPTIMIZED UPDATE ALL STATS =====
+let statsUpdateScheduled = false;
 
-// Function to update calculations for a row
+function updateAllStats() {
+    if (statsUpdateScheduled) return;
+    statsUpdateScheduled = true;
+    
+    requestAnimationFrame(() => {
+        updateRowCount();
+        updateTotals();
+        updateSummaryRow();
+        updateTallySections();
+        statsUpdateScheduled = false;
+    });
+}
+// ===== OPTIMIZED UPDATE CALCULATIONS =====
 function updateCalculations(row) {
+    if (!row) return;
+    
     const grossSales = parseFloat(row.querySelector('.gross-sales')?.value) || 0;
+    const exemptSales = parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
     const withholdingRate = parseFloat(row.querySelector('.withholding-rate')?.value) || 0;
     
     // Calculate net sales: Gross Sales / 1.12
@@ -2644,8 +2708,6 @@ function updateCalculations(row) {
     const withholdingAmount = netSales * withholdingRate;
     const withholdingAmountEl = row.querySelector('.withholding-amount');
     if (withholdingAmountEl) withholdingAmountEl.textContent = withholdingAmount.toFixed(2);
-    
-    updateAllStats();
 }
 
 // Function to format TIN input
@@ -2696,33 +2758,27 @@ function validateTIN(input) {
     }
 }
 
-// Function to update row count
+// ===== OPTIMIZED UPDATE ROW COUNT =====
 function updateRowCount() {
     const tableBody = document.getElementById('tableBody');
     const rowCount = tableBody ? tableBody.children.length : 0;
-    const rowCountEl = document.getElementById('rowCount');
-    if (rowCountEl) rowCountEl.textContent = rowCount;
     
     // Update entry counter in header
     updateEntryCounter(rowCount);
 }
 
-// New function to update the entry counter with animation
 function updateEntryCounter(count) {
     const entryCountSpan = document.getElementById('entryCount');
     if (entryCountSpan) {
-        // Add pulse animation
         entryCountSpan.classList.add('pulse');
-        
-        // Update the count
         entryCountSpan.textContent = count;
         
-        // Remove animation after it completes
         setTimeout(() => {
-            entryCountSpan.classList.remove('pulse');
+            if (entryCountSpan) {
+                entryCountSpan.classList.remove('pulse');
+            }
         }, 300);
         
-        // Update the button tooltip with additional info
         const counterBtn = document.getElementById('entryCounterBtn');
         if (counterBtn) {
             if (count === 0) {
@@ -2736,40 +2792,42 @@ function updateEntryCounter(count) {
     }
 }
 
-// Function to update totals
+// ===== OPTIMIZED UPDATE TOTALS =====
+let totalsTimeout = null;
+
 function updateTotals() {
-    let totalGrossSales = 0;
-    let totalExemptSales = 0;
-    let totalNetSales = 0;
-    let totalOutputTax = 0;
-    let totalWithholding = 0;
+    if (totalsTimeout) cancelAnimationFrame(totalsTimeout);
     
-    const rows = document.querySelectorAll('#tableBody tr');
-    rows.forEach(row => {
-        const grossSales = parseFloat(row.querySelector('.gross-sales')?.value) || 0;
-        const exemptSales = parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
-        const netSales = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
-        const outputTax = parseFloat(row.querySelector('.output-tax')?.textContent) || 0;
-        const withholdingAmount = parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
+    totalsTimeout = requestAnimationFrame(() => {
+        let totalGrossSales = 0;
+        let totalExemptSales = 0;
+        let totalNetSales = 0;
+        let totalOutputTax = 0;
+        let totalWithholding = 0;
         
-        totalGrossSales += grossSales;
-        totalExemptSales += exemptSales;
-        totalNetSales += netSales;
-        totalOutputTax += outputTax;
-        totalWithholding += withholdingAmount;
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            totalGrossSales += parseFloat(row.querySelector('.gross-sales')?.value) || 0;
+            totalExemptSales += parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
+            totalNetSales += parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+            totalOutputTax += parseFloat(row.querySelector('.output-tax')?.textContent) || 0;
+            totalWithholding += parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
+        }
+        
+        const totalGrossSalesEl = document.getElementById('totalGrossSales');
+        const totalExemptSalesEl = document.getElementById('totalExemptSales');
+        const totalNetSalesEl = document.getElementById('totalNetSales');
+        const totalOutputTaxEl = document.getElementById('totalOutputTax');
+        const totalWithholdingEl = document.getElementById('totalWithholding');
+        
+        if (totalGrossSalesEl) totalGrossSalesEl.textContent = totalGrossSales.toFixed(2);
+        if (totalExemptSalesEl) totalExemptSalesEl.textContent = totalExemptSales.toFixed(2);
+        if (totalNetSalesEl) totalNetSalesEl.textContent = totalNetSales.toFixed(2);
+        if (totalOutputTaxEl) totalOutputTaxEl.textContent = totalOutputTax.toFixed(2);
+        if (totalWithholdingEl) totalWithholdingEl.textContent = totalWithholding.toFixed(2);
     });
-    
-    const totalGrossSalesEl = document.getElementById('totalGrossSales');
-    const totalExemptSalesEl = document.getElementById('totalExemptSales');
-    const totalNetSalesEl = document.getElementById('totalNetSales');
-    const totalOutputTaxEl = document.getElementById('totalOutputTax');
-    const totalWithholdingEl = document.getElementById('totalWithholding');
-    
-    if (totalGrossSalesEl) totalGrossSalesEl.textContent = totalGrossSales.toFixed(2);
-    if (totalExemptSalesEl) totalExemptSalesEl.textContent = totalExemptSales.toFixed(2);
-    if (totalNetSalesEl) totalNetSalesEl.textContent = totalNetSales.toFixed(2);
-    if (totalOutputTaxEl) totalOutputTaxEl.textContent = totalOutputTax.toFixed(2);
-    if (totalWithholdingEl) totalWithholdingEl.textContent = totalWithholding.toFixed(2);
 }
 
 // Helper function to get the number of visible columns
@@ -2784,7 +2842,11 @@ function getVisibleColumnCount() {
     return visibleCount;
 }
 
+// ===== OPTIMIZED UPDATE SUMMARY ROW =====
 function updateSummaryRow() {
+    const summaryRow = document.getElementById('summaryRow');
+    if (!summaryRow) return;
+    
     let totalGrossSales = 0;
     let totalExemptSales = 0;
     let totalNetSales = 0;
@@ -2792,158 +2854,142 @@ function updateSummaryRow() {
     let totalWithholding = 0;
     
     const rows = document.querySelectorAll('#tableBody tr');
-    rows.forEach(row => {
+    
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
         totalGrossSales += parseFloat(row.querySelector('.gross-sales')?.value) || 0;
         totalExemptSales += parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
         totalNetSales += parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
         totalOutputTax += parseFloat(row.querySelector('.output-tax')?.textContent) || 0;
         totalWithholding += parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
-    });
-    
-    const visibleCount = getVisibleColumnCount();
-    const summaryRow = document.getElementById('summaryRow');
-    
-    if (summaryRow) {
-        // Create cells based on which columns are visible
-        // We need to place total values in the correct column positions
-        let summaryCells = '';
-        
-        // Get all headers to know which columns are visible
-        const headers = document.querySelectorAll('#vatableTable thead th');
-        let colIndex = 0;
-        
-        headers.forEach((header, index) => {
-            if (!header.classList.contains('hidden-column')) {
-                // Determine what value to put in this cell based on the column index
-                switch(index) {
-                    case 0: // Date column
-                        summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
-                        break;
-                    case 7: // Gross Sales column
-                        summaryCells += `<td class="uneditable">${totalGrossSales.toFixed(2)}</td>`;
-                        break;
-                    case 8: // Exempt Sales column
-                        summaryCells += `<td class="uneditable">${totalExemptSales.toFixed(2)}</td>`;
-                        break;
-                    case 10: // Net Sales column
-                        summaryCells += `<td class="uneditable">${totalNetSales.toFixed(2)}</td>`;
-                        break;
-                    case 11: // Output Tax column
-                        summaryCells += `<td class="uneditable">${totalOutputTax.toFixed(2)}</td>`;
-                        break;
-                    case 13: // Withholding Amount column
-                        summaryCells += `<td class="uneditable">${totalWithholding.toFixed(2)}</td>`;
-                        break;
-                    default:
-                        // For other columns, leave empty or show dash
-                        if (index === 0) {
-                            // Already handled
-                        } else if (index === 7 || index === 8 || index === 10 || index === 11 || index === 13) {
-                            // Already handled
-                        } else if (index === 14 || index === 15) {
-                            summaryCells += '<td>-</td>';
-                        } else {
-                            summaryCells += '<td></td>';
-                        }
-                        break;
-                }
-            }
-        });
-        
-        summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
     }
+    
+    const headers = document.querySelectorAll('#vatableTable thead th');
+    let summaryCells = '';
+    
+    for (let i = 0; i < headers.length; i++) {
+        if (!headers[i].classList.contains('hidden-column')) {
+            switch(i) {
+                case 0:
+                    summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+                    break;
+                case 7:
+                    summaryCells += `<td class="uneditable">${totalGrossSales.toFixed(2)}</td>`;
+                    break;
+                case 8:
+                    summaryCells += `<td class="uneditable">${totalExemptSales.toFixed(2)}</td>`;
+                    break;
+                case 10:
+                    summaryCells += `<td class="uneditable">${totalNetSales.toFixed(2)}</td>`;
+                    break;
+                case 11:
+                    summaryCells += `<td class="uneditable">${totalOutputTax.toFixed(2)}</td>`;
+                    break;
+                case 13:
+                    summaryCells += `<td class="uneditable">${totalWithholding.toFixed(2)}</td>`;
+                    break;
+                default:
+                    if (i === 14 || i === 15) {
+                        summaryCells += '<td>-</td>';
+                    } else {
+                        summaryCells += '<td></td>';
+                    }
+                    break;
+            }
+        }
+    }
+    
+    summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</table>`;
 }
 
-// Function to update tally sections
+// ===== OPTIMIZED UPDATE TALLY SECTIONS =====
+let tallyUpdateTimeout = null;
+
 function updateTallySections() {
-    let totalCashAmount = 0;
-    let totalChargeAmount = 0;
-    let totalPrivateAmount = 0;
-    let totalGovernmentAmount = 0;
+    if (tallyUpdateTimeout) cancelAnimationFrame(tallyUpdateTimeout);
     
-    let cashCount = 0;
-    let chargeCount = 0;
-    let privateCount = 0;
-    let governmentCount = 0;
-    
-    const rows = document.querySelectorAll('#tableBody tr');
-    
-    rows.forEach(row => {
-        const paymentMode = row.querySelector('.payment-mode')?.value;
-        const salesType = row.querySelector('.sales-type')?.value;
-        const netSales = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+    tallyUpdateTimeout = requestAnimationFrame(() => {
+        let totalCashAmount = 0;
+        let totalChargeAmount = 0;
+        let totalPrivateAmount = 0;
+        let totalGovernmentAmount = 0;
+        let cashCount = 0;
+        let chargeCount = 0;
+        let privateCount = 0;
+        let governmentCount = 0;
         
-        // Count by payment mode
-        if (paymentMode === 'Cash') {
-            totalCashAmount += netSales;
-            cashCount++;
-        } else if (paymentMode === 'Charge') {
-            totalChargeAmount += netSales;
-            chargeCount++;
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const paymentMode = row.querySelector('.payment-mode')?.value;
+            const salesType = row.querySelector('.sales-type')?.value;
+            const netSales = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+            
+            if (paymentMode === 'Cash') {
+                totalCashAmount += netSales;
+                cashCount++;
+            } else if (paymentMode === 'Charge') {
+                totalChargeAmount += netSales;
+                chargeCount++;
+            }
+            
+            if (salesType === 'Private') {
+                totalPrivateAmount += netSales;
+                privateCount++;
+            } else if (salesType === 'Government') {
+                totalGovernmentAmount += netSales;
+                governmentCount++;
+            }
         }
         
-        // Count by sales type
-        if (salesType === 'Private') {
-            totalPrivateAmount += netSales;
-            privateCount++;
-        } else if (salesType === 'Government') {
-            totalGovernmentAmount += netSales;
-            governmentCount++;
-        }
+        // Update DOM elements
+        const elements = {
+            totalCashAmount: document.getElementById('totalCashAmount'),
+            totalChargeAmount: document.getElementById('totalChargeAmount'),
+            totalPrivateAmount: document.getElementById('totalPrivateAmount'),
+            totalGovernmentAmount: document.getElementById('totalGovernmentAmount'),
+            cashCount: document.getElementById('cashCount'),
+            chargeCount: document.getElementById('chargeCount'),
+            privateCount: document.getElementById('privateCount'),
+            governmentCount: document.getElementById('governmentCount'),
+            cashPercentage: document.getElementById('cashPercentage'),
+            chargePercentage: document.getElementById('chargePercentage'),
+            privatePercentage: document.getElementById('privatePercentage'),
+            governmentPercentage: document.getElementById('governmentPercentage'),
+            totalTallyAmount: document.getElementById('totalTallyAmount'),
+            totalTallyCount: document.getElementById('totalTallyCount'),
+            totalNetSalesTally: document.getElementById('totalNetSalesTally')
+        };
+        
+        if (elements.totalCashAmount) elements.totalCashAmount.textContent = totalCashAmount.toFixed(2);
+        if (elements.totalChargeAmount) elements.totalChargeAmount.textContent = totalChargeAmount.toFixed(2);
+        if (elements.totalPrivateAmount) elements.totalPrivateAmount.textContent = totalPrivateAmount.toFixed(2);
+        if (elements.totalGovernmentAmount) elements.totalGovernmentAmount.textContent = totalGovernmentAmount.toFixed(2);
+        
+        if (elements.cashCount) elements.cashCount.textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`;
+        if (elements.chargeCount) elements.chargeCount.textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`;
+        if (elements.privateCount) elements.privateCount.textContent = `${privateCount} transaction${privateCount !== 1 ? 's' : ''}`;
+        if (elements.governmentCount) elements.governmentCount.textContent = `${governmentCount} transaction${governmentCount !== 1 ? 's' : ''}`;
+        
+        const totalTallyAmount = totalCashAmount + totalChargeAmount;
+        const totalTransactions = rows.length;
+        const totalNetSales = parseFloat(document.getElementById('totalNetSales')?.textContent) || 0;
+        
+        const cashPercentage = totalTallyAmount > 0 ? ((totalCashAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+        const chargePercentage = totalTallyAmount > 0 ? ((totalChargeAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+        const privatePercentage = totalTallyAmount > 0 ? ((totalPrivateAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+        const governmentPercentage = totalTallyAmount > 0 ? ((totalGovernmentAmount / totalTallyAmount) * 100).toFixed(1) : 0;
+        
+        if (elements.cashPercentage) elements.cashPercentage.textContent = `${cashPercentage}% of total`;
+        if (elements.chargePercentage) elements.chargePercentage.textContent = `${chargePercentage}% of total`;
+        if (elements.privatePercentage) elements.privatePercentage.textContent = `${privatePercentage}% of total`;
+        if (elements.governmentPercentage) elements.governmentPercentage.textContent = `${governmentPercentage}% of total`;
+        
+        if (elements.totalTallyAmount) elements.totalTallyAmount.textContent = `₱ ${totalTallyAmount.toFixed(2)}`;
+        if (elements.totalTallyCount) elements.totalTallyCount.textContent = `${totalTransactions} total transaction${totalTransactions !== 1 ? 's' : ''}`;
+        if (elements.totalNetSalesTally) elements.totalNetSalesTally.textContent = totalNetSales.toFixed(2);
     });
-    
-    // Update DOM elements
-    const totalCashAmountEl = document.getElementById('totalCashAmount');
-    const totalChargeAmountEl = document.getElementById('totalChargeAmount');
-    const totalPrivateAmountEl = document.getElementById('totalPrivateAmount');
-    const totalGovernmentAmountEl = document.getElementById('totalGovernmentAmount');
-    
-    if (totalCashAmountEl) totalCashAmountEl.textContent = totalCashAmount.toFixed(2);
-    if (totalChargeAmountEl) totalChargeAmountEl.textContent = totalChargeAmount.toFixed(2);
-    if (totalPrivateAmountEl) totalPrivateAmountEl.textContent = totalPrivateAmount.toFixed(2);
-    if (totalGovernmentAmountEl) totalGovernmentAmountEl.textContent = totalGovernmentAmount.toFixed(2);
-    
-    const cashCountEl = document.getElementById('cashCount');
-    const chargeCountEl = document.getElementById('chargeCount');
-    const privateCountEl = document.getElementById('privateCount');
-    const governmentCountEl = document.getElementById('governmentCount');
-    
-    if (cashCountEl) cashCountEl.textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`;
-    if (chargeCountEl) chargeCountEl.textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`;
-    if (privateCountEl) privateCountEl.textContent = `${privateCount} transaction${privateCount !== 1 ? 's' : ''}`;
-    if (governmentCountEl) governmentCountEl.textContent = `${governmentCount} transaction${governmentCount !== 1 ? 's' : ''}`;
-    
-    // Calculate percentages
-    const totalTallyAmount = totalCashAmount + totalChargeAmount;
-    const totalTransactions = rows.length;
-    
-    const cashPercentage = totalTallyAmount > 0 ? ((totalCashAmount / totalTallyAmount) * 100).toFixed(1) : 0;
-    const chargePercentage = totalTallyAmount > 0 ? ((totalChargeAmount / totalTallyAmount) * 100).toFixed(1) : 0;
-    
-    const privatePercentage = totalTallyAmount > 0 ? ((totalPrivateAmount / totalTallyAmount) * 100).toFixed(1) : 0;
-    const governmentPercentage = totalTallyAmount > 0 ? ((totalGovernmentAmount / totalTallyAmount) * 100).toFixed(1) : 0;
-    
-    // Update percentages
-    const cashPercentageEl = document.getElementById('cashPercentage');
-    const chargePercentageEl = document.getElementById('chargePercentage');
-    const privatePercentageEl = document.getElementById('privatePercentage');
-    const governmentPercentageEl = document.getElementById('governmentPercentage');
-    
-    if (cashPercentageEl) cashPercentageEl.textContent = `${cashPercentage}% of total`;
-    if (chargePercentageEl) chargePercentageEl.textContent = `${chargePercentage}% of total`;
-    if (privatePercentageEl) privatePercentageEl.textContent = `${privatePercentage}% of total`;
-    if (governmentPercentageEl) governmentPercentageEl.textContent = `${governmentPercentage}% of total`;
-    
-    // Update summary
-    const totalTallyAmountEl = document.getElementById('totalTallyAmount');
-    const totalTallyCountEl = document.getElementById('totalTallyCount');
-    
-    if (totalTallyAmountEl) totalTallyAmountEl.textContent = `₱ ${totalTallyAmount.toFixed(2)}`;
-    if (totalTallyCountEl) totalTallyCountEl.textContent = `${totalTransactions} total transaction${totalTransactions !== 1 ? 's' : ''}`;
-    
-    const totalNetSales = parseFloat(document.getElementById('totalNetSales')?.textContent) || 0;
-    const totalNetSalesTallyEl = document.getElementById('totalNetSalesTally');
-    if (totalNetSalesTallyEl) totalNetSalesTallyEl.textContent = totalNetSales.toFixed(2);
 }
 
 // Update the clearAllData function:
