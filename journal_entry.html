@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Journal Entry | Tally Ledger with File Imports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-blue: #1e88e5;
+            --primary-red: #e53935;
+            --deep-bg: #0a1f2c;
+            --card-glass: rgba(20, 40, 55, 0.92);
+            --border-glow: rgba(30, 136, 229, 0.5);
+            --text-light: #f0f8ff;
+            --text-muted: #bbdef5;
+            --accent-gradient: linear-gradient(135deg, #1e88e5, #e53935);
+        }
+
+        body {
+            background: linear-gradient(145deg, #07161f, #0b2a38);
+            color: var(--text-light);
+            padding: 30px 24px 50px;
+            min-height: 100vh;
+        }
+
+        /* PRINT STYLES - Optimized to fit on one page */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                color: black;
+            }
+            .top-action-bar, .action-bar, .summary-cards, .footer-note, .load-btn, .calc-btn, .back-dash-btn {
+                display: none !important;
+            }
+            .journal-container {
+                background: white;
+                box-shadow: none;
+                padding: 10px;
+                margin: 0;
+                border: none;
+            }
+            .tally-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 9pt;
+            }
+            .tally-table th, .tally-table td {
+                border: 1px solid #ccc;
+                padding: 6px 4px;
+                color: black;
+            }
+            .tally-table th {
+                background: #f0f0f0;
+                color: black;
+                font-weight: bold;
+            }
+            .debit-credit-input {
+                border: none;
+                background: transparent;
+                padding: 0;
+                width: auto;
+                text-align: right;
+                color: black;
+            }
+            .amount-display {
+                color: black;
+            }
+            .section-header-row td {
+                background: #e0e0e0 !important;
+                color: black !important;
+            }
+            .subtotal-row td {
+                background: #f5f5f5 !important;
+                border-top: 1px solid #999;
+            }
+            .grand-total-row td {
+                background: #e8e8e8 !important;
+                font-weight: bold;
+            }
+            .page-header h1 {
+                color: #333;
+                font-size: 18pt;
+            }
+            .page-header p {
+                color: #555;
+            }
+            @page {
+                size: landscape;
+                margin: 0.5in;
+            }
+            body, .journal-container {
+                transform: scale(0.98);
+                transform-origin: top center;
+            }
+            .tally-table-wrapper {
+                overflow: visible !important;
+            }
+        }
+
+        .top-action-bar {
+            position: sticky;
+            top: 20px;
+            z-index: 1200;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: rgba(5, 20, 28, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            border: 1px solid rgba(30, 136, 229, 0.5);
+        }
+        .back-dash-btn {
+            background: rgba(10, 35, 55, 0.9);
+            padding: 8px 20px;
+            border-radius: 48px;
+            border: 1px solid rgba(30, 136, 229, 0.6);
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+        }
+        .back-dash-btn:hover {
+            background: rgba(30, 136, 229, 0.85);
+            transform: translateX(-4px);
+        }
+        .load-buttons-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: relative;
+        }
+        .load-btn {
+            background: linear-gradient(145deg, #1e5a7a, #0a2f44);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .load-btn i { font-size: 0.9rem; }
+        .load-btn:hover { transform: translateY(-2px); filter: brightness(1.05); border-color: #ffb74d; }
+        .load-sales { background: linear-gradient(145deg, #0d47a1, #b71c1c); }
+        .load-purchases { background: linear-gradient(145deg, #1b5e20, #bf360c); position: relative; }
+        .print-btn { background: linear-gradient(145deg, #6a1b9a, #880e4f); }
+        
+        /* Dropdown menu for purchases */
+        .purchases-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: rgba(10, 30, 25, 0.98);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 183, 77, 0.5);
+            border-radius: 16px;
+            min-width: 220px;
+            z-index: 1000;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), 0 0 15px rgba(255, 183, 77, 0.2);
+            overflow: hidden;
+            animation: dropdownFadeIn 0.2s ease;
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .purchases-dropdown-item {
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e0f0ff;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 183, 77, 0.2);
+        }
+        .purchases-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .purchases-dropdown-item:hover {
+            background: rgba(30, 136, 229, 0.3);
+            padding-left: 24px;
+            color: #ffb74d;
+        }
+        .purchases-dropdown-item i {
+            width: 24px;
+            font-size: 1rem;
+        }
+        
+        .journal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--card-glass);
+            backdrop-filter: blur(6px);
+            border-radius: 32px;
+            padding: 20px 20px 40px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            border: 1px solid rgba(30,136,229,0.3);
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+            border-bottom: 2px dashed rgba(229,57,53,0.5);
+            padding-bottom: 14px;
+        }
+        .page-header h1 { font-size: 2rem; background: linear-gradient(135deg, #90caf9, #ff8a80); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .tally-table-wrapper { overflow-x: auto; border-radius: 24px; background: rgba(6, 22, 32, 0.7); padding: 4px; }
+        .tally-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 700px; }
+        .tally-table th, .tally-table td { padding: 14px 12px; text-align: left; border-bottom: 1px solid rgba(80, 140, 180, 0.3); }
+        .tally-table th { background: rgba(10, 45, 65, 0.9); font-weight: 700; color: #ffd966; border-bottom: 2px solid #e53935; }
+        .section-header-row td { background-color: rgba(15, 60, 85, 0.85); font-size: 1.05rem; color: #ffcd7e; font-weight: 800; }
+        .subtotal-row td { background: rgba(0, 0, 0, 0.5); font-weight: bold; border-top: 1px solid #e53935; }
+        .grand-total-row td { background: linear-gradient(90deg, rgba(30,136,229,0.3), rgba(229,57,53,0.3)); font-weight: 800; border-top: 2px solid #ffb74d; }
+        .debit-credit-input { width: 130px; background: rgba(0, 0, 0, 0.5); border: 1px solid #3a7ca5; border-radius: 12px; padding: 8px 12px; color: white; font-weight: 500; text-align: right; outline: none; font-family: monospace; }
+        .debit-credit-input:focus { border-color: #e53935; box-shadow: 0 0 12px rgba(229,57,53,0.6); }
+        .amount-display { font-family: monospace; font-weight: 600; text-align: right; display: inline-block; width: 100%; letter-spacing: 0.3px; }
+        .action-bar { margin-top: 32px; display: flex; justify-content: flex-end; gap: 20px; }
+        .calc-btn { background: linear-gradient(145deg, #1e5a7a, #0a2f44); border: none; padding: 12px 28px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; }
+        .calc-btn.primary { background: linear-gradient(145deg, #1e88e5, #c62828); }
+        .summary-cards { display: flex; gap: 20px; margin-top: 30px; justify-content: flex-end; }
+        .summary-card { background: rgba(0,0,0,0.5); border-radius: 24px; padding: 12px 24px; border-left: 5px solid #e53935; }
+        .summary-card span { font-size: 1.4rem; font-weight: 800; color: #ffb74d; }
+        .footer-note { text-align: center; margin-top: 35px; font-size: 0.75rem; color: #9bc3db; }
+        @media (max-width: 780px) { .load-buttons-group { justify-content: center; } .top-action-bar { flex-direction: column; align-items: stretch; } }
+        .toast-msg {
+            position: fixed; bottom: 25px; right: 25px; background: #1e5a7a; color: white; padding: 12px 20px;
+            border-radius: 40px; z-index: 9999; backdrop-filter: blur(8px); border-left: 4px solid #ffb74d; font-size: 0.85rem;
+            animation: fadeInOut 3s ease forwards;
+        }
+        @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 85% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+    </style>
+</head>
+<body>
+
+<div class="top-action-bar">
+    <a href="index2.html" class="back-dash-btn"><i class="fas fa-arrow-left"></i> Kiosk Dashboard</a>
+    <div class="load-buttons-group">
+        <button class="load-btn print-btn" id="printBtn"><i class="fas fa-print"></i> Print Journal</button>
+        <button class="load-btn load-sales" id="loadSalesBtn"><i class="fas fa-file-import"></i> Load Sales (.vat)</button>
+        
+        <!-- Load Purchases with dropdown -->
+        <div style="position: relative;">
+            <button class="load-btn load-purchases" id="loadPurchasesBtn">
+                <i class="fas fa-cart-shopping"></i> Load Purchases ▼
+            </button>
+            <div class="purchases-dropdown" id="purchasesDropdown" style="display: none;">
+                <div class="purchases-dropdown-item" data-type="vat">
+                    <i class="fas fa-file-invoice"></i> VAT Purchases (.purch)
+                </div>
+                <div class="purchases-dropdown-item" data-type="nonvat">
+                    <i class="fas fa-file-invoice-dollar"></i> Non-VAT Purchases (.npurch)
+                </div>
+                <div class="purchases-dropdown-item" data-type="returns">
+                    <i class="fas fa-undo-alt"></i> Purchase Returns (.exp)
+                </div>
+                <div class="purchases-dropdown-item" data-type="all" style="border-top: 1px solid rgba(255,183,77,0.3);">
+                    <i class="fas fa-layer-group"></i> Load All Three (Sequential)
+                </div>
+            </div>
+        </div>
+        
+        <button class="load-btn" id="loadExpensesBtn"><i class="fas fa-receipt"></i> Load Expenses</button>
+        <button class="load-btn" id="loadTaxesBtn"><i class="fas fa-landmark"></i> Load Taxes</button>
+        <button class="load-btn" id="loadCapexBtn"><i class="fas fa-building"></i> Load CAPEX</button>
+    </div>
+</div>
+
+<div class="journal-container" id="printArea">
+    <div class="page-header">
+        <h1><i class="fas fa-book-open"></i> General Journal · VAT Tally Ledger</h1>
+        <p>Tally table · Debits & Credits · Subtotal per section (Sales, Purchases, CAPEX, etc.)</p>
+    </div>
+    <div class="tally-table-wrapper">
+        <table class="tally-table" id="journalTallyTable">
+            <thead><tr><th>Account Title</th><th style="width: 160px;">Debit (₱)</th><th style="width: 160px;">Credit (₱)</th></tr></thead>
+            <tbody id="journalTbody"></tbody>
+        </table>
+    </div>
+    <div class="action-bar">
+        <button class="calc-btn" id="resetAllBtn"><i class="fas fa-eraser"></i> Clear All Entries</button>
+        <button class="calc-btn primary" id="refreshTotalsBtn"><i class="fas fa-calculator"></i> Recalculate Totals</button>
+    </div>
+    <div class="summary-cards">
+        <div class="summary-card"><i class="fas fa-arrow-down"></i> Total Debits: <span id="totalDebitSpan">0.00</span></div>
+        <div class="summary-card"><i class="fas fa-arrow-up"></i> Total Credits: <span id="totalCreditSpan">0.00</span></div>
+        <div class="summary-card"><i class="fas fa-balance-scale"></i> Difference: <span id="balanceDiffSpan">0.00</span></div>
+    </div>
+    <div class="footer-note"><i class="fas fa-pen-alt"></i> Purchases dropdown: choose VAT Purchases (.purch), Non-VAT Purchases (.npurch), Returns (.exp), or Load All.</div>
+</div>
+
+<script>
+    (function() {
+        // ======================= DATA STRUCTURE (TALLY TABLE) =======================
+        const sections = [
+            { name: "Sales", accounts: ["Cash","Accounts Receivable","Creditable Withholding Tax","Sales - Vatable","Sales - Exempted","Sales - Return","Output Tax"] },
+            { name: "Purchases", accounts: ["Purchases - Vatable","Purchases - Non Vatable","Input Tax","Cash","Purchase Return","Accounts Payable","Withholding Tax Payable"] },
+            { name: "Expenses", accounts: [] },
+            { name: "Taxes and Licenses", accounts: ["Cash","Accounts Payable"] },
+            { name: "CAPEX", accounts: ["CAPEX - Vatable","CAPEX - Non Vatable","Input Tax","Cash","Accounts Payable","Withholding Tax Payable"] }
+        ];
+
+        let rows = [];
+        
+        // Store current loaded data for incremental updates
+        let currentVatData = null;
+        let currentNonVatData = null;
+        let currentReturnsTotal = 0;
+
+        function buildRowsStructure() {
+            const newRows = [];
+            let rowId = 0;
+            for (let sec of sections) {
+                newRows.push({ id: rowId++, type: 'subheader', sectionName: sec.name, accountTitle: sec.name, debitEditable: false, creditEditable: false, debitVal: 0, creditVal: 0 });
+                if (sec.accounts.length === 0) {
+                    newRows.push({ id: rowId++, type: 'placeholder', sectionName: sec.name, accountTitle: '— pending —', debitEditable: false, creditEditable: false, debitVal: 0, creditVal: 0 });
+                } else {
+                    for (let acc of sec.accounts) {
+                        newRows.push({ id: rowId++, type: 'account', sectionName: sec.name, accountTitle: acc, debitEditable: true, creditEditable: true, debitVal: 0, creditVal: 0 });
+                    }
+                }
+                newRows.push({ id: rowId++, type: 'subtotal', sectionName: sec.name, accountTitle: `TOTAL ${sec.name.toUpperCase()}`, debitEditable: false, creditEditable: false, debitVal: 0, creditVal: 0 });
+            }
+            newRows.push({ id: rowId++, type: 'grandtotal', sectionName: 'GRAND', accountTitle: 'GRAND TOTAL (All Sections)', debitEditable: false, creditEditable: false, debitVal: 0, creditVal: 0 });
+            return newRows;
+        }
+
+        function recalcTotals() {
+            rows.forEach(row => { if (row.type === 'subtotal' || row.type === 'grandtotal') { row.debitVal = 0; row.creditVal = 0; } });
+            const sectionDebit = new Map(), sectionCredit = new Map();
+            sections.forEach(sec => { sectionDebit.set(sec.name, 0); sectionCredit.set(sec.name, 0); });
+            rows.forEach(row => {
+                if (row.type === 'account' && row.sectionName) {
+                    let d = parseFloat(row.debitVal) || 0, c = parseFloat(row.creditVal) || 0;
+                    if (d < 0) d = 0; if (c < 0) c = 0;
+                    row.debitVal = d; row.creditVal = c;
+                    sectionDebit.set(row.sectionName, (sectionDebit.get(row.sectionName) || 0) + d);
+                    sectionCredit.set(row.sectionName, (sectionCredit.get(row.sectionName) || 0) + c);
+                }
+            });
+            rows.forEach(row => {
+                if (row.type === 'subtotal') {
+                    row.debitVal = sectionDebit.get(row.sectionName) || 0;
+                    row.creditVal = sectionCredit.get(row.sectionName) || 0;
+                }
+            });
+            let grandDebit = 0, grandCredit = 0;
+            rows.forEach(row => { if (row.type === 'subtotal') { grandDebit += row.debitVal; grandCredit += row.creditVal; } });
+            const grandRow = rows.find(r => r.type === 'grandtotal');
+            if (grandRow) { grandRow.debitVal = grandDebit; grandRow.creditVal = grandCredit; }
+            updateSummaryDisplay();
+        }
+
+        function updateSummaryDisplay() {
+            const grand = rows.find(r => r.type === 'grandtotal');
+            let totalDebit = grand ? grand.debitVal : 0, totalCredit = grand ? grand.creditVal : 0;
+            document.getElementById('totalDebitSpan').innerText = totalDebit.toFixed(2);
+            document.getElementById('totalCreditSpan').innerText = totalCredit.toFixed(2);
+            let diff = totalDebit - totalCredit;
+            document.getElementById('balanceDiffSpan').innerText = diff.toFixed(2);
+            document.getElementById('balanceDiffSpan').style.color = Math.abs(diff) < 0.01 ? '#b0ffb0' : '#ffaa88';
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('journalTbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            for (let row of rows) {
+                const tr = document.createElement('tr');
+                if (row.type === 'subheader') tr.classList.add('section-header-row');
+                else if (row.type === 'subtotal') tr.classList.add('subtotal-row');
+                else if (row.type === 'grandtotal') tr.classList.add('grand-total-row');
+                else if (row.type === 'placeholder') tr.style.opacity = '0.7';
+                const tdTitle = document.createElement('td');
+                tdTitle.innerHTML = row.type === 'subheader' ? `<i class="fas fa-folder-open"></i> <strong>${escapeHtml(row.accountTitle)}</strong>` :
+                                    (row.type === 'subtotal' ? `<i class="fas fa-chart-line"></i> ${escapeHtml(row.accountTitle)}` :
+                                    (row.type === 'grandtotal' ? `<i class="fas fa-star-of-life"></i> <strong style="color:#ffaa66;">${escapeHtml(row.accountTitle)}</strong>` :
+                                    `<i class="fas fa-receipt"></i> ${escapeHtml(row.accountTitle)}`));
+                tr.appendChild(tdTitle);
+                const tdDebit = document.createElement('td');
+                if (row.debitEditable) {
+                    const inp = document.createElement('input');
+                    inp.type = 'number'; inp.step = '0.01'; inp.value = row.debitVal;
+                    inp.classList.add('debit-credit-input');
+                    inp.addEventListener('input', (e) => {
+                        let val = parseFloat(e.target.value);
+                        if (isNaN(val)) val = 0; if (val < 0) val = 0;
+                        row.debitVal = val;
+                        recalcTotals();
+                        renderTable();
+                    });
+                    tdDebit.appendChild(inp);
+                } else {
+                    const span = document.createElement('span'); span.className = 'amount-display';
+                    span.innerHTML = `<i class="fas fa-peso-sign"></i> ${(row.debitVal || 0).toFixed(2)}`;
+                    tdDebit.appendChild(span);
+                }
+                tr.appendChild(tdDebit);
+                const tdCredit = document.createElement('td');
+                if (row.creditEditable) {
+                    const inp = document.createElement('input');
+                    inp.type = 'number'; inp.step = '0.01'; inp.value = row.creditVal;
+                    inp.classList.add('debit-credit-input');
+                    inp.addEventListener('input', (e) => {
+                        let val = parseFloat(e.target.value);
+                        if (isNaN(val)) val = 0; if (val < 0) val = 0;
+                        row.creditVal = val;
+                        recalcTotals();
+                        renderTable();
+                    });
+                    tdCredit.appendChild(inp);
+                } else {
+                    const span = document.createElement('span'); span.className = 'amount-display';
+                    span.innerHTML = `<i class="fas fa-peso-sign"></i> ${(row.creditVal || 0).toFixed(2)}`;
+                    tdCredit.appendChild(span);
+                }
+                tr.appendChild(tdCredit);
+                tbody.appendChild(tr);
+            }
+        }
+
+        function resetAllEntries() {
+            rows.forEach(row => { if (row.type === 'account') { row.debitVal = 0; row.creditVal = 0; } });
+            currentVatData = null;
+            currentNonVatData = null;
+            currentReturnsTotal = 0;
+            recalcTotals(); renderTable();
+            showToast("All journal entries cleared.");
+        }
+
+        // ========== PRINT FUNCTION ==========
+        function printJournal() {
+            const printContent = document.getElementById('printArea').cloneNode(true);
+            // Remove any buttons or interactive elements inside print area that shouldn't print
+            const actionBar = printContent.querySelector('.action-bar');
+            if (actionBar) actionBar.remove();
+            
+            // Create print window
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Journal Entry Report</title>
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                            font-family: 'Segoe UI', Arial, sans-serif;
+                        }
+                        body {
+                            padding: 20px;
+                            background: white;
+                            color: black;
+                        }
+                        .journal-container {
+                            max-width: 100%;
+                            margin: 0 auto;
+                        }
+                        .page-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            border-bottom: 2px solid #333;
+                            padding-bottom: 10px;
+                        }
+                        .page-header h1 {
+                            font-size: 20pt;
+                            color: #333;
+                        }
+                        .page-header p {
+                            color: #666;
+                            font-size: 10pt;
+                        }
+                        .tally-table-wrapper {
+                            overflow-x: visible;
+                        }
+                        .tally-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 9pt;
+                        }
+                        .tally-table th, .tally-table td {
+                            border: 1px solid #aaa;
+                            padding: 8px 6px;
+                            text-align: left;
+                            vertical-align: top;
+                        }
+                        .tally-table th {
+                            background: #f0f0f0;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .debit-credit-input {
+                            border: none;
+                            background: transparent;
+                            width: 100%;
+                            text-align: right;
+                            font-family: monospace;
+                            font-size: 9pt;
+                            padding: 0;
+                        }
+                        .amount-display {
+                            text-align: right;
+                            display: block;
+                            font-family: monospace;
+                        }
+                        .section-header-row td {
+                            background: #e8e8e8 !important;
+                            font-weight: bold;
+                        }
+                        .subtotal-row td {
+                            background: #f5f5f5 !important;
+                            border-top: 2px solid #999;
+                        }
+                        .grand-total-row td {
+                            background: #e0e0e0 !important;
+                            font-weight: bold;
+                            border-top: 2px solid #333;
+                        }
+                        .summary-cards {
+                            display: flex;
+                            gap: 20px;
+                            margin-top: 25px;
+                            justify-content: flex-end;
+                            flex-wrap: wrap;
+                        }
+                        .summary-card {
+                            background: #f8f8f8;
+                            border: 1px solid #ccc;
+                            border-radius: 8px;
+                            padding: 10px 20px;
+                            text-align: center;
+                            border-left: 4px solid #e53935;
+                        }
+                        .summary-card span {
+                            font-size: 14pt;
+                            font-weight: bold;
+                            color: #e53935;
+                        }
+                        .footer-note {
+                            text-align: center;
+                            margin-top: 25px;
+                            font-size: 8pt;
+                            color: #666;
+                            border-top: 1px solid #ccc;
+                            padding-top: 10px;
+                        }
+                        @page {
+                            size: landscape;
+                            margin: 0.4in;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                                margin: 0;
+                            }
+                            .summary-cards {
+                                page-break-inside: avoid;
+                            }
+                            .tally-table tr {
+                                page-break-inside: avoid;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent.outerHTML}
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function() { window.close(); }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        // ========== FILE LOADING HELPERS ==========
+        function loadVatPurchasesFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.tableData) throw new Error("Invalid .purch file format");
+                        resolve(data.tableData.length ? data : null);
+                    } catch (err) { reject(err); }
+                };
+                reader.onerror = () => reject(new Error("File read error"));
+                reader.readAsText(file);
+            });
+        }
+        
+        function loadNonVatPurchasesFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.tableData) throw new Error("Invalid .npurch file format");
+                        resolve(data.tableData.length ? data : null);
+                    } catch (err) { reject(err); }
+                };
+                reader.onerror = () => reject(new Error("File read error"));
+                reader.readAsText(file);
+            });
+        }
+        
+        function loadPurchaseReturnsFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.tableData) throw new Error("Invalid .exp file format");
+                        if (!data.tableData.length) { resolve(0); return; }
+                        let totalNetReturns = 0;
+                        for (let row of data.tableData) {
+                            const grossReturns = parseFloat(row.grossReturns) || 0;
+                            const netReturns = grossReturns / 1.12;
+                            totalNetReturns += netReturns;
+                        }
+                        resolve(totalNetReturns);
+                    } catch (err) { reject(err); }
+                };
+                reader.onerror = () => reject(new Error("File read error"));
+                reader.readAsText(file);
+            });
+        }
+        
+        function updatePurchasesDisplay() {
+            let totalVatableNet = 0, totalNonVatGross = 0, totalInputTax = 0;
+            let totalCashCredit = 0, totalChargeCredit = 0, totalWithholdingPayable = 0;
+
+            if (currentVatData && currentVatData.tableData) {
+                for (let row of currentVatData.tableData) {
+                    const gross = parseFloat(row.grossPurchases) || 0;
+                    const paymentMode = row.paymentMode || "";
+                    const withholdingRate = parseFloat(row.withholdingRate) || 0;
+                    const netPurchases = gross / 1.12;
+                    const inputTax = netPurchases * 0.12;
+                    const withholdingAmount = netPurchases * withholdingRate;
+                    const netReceipt = gross - withholdingAmount;
+                    totalVatableNet += netPurchases;
+                    totalInputTax += inputTax;
+                    totalWithholdingPayable += withholdingAmount;
+                    if (paymentMode === "Cash") totalCashCredit += netReceipt;
+                    if (paymentMode === "Charge") totalChargeCredit += netReceipt;
+                }
+            }
+            
+            if (currentNonVatData && currentNonVatData.tableData) {
+                for (let row of currentNonVatData.tableData) {
+                    const gross = parseFloat(row.grossPurchases) || 0;
+                    const paymentMode = row.paymentMode || "";
+                    const withholdingRate = parseFloat(row.withholdingRate) || 0;
+                    const withholdingAmount = gross * withholdingRate;
+                    const netReceipt = gross - withholdingAmount;
+                    totalNonVatGross += gross;
+                    totalWithholdingPayable += withholdingAmount;
+                    if (paymentMode === "Cash") totalCashCredit += netReceipt;
+                    if (paymentMode === "Charge") totalChargeCredit += netReceipt;
+                }
+            }
+            
+            const findAndSet = (section, accountTitle, debitVal, creditVal, isDebitField = true) => {
+                const rowObj = rows.find(r => r.sectionName === section && r.accountTitle === accountTitle && r.type === 'account');
+                if (rowObj) {
+                    if (isDebitField) { rowObj.debitVal = debitVal; rowObj.creditVal = 0; }
+                    else { rowObj.creditVal = creditVal; rowObj.debitVal = 0; }
+                }
+            };
+            
+            findAndSet('Purchases', 'Purchases - Vatable', totalVatableNet, 0, true);
+            findAndSet('Purchases', 'Purchases - Non Vatable', totalNonVatGross, 0, true);
+            findAndSet('Purchases', 'Input Tax', totalInputTax, 0, true);
+            findAndSet('Purchases', 'Cash', 0, totalCashCredit, false);
+            findAndSet('Purchases', 'Purchase Return', 0, currentReturnsTotal, false);
+            findAndSet('Purchases', 'Accounts Payable', 0, totalChargeCredit, false);
+            findAndSet('Purchases', 'Withholding Tax Payable', 0, totalWithholdingPayable, false);
+            
+            recalcTotals();
+            renderTable();
+        }
+        
+        // Single file picker
+        function pickSingleFile(accept, callback) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = accept;
+            input.style.display = 'none';
+            document.body.appendChild(input);
+            input.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    callback(e.target.files[0]);
+                }
+                input.remove();
+            });
+            input.click();
+        }
+        
+        // Dropdown handlers
+        function handleVatPurchases() {
+            pickSingleFile('.purch,.json', (file) => {
+                loadVatPurchasesFile(file).then(data => {
+                    if (data) {
+                        currentVatData = data;
+                        showToast(`✅ VAT Purchases loaded: ${data.tableData.length} transactions`);
+                    } else {
+                        currentVatData = null;
+                        showToast("⚠️ VAT Purchases file has no entries, cleared.");
+                    }
+                    updatePurchasesDisplay();
+                }).catch(err => { showToast("❌ Invalid VAT Purchases file"); });
+            });
+        }
+        
+        function handleNonVatPurchases() {
+            pickSingleFile('.npurch,.json', (file) => {
+                loadNonVatPurchasesFile(file).then(data => {
+                    if (data) {
+                        currentNonVatData = data;
+                        showToast(`✅ Non-VAT Purchases loaded: ${data.tableData.length} transactions`);
+                    } else {
+                        currentNonVatData = null;
+                        showToast("⚠️ Non-VAT file has no entries, cleared.");
+                    }
+                    updatePurchasesDisplay();
+                }).catch(err => { showToast("❌ Invalid Non-VAT Purchases file"); });
+            });
+        }
+        
+        function handleReturns() {
+            pickSingleFile('.exp,.json', (file) => {
+                loadPurchaseReturnsFile(file).then(total => {
+                    currentReturnsTotal = total;
+                    if (total === 0) showToast("⚠️ Returns file has no entries or zero total.");
+                    else showToast(`✅ Returns loaded: Net Returns ₱${total.toFixed(2)}`);
+                    updatePurchasesDisplay();
+                }).catch(err => { showToast("❌ Invalid Returns file"); });
+            });
+        }
+        
+        function handleLoadAll() {
+            function pickVat() {
+                pickSingleFile('.purch,.json', (file) => {
+                    loadVatPurchasesFile(file).then(data => {
+                        if (data) { currentVatData = data; showToast(`✅ VAT: ${data.tableData.length} rows`); }
+                        else { currentVatData = null; showToast("⚠️ VAT file empty, skipped"); }
+                        pickNonVat();
+                    }).catch(() => { showToast("❌ VAT file invalid, skip"); pickNonVat(); });
+                });
+            }
+            function pickNonVat() {
+                pickSingleFile('.npurch,.json', (file) => {
+                    loadNonVatPurchasesFile(file).then(data => {
+                        if (data) { currentNonVatData = data; showToast(`✅ Non-VAT: ${data.tableData.length} rows`); }
+                        else { currentNonVatData = null; showToast("⚠️ Non-VAT empty, skipped"); }
+                        pickReturns();
+                    }).catch(() => { showToast("❌ Non-VAT invalid, skip"); pickReturns(); });
+                });
+            }
+            function pickReturns() {
+                pickSingleFile('.exp,.json', (file) => {
+                    loadPurchaseReturnsFile(file).then(total => {
+                        currentReturnsTotal = total;
+                        if (total === 0) showToast("⚠️ Returns empty or zero");
+                        else showToast(`✅ Returns: ₱${total.toFixed(2)}`);
+                        updatePurchasesDisplay();
+                        showToast("✅ All purchases data loaded and applied.");
+                    }).catch(() => { showToast("❌ Returns invalid, proceed without"); updatePurchasesDisplay(); });
+                });
+            }
+            pickVat();
+        }
+        
+        // ========== SALES LOAD ==========
+        function processSalesFileAndLoad(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const fileData = JSON.parse(e.target.result);
+                    let transactions = [];
+                    if (fileData.tableData && Array.isArray(fileData.tableData)) {
+                        transactions = fileData.tableData;
+                    } else if (fileData.data && Array.isArray(fileData.data)) {
+                        transactions = fileData.data;
+                    } else if (Array.isArray(fileData)) {
+                        transactions = fileData;
+                    } else {
+                        throw new Error("Invalid file format");
+                    }
+                    if (transactions.length === 0) { showToast("File contains no data"); return; }
+                    let totalCashAmount = 0, totalChargeAmount = 0, totalWithholdingTax = 0, totalNetSales = 0, totalExemptSales = 0, totalOutputTax = 0;
+                    for (let row of transactions) {
+                        const gross = parseFloat(row.grossSales) || 0;
+                        const exempt = parseFloat(row.exemptSales) || 0;
+                        const paymentMode = row.paymentMode || "";
+                        const withholdingRate = parseFloat(row.withholdingRate) || 0;
+                        const netSales = gross / 1.12;
+                        const outputTax = netSales * 0.12;
+                        const withholdingAmount = netSales * withholdingRate;
+                        const netReceipt = gross - withholdingAmount + exempt;
+                        if (paymentMode === "Cash") totalCashAmount += netReceipt;
+                        if (paymentMode === "Charge") totalChargeAmount += netReceipt;
+                        totalWithholdingTax += withholdingAmount;
+                        totalNetSales += netSales;
+                        totalExemptSales += exempt;
+                        totalOutputTax += outputTax;
+                    }
+                    const findAndSet = (section, accountTitle, debitVal, creditVal, isDebitField = true) => {
+                        const rowObj = rows.find(r => r.sectionName === section && r.accountTitle === accountTitle && r.type === 'account');
+                        if (rowObj) { if (isDebitField) { rowObj.debitVal = debitVal; rowObj.creditVal = 0; } else { rowObj.creditVal = creditVal; rowObj.debitVal = 0; } }
+                    };
+                    findAndSet('Sales', 'Cash', totalCashAmount, 0, true);
+                    findAndSet('Sales', 'Accounts Receivable', totalChargeAmount, 0, true);
+                    findAndSet('Sales', 'Creditable Withholding Tax', totalWithholdingTax, 0, true);
+                    findAndSet('Sales', 'Sales - Vatable', 0, totalNetSales, false);
+                    findAndSet('Sales', 'Sales - Exempted', 0, totalExemptSales, false);
+                    findAndSet('Sales', 'Output Tax', 0, totalOutputTax, false);
+                    recalcTotals(); renderTable();
+                    showToast(`✅ Sales loaded: ${transactions.length} rows. Cash: ₱${totalCashAmount.toFixed(2)}`);
+                } catch (err) { showToast("❌ Failed to parse sales file"); }
+            };
+            reader.readAsText(file);
+        }
+        
+        function openSalesFilePicker() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.vat,.json';
+            input.style.display = 'none';
+            document.body.appendChild(input);
+            input.addEventListener('change', (e) => { if (e.target.files && e.target.files[0]) processSalesFileAndLoad(e.target.files[0]); input.remove(); });
+            input.click();
+        }
+        
+        // Dropdown toggle
+        function initDropdown() {
+            const btn = document.getElementById('loadPurchasesBtn');
+            const dropdown = document.getElementById('purchasesDropdown');
+            if (!btn || !dropdown) return;
+            
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isVisible = dropdown.style.display === 'block';
+                dropdown.style.display = isVisible ? 'none' : 'block';
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+            
+            document.querySelectorAll('.purchases-dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const type = item.getAttribute('data-type');
+                    dropdown.style.display = 'none';
+                    if (type === 'vat') handleVatPurchases();
+                    else if (type === 'nonvat') handleNonVatPurchases();
+                    else if (type === 'returns') handleReturns();
+                    else if (type === 'all') handleLoadAll();
+                });
+            });
+        }
+        
+        // Stubs
+        function loadExpensesStub() { showToast("Expenses module — pending."); }
+        function loadTaxesStub() { showToast("Taxes & Licenses — pending."); }
+        function loadCapexStub() { showToast("CAPEX — pending."); }
+        
+        function showToast(msg) {
+            const existing = document.querySelector('.toast-msg');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { if(toast) toast.remove(); }, 3500);
+        }
+        
+        // ========== INITIALIZE ==========
+        rows = buildRowsStructure();
+        recalcTotals();
+        renderTable();
+        initDropdown();
+        
+        document.getElementById('loadSalesBtn')?.addEventListener('click', openSalesFilePicker);
+        document.getElementById('printBtn')?.addEventListener('click', printJournal);
+        document.getElementById('loadExpensesBtn')?.addEventListener('click', loadExpensesStub);
+        document.getElementById('loadTaxesBtn')?.addEventListener('click', loadTaxesStub);
+        document.getElementById('loadCapexBtn')?.addEventListener('click', loadCapexStub);
+        document.getElementById('resetAllBtn')?.addEventListener('click', resetAllEntries);
+        document.getElementById('refreshTotalsBtn')?.addEventListener('click', () => { recalcTotals(); renderTable(); showToast("Totals refreshed"); });
+    })();
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m) { if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
+</script>
+</body>
+</html>
