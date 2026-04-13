@@ -24,15 +24,218 @@
             --accent-gradient: linear-gradient(135deg, #1e88e5, #e53935);
         }
 
+        /* Page Entrance Animation */
+        @keyframes pageFadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
         body {
-            background: linear-gradient(145deg, #07161f, #0b2a38);
+            /* Journal background image - full screen cover */
+            background-image: url('journal.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             color: var(--text-light);
             padding: 30px 24px 50px;
             min-height: 100vh;
+            position: relative;
+            animation: fadeIn 0.8s ease-out;
         }
+
+        /* Optional: Add a subtle dark overlay to improve text readability */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: -1;
+        }
+
+        /* Entrance animation for top action bar */
+        .top-action-bar {
+            position: sticky;
+            top: 20px;
+            z-index: 1200;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: rgba(5, 20, 28, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            border: 1px solid rgba(30, 136, 229, 0.5);
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        /* Entrance animation for journal container */
+        .journal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--card-glass);
+            backdrop-filter: blur(6px);
+            border-radius: 32px;
+            padding: 20px 20px 40px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            border: 1px solid rgba(30,136,229,0.3);
+            animation: scaleIn 0.7s ease-out;
+        }
+
+        /* Entrance animation for page header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+            border-bottom: 2px dashed rgba(229,57,53,0.5);
+            padding-bottom: 14px;
+            animation: fadeIn 0.8s ease-out 0.1s both;
+        }
+
+        /* Entrance animation for table wrapper */
+        .tally-table-wrapper {
+            overflow-x: auto;
+            border-radius: 24px;
+            background: rgba(6, 22, 32, 0.7);
+            padding: 4px;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        /* Entrance animation for action bar */
+        .action-bar {
+            margin-top: 32px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            animation: slideInRight 0.6s ease-out 0.3s both;
+        }
+
+        /* Entrance animation for summary cards */
+        .summary-cards {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: flex-end;
+            animation: fadeIn 0.6s ease-out 0.4s both;
+        }
+
+        /* Individual summary card hover and entrance */
+        .summary-card {
+            background: rgba(0,0,0,0.5);
+            border-radius: 24px;
+            padding: 12px 24px;
+            border-left: 5px solid #e53935;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideInRight 0.5s ease-out backwards;
+        }
+
+        .summary-card:nth-child(1) { animation-delay: 0.4s; }
+        .summary-card:nth-child(2) { animation-delay: 0.5s; }
+        .summary-card:nth-child(3) { animation-delay: 0.6s; }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            background: rgba(0,0,0,0.7);
+            border-left-color: #ffb74d;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Entrance animation for footer note */
+        .footer-note {
+            text-align: center;
+            margin-top: 35px;
+            font-size: 0.75rem;
+            color: #9bc3db;
+            animation: fadeIn 0.6s ease-out 0.7s both;
+        }
+
+        /* Button hover animations */
+        .load-btn, .calc-btn, .back-dash-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .load-btn:hover, .calc-btn:hover, .back-dash-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.08);
+        }
+
+        /* Staggered entrance for table rows */
+        .tally-table tbody tr {
+            animation: fadeIn 0.4s ease-out backwards;
+        }
+
+        .tally-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        .tally-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+        .tally-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+        .tally-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+        .tally-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+        .tally-table tbody tr:nth-child(6) { animation-delay: 0.35s; }
+        .tally-table tbody tr:nth-child(7) { animation-delay: 0.4s; }
+        .tally-table tbody tr:nth-child(8) { animation-delay: 0.45s; }
+        .tally-table tbody tr:nth-child(9) { animation-delay: 0.5s; }
+        .tally-table tbody tr:nth-child(10) { animation-delay: 0.55s; }
+        .tally-table tbody tr:nth-child(11) { animation-delay: 0.6s; }
+        .tally-table tbody tr:nth-child(12) { animation-delay: 0.65s; }
+        .tally-table tbody tr:nth-child(13) { animation-delay: 0.7s; }
+        .tally-table tbody tr:nth-child(14) { animation-delay: 0.75s; }
+        .tally-table tbody tr:nth-child(15) { animation-delay: 0.8s; }
 
         @media print {
             body { background: white; padding: 0; margin: 0; color: black; }
+            body::before { display: none; }
             .top-action-bar, .action-bar, .summary-cards, .footer-note, .load-btn, .calc-btn, .back-dash-btn { display: none !important; }
             .journal-container { background: white; box-shadow: none; padding: 10px; margin: 0; border: none; }
             .tally-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
@@ -50,22 +253,6 @@
             .tally-table-wrapper { overflow: visible !important; }
         }
 
-        .top-action-bar {
-            position: sticky;
-            top: 20px;
-            z-index: 1200;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            background: rgba(5, 20, 28, 0.85);
-            backdrop-filter: blur(12px);
-            padding: 12px 24px;
-            border-radius: 60px;
-            border: 1px solid rgba(30, 136, 229, 0.5);
-        }
         .back-dash-btn {
             background: rgba(10, 35, 55, 0.9);
             padding: 8px 20px;
@@ -77,7 +264,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: 0.2s;
         }
         .back-dash-btn:hover {
             background: rgba(30, 136, 229, 0.85);
@@ -97,7 +283,6 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -149,22 +334,6 @@
             color: #ffb74d;
         }
         
-        .journal-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: var(--card-glass);
-            backdrop-filter: blur(6px);
-            border-radius: 32px;
-            padding: 20px 20px 40px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
-            border: 1px solid rgba(30,136,229,0.3);
-        }
-        .page-header {
-            text-align: center;
-            margin-bottom: 28px;
-            border-bottom: 2px dashed rgba(229,57,53,0.5);
-            padding-bottom: 14px;
-        }
         .page-header h1 { font-size: 2rem; background: linear-gradient(135deg, #90caf9, #ff8a80); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .tally-table-wrapper { overflow-x: auto; border-radius: 24px; background: rgba(6, 22, 32, 0.7); padding: 4px; }
         .tally-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 700px; }
@@ -176,13 +345,9 @@
         .debit-credit-input { width: 130px; background: rgba(0, 0, 0, 0.5); border: 1px solid #3a7ca5; border-radius: 12px; padding: 8px 12px; color: white; font-weight: 500; text-align: right; outline: none; font-family: monospace; }
         .debit-credit-input:focus { border-color: #e53935; box-shadow: 0 0 12px rgba(229,57,53,0.6); }
         .amount-display { font-family: monospace; font-weight: 600; text-align: right; display: inline-block; width: 100%; letter-spacing: 0.3px; }
-        .action-bar { margin-top: 32px; display: flex; justify-content: flex-end; gap: 20px; }
         .calc-btn { background: linear-gradient(145deg, #1e5a7a, #0a2f44); border: none; padding: 12px 28px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; }
         .calc-btn.primary { background: linear-gradient(145deg, #1e88e5, #c62828); }
-        .summary-cards { display: flex; gap: 20px; margin-top: 30px; justify-content: flex-end; }
-        .summary-card { background: rgba(0,0,0,0.5); border-radius: 24px; padding: 12px 24px; border-left: 5px solid #e53935; }
         .summary-card span { font-size: 1.4rem; font-weight: 800; color: #ffb74d; }
-        .footer-note { text-align: center; margin-top: 35px; font-size: 0.75rem; color: #9bc3db; }
         @media (max-width: 780px) { .load-buttons-group { justify-content: center; } .top-action-bar { flex-direction: column; align-items: stretch; } }
         .toast-msg {
             position: fixed; bottom: 25px; right: 25px; background: #1e5a7a; color: white; padding: 12px 20px;
@@ -605,7 +770,6 @@
         }
         function openSalesFilePicker() { pickSingleFile('.vat,.json', (file) => processSalesFileAndLoad(file)); }
         
-        // ================= TAXES AND LICENSES =================
         function loadTaxesAndLicenses() {
             pickSingleFile('.exp,.json', (file) => {
                 const reader = new FileReader();
@@ -632,7 +796,6 @@
             });
         }
 
-        // ================= CAPEX LOADER (Based on capex.html structure) =================
         function loadCapexFile() {
             pickSingleFile('.exp,.json', (file) => {
                 const reader = new FileReader();
@@ -641,12 +804,12 @@
                         const data = JSON.parse(e.target.result);
                         if (!data.tableData || !Array.isArray(data.tableData)) throw new Error("Invalid CAPEX file format");
                         
-                        let totalVatableNet = 0;      // Debit: CAPEX - Vatable (net = vatableGross / 1.12)
-                        let totalNonVatGross = 0;     // Debit: CAPEX - Non Vatable
-                        let totalInputTax = 0;         // Debit: Input Tax
-                        let totalCashCredit = 0;       // Credit: Cash (vatableGross + nonVatGross - withholding)
-                        let totalAPCredit = 0;         // Credit: Accounts Payable
-                        let totalWithholdingPayable = 0; // Credit: Withholding Tax Payable
+                        let totalVatableNet = 0;
+                        let totalNonVatGross = 0;
+                        let totalInputTax = 0;
+                        let totalCashCredit = 0;
+                        let totalAPCredit = 0;
+                        let totalWithholdingPayable = 0;
                         
                         for (let row of data.tableData) {
                             const vatableGross = parseFloat(row.vatableGross) || 0;
@@ -694,7 +857,6 @@
                 reader.readAsText(file);
             });
         }
-        // =====================================================================
         
         function initDropdowns() {
             const purchBtn = document.getElementById('loadPurchasesBtn');
