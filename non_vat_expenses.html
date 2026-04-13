@@ -1211,6 +1211,7 @@ td.selected {
                         <th>Date</th>
                         <th>Invoice Number</th>
                         <th>Invoice Type</th>
+                        <th>Mode of Payment</th>
                         <th>Transaction Type</th>
                         <th>12-digit TIN Number</th>
                         <th>Particulars/Supplier Name</th>
@@ -2048,12 +2049,19 @@ function addNewRow() {
                 <option value="OTHERS">OTHERS</option>
             </select>
           </td>
+          <td>
+            <select class="editable payment-mode">
+                <option value="">Select</option>
+                <option value="Cash">Cash</option>
+                <option value="Charge">Charge</option>
+            </select>
+            </td>
          <td>
             <select class="editable transaction-type">
                 <option value="">Select</option>
                 <option value="Goods">Goods</option>
                 <option value="Services">Services</option>
-            </select>
+            </select>   
           </td>
         <td style="position: relative;">
             <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
@@ -2100,9 +2108,10 @@ function addNewRow() {
     // FIX: Apply current column visibility states to the new row
     const columnVisibility = JSON.parse(localStorage.getItem('nonVatExpensesColumnVisibility')) || {};
     const columns = [
-        'date', 'invoiceNumber', 'invoiceType', 'transactionType', 'tinNumber',
-        'supplierName', 'address', 'grossAmount', 'natureExpense', 'inputTax',
-        'withholdingRate', 'withholdingTax', 'grossMinusWithholding', 'remarks', 'action'
+        'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'transactionType',
+    'tinNumber', 'supplierName', 'address', 'grossAmount', 'natureExpense',
+    'inputTax', 'withholdingRate', 'withholdingTax', 'grossMinusWithholding',
+    'remarks', 'action'
     ];
     
     const cells = row.querySelectorAll('td');
@@ -2256,6 +2265,13 @@ function addMultipleRows(count) {
             </div>
             </td>
             <td>
+    <select class="editable payment-mode">
+        <option value="">Select</option>
+        <option value="Cash">Cash</option>
+        <option value="Charge">Charge</option>
+    </select>
+</td>
+            <td>
                 <select class="editable transaction-type">
                     <option value="">Select</option>
                     <option value="Goods">Goods</option>
@@ -2300,9 +2316,10 @@ function addMultipleRows(count) {
     // Apply column visibility and attach listeners
     const columnVisibility = JSON.parse(localStorage.getItem('nonVatExpensesColumnVisibility')) || {};
     const columns = [
-        'date', 'invoiceNumber', 'invoiceType', 'transactionType', 'tinNumber',
-        'supplierName', 'address', 'grossAmount', 'natureExpense', 'inputTax',
-        'withholdingRate', 'withholdingTax', 'grossMinusWithholding', 'remarks', 'action'
+        'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'transactionType',
+    'tinNumber', 'supplierName', 'address', 'grossAmount', 'natureExpense',
+    'inputTax', 'withholdingRate', 'withholdingTax', 'grossMinusWithholding',
+    'remarks', 'action'
     ];
     
     for (const row of rows) {
@@ -2615,16 +2632,16 @@ function updateSummaryRow() {
                     case 0:
                         summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
                         break;
-                    case 7:
+                    case 8:
                         summaryCells += `<td class="uneditable">${totalGrossAmount.toFixed(2)}</td>`;
                         break;
-                    case 9:
+                    case 10:
                         summaryCells += `<td class="uneditable">${totalInputTax.toFixed(2)}</td>`;
                         break;
-                    case 11:
+                    case 12:
                         summaryCells += `<td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>`;
                         break;
-                    case 12:
+                    case 13:
                         summaryCells += `<td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>`;
                         break;
                     default:
@@ -2779,6 +2796,7 @@ function saveDataToFile() {
             date: row.querySelector('.date-input')?.value || '',
             invoiceNumber: row.querySelector('.invoice-number')?.value || '',
             invoiceType: row.querySelector('.invoice-type')?.value || '',
+            paymentMode: row.querySelector('.payment-mode')?.value || '',
             transactionType: row.querySelector('.transaction-type')?.value || '',
             tinNumber: row.querySelector('.tin-number')?.value || '',
             supplierName: row.querySelector('.supplier-name')?.value || '',
@@ -2983,6 +3001,13 @@ function addRowFromData(rowData) {
                 <option value="OTHERS" ${rowData.invoiceType === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
             </select>
          </td>
+         <td>
+    <select class="editable payment-mode">
+        <option value="">Select</option>
+        <option value="Cash" ${rowData.paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+        <option value="Charge" ${rowData.paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
+    </select>
+</td>
         <td>
             <select class="editable transaction-type">
                 <option value="">Select</option>
@@ -3463,6 +3488,7 @@ function exportToExcel() {
                         <th>Date<\/th>
                         <th>Invoice Number<\/th>
                         <th>Invoice Type<\/th>
+                        <th>Mode of Payment<\/th>
                         <th>Transaction Type<\/th>
                         <th>TIN Number<\/th>
                         <th>Supplier Name<\/th>
@@ -3491,6 +3517,9 @@ function exportToExcel() {
         
         const invoiceTypeSelect = row.querySelector('.invoice-type');
         const invoiceTypeValue = invoiceTypeSelect ? invoiceTypeSelect.value : '';
+
+        const paymentModeSelect = row.querySelector('.payment-mode');
+        const paymentModeValue = paymentModeSelect ? paymentModeSelect.value : '';
         
         const transactionTypeSelect = row.querySelector('.transaction-type');
         const transactionTypeValue = transactionTypeSelect ? transactionTypeSelect.value : '';
@@ -3532,6 +3561,7 @@ function exportToExcel() {
                 <td class="date-cell">${escapeHtml(dateValue)}<\/td>
                 <td class="text-left">${escapeHtml(invoiceValue)}<\/td>
                 <td class="text-center">${escapeHtml(invoiceTypeValue)}<\/td>
+                <td class="text-center">${escapeHtml(paymentModeValue)}<\/td>
                 <td class="text-center">${escapeHtml(transactionTypeValue)}<\/td>
                 <td class="text-center">${escapeHtml(tinValue)}<\/td>
                 <td class="text-left">${escapeHtml(supplierValue)}<\/td>
@@ -3554,7 +3584,7 @@ function exportToExcel() {
                 <\/tbody>
                 <tfoot>
                     <tr class="summary-row">
-                        <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:<\/td>
+                        <td colspan="8" class="text-right" style="font-weight: bold;">TOTALS:<\/td>
                         <td class="currency numeric" style="font-weight: bold;">${totalGrossAmount.toFixed(2)}<\/td>
                         <td class="text-center">-<\/td>
                         <td class="currency numeric" style="font-weight: bold;">${totalInputTax.toFixed(2)}<\/td>
@@ -4991,18 +5021,19 @@ function initColumnVisibility() {
         { index: 0, name: 'Date', key: 'date' },
         { index: 1, name: 'Invoice Number', key: 'invoiceNumber' },
         { index: 2, name: 'Invoice Type', key: 'invoiceType' },
-        { index: 3, name: 'Transaction Type', key: 'transactionType' },
-        { index: 4, name: 'TIN Number', key: 'tinNumber' },
-        { index: 5, name: 'Supplier Name', key: 'supplierName' },
-        { index: 6, name: 'Address', key: 'address' },
-        { index: 7, name: 'Gross Amount', key: 'grossAmount' },
-        { index: 8, name: 'Nature of Expense', key: 'natureExpense' },
-        { index: 9, name: 'Input Tax', key: 'inputTax' },
-        { index: 10, name: 'Withholding Rate', key: 'withholdingRate' },
-        { index: 11, name: 'Withholding Tax', key: 'withholdingTax' },
-        { index: 12, name: 'Gross - Withholding Tax', key: 'grossMinusWithholding' },
-        { index: 13, name: 'Remarks', key: 'remarks' },
-        { index: 14, name: 'Action', key: 'action' }
+        { index: 3, name: 'Mode of Payment', key: 'paymentMode' },
+        { index: 4, name: 'Transaction Type', key: 'transactionType' },
+        { index: 5, name: 'TIN Number', key: 'tinNumber' },
+        { index: 6, name: 'Supplier Name', key: 'supplierName' },
+        { index: 7, name: 'Address', key: 'address' },
+        { index: 8, name: 'Gross Amount', key: 'grossAmount' },
+        { index: 9, name: 'Nature of Expense', key: 'natureExpense' },
+        { index: 10, name: 'Input Tax', key: 'inputTax' },
+        { index: 11, name: 'Withholding Rate', key: 'withholdingRate' },
+        { index: 12, name: 'Withholding Tax', key: 'withholdingTax' },
+        { index: 13, name: 'Gross - Withholding Tax', key: 'grossMinusWithholding' },
+        { index: 14, name: 'Remarks', key: 'remarks' },
+        { index: 15, name: 'Action', key: 'action' }
     ];
     
     // Load saved column visibility from localStorage (use non-vat-expenses-specific key)
@@ -5273,6 +5304,48 @@ function initColumnVisibility() {
         }
         return pairs.sort((a, b) => a.name.localeCompare(b.name));
     }
+
+    // ===== SUPPLIERS MONITOR TOGGLE FIX =====
+function initSuppliersToggle() {
+    const toggleBtn = document.getElementById('toggleSuppliersMonitorBtn');
+    if (!toggleBtn) return;
+    
+    // Load saved state
+    let isHidden = localStorage.getItem('suppliersMonitorHidden') === 'true';
+    
+    // Apply initial state
+    const monitorSection = document.getElementById('registeredNonVatExpensesSuppliersMonitor');
+    if (monitorSection) {
+        if (isHidden) {
+            monitorSection.style.display = 'none';
+            toggleBtn.innerHTML = '<i class="fas fa-truck"></i><span class="sidebar-btn-text">Show Suppliers List</span>';
+        } else {
+            monitorSection.style.display = 'block';
+            toggleBtn.innerHTML = '<i class="fas fa-truck"></i><span class="sidebar-btn-text">Hide Suppliers List</span>';
+        }
+    }
+    
+    // Add click handler
+    toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const monitorSection = document.getElementById('registeredNonVatExpensesSuppliersMonitor');
+        if (!monitorSection) return;
+        
+        if (monitorSection.style.display === 'none') {
+            // Show it
+            monitorSection.style.display = 'block';
+            this.innerHTML = '<i class="fas fa-truck"></i><span class="sidebar-btn-text">Hide Suppliers List</span>';
+            localStorage.setItem('suppliersMonitorHidden', 'false');
+            showToast('Suppliers list visible', 'success');
+        } else {
+            // Hide it
+            monitorSection.style.display = 'none';
+            this.innerHTML = '<i class="fas fa-truck"></i><span class="sidebar-btn-text">Show Suppliers List</span>';
+            localStorage.setItem('suppliersMonitorHidden', 'true');
+            showToast('Suppliers list hidden', 'info');
+        }
+    });
+}
     
     function updateMonitorDisplay() {
         let monitorSection = document.getElementById('registeredNonVatExpensesSuppliersMonitor');
@@ -5423,6 +5496,7 @@ function initColumnVisibility() {
         loadSupplierDB();
         bindAutoFillToAllRows();
         observeNewRows();
+        initSuppliersToggle();
         
         // Enhance addMultipleRows to bind auto-fill
         if (typeof addMultipleRows === 'function') {

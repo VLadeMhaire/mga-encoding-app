@@ -1344,6 +1344,7 @@ tr.page-hidden {
                         <th>Date</th>
                         <th>Invoice Number</th>
                         <th>Invoice Type</th>
+                        <th>Mode of Payment</th>
                         <th>Transaction Type</th>
                         <th>12-digit TIN Number</th>
                         <th>Particulars/Supplier Name</th>
@@ -1881,9 +1882,9 @@ window.addNewRow = addNewRow;
 // Expense categories with their withholding tax rates
 const expenseCategories = {
     // Services (2%)
-    "REPAIRS AND MAINTENANCE-LABOR": 0.02,
-    "MEALS AND ACCOMMODATION – SERVICES": 0.02,
-    "REPRESENTATIONS – SERVICES": 0.02,
+    "REPAIRS AND MAINTENANCE- LABOR": 0.02,
+    "MEALS AND ACCOMMODATION - SERVICES": 0.02,
+    "REPRESENTATION - SERVICES": 0.02,
     "ELECTRICITY AND WATER": 0.02,
     "COMMUNICATION EXPENSE": 0.02,
     "FREIGHT AND COURIER": 0.02,
@@ -1892,24 +1893,24 @@ const expenseCategories = {
     "SECURITY SERVICES": 0.02,
     "INSURANCE": 0.02,
     "SEMINAR AND TRAINING": 0.02,
-    "MEDICAL EXPENSES – SERVICES": 0.02,
+    "MEDICAL EXPENSE - SERVICES": 0.02,
     "PROFESSIONAL FEES": 0.02,
     "CLEANING SERVICES": 0.02,
     "OTHERS - SERVICES": 0.02,
     
     // Goods (1%)
     "REPAIRS AND MAINTENANCE-MATERIALS": 0.01,
-    "MEALS AND ALLOWANCES – GOODS": 0.01,
-    "REPRESENTATIONS – GOODS": 0.01,
+    "MEALS AND ACCOMMODATION - GOODS": 0.01,
+    "REPRESENTATION- GOODS": 0.01,
     "FUEL AND OIL": 0.01,
     "OFFICE SUPPLIES": 0.01,
     "UNIFORMS": 0.01,
-    "MEDICAL EXPENSES – GOODS": 0.01,
+    "MEDICAL EXPENSE - GOODS": 0.01,
     "CLEANING SUPPLIES": 0.01,
     "OTHERS - GOODS": 0.01,
     
-    // Rental (5%)
-    "Rental": 0.05
+    // RENTAL (5%)
+    "RENTAL": 0.05
 };
 
 // Grouped categories for display
@@ -1918,9 +1919,9 @@ const categoryGroups = [
         name: "SERVICES (2% Withholding Tax)",
         icon: "fa-cogs",
         categories: [
-            "REPAIRS AND MAINTENANCE-LABOR",
-            "MEALS AND ACCOMMODATION – SERVICES",
-            "REPRESENTATIONS – SERVICES",
+            "REPAIRS AND MAINTENANCE- LABOR",
+            "MEALS AND ACCOMMODATION - SERVICES",
+            "REPRESENTATION - SERVICES",
             "ELECTRICITY AND WATER",
             "COMMUNICATION EXPENSE",
             "FREIGHT AND COURIER",
@@ -1929,7 +1930,7 @@ const categoryGroups = [
             "SECURITY SERVICES",
             "INSURANCE",
             "SEMINAR AND TRAINING",
-            "MEDICAL EXPENSES – SERVICES",
+            "MEDICAL EXPENSE - SERVICES",
             "PROFESSIONAL FEES",
             "CLEANING SERVICES",
             "OTHERS - SERVICES"
@@ -1940,12 +1941,12 @@ const categoryGroups = [
         icon: "fa-boxes",
         categories: [
             "REPAIRS AND MAINTENANCE-MATERIALS",
-            "MEALS AND ALLOWANCES – GOODS",
-            "REPRESENTATIONS – GOODS",
+            "MEALS AND ACCOMMODATION - GOODS",
+            "REPRESENTATION- GOODS",
             "FUEL AND OIL",
             "OFFICE SUPPLIES",
             "UNIFORMS",
-            "MEDICAL EXPENSES – GOODS",
+            "MEDICAL EXPENSE - GOODS",
             "CLEANING SUPPLIES",
             "OTHERS - GOODS"
         ]
@@ -1953,7 +1954,7 @@ const categoryGroups = [
     {
         name: "RENTAL (5% Withholding Tax)",
         icon: "fa-building",
-        categories: ["Rental"]
+        categories: ["RENTAL"]
     }
 ];
 
@@ -1989,7 +1990,7 @@ function addToRecentExpenses(category) {
 // Get category type for styling
 function getCategoryType(expenseValue) {
     if (!expenseValue) return null;
-    if (expenseValue === "Rental") return "rental";
+    if (expenseValue === "RENTAL") return "rental";
     if (expenseCategories[expenseValue] === 0.02) return "services";
     if (expenseCategories[expenseValue] === 0.01) return "goods";
     if (expenseValue.includes("SERVICES") || expenseValue.includes("LABOR") || 
@@ -2965,6 +2966,13 @@ function addNewRow() {
         </div>
         </td>
         <td>
+            <select class="editable payment-mode">
+                <option value="">Select</option>
+                <option value="Cash">Cash</option>
+                <option value="Charge">Charge</option>
+            </select>
+        </td>
+        <td>
             <select class="editable transaction-type">
                 <option value="">Select</option>
                 <option value="Goods">Goods</option>
@@ -3108,6 +3116,13 @@ function addMultipleRows(count) {
             </div>
             </td>
             <td>
+    <select class="editable payment-mode">
+        <option value="">Select</option>
+        <option value="Cash">Cash</option>
+        <option value="Charge">Charge</option>
+    </select>
+</td>
+            <td>
                 <select class="editable transaction-type">
                     <option value="">Select</option>
                     <option value="Goods">Goods</option>
@@ -3192,11 +3207,11 @@ function addMultipleRows(count) {
 function applyColumnVisibilityToRow(row) {
     const columnVisibility = JSON.parse(localStorage.getItem('expensesColumnVisibility')) || {};
     const columns = [
-        'date', 'invoiceNumber', 'invoiceType', 'transactionType', 'tinNumber',
-        'supplierName', 'address', 'grossAmount', 'natureExpense', 'netExpenses',
-        'inputTax', 'withholdingRate', 'withholdingTax', 'grossMinusWithholding',
-        'remarks', 'action'
-    ];
+    'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'transactionType',
+    'tinNumber', 'supplierName', 'address', 'grossAmount', 'natureExpense',
+    'netExpenses', 'inputTax', 'withholdingRate', 'withholdingTax',
+    'grossMinusWithholding', 'remarks', 'action'
+];
     
     const cells = row.querySelectorAll('td');
     columns.forEach((key, index) => {
@@ -3642,8 +3657,8 @@ function updateExpenseTally() {
         
         for (const [category, data] of sortedCategories) {
             let categoryType = '';
-            if (category.includes('SERVICES') || category === 'Rental') {
-                categoryType = category === 'Rental' ? 'rental' : 'services';
+            if (category.includes('SERVICES') || category === 'RENTAL') {
+                categoryType = category === 'RENTAL' ? 'rental' : 'services';
             } else {
                 categoryType = 'goods';
             }
@@ -3715,6 +3730,7 @@ function saveDataToFile() {
             date: row.querySelector('.date-input')?.value || '',
             invoiceNumber: row.querySelector('.invoice-number')?.value || '',
             invoiceType: row.querySelector('.invoice-type')?.value || '',
+            paymentMode: row.querySelector('.payment-mode')?.value || '',
             transactionType: row.querySelector('.transaction-type')?.value || '',
             tinNumber: row.querySelector('.tin-number')?.value || '',
             supplierName: row.querySelector('.supplier-name')?.value || '',
@@ -3866,6 +3882,13 @@ function addRowFromData(rowData) {
                 <option value="OTHERS" ${rowData.invoiceType === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
             </select>
           </div>
+          <td>  <!-- ADD THIS WHOLE BLOCK -->
+        <select class="editable payment-mode">
+            <option value="">Select</option>
+            <option value="Cash" ${rowData.paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+            <option value="Charge" ${rowData.paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
+        </select>
+    </td>
           <td>
             <select class="editable transaction-type">
                 <option value="">Select</option>
@@ -4359,6 +4382,7 @@ function exportToExcel() {
                         <th>Date<\/th>
                         <th>Invoice Number<\/th>
                         <th>Invoice Type<\/th>
+                        <th>Mode of Payment<\/th>
                         <th>Transaction Type<\/th>
                         <th>TIN Number<\/th>
                         <th>Supplier Name<\/th>
@@ -4388,6 +4412,9 @@ function exportToExcel() {
         
         const invoiceTypeSelect = row.querySelector('.invoice-type');
         const invoiceTypeValue = invoiceTypeSelect ? invoiceTypeSelect.value : '';
+
+        const paymentModeSelect = row.querySelector('.payment-mode');
+        const paymentModeValue = paymentModeSelect ? paymentModeSelect.value : '';
         
         const transactionTypeSelect = row.querySelector('.transaction-type');
         const transactionTypeValue = transactionTypeSelect ? transactionTypeSelect.value : '';
@@ -4432,6 +4459,7 @@ function exportToExcel() {
                 <td class="date-cell">${escapeHtml(dateValue)}<\/td>
                 <td class="text-left">${escapeHtml(invoiceValue)}<\/td>
                 <td class="text-center">${escapeHtml(invoiceTypeValue)}<\/td>
+                <td class="text-center">${escapeHtml(paymentModeValue)}<\/td>
                 <td class="text-center">${escapeHtml(transactionTypeValue)}<\/td>
                 <td class="text-center">${escapeHtml(tinValue)}<\/td>
                 <td class="text-left">${escapeHtml(supplierValue)}<\/td>
@@ -4455,7 +4483,7 @@ function exportToExcel() {
                 <\/tbody>
                 <tfoot>
                     <tr class="summary-row">
-                        <td colspan="7" class="text-right" style="font-weight: bold;">TOTALS:<\/td>
+                        <td colspan="8" class="text-right" style="font-weight: bold;">TOTALS:<\/td>
                         <td class="currency numeric" style="font-weight: bold;">${totalGrossAmount.toFixed(2)}<\/td>
                         <td class="text-center">-<\/td>
                         <td class="currency numeric" style="font-weight: bold;">${totalNetExpenses.toFixed(2)}<\/td>
@@ -5889,19 +5917,20 @@ function initColumnVisibility() {
         { index: 0, name: 'Date', key: 'date' },
         { index: 1, name: 'Invoice Number', key: 'invoiceNumber' },
         { index: 2, name: 'Invoice Type', key: 'invoiceType' },
-        { index: 3, name: 'Transaction Type', key: 'transactionType' },
-        { index: 4, name: 'TIN Number', key: 'tinNumber' },
-        { index: 5, name: 'Supplier Name', key: 'supplierName' },
-        { index: 6, name: 'Address', key: 'address' },
-        { index: 7, name: 'Gross Amount', key: 'grossAmount' },
-        { index: 8, name: 'Nature of Expense', key: 'natureExpense' },
-        { index: 9, name: 'Net Expenses', key: 'netExpenses' },
-        { index: 10, name: 'Input Tax', key: 'inputTax' },
-        { index: 11, name: 'Withholding Rate', key: 'withholdingRate' },
-        { index: 12, name: 'Withholding Tax', key: 'withholdingTax' },
-        { index: 13, name: 'Gross - Withholding Tax', key: 'grossMinusWithholding' },
-        { index: 14, name: 'Remarks', key: 'remarks' },
-        { index: 15, name: 'Action', key: 'action' }
+        { index: 3, name: 'Mode of Payment', key: 'paymentMode' },
+        { index: 4, name: 'Transaction Type', key: 'transactionType' },
+        { index: 5, name: 'TIN Number', key: 'tinNumber' },
+        { index: 6, name: 'Supplier Name', key: 'supplierName' },
+        { index: 7, name: 'Address', key: 'address' },
+        { index: 8, name: 'Gross Amount', key: 'grossAmount' },
+        { index: 9, name: 'Nature of Expense', key: 'natureExpense' },
+        { index: 10, name: 'Net Expenses', key: 'netExpenses' },
+        { index: 11, name: 'Input Tax', key: 'inputTax' },
+        { index: 12, name: 'Withholding Rate', key: 'withholdingRate' },
+        { index: 13, name: 'Withholding Tax', key: 'withholdingTax' },
+        { index: 14, name: 'Gross - Withholding Tax', key: 'grossMinusWithholding' },
+        { index: 15, name: 'Remarks', key: 'remarks' },
+        { index: 16, name: 'Action', key: 'action' }
     ];
     
     // Load saved column visibility from localStorage (use expenses-specific key)

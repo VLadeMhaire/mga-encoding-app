@@ -1842,8 +1842,6 @@ function addNewRow() {
                 <option value="">Select</option>
                 <option value="Cash">Cash</option>
                 <option value="Charge">Charge</option>
-                <option value="Credit">Credit</option>
-                <option value="Lease">Lease</option>
             </select>
          </td>
          <td>
@@ -2388,8 +2386,6 @@ function addRowFromData(rowData) {
                 <option value="">Select</option>
                 <option value="Cash" ${rowData.paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
                 <option value="Charge" ${rowData.paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
-                <option value="Credit" ${rowData.paymentMode === 'Credit' ? 'selected' : ''}>Credit</option>
-                <option value="Lease" ${rowData.paymentMode === 'Lease' ? 'selected' : ''}>Lease</option>
             </select>
         </td>
         <td><input type="text" value="${escapeHtml(rowData.supplierName || '')}" class="editable supplier-name" placeholder="Supplier name"></td>
