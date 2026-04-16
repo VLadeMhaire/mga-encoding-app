@@ -182,7 +182,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Quick Start Section */
+        /* Quick Start Grid */
         .quick-start-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -257,6 +257,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-top: 20px;
+            margin-bottom: 30px;
         }
         
         .module-card {
@@ -399,6 +400,65 @@
         .tip-content p {
             color: var(--text-secondary);
             line-height: 1.6;
+        }
+        
+        /* Quick Access Buttons */
+        .quick-access-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .quick-access-btn {
+            background: linear-gradient(135deg, rgba(30, 136, 229, 0.25), rgba(229, 57, 53, 0.2));
+            border: 1px solid var(--border-mix);
+            border-radius: 50px;
+            padding: 12px 25px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .quick-access-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            background: linear-gradient(135deg, rgba(30, 136, 229, 0.4), rgba(229, 57, 53, 0.35));
+            box-shadow: 0 0 20px var(--glow-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .quick-access-btn i {
+            font-size: 1.1rem;
+        }
+        
+        /* Back to Top Button */
+        .back-to-top {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(30, 136, 229, 0.2);
+            border: 1px solid var(--border-mix);
+            border-radius: 40px;
+            padding: 8px 20px;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .back-to-top:hover {
+            background: rgba(229, 57, 53, 0.3);
+            transform: translateY(-2px);
+            color: white;
         }
         
         /* Keyboard Shortcuts */
@@ -557,12 +617,28 @@
             transform: scale(1.05);
         }
         
+        /* Module Section */
+        .module-section {
+            margin-top: 40px;
+            background: rgba(0, 30, 40, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-mix);
+            scroll-margin-top: 80px;
+        }
+        .module-section h3 {
+            color: #00ff9d;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
         /* Responsive */
         @media (max-width: 1024px) {
             .modules-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
             .features-grid {
                 grid-template-columns: 1fr;
             }
@@ -572,7 +648,6 @@
             .guide-header h1 {
                 font-size: 1.8rem;
             }
-            
             .back-button {
                 position: relative;
                 left: 0;
@@ -581,47 +656,26 @@
                 margin-bottom: 20px;
                 display: inline-flex;
             }
-            
             .modules-grid {
                 grid-template-columns: 1fr;
             }
-            
             .quick-start-grid {
                 grid-template-columns: 1fr;
             }
-            
             .tab-btn {
                 padding: 12px;
                 font-size: 0.9rem;
-                min-width: auto;
             }
-            
-            .tab-btn i {
-                font-size: 1rem;
-            }
-            
             .feature-item {
                 flex-direction: column;
             }
-            
-            .tip-box {
+            .quick-access-buttons {
                 flex-direction: column;
+                align-items: stretch;
             }
-        }
-        
-        /* Animations */
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .glow-text {
-            color: #00ff9d;
-            text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+            .quick-access-btn {
+                justify-content: center;
+            }
         }
         
         .badge {
@@ -637,631 +691,251 @@
 </head>
 <body>
     <div class="guide-container">
-        <!-- Header -->
         <div class="guide-header">
             <a href="index2.html" class="back-button">
                 <i class="fas fa-arrow-left"></i>
                 <span>Back to Dashboard</span>
             </a>
-            <h1>
-                <i class="fas fa-compass"></i>
-                Quick Guide
-            </h1>
+            <h1><i class="fas fa-compass"></i> Quick Guide</h1>
             <p>Your complete guide to the MGAA VAT Tracking System</p>
         </div>
         
-        <!-- Navigation Tabs -->
         <div class="guide-tabs">
-            <button class="tab-btn active" data-tab="quickstart">
-                <i class="fas fa-rocket"></i>
-                <span>Quick Start</span>
-            </button>
-            <button class="tab-btn" data-tab="modules">
-                <i class="fas fa-th"></i>
-                <span>Modules</span>
-            </button>
-            <button class="tab-btn" data-tab="features">
-                <i class="fas fa-star"></i>
-                <span>Features</span>
-            </button>
-            <button class="tab-btn" data-tab="shortcuts">
-                <i class="fas fa-keyboard"></i>
-                <span>Shortcuts</span>
-            </button>
-            <button class="tab-btn" data-tab="faq">
-                <i class="fas fa-question-circle"></i>
-                <span>FAQ</span>
-            </button>
+            <button class="tab-btn active" data-tab="quickstart"><i class="fas fa-rocket"></i><span>Quick Start</span></button>
+            <button class="tab-btn" data-tab="modules"><i class="fas fa-th"></i><span>Modules</span></button>
+            <button class="tab-btn" data-tab="features"><i class="fas fa-star"></i><span>Features</span></button>
+            <button class="tab-btn" data-tab="shortcuts"><i class="fas fa-keyboard"></i><span>Shortcuts</span></button>
+            <button class="tab-btn" data-tab="faq"><i class="fas fa-question-circle"></i><span>FAQ</span></button>
         </div>
         
-        <!-- Tab Content -->
         <div class="tab-content">
             <!-- Quick Start Tab -->
             <div class="tab-pane active" id="quickstart">
-                <h2 style="color: white; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-play-circle" style="color: var(--primary-red);"></i>
-                    Getting Started in 3 Simple Steps
-                </h2>
-                
+                <h2 style="color: white; margin-bottom: 25px;"><i class="fas fa-play-circle" style="color: var(--primary-red);"></i> Getting Started in 3 Simple Steps</h2>
                 <div class="quick-start-grid">
-                    <div class="quick-card">
-                        <div class="step-number">1</div>
-                        <div class="quick-card-icon">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <h3>Enter Company Info</h3>
-                        <p>Start by filling in your company details in the right sidebar. Required fields are marked with * and include Company Name, TIN, Address, Line of Business, and Authorized Employee.</p>
-                    </div>
-                    
-                    <div class="quick-card">
-                        <div class="step-number">2</div>
-                        <div class="quick-card-icon">
-                            <i class="fas fa-table"></i>
-                        </div>
-                        <h3>Add Transactions</h3>
-                        <p>Click "Add New Row" in the left sidebar or the Entry Counter button to begin entering your sales data. All VAT calculations are automatic!</p>
-                    </div>
-                    
-                    <div class="quick-card">
-                        <div class="step-number">3</div>
-                        <div class="quick-card-icon">
-                            <i class="fas fa-file-export"></i>
-                        </div>
-                        <h3>Export Reports</h3>
-                        <p>Once your data is entered, use the "Export to Excel" button to generate a professionally formatted VAT report with all calculations and summaries.</p>
-                    </div>
+                    <div class="quick-card"><div class="step-number">1</div><div class="quick-card-icon"><i class="fas fa-building"></i></div><h3>Enter Company Info</h3><p>Fill in your company details in the right sidebar: Company Name, TIN, Address, Line of Business, and Authorized Employee.</p></div>
+                    <div class="quick-card"><div class="step-number">2</div><div class="quick-card-icon"><i class="fas fa-table"></i></div><h3>Add Transactions</h3><p>Click "Add New Row" or use the Entry Counter button. All VAT calculations are automatic!</p></div>
+                    <div class="quick-card"><div class="step-number">3</div><div class="quick-card-icon"><i class="fas fa-file-export"></i></div><h3>Export Reports</h3><p>Use "Export to Excel" to generate professionally formatted VAT reports with summaries and charts.</p></div>
                 </div>
-                
-                <div class="tip-box">
-                    <i class="fas fa-lightbulb"></i>
-                    <div class="tip-content">
-                        <h4>💡 Pro Tip: Start with Company Information</h4>
-                        <p>Always fill in your company details first before entering transactions. This information is required for exporting reports and will be automatically saved to your browser's local storage for future sessions.</p>
-                    </div>
-                </div>
-                
-                <h3 style="color: white; margin: 30px 0 20px;">System Overview</h3>
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Automatic VAT Calculations</h4>
-                            <p>Net Sales = Gross Sales ÷ 1.12 | Output Tax = Net Sales × 0.12 | Withholding Tax = Net Sales × Withholding Rate</p>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-pie"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Real-time Statistics</h4>
-                            <p>View totals for Gross Sales, Net Sales, Output Tax, and more. Tally sections show breakdowns by payment mode and customer type.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-undo-alt"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Data Persistence</h4>
-                            <p>Save your data to .vat files and load them later. Company information is automatically saved in your browser.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-mouse-pointer"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Selection Mode</h4>
-                            <p>Use "Select Multiple" mode to select, copy, paste, or delete multiple cells at once. Great for bulk editing!</p>
-                        </div>
-                    </div>
-                </div>
+                <div class="tip-box"><i class="fas fa-lightbulb"></i><div class="tip-content"><h4>💡 Pro Tip: Start with Company Information</h4><p>Fill in company details first. This info is required for exports and auto-saves to your browser.</p></div></div>
             </div>
             
             <!-- Modules Tab -->
             <div class="tab-pane" id="modules">
-                <h2 style="color: white; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-th" style="color: var(--primary-blue);"></i>
-                    Dashboard Modules
-                </h2>
+                <h2 style="color: white; margin-bottom: 25px;"><i class="fas fa-th" style="color: var(--primary-blue);"></i> Dashboard Modules (9 Core Modules)</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 25px;">The system features 9 core tracking modules plus dedicated detailed trackers for Sales, Purchases, Expenses, and a powerful Journal Entry consolidator.</p>
                 
-                <p style="color: var(--text-secondary); margin-bottom: 25px;">The main dashboard features 9 tracking modules, each designed for specific transaction types:</p>
+                <!-- Quick Access Buttons -->
+                <div class="quick-access-buttons">
+                    <div class="quick-access-btn" onclick="scrollToSection('journal-guide');"><i class="fas fa-book-open"></i> Journal Entry</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('sales-guide');"><i class="fas fa-file-invoice-dollar"></i> Vatable Sales</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('purchases-guide');"><i class="fas fa-shopping-cart"></i> Vatable Purchases</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('expenses-guide');"><i class="fas fa-money-bill-wave"></i> Vatable Expenses</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('nonvat-purchases-guide');"><i class="fas fa-shopping-basket"></i> Non-VAT Purchases</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('nonvat-expenses-guide');"><i class="fas fa-receipt"></i> Non-VAT Expenses</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('capex-guide');"><i class="fas fa-building"></i> CAPEX</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('taxes-guide');"><i class="fas fa-file-certificate"></i> Taxes & Licenses</div>
+                    <div class="quick-access-btn" onclick="scrollToSection('returns-guide');"><i class="fas fa-undo-alt"></i> Purchase Returns</div>
+                </div>
                 
                 <div class="modules-grid">
-                    <!-- Row 1 - VAT Modules -->
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-file-invoice-dollar"></i>
-                            <h4>VAT Sales</h4>
-                            <span class="module-badge">VAT</span>
-                        </div>
-                        <div class="module-description">
-                            Track vatable sales with automated VAT calculations.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Automatic 12% VAT computation</li>
-                            <li><i class="fas fa-check-circle"></i> Withholding tax options (0%,1%,2%,5%)</li>
-                            <li><i class="fas fa-check-circle"></i> TIN validation</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-shopping-cart"></i>
-                            <h4>VAT Purchases</h4>
-                            <span class="module-badge">VAT</span>
-                        </div>
-                        <div class="module-description">
-                            Track vatable purchases with input tax calculations.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Input tax tracking</li>
-                            <li><i class="fas fa-check-circle"></i> Supplier management</li>
-                            <li><i class="fas fa-check-circle"></i> Purchase categorization</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <h4>VAT Expenses</h4>
-                            <span class="module-badge">VAT</span>
-                        </div>
-                        <div class="module-description">
-                            Track vatable expenses with automated VAT calculations.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Expense categorization</li>
-                            <li><i class="fas fa-check-circle"></i> VAT recoverable tracking</li>
-                            <li><i class="fas fa-check-circle"></i> Receipt management</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Row 2 - Non-VAT Modules -->
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-file-invoice"></i>
-                            <h4>Non-VAT Sales</h4>
-                            <span class="module-badge">Non-VAT</span>
-                        </div>
-                        <div class="module-description">
-                            Track sales that are exempt from VAT.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Exempt transaction tracking</li>
-                            <li><i class="fas fa-check-circle"></i> Zero-rated sales</li>
-                            <li><i class="fas fa-check-circle"></i> Exemption reason codes</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-shopping-basket"></i>
-                            <h4>Non-VAT Purchases</h4>
-                            <span class="module-badge">Non-VAT</span>
-                        </div>
-                        <div class="module-description">
-                            Track purchases that are exempt from VAT.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Exempt purchase tracking</li>
-                            <li><i class="fas fa-check-circle"></i> VAT-exempt suppliers</li>
-                            <li><i class="fas fa-check-circle"></i> Special transaction types</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-receipt"></i>
-                            <h4>Non-VAT Expenses</h4>
-                            <span class="module-badge">Non-VAT</span>
-                        </div>
-                        <div class="module-description">
-                            Track expenses that are exempt from VAT.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> VAT-exempt expense tracking</li>
-                            <li><i class="fas fa-check-circle"></i> Operating expenses</li>
-                            <li><i class="fas fa-check-circle"></i> Administrative costs</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Row 3 - Special Modules -->
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-building"></i>
-                            <h4>Capital Expenditures</h4>
-                            <span class="module-badge">CAPEX</span>
-                        </div>
-                        <div class="module-description">
-                            Track asset acquisitions with VAT calculations.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Asset depreciation tracking</li>
-                            <li><i class="fas fa-check-circle"></i> Capital goods monitoring</li>
-                            <li><i class="fas fa-check-circle"></i> Long-term asset management</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-file-certificate"></i>
-                            <h4>Taxes & Licenses</h4>
-                            <span class="module-badge">GOV</span>
-                        </div>
-                        <div class="module-description">
-                            Track tax payments and government license fees.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Annual registration fees</li>
-                            <li><i class="fas fa-check-circle"></i> Permit tracking</li>
-                            <li><i class="fas fa-check-circle"></i> Government payment records</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="module-card">
-                        <div class="module-header">
-                            <i class="fas fa-undo-alt"></i>
-                            <h4>Purchase Returns</h4>
-                            <span class="module-badge">RETURNS</span>
-                        </div>
-                        <div class="module-description">
-                            Track purchase returns with VAT adjustments.
-                        </div>
-                        <ul class="module-features">
-                            <li><i class="fas fa-check-circle"></i> Return to supplier tracking</li>
-                            <li><i class="fas fa-check-circle"></i> VAT credit adjustments</li>
-                            <li><i class="fas fa-check-circle"></i> Debit note management</li>
-                        </ul>
-                    </div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-book-open"></i><h4>Journal Entry</h4><span class="module-badge">CONSOLIDATOR</span></div><div class="module-description">Consolidate all transactions into a General Journal with Debits & Credits.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Load .vat, .purch, .exp, .taxes, .capex files</li><li><i class="fas fa-check-circle"></i> Automatic Debit/Credit posting</li><li><i class="fas fa-check-circle"></i> Print-ready journal format</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-file-invoice-dollar"></i><h4>Vatable Sales</h4><span class="module-badge">VAT</span></div><div class="module-description">Track vatable sales with automated VAT calculations.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Automatic 12% VAT computation</li><li><i class="fas fa-check-circle"></i> Withholding tax options (0%,1%,2%,5%)</li><li><i class="fas fa-check-circle"></i> TIN validation</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-shopping-cart"></i><h4>Vatable Purchases</h4><span class="module-badge">VAT</span></div><div class="module-description">Track vatable purchases with input tax calculations.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Input tax tracking</li><li><i class="fas fa-check-circle"></i> Supplier management</li><li><i class="fas fa-check-circle"></i> Purchase categorization</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-money-bill-wave"></i><h4>Vatable Expenses</h4><span class="module-badge">VAT</span></div><div class="module-description">Track vatable expenses with automated VAT calculations.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Expense categorization</li><li><i class="fas fa-check-circle"></i> VAT recoverable tracking</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-shopping-basket"></i><h4>Non-VAT Purchases</h4><span class="module-badge">Non-VAT</span></div><div class="module-description">Track purchases exempt from VAT.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Exempt purchase tracking</li><li><i class="fas fa-check-circle"></i> VAT-exempt suppliers</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-receipt"></i><h4>Non-VAT Expenses</h4><span class="module-badge">Non-VAT</span></div><div class="module-description">Track expenses exempt from VAT.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> VAT-exempt expense tracking</li><li><i class="fas fa-check-circle"></i> Operating expenses</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-building"></i><h4>Capital Expenditures</h4><span class="module-badge">CAPEX</span></div><div class="module-description">Track asset acquisitions with VAT calculations.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Asset depreciation tracking</li><li><i class="fas fa-check-circle"></i> Capital goods monitoring</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-file-certificate"></i><h4>Taxes & Licenses</h4><span class="module-badge">GOV</span></div><div class="module-description">Track tax payments and government license fees.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Annual registration fees</li><li><i class="fas fa-check-circle"></i> Permit tracking</li></ul></div>
+                    <div class="module-card"><div class="module-header"><i class="fas fa-undo-alt"></i><h4>Purchase Returns</h4><span class="module-badge">RETURNS</span></div><div class="module-description">Track purchase returns with VAT adjustments.</div><ul class="module-features"><li><i class="fas fa-check-circle"></i> Return to supplier tracking</li><li><i class="fas fa-check-circle"></i> VAT credit adjustments</li></ul></div>
                 </div>
                 
-                <div class="tip-box" style="margin-top: 25px;">
-                    <i class="fas fa-info-circle"></i>
-                    <div class="tip-content">
-                        <h4>📊 Additional Features</h4>
-                        <p>Don't forget to explore Tax Facts, Tax Calculator, Compensation, and Tax Game modules in the sidebar for comprehensive tax management!</p>
+                <!-- Journal Entry Guide -->
+                <div id="journal-guide" class="module-section">
+                    <h3><i class="fas fa-book-open"></i> Using Journal Entry</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">The <strong>Journal Entry page</strong> consolidates all your VAT transactions into a professional General Journal with automatic Debit/Credit balancing across five sections: Sales, Purchases, Expenses, Taxes & Licenses, and CAPEX.</p>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-file-import"></i></div><div class="feature-text"><h4>Load Transaction Files</h4><p>Import .vat, .purch/.npurch/.rpurch, .exp/.nexp, .taxes, and .capex files. The system automatically processes each file and posts the appropriate Debit/Credit entries.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-layer-group"></i></div><div class="feature-text"><h4>Batch Loading</h4><p>Use dropdown menus to load multiple files at once (e.g., Load All Three for Purchases). Categories are automatically combined.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-calculator"></i></div><div class="feature-text"><h4>Automatic Calculations</h4><p>Calculates Net (Gross ÷ 1.12), Tax (Net × 0.12), Withholding (Net × Rate), and posts to correct accounts.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-edit"></i></div><div class="feature-text"><h4>Editable Debit/Credit Fields</h4><p>Manually adjust Debit and Credit amounts. Changes automatically recalculate section subtotals and grand totals.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-chart-line"></i></div><div class="feature-text"><h4>Real-Time Totals</h4><p>View Total Debits, Total Credits, and the Difference (should be zero for balanced journals).</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-print"></i></div><div class="feature-text"><h4>Print-Ready Journal</h4><p>Click <strong>Print Journal</strong> for a clean, print-optimized version — perfect for BIR submission.</p></div></div>
                     </div>
+                    <div class="tip-box"><i class="fas fa-file-excel"></i><div class="tip-content"><h4>📊 Supported File Formats</h4><p>.vat, .purch, .npurch, .rpurch, .exp, .nexp, .taxes, .capex — all JSON-based files from tracker modules.</p></div></div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
                 </div>
+                
+                <!-- Vatable Sales Guide -->
+                <div id="sales-guide" class="module-section">
+                    <h3><i class="fas fa-file-invoice-dollar"></i> Using Vatable Sales</h3>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Row Management</h4><p>Click <strong>"Add New Row"</strong> or long-press. Use <strong>"Add Multiple Rows"</strong> for bulk creation (up to 5,000 rows).</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-check-double"></i></div><div class="feature-text"><h4>Select Multiple Mode</h4><p>Select ranges of cells, copy (Ctrl+C), paste (Ctrl+V), or delete selected cells.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-columns"></i></div><div class="feature-text"><h4>Column Visibility</h4><p>Click <strong>"Show/Hide Columns"</strong> to toggle specific columns on/off.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load Data</h4><p>Save work to <strong>.vat files</strong> and reload later.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-chart-line"></i></div><div class="feature-text"><h4>Auto Calculations</h4><p>Net Sales = Gross ÷ 1.12, Output Tax = Net × 0.12, Withholding = Net × Rate.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-address-card"></i></div><div class="feature-text"><h4>Customer Name & TIN Memory</h4><p>Auto-fills future entries when you enter a customer name or TIN.</p></div></div>
+                    </div>
+                    <div class="tip-box"><i class="fas fa-file-excel"></i><div class="tip-content"><h4>📊 Export Reports</h4><p>Export includes: company header, transaction table, <strong>Customer Summary by TIN & Name</strong>, financial totals, and payment distribution.</p></div></div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <!-- Vatable Purchases Guide -->
+                <div id="purchases-guide" class="module-section">
+                    <h3><i class="fas fa-shopping-cart"></i> Using Vatable Purchases</h3>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Row Management</h4><p>Add single or multiple rows. Long-press for continuous addition. Supports up to 5,000 rows per batch.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-check-double"></i></div><div class="feature-text"><h4>Select Multiple Mode</h4><p>Select cell ranges, copy/paste/delete in bulk.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-columns"></i></div><div class="feature-text"><h4>Column Visibility</h4><p>Customize your view by showing/hiding columns.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load Data</h4><p>Save to <strong>.purch files</strong> or load previously saved purchases data.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-chart-line"></i></div><div class="feature-text"><h4>Auto Calculations</h4><p>Net Purchases = Gross ÷ 1.12, Input Tax = Net × 0.12, Withholding = Net × Rate.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-building"></i></div><div class="feature-text"><h4>Supplier Name & TIN Memory</h4><p>Auto-fills future entries when you enter a supplier name or TIN.</p></div></div>
+                    </div>
+                    <div class="tip-box"><i class="fas fa-file-excel"></i><div class="tip-content"><h4>📊 Purchases Export Report</h4><p>Export includes: company header, transaction table, <strong>Supplier Summary by TIN & Name</strong>, financial totals, and distribution charts.</p></div></div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <!-- Vatable Expenses Guide -->
+                <div id="expenses-guide" class="module-section">
+                    <h3><i class="fas fa-money-bill-wave"></i> Using Vatable Expenses</h3>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Row Management</h4><p>Add single or multiple rows. Long-press for continuous addition. Smart batch processing up to 5,000 rows.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-check-double"></i></div><div class="feature-text"><h4>Select Multiple Mode</h4><p>Select ranges of cells, copy/paste/delete in bulk.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-columns"></i></div><div class="feature-text"><h4>Column Visibility</h4><p>Show/hide columns to focus on what matters.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load Data</h4><p>Save to <strong>.exp files</strong> or load previously saved expenses data.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-chart-line"></i></div><div class="feature-text"><h4>Auto Calculations</h4><p>Net Expenses = Gross ÷ 1.12, Input Tax = Net × 0.12, Withholding = Net × Rate.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-tags"></i></div><div class="feature-text"><h4>Nature of Expense Dropdown</h4><p>Pre-defined categories with automatic rates (Services: 2%, Goods: 1%, Rental: 5%). Smart search and recent items.</p></div></div>
+                    </div>
+                    <div class="tip-box"><i class="fas fa-file-excel"></i><div class="tip-content"><h4>📊 Expenses Export Report</h4><p>Export includes: company header, transaction table, <strong>Supplier Summary by TIN & Name</strong>, financial totals, and <strong>Expense Category Tally</strong>.</p></div></div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <!-- Non-VAT Purchases Guide -->
+                <div id="nonvat-purchases-guide" class="module-section">
+                    <h3><i class="fas fa-shopping-basket"></i> Using Non-VAT Purchases</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Track purchases that are exempt from VAT. Similar to Vatable Purchases but without VAT calculations. Exempt transactions are recorded at gross value.</p>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Row Management</h4><p>Add single or multiple rows. Long-press for continuous addition. Bulk creation up to 5,000 rows.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-check-double"></i></div><div class="feature-text"><h4>Select Multiple Mode</h4><p>Select ranges of cells, copy/paste/delete in bulk.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load Data</h4><p>Save to <strong>.npurch files</strong> (Non-VAT Purchases) for future reference.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-building"></i></div><div class="feature-text"><h4>Supplier Name & TIN Memory</h4><p>Auto-fills future entries when you enter a supplier name or TIN.</p></div></div>
+                    </div>
+                    <div class="tip-box"><i class="fas fa-file-excel"></i><div class="tip-content"><h4>📊 Non-VAT Purchases Export</h4><p>Export includes exempt purchase transactions with supplier summaries and totals.</p></div></div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <!-- Non-VAT Expenses Guide -->
+                <div id="nonvat-expenses-guide" class="module-section">
+                    <h3><i class="fas fa-receipt"></i> Using Non-VAT Expenses</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Track expenses that are exempt from VAT. All transactions are recorded at gross value without VAT calculations.</p>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Row Management</h4><p>Add single or multiple rows. Long-press for continuous addition.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-check-double"></i></div><div class="feature-text"><h4>Select Multiple Mode</h4><p>Select ranges of cells for bulk editing.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load Data</h4><p>Save to <strong>.nexp files</strong> (Non-VAT Expenses).</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-tags"></i></div><div class="feature-text"><h4>Expense Categorization</h4><p>Categorize expenses for better tracking and reporting.</p></div></div>
+                    </div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <!-- CAPEX Guide -->
+                <div id="capex-guide" class="module-section">
+                    <h3><i class="fas fa-building"></i> Using Capital Expenditures</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Track asset acquisitions with VAT calculations. Supports both vatable and non-vatable asset purchases.</p>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Asset Tracking</h4><p>Record asset purchases with VAT computation (Gross ÷ 1.12 for vatable assets).</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-chart-line"></i></div><div class="feature-text"><h4>Auto Calculations</h4><p>Net Asset Value = Gross ÷ 1.12 (vatable) or Gross (non-vatable), Input Tax on vatable portion.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load</h4><p>Save to <strong>.capex files</strong> for asset register management.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-file-excel"></i></div><div class="feature-text"><h4>Export Reports</h4><p>Generate CAPEX reports with asset summaries and VAT breakdowns.</p></div></div>
+                    </div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <!-- Taxes & Licenses Guide -->
+                <div id="taxes-guide" class="module-section">
+                    <h3><i class="fas fa-file-certificate"></i> Using Taxes & Licenses</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Track tax payments and government license fees. Record payments with payment mode (Cash/Charge).</p>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Track Payments</h4><p>Record annual registration fees, permit payments, and other government dues.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-credit-card"></i></div><div class="feature-text"><h4>Payment Mode</h4><p>Select Cash or Charge for each transaction.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load</h4><p>Save to <strong>.taxes files</strong> for audit trail.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-file-excel"></i></div><div class="feature-text"><h4>Export Reports</h4><p>Generate tax payment summaries with Cash/Charge breakdown.</p></div></div>
+                    </div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <!-- Purchase Returns Guide -->
+                <div id="returns-guide" class="module-section">
+                    <h3><i class="fas fa-undo-alt"></i> Using Purchase Returns</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Track purchase returns with VAT adjustments. Returns are recorded at net value (Gross ÷ 1.12).</p>
+                    <div class="features-grid" style="margin-bottom: 20px;">
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-plus-circle"></i></div><div class="feature-text"><h4>Return Tracking</h4><p>Record returns to suppliers with VAT adjustment calculations.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-chart-line"></i></div><div class="feature-text"><h4>Auto Calculations</h4><p>Net Return Value = Gross Returns ÷ 1.12 for proper VAT credit adjustments.</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-save"></i></div><div class="feature-text"><h4>Save & Load</h4><p>Save to <strong>.rpurch files</strong> (Return Purchases).</p></div></div>
+                        <div class="feature-item"><div class="feature-icon"><i class="fas fa-file-excel"></i></div><div class="feature-text"><h4>Export Reports</h4><p>Generate return summaries with VAT adjustments.</p></div></div>
+                    </div>
+                    <div onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i> Back to Top</div>
+                </div>
+                
+                <div class="tip-box" style="margin-top: 25px;"><i class="fas fa-info-circle"></i><div class="tip-content"><h4>📊 Additional Features</h4><p>Explore Tax Facts, Tax Calculator, Compensation, and Tax Game modules in the sidebar for comprehensive tax management!</p></div></div>
             </div>
             
             <!-- Features Tab -->
             <div class="tab-pane" id="features">
-                <h2 style="color: white; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-crown" style="color: #ffd700;"></i>
-                    Advanced Features
-                </h2>
-                
+                <h2 style="color: white; margin-bottom: 25px;"><i class="fas fa-crown" style="color: #ffd700;"></i> Advanced Features</h2>
                 <div class="features-grid" style="grid-template-columns: 1fr;">
-                    <!-- Pagination -->
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-arrows-alt-h"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Smart Pagination</h4>
-                            <p>Navigate through your data with intuitive pagination controls. Choose from 10, 25, 50, or 100 rows per page. The page indicator is clickable for direct page navigation.</p>
-                            <div class="formula-example" style="margin-top: 10px;">
-                                <i class="fas fa-chevron-left"></i> 1 / 5 <i class="fas fa-chevron-right"></i> • First/Last buttons for quick navigation
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Selection Mode -->
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-check-double"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Multiple Selection Mode</h4>
-                            <p>Enable "Select Multiple" from the sidebar to select ranges of cells. Copy (Ctrl+C), paste (Ctrl+V), or delete multiple cells at once. Perfect for bulk data entry!</p>
-                            <div class="formula-example" style="margin-top: 10px;">
-                                Click and drag to select • Delete key to clear • Escape to exit
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Save/Load -->
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Data Persistence System</h4>
-                            <p>Save your work to .vat files and load them anytime. The system saves:</p>
-                            <ul style="color: var(--text-secondary); margin-left: 20px; margin-top: 8px;">
-                                <li>All transaction data with full formatting</li>
-                                <li>Company information and settings</li>
-                                <li>Timestamp and version information</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <!-- Excel Export -->
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-file-excel"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Professional Excel Reports</h4>
-                            <p>Generate beautifully formatted Excel reports with:</p>
-                            <ul style="color: var(--text-secondary); margin-left: 20px; margin-top: 8px;">
-                                <li>Company header with all details</li>
-                                <li>Color-coded sections and totals</li>
-                                <li>Financial summaries and distribution charts</li>
-                                <li>Print-ready layout with proper formatting</li>
-                                <li>Automatic filename generation</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <!-- Zoom Adaptation -->
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-search-plus"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Adaptive Zoom Interface</h4>
-                            <p>The interface automatically adapts to your zoom level:</p>
-                            <ul style="color: var(--text-secondary); margin-left: 20px; margin-top: 8px;">
-                                <li>100-125%: Full interface</li>
-                                <li>150%: Compact headers</li>
-                                <li>175-200%: Shortened labels, hidden less important columns</li>
-                                <li>200%+: Table Focus Mode available</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <!-- Table Focus Mode -->
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-expand"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h4>Table Focus Mode</h4>
-                            <p>When working with many rows, enable Table Focus Mode (Ctrl+Shift+F) to maximize table space. All other sections are hidden, giving you a full-screen spreadsheet experience.</p>
-                        </div>
-                    </div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-arrows-alt-h"></i></div><div class="feature-text"><h4>Smart Pagination</h4><p>Choose 10, 25, 50, or 100 rows per page. Clickable page indicator for direct navigation.</p></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-check-double"></i></div><div class="feature-text"><h4>Multiple Selection Mode</h4><p>Select ranges of cells, copy/paste/delete in bulk. Perfect for data entry.</p></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-database"></i></div><div class="feature-text"><h4>Data Persistence</h4><p>Save to .vat/.purch/.exp/.taxes/.capex files, load anytime. Company info auto-saves to localStorage.</p></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-file-excel"></i></div><div class="feature-text"><h4>Professional Excel Reports</h4><p>Generate formatted reports with company header, transaction tables, customer/supplier summaries, financial totals, and distribution charts.</p></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-book"></i></div><div class="feature-text"><h4>General Journal Consolidation</h4><p>Load multiple transaction files and automatically generate a complete General Journal with proper Debits and Credits.</p></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-print"></i></div><div class="feature-text"><h4>Print-Optimized Journal</h4><p>One-click printing of the entire General Journal with professional formatting — ready for audit or BIR submission.</p></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-search-plus"></i></div><div class="feature-text"><h4>Adaptive Zoom Interface</h4><p>Interface adapts to zoom level: 100-125% full, 150% compact headers, 175-200% shortened labels, 200%+ Table Focus Mode.</p></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-expand"></i></div><div class="feature-text"><h4>Table Focus Mode</h4><p>Ctrl+Shift+F to maximize table space. Hide all other sections for full-screen spreadsheet experience.</p></div></div>
                 </div>
-                
                 <h3 style="color: white; margin: 30px 0 20px;">VAT Calculation Formulas</h3>
-                
-                <div class="formula-card">
-                    <div class="formula-title">
-                        <i class="fas fa-divide"></i>
-                        Net Sales Calculation
-                    </div>
-                    <p><strong>Formula:</strong> Net Sales = Gross Sales ÷ 1.12</p>
-                    <div class="formula-example">
-                        Example: Gross Sales = ₱1,120.00<br>
-                        Net Sales = ₱1,120.00 ÷ 1.12 = ₱1,000.00
-                    </div>
-                </div>
-                
-                <div class="formula-card">
-                    <div class="formula-title">
-                        <i class="fas fa-percent"></i>
-                        Output Tax (VAT)
-                    </div>
-                    <p><strong>Formula:</strong> Output Tax = Net Sales × 0.12</p>
-                    <div class="formula-example">
-                        Example: Net Sales = ₱1,000.00<br>
-                        Output Tax = ₱1,000.00 × 0.12 = ₱120.00
-                    </div>
-                </div>
-                
-                <div class="formula-card">
-                    <div class="formula-title">
-                        <i class="fas fa-hand-holding-usd"></i>
-                        Withholding Tax
-                    </div>
-                    <p><strong>Formula:</strong> Withholding Amount = Net Sales × Withholding Rate</p>
-                    <div class="formula-example">
-                        Example: Net Sales = ₱1,000.00, Rate = 2% (0.02)<br>
-                        Withholding Amount = ₱1,000.00 × 0.02 = ₱20.00
-                    </div>
-                </div>
+                <div class="formula-card"><div class="formula-title"><i class="fas fa-divide"></i> Net Sales / Net Purchases / Net Expenses</div><p><strong>Formula:</strong> Net = Gross ÷ 1.12</p><div class="formula-example">Example: Gross = ₱1,120.00 → Net = ₱1,000.00</div></div>
+                <div class="formula-card"><div class="formula-title"><i class="fas fa-percent"></i> Output Tax / Input Tax</div><p><strong>Formula:</strong> Tax = Net × 0.12</p><div class="formula-example">Example: Net = ₱1,000.00 → Tax = ₱120.00</div></div>
+                <div class="formula-card"><div class="formula-title"><i class="fas fa-hand-holding-usd"></i> Withholding Tax</div><p><strong>Formula:</strong> Withholding = Net × Rate</p><div class="formula-example">Example: Net = ₱1,000.00, Rate = 2% → Withholding = ₱20.00</div></div>
             </div>
             
             <!-- Shortcuts Tab -->
             <div class="tab-pane" id="shortcuts">
-                <h2 style="color: white; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-keyboard" style="color: var(--primary-blue);"></i>
-                    Keyboard Shortcuts
-                </h2>
-                
+                <h2 style="color: white; margin-bottom: 25px;"><i class="fas fa-keyboard" style="color: var(--primary-blue);"></i> Keyboard Shortcuts</h2>
                 <div class="shortcuts-grid">
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Tab</span>
-                        <span class="shortcut-desc">Navigate between fields</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">↑ ↓ → ←</span>
-                        <span class="shortcut-desc">Navigate between cells</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Enter</span>
-                        <span class="shortcut-desc">Confirm input / Next row</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Delete</span>
-                        <span class="shortcut-desc">Delete selected cells</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + C</span>
-                        <span class="shortcut-desc">Copy selected cells</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + V</span>
-                        <span class="shortcut-desc">Paste to selected cells</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + S</span>
-                        <span class="shortcut-desc">Save data to file</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + O</span>
-                        <span class="shortcut-desc">Load data from file</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + E</span>
-                        <span class="shortcut-desc">Export to Excel</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + N</span>
-                        <span class="shortcut-desc">Add new row</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + Shift + F</span>
-                        <span class="shortcut-desc">Toggle Table Focus Mode</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + M</span>
-                        <span class="shortcut-desc">Toggle Selection Mode</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Esc</span>
-                        <span class="shortcut-desc">Clear selection / Exit mode</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">F1</span>
-                        <span class="shortcut-desc">Open this guide</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + P</span>
-                        <span class="shortcut-desc">Print report</span>
-                    </div>
-                    
-                    <div class="shortcut-item">
-                        <span class="shortcut-key">Ctrl + =</span>
-                        <span class="shortcut-desc">Zoom in</span>
-                    </div>
+                    <div class="shortcut-item"><span class="shortcut-key">Tab</span><span class="shortcut-desc">Navigate between fields</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">↑ ↓ → ←</span><span class="shortcut-desc">Navigate between cells</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Enter</span><span class="shortcut-desc">Confirm input / Next row</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Delete</span><span class="shortcut-desc">Delete selected cells</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + C</span><span class="shortcut-desc">Copy selected cells</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + V</span><span class="shortcut-desc">Paste to selected cells</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + S</span><span class="shortcut-desc">Save data to file</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + O</span><span class="shortcut-desc">Load data from file</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + E</span><span class="shortcut-desc">Export to Excel</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + N</span><span class="shortcut-desc">Add new row</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + Shift + F</span><span class="shortcut-desc">Toggle Table Focus Mode</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + M</span><span class="shortcut-desc">Toggle Selection Mode</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Esc</span><span class="shortcut-desc">Clear selection / Exit mode</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">F1</span><span class="shortcut-desc">Open this guide</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + P</span><span class="shortcut-desc">Print report / Print Journal</span></div>
+                    <div class="shortcut-item"><span class="shortcut-key">Ctrl + =</span><span class="shortcut-desc">Zoom in</span></div>
                 </div>
-                
-                <div class="tip-box" style="margin-top: 25px;">
-                    <i class="fas fa-magic"></i>
-                    <div class="tip-content">
-                        <h4>✨ Selection Mode Shortcuts</h4>
-                        <p>When in Selection Mode (Ctrl+M):<br>
-                        • Click and drag to select a range<br>
-                        • Ctrl+C to copy selected cells<br>
-                        • Ctrl+V to paste to selected cells<br>
-                        • Delete to clear selected cells<br>
-                        • Escape to clear selection or exit mode</p>
-                    </div>
-                </div>
+                <div class="tip-box"><i class="fas fa-magic"></i><div class="tip-content"><h4>✨ Selection Mode Shortcuts</h4><p>In Selection Mode (Ctrl+M): Click+drag to select • Ctrl+C copy • Ctrl+V paste • Delete clear • Escape exit</p></div></div>
             </div>
             
             <!-- FAQ Tab -->
             <div class="tab-pane" id="faq">
-                <h2 style="color: white; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-question-circle" style="color: var(--primary-red);"></i>
-                    Frequently Asked Questions
-                </h2>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>How do I save my work?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        Use the "Save Data to File" button in the left sidebar. This will download a .vat file containing all your transactions and company information. To load it later, use "Load Data from File". Company information is automatically saved in your browser's local storage.
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>Why can't I export to Excel?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        Excel export requires all required company fields to be filled: Company Name, TIN Number, Address, Line of Business, and Authorized Employee. These are marked with * in the right sidebar. Once all are filled, the export will work perfectly.
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>How do I edit multiple cells at once?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        Click "Select Multiple" in the left sidebar to enter selection mode. Then click and drag to select a range of cells. You can copy (Ctrl+C), paste (Ctrl+V), or delete them all at once. Click "Exit Selection Mode" when done.
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>What's the correct TIN format?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        TIN numbers should follow the format: 000-000-000-000 (12 digits). The system automatically formats as you type and validates that you've entered all 12 digits. A valid TIN is required for proper VAT reporting.
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>How does the withholding tax work?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        Withholding tax is calculated based on the Net Sales amount. Available rates: 0% (none), 1% (EWT), 2% (creditable withholding tax), and 5% (government withholding). The amount is automatically computed and shown in the Withholding Amount column.
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>What happens when I zoom in too much?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        The system automatically adapts to your zoom level. At 175%+, headers are shortened. At 200%+, less important columns (Address, Remarks) are hidden. You can use Table Focus Mode (Ctrl+Shift+F) for maximum space when working with many rows.
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>Can I print my reports?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        Yes! Click "Print Report" in the sidebar, or use Ctrl+P. For best results, export to Excel first and print from there. The Excel export includes print-optimized formatting with proper margins, headers, and page layout.
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(this)">
-                        <i class="fas fa-chevron-right"></i>
-                        <h4>Is my data secure?</h4>
-                    </div>
-                    <div class="faq-answer">
-                        All data is stored locally in your browser or in files you choose to save. No data is sent to any server. The system works entirely offline, giving you full control over your sensitive financial information.
-                    </div>
-                </div>
+                <h2 style="color: white; margin-bottom: 25px;"><i class="fas fa-question-circle" style="color: var(--primary-red);"></i> Frequently Asked Questions</h2>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFAQ(this)"><i class="fas fa-chevron-right"></i><h4>How do I save my work?</h4></div><div class="faq-answer">Use "Save Data to File" in the left sidebar. Downloads a .vat (Sales), .purch (Purchases), .exp (Expenses), .taxes (Taxes), or .capex (CAPEX) file.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFAQ(this)"><i class="fas fa-chevron-right"></i><h4>Why can't I export to Excel?</h4></div><div class="faq-answer">All required company fields must be filled: Company Name, TIN, Address, Line of Business, Authorized Employee.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFAQ(this)"><i class="fas fa-chevron-right"></i><h4>How do I edit multiple cells at once?</h4></div><div class="faq-answer">Click "Select Multiple" in the sidebar, then click+drag to select a range. Use Ctrl+C, Ctrl+V, or Delete.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFAQ(this)"><i class="fas fa-chevron-right"></i><h4>What's the correct TIN format?</h4></div><div class="faq-answer">000-000-000-000 (12 digits). System auto-formats and validates as you type.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFAQ(this)"><i class="fas fa-chevron-right"></i><h4>How do I create a complete General Journal?</h4></div><div class="faq-answer">Use the <strong>Journal Entry page (journal_entry.html)</strong>. Load your transaction files and the system automatically consolidates all transactions into a balanced General Journal.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFAQ(this)"><i class="fas fa-chevron-right"></i><h4>What happens at high zoom?</h4></div><div class="faq-answer">At 175%+ headers shorten. At 200%+ less important columns hide. Use Table Focus Mode (Ctrl+Shift+F) for maximum space.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFAQ(this)"><i class="fas fa-chevron-right"></i><h4>Is my data secure?</h4></div><div class="faq-answer">All data stored locally in browser or in files you save. No data sent to any server. Works entirely offline.</div></div>
             </div>
         </div>
         
-        <!-- Footer -->
         <div class="guide-footer">
             <p>MGAA VAT Tracking System v2.0 | Professional VAT-Compliant Tracking System</p>
             <div class="guide-footer-links">
@@ -1274,59 +948,44 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Tab switching
             const tabBtns = document.querySelectorAll('.tab-btn');
             const tabPanes = document.querySelectorAll('.tab-pane');
-            
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabId = this.dataset.tab;
-                    
-                    // Remove active class from all buttons and panes
                     tabBtns.forEach(b => b.classList.remove('active'));
                     tabPanes.forEach(p => p.classList.remove('active'));
-                    
-                    // Add active class to current button and pane
                     this.classList.add('active');
                     document.getElementById(tabId).classList.add('active');
                 });
             });
-            
-            // Print guide
-            document.getElementById('printGuide')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.print();
-            });
-            
-            // Email support
-            document.getElementById('emailSupport')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.location.href = 'mailto:support@mgaa-vat.com?subject=VAT%20Tracking%20System%20Support';
-            });
-            
-            // Add keyboard shortcut (F1) to open this guide from anywhere
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'F1') {
-                    e.preventDefault();
-                    // Already on guide page, could scroll to top
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            });
+            document.getElementById('printGuide')?.addEventListener('click', e => { e.preventDefault(); window.print(); });
+            document.getElementById('emailSupport')?.addEventListener('click', e => { e.preventDefault(); window.location.href = 'mailto:support@mgaa-vat.com?subject=VAT%20Tracking%20System%20Support'; });
+            document.addEventListener('keydown', e => { if (e.key === 'F1') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
         });
         
-        // FAQ toggle function
         function toggleFAQ(element) {
             const answer = element.nextElementSibling;
             const icon = element.querySelector('i');
-            
             answer.classList.toggle('show');
             element.classList.toggle('active');
-            
-            if (answer.classList.contains('show')) {
-                icon.style.transform = 'rotate(90deg)';
-            } else {
-                icon.style.transform = 'rotate(0deg)';
+            icon.style.transform = answer.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+        
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                section.style.transition = 'box-shadow 0.3s ease';
+                section.style.boxShadow = '0 0 0 3px rgba(30, 136, 229, 0.5), 0 0 20px rgba(30, 136, 229, 0.3)';
+                setTimeout(() => {
+                    section.style.boxShadow = '';
+                }, 1500);
             }
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
