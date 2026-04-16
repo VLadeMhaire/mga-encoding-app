@@ -751,6 +751,11 @@ td.selected {
 .header-entry-counter #entryCount.pulse {
     animation: counterPulse 0.3s ease;
 }
+
+/* Add this to your existing CSS */
+.container, body::before {
+    will-change: transform;
+}
 </style>
 </head>
 <body>
@@ -2674,17 +2679,127 @@ function deleteRow(rowId) {
 // ===== OPTIMIZED UPDATE ALL STATS =====
 let statsUpdateScheduled = false;
 
+// Replace your entire updateAllStats function with this:
+let isUpdating = false;
+let pendingUpdate = false;
+
 function updateAllStats() {
-    if (statsUpdateScheduled) return;
-    statsUpdateScheduled = true;
+    if (isUpdating) {
+        pendingUpdate = true;
+        return;
+    }
     
-    requestAnimationFrame(() => {
-        updateRowCount();
-        updateTotals();
-        updateSummaryRow();
-        updateTallySections();
-        statsUpdateScheduled = false;
+    isUpdating = true;
+    
+    // Use requestIdleCallback for non-critical updates
+    const scheduleUpdate = window.requestIdleCallback || requestAnimationFrame;
+    
+    scheduleUpdate(() => {
+        try {
+            // Cache DOM queries - don't repeat them!
+            const rows = document.querySelectorAll('#tableBody tr');
+            const rowCount = rows.length;
+            
+            // Use local variables (much faster than DOM access)
+            let totalGross = 0, totalExempt = 0, totalNet = 0;
+            let totalOutput = 0, totalWithholding = 0;
+            let cashTotal = 0, chargeTotal = 0, cashCount = 0, chargeCount = 0;
+            let privateTotal = 0, govTotal = 0, privateCount = 0, govCount = 0;
+            
+            // Single loop - do ALL calculations at once
+            for (let i = 0; i < rowCount; i++) {
+                const row = rows[i];
+                
+                // Use cached references
+                const gross = parseFloat(row.querySelector('.gross-sales')?.value) || 0;
+                const exempt = parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
+                const net = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+                const output = parseFloat(row.querySelector('.output-tax')?.textContent) || 0;
+                const withholding = parseFloat(row.querySelector('.withholding-amount')?.textContent) || 0;
+                
+                totalGross += gross;
+                totalExempt += exempt;
+                totalNet += net;
+                totalOutput += output;
+                totalWithholding += withholding;
+                
+                // Payment mode tally
+                const paymentMode = row.querySelector('.payment-mode')?.value;
+                if (paymentMode === 'Cash') {
+                    cashTotal += net;
+                    cashCount++;
+                } else if (paymentMode === 'Charge') {
+                    chargeTotal += net;
+                    chargeCount++;
+                }
+                
+                // Customer type tally
+                const salesType = row.querySelector('.sales-type')?.value;
+                if (salesType === 'Private') {
+                    privateTotal += net;
+                    privateCount++;
+                } else if (salesType === 'Government') {
+                    govTotal += net;
+                    govCount++;
+                }
+            }
+            
+            // Batch DOM updates (minimize reflows)
+            const updates = [
+                () => document.getElementById('totalGrossSales').textContent = totalGross.toFixed(2),
+                () => document.getElementById('totalExemptSales').textContent = totalExempt.toFixed(2),
+                () => document.getElementById('totalNetSales').textContent = totalNet.toFixed(2),
+                () => document.getElementById('totalOutputTax').textContent = totalOutput.toFixed(2),
+                () => document.getElementById('totalWithholding').textContent = totalWithholding.toFixed(2),
+                () => document.getElementById('entryCount').textContent = rowCount,
+                // Tally updates
+                () => document.getElementById('totalCashAmount').textContent = cashTotal.toFixed(2),
+                () => document.getElementById('totalChargeAmount').textContent = chargeTotal.toFixed(2),
+                () => document.getElementById('totalPrivateAmount').textContent = privateTotal.toFixed(2),
+                () => document.getElementById('totalGovernmentAmount').textContent = govTotal.toFixed(2),
+                () => document.getElementById('cashCount').textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`,
+                () => document.getElementById('chargeCount').textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`,
+                () => document.getElementById('privateCount').textContent = `${privateCount} transaction${privateCount !== 1 ? 's' : ''}`,
+                () => document.getElementById('governmentCount').textContent = `${govCount} transaction${govCount !== 1 ? 's' : ''}`,
+            ];
+            
+            // Apply all DOM updates at once
+            updates.forEach(update => update());
+            
+            // Update summary row
+            updateSummaryRowOptimized(totalGross, totalExempt, totalNet, totalOutput, totalWithholding);
+            
+        } finally {
+            isUpdating = false;
+            if (pendingUpdate) {
+                pendingUpdate = false;
+                updateAllStats();
+            }
+        }
     });
+}
+
+// New optimized summary row function
+function updateSummaryRowOptimized(gross, exempt, net, output, withholding) {
+    const summaryRow = document.getElementById('summaryRow');
+    if (!summaryRow) return;
+    
+    const visibleCols = document.querySelectorAll('#vatableTable thead th:not(.hidden-column)').length;
+    let html = '<tr class="summary-row">';
+    
+    for (let i = 0; i < visibleCols; i++) {
+        if (i === 0) {
+            html += '<td style="text-align: right; font-weight: bold;">TOTALS:<\/td>';
+        } else if (i === 7) html += `<td class="uneditable">${gross.toFixed(2)}<\/td>`;
+        else if (i === 8) html += `<td class="uneditable">${exempt.toFixed(2)}<\/td>`;
+        else if (i === 10) html += `<td class="uneditable">${net.toFixed(2)}<\/td>`;
+        else if (i === 11) html += `<td class="uneditable">${output.toFixed(2)}<\/td>`;
+        else if (i === 13) html += `<td class="uneditable">${withholding.toFixed(2)}<\/td>`;
+        else html += '<td>-<\/td>';
+    }
+    
+    html += '<\/tr>';
+    summaryRow.innerHTML = html;
 }
 // ===== OPTIMIZED UPDATE CALCULATIONS =====
 function updateCalculations(row) {
@@ -2711,29 +2826,22 @@ function updateCalculations(row) {
 }
 
 // Function to format TIN input
+let tinTimeout;
 function formatTIN(input) {
-    if (!input) return;
+    if (tinTimeout) clearTimeout(tinTimeout);
     
-    // Remove all non-digit characters
-    let value = input.value.replace(/\D/g, '');
-    
-    // Limit to 12 digits
-    if (value.length > 12) {
-        value = value.substring(0, 12);
-    }
-    
-    // Add dashes after every 3 digits
-    if (value.length > 9) {
-        value = value.substring(0, 9) + '-' + value.substring(9);
-    }
-    if (value.length > 6) {
-        value = value.substring(0, 6) + '-' + value.substring(6);
-    }
-    if (value.length > 3) {
-        value = value.substring(0, 3) + '-' + value.substring(3);
-    }
-    
-    input.value = value;
+    tinTimeout = setTimeout(() => {
+        if (!input) return;
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 12) value = value.substring(0, 12);
+        
+        // Add dashes
+        if (value.length > 9) value = value.substring(0, 9) + '-' + value.substring(9);
+        if (value.length > 6) value = value.substring(0, 6) + '-' + value.substring(6);
+        if (value.length > 3) value = value.substring(0, 3) + '-' + value.substring(3);
+        
+        if (input.value !== value) input.value = value;
+    }, 100); // Wait 100ms after user stops typing
 }
 
 // Function to validate TIN input
@@ -3851,27 +3959,6 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
-
-// Add event listeners to existing rows (if any)
-document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('editable')) {
-        const row = e.target.closest('tr');
-        if (row) {
-            updateCalculations(row);
-            updateAllStats();
-        }
-    }
-});
-
-document.addEventListener('change', function(e) {
-    if (e.target.classList.contains('editable')) {
-        const row = e.target.closest('tr');
-        if (row) {
-            updateCalculations(row);
-            updateAllStats();
-        }
-    }
-});
 
 // ===== VISIBILITY TOGGLE FUNCTIONS =====
 
