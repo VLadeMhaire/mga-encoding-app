@@ -813,6 +813,11 @@ td.selected {
                     <i class="fas fa-folder-open"></i>
                     <span class="sidebar-btn-text">Load Data from File</span>
                 </button>
+
+                <button class="sidebar-btn" id="loadMultipleFilesBtn">
+    <i class="fas fa-folder-open"></i>
+    <span class="sidebar-btn-text">Load Multiple VAT Files</span>
+</button>
                 
                 <button class="sidebar-btn" id="clearBtn">
                     <i class="fas fa-trash-alt"></i>
@@ -1213,38 +1218,65 @@ td.selected {
         return existingName && existingName !== name.trim();
     }
     
-    function addCustomerPair(customerName, tinNumber) {
-        if (!customerName || !tinNumber) return false;
-        
-        const cleanName = customerName.trim();
-        const cleanTin = tinNumber.trim();
-        
-        if (cleanName === "" || cleanTin === "") return false;
-        
-        const existingTinForName = customerDB.get(`name:${cleanName}`);
-        const existingNameForTin = customerDB.get(`tin:${cleanTin}`);
-        
-        if (existingTinForName === cleanTin && existingNameForTin === cleanName) {
-            return true;
+    function addCustomerPair(customerName, tinNumber, salesType = null, address = null) {
+    if (!customerName || !tinNumber) return false;
+    
+    const cleanName = customerName.trim();
+    const cleanTin = tinNumber.trim();
+    
+    if (cleanName === "" || cleanTin === "") return false;
+    
+    const existingTinForName = customerDB.get(`name:${cleanName}`);
+    const existingNameForTin = customerDB.get(`tin:${cleanTin}`);
+    
+    if (existingTinForName === cleanTin && existingNameForTin === cleanName) {
+        // Update sales type if provided and different
+        if (salesType && customerDB.get(`type:${cleanName}`) !== salesType) {
+            customerDB.set(`type:${cleanName}`, salesType);
+            customerDB.set(`type:${cleanTin}`, salesType);
+            saveCustomerDB();
+            showAutoFillFeedback(null, `✓ Updated "${cleanName}" to ${salesType} sector`);
         }
-        
-        if (existingTinForName && existingTinForName !== cleanTin) {
-            showWarningToast(`❌ "${cleanName}" already registered with TIN ${existingTinForName}. Cannot reassign.`);
-            return false;
+        // Update address if provided and different
+        if (address && customerDB.get(`address:${cleanName}`) !== address) {
+            customerDB.set(`address:${cleanName}`, address);
+            customerDB.set(`address:${cleanTin}`, address);
+            saveCustomerDB();
+            showAutoFillFeedback(null, `✓ Updated address for "${cleanName}"`);
         }
-        
-        if (existingNameForTin && existingNameForTin !== cleanName) {
-            showWarningToast(`❌ TIN ${cleanTin} already registered to "${existingNameForTin}". Cannot reassign.`);
-            return false;
-        }
-        
-        customerDB.set(`name:${cleanName}`, cleanTin);
-        customerDB.set(`tin:${cleanTin}`, cleanName);
-        
-        saveCustomerDB();
-        showAutoFillFeedback(null, `✓ Saved: "${cleanName}" ↔ ${cleanTin}`);
         return true;
     }
+    
+    if (existingTinForName && existingTinForName !== cleanTin) {
+        showWarningToast(`❌ "${cleanName}" already registered with TIN ${existingTinForName}. Cannot reassign.`);
+        return false;
+    }
+    
+    if (existingNameForTin && existingNameForTin !== cleanName) {
+        showWarningToast(`❌ TIN ${cleanTin} already registered to "${existingNameForTin}". Cannot reassign.`);
+        return false;
+    }
+    
+    customerDB.set(`name:${cleanName}`, cleanTin);
+    customerDB.set(`tin:${cleanTin}`, cleanName);
+    
+    // Store sales type if provided
+    if (salesType) {
+        customerDB.set(`type:${cleanName}`, salesType);
+        customerDB.set(`type:${cleanTin}`, salesType);
+    }
+    
+    // Store address if provided
+    if (address) {
+        customerDB.set(`address:${cleanName}`, address);
+        customerDB.set(`address:${cleanTin}`, address);
+    }
+    
+    saveCustomerDB();
+    showAutoFillFeedback(null, `✓ Saved: "${cleanName}" ↔ ${cleanTin} ${salesType ? `[${salesType}]` : ''}${address ? ` 📍${address.substring(0, 30)}...` : ''}`);
+    
+    return true;
+}
     
     function lookupTinByName(name) {
         if (!name) return null;
@@ -1257,14 +1289,18 @@ td.selected {
     }
     
     function getAllPairs() {
-        const pairs = [];
-        for (let [key, value] of customerDB.entries()) {
-            if (key.startsWith('name:')) {
-                pairs.push({ name: key.slice(5), tin: value });
-            }
+    const pairs = [];
+    for (let [key, value] of customerDB.entries()) {
+        if (key.startsWith('name:')) {
+            const name = key.slice(5);
+            const tin = value;
+            const salesType = customerDB.get(`type:${name}`) || 'Not specified';
+            const address = customerDB.get(`address:${name}`) || '';
+            pairs.push({ name, tin, salesType, address });
         }
-        return pairs.sort((a, b) => a.name.localeCompare(b.name));
     }
+    return pairs.sort((a, b) => a.name.localeCompare(b.name));
+}
     
     function deletePair(name, tin) {
         if (confirm(`Delete "${name}" (TIN: ${tin})? This cannot be undone.`)) {
@@ -1313,105 +1349,138 @@ td.selected {
     }
     
     function updateMonitorDisplay() {
-        let monitorSection = document.getElementById('registeredCustomersMonitor');
-        const pairs = getAllPairs();
+    let monitorSection = document.getElementById('registeredCustomersMonitor');
+    const pairs = getAllPairs();
+    
+    if (!monitorSection) {
+        const tallySection = document.querySelector('.tally-section');
+        if (!tallySection) return;
         
-        if (!monitorSection) {
-            const tallySection = document.querySelector('.tally-section');
-            if (!tallySection) return;
-            
-            monitorSection = document.createElement('div');
-            monitorSection.id = 'registeredCustomersMonitor';
-            monitorSection.className = 'registered-monitor';
-            monitorSection.style.cssText = `
-                margin: 20px 30px;
-                background: linear-gradient(135deg, rgba(0, 40, 30, 0.85) 0%, rgba(0, 30, 25, 0.9) 100%);
-                border: 1px solid rgba(0, 255, 157, 0.3);
-                border-radius: 12px;
-                overflow: hidden;
-                flex-shrink: 0;
-                display: ${monitorVisible ? 'block' : 'none'};
-            `;
-            
-            const headerHtml = `
-                <div style="padding: 15px 20px; background: rgba(0, 255, 157, 0.1); border-bottom: 1px solid rgba(0, 255, 157, 0.3); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-address-card" style="color: #00ff9d; font-size: 20px;"></i>
-                        <h3 style="color: #00ff9d; margin: 0; font-weight: 600; text-shadow: 0 0 5px rgba(0,255,157,0.5);">REGISTERED CUSTOMERS</h3>
-                        <span id="customersCount" style="background: rgba(0,255,157,0.2); padding: 2px 10px; border-radius: 20px; font-size: 12px; color: #a7ffeb;">${pairs.length} customer(s)</span>
-                    </div>
-                    <button id="clearAllCustomersBtn" style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; color: #ff8888; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s;">
-                        <i class="fas fa-trash-alt"></i> Clear All
-                    </button>
+        monitorSection = document.createElement('div');
+        monitorSection.id = 'registeredCustomersMonitor';
+        monitorSection.className = 'registered-monitor';
+        monitorSection.style.cssText = `
+            margin: 20px 30px;
+            background: linear-gradient(135deg, rgba(0, 40, 30, 0.85) 0%, rgba(0, 30, 25, 0.9) 100%);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: ${monitorVisible ? 'block' : 'none'};
+        `;
+        
+        const headerHtml = `
+            <div style="padding: 15px 20px; background: rgba(0, 255, 157, 0.1); border-bottom: 1px solid rgba(0, 255, 157, 0.3); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-address-card" style="color: #00ff9d; font-size: 20px;"></i>
+                    <h3 style="color: #00ff9d; margin: 0; font-weight: 600; text-shadow: 0 0 5px rgba(0,255,157,0.5);">REGISTERED CUSTOMERS</h3>
+                    <span id="customersCount" style="background: rgba(0,255,157,0.2); padding: 2px 10px; border-radius: 20px; font-size: 12px; color: #a7ffeb;">${pairs.length} customer(s)</span>
                 </div>
-                <div id="customersListContainer" style="max-height: 300px; overflow-y: auto; padding: 10px;">
-                    <div style="text-align: center; padding: 40px; color: #80cbc4;">Loading customers...</div>
-                </div>
-            `;
-            monitorSection.innerHTML = headerHtml;
-            
-            const statsSection = document.querySelector('.stats');
-            if (statsSection) {
-                statsSection.parentNode.insertBefore(monitorSection, statsSection);
-            } else {
-                tallySection.parentNode.insertBefore(monitorSection, tallySection.nextSibling);
-            }
-            
-            const clearAllBtn = document.getElementById('clearAllCustomersBtn');
-            if (clearAllBtn) {
-                clearAllBtn.addEventListener('click', () => {
-                    if (confirm('⚠️ WARNING: This will delete ALL registered customers. Are you sure?')) {
-                        customerDB.clear();
-                        saveCustomerDB();
-                        showAutoFillFeedback(null, '🗑 All customers cleared');
-                    }
-                });
-            }
+                <button id="clearAllCustomersBtn" style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; color: #ff8888; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s;">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </div>
+            <div id="customersListContainer" style="max-height: 400px; overflow-y: auto; padding: 10px;">
+                <div style="text-align: center; padding: 40px; color: #80cbc4;">Loading customers...</div>
+            </div>
+        `;
+        monitorSection.innerHTML = headerHtml;
+        
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            statsSection.parentNode.insertBefore(monitorSection, statsSection);
+        } else {
+            tallySection.parentNode.insertBefore(monitorSection, tallySection.nextSibling);
         }
         
-        // Update count badge
-        const countBadge = document.getElementById('customersCount');
-        if (countBadge) countBadge.textContent = `${pairs.length} customer(s)`;
-        
-        // Update the list
-        const container = document.getElementById('customersListContainer');
-        if (!container) return;
-        
-        if (pairs.length === 0) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #80cbc4;">
-                    <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
-                    <p>No registered customers yet.</p>
-                    <p style="font-size: 12px;">Enter a Customer Name and TIN in the table to add them here.</p>
-                </div>
-            `;
-            return;
+        const clearAllBtn = document.getElementById('clearAllCustomersBtn');
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', () => {
+                if (confirm('⚠️ WARNING: This will delete ALL registered customers. Are you sure?')) {
+                    customerDB.clear();
+                    saveCustomerDB();
+                    showAutoFillFeedback(null, '🗑 All customers cleared');
+                }
+            });
         }
-        
-        let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
-        pairs.forEach(pair => {
-            html += `
-                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ff9d; transition: all 0.2s;">
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                            <i class="fas fa-user" style="color: #00ff9d; font-size: 16px;"></i>
-                            <span style="font-weight: 600; color: #e0f7e9;">${escapeHtml(pair.name)}</span>
-                            <span style="color: #80cbc4;">→</span>
-                            <span style="font-family: monospace; color: #a7ffeb;">${escapeHtml(pair.tin)}</span>
-                        </div>
-                    </div>
-                    <button onclick="window.deleteCustomerPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
-                            style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: all 0.2s;"
-                            onmouseover="this.style.background='rgba(255,85,85,0.4)'" 
-                            onmouseout="this.style.background='rgba(255,85,85,0.2)'">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </div>
-            `;
-        });
-        html += '</div>';
-        container.innerHTML = html;
     }
+    
+    // Update count badge
+    const countBadge = document.getElementById('customersCount');
+    if (countBadge) countBadge.textContent = `${pairs.length} customer(s)`;
+    
+    // Update the list with sales type badge and FULL address (no truncation)
+    const container = document.getElementById('customersListContainer');
+    if (!container) return;
+    
+    if (pairs.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #80cbc4;">
+                <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>No registered customers yet.</p>
+                <p style="font-size: 12px;">Enter a Customer Name and TIN in the table to add them here.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+    pairs.forEach(pair => {
+        // Determine badge color based on sales type
+        let badgeStyle = '';
+        let badgeIcon = '';
+        let badgeText = pair.salesType;
+        
+        if (pair.salesType === 'Private') {
+            badgeStyle = 'background: rgba(0, 100, 200, 0.3); border-color: #4db8ff; color: #4db8ff;';
+            badgeIcon = '<i class="fas fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i>';
+        } else if (pair.salesType === 'Government') {
+            badgeStyle = 'background: rgba(200, 50, 50, 0.3); border-color: #ff6b6b; color: #ff6b6b;';
+            badgeIcon = '<i class="fas fa-landmark" style="font-size: 10px; margin-right: 4px;"></i>';
+        } else {
+            badgeStyle = 'background: rgba(100, 100, 100, 0.3); border-color: #888; color: #ccc;';
+            badgeIcon = '<i class="fas fa-question" style="font-size: 10px; margin-right: 4px;"></i>';
+            badgeText = 'Pending';
+        }
+        
+        // Display FULL address without truncation - wrapped for long addresses
+        let displayAddress = pair.address || '';
+        let addressHtml = '';
+        if (displayAddress) {
+            addressHtml = `
+                <div style="display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dotted rgba(128, 203, 196, 0.3);">
+                    <i class="fas fa-map-marker-alt" style="font-size: 12px; color: #80cbc4; margin-top: 2px;"></i>
+                    <span style="font-size: 12px; color: #a7ffeb; line-height: 1.4; word-break: break-word; white-space: normal; flex: 1;">${escapeHtml(displayAddress)}</span>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ff9d; transition: all 0.2s;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <i class="fas fa-user" style="color: #00ff9d; font-size: 16px;"></i>
+                        <span style="font-weight: 600; color: #e0f7e9;">${escapeHtml(pair.name)}</span>
+                        <span style="color: #80cbc4;">→</span>
+                        <span style="font-family: monospace; color: #a7ffeb;">${escapeHtml(pair.tin)}</span>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; ${badgeStyle} border: 1px solid;">
+                            ${badgeIcon} ${badgeText}
+                        </span>
+                    </div>
+                    ${addressHtml}
+                </div>
+                <button onclick="window.deleteCustomerPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
+                        style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: all 0.2s; margin-left: 10px; align-self: center;"
+                        onmouseover="this.style.background='rgba(255,85,85,0.4)'" 
+                        onmouseout="this.style.background='rgba(255,85,85,0.2)'">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        `;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
     
     function escapeHtml(text) {
         const div = document.createElement('div');
@@ -1427,47 +1496,154 @@ td.selected {
     }
     
     function attachAutoFillToRow(row) {
-        if (!row) return;
-        const fields = getRowFields(row);
-        if (!fields.tinInput || !fields.nameInput) return;
-        if (row.hasAttribute('data-autofill-bound')) return;
-        row.setAttribute('data-autofill-bound', 'true');
+    if (!row) return;
+    const fields = getRowFields(row);
+    if (!fields.tinInput || !fields.nameInput) return;
+    if (row.hasAttribute('data-autofill-bound')) return;
+    row.setAttribute('data-autofill-bound', 'true');
+    
+    const salesTypeSelect = row.querySelector('.sales-type');
+    const addressInput = row.querySelector('.address');
+    
+    // NEW: Function to auto-fill ALL customer data (TIN, Sales Type, Address) from name
+    function autoFillFromName(nameValue) {
+        if (!nameValue) return false;
+        const existingTin = lookupTinByName(nameValue);
+        if (!existingTin) return false;
         
-        fields.nameInput.addEventListener('blur', function(e) {
-            const nameVal = this.value.trim();
-            if (nameVal === "") return;
-            const existingTin = lookupTinByName(nameVal);
-            if (existingTin && fields.tinInput && fields.tinInput.value.trim() === "") {
-                fields.tinInput.value = existingTin;
-                if (typeof formatTIN === 'function') formatTIN(fields.tinInput);
-                if (typeof validateTIN === 'function') validateTIN(fields.tinInput);
-                fields.tinInput.dispatchEvent(new Event('input', { bubbles: true }));
-                showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled');
-            }
-        });
+        let filled = false;
         
-        fields.tinInput.addEventListener('blur', function(e) {
-            const tinVal = this.value.trim();
-            if (tinVal === "") return;
-            const existingName = lookupNameByTin(tinVal);
-            if (existingName && fields.nameInput && fields.nameInput.value.trim() === "") {
-                fields.nameInput.value = existingName;
-                fields.nameInput.dispatchEvent(new Event('input', { bubbles: true }));
-                showAutoFillFeedback(fields.nameInput, '✓ Customer name auto-filled');
-            }
-        });
+        // Auto-fill TIN
+        if (fields.tinInput && fields.tinInput.value.trim() === "") {
+            fields.tinInput.value = existingTin;
+            if (typeof formatTIN === 'function') formatTIN(fields.tinInput);
+            if (typeof validateTIN === 'function') validateTIN(fields.tinInput);
+            fields.tinInput.dispatchEvent(new Event('input', { bubbles: true }));
+            showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled from registered customer');
+            filled = true;
+        }
         
-        function storeIfValidPair() {
-            const nameVal = fields.nameInput?.value.trim() || "";
-            const tinVal = fields.tinInput?.value.trim() || "";
-            if (nameVal !== "" && tinVal !== "") {
-                addCustomerPair(nameVal, tinVal);
+        // Auto-fill Sales Type from registered customer data
+        if (salesTypeSelect) {
+            const registeredSalesType = customerDB.get(`type:${nameValue}`);
+            if (registeredSalesType && salesTypeSelect.value === "") {
+                salesTypeSelect.value = registeredSalesType;
+                salesTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                showAutoFillFeedback(salesTypeSelect, `✓ Sales Type auto-filled: ${registeredSalesType}`);
+                filled = true;
             }
         }
         
-        fields.nameInput.addEventListener('blur', storeIfValidPair);
-        fields.tinInput.addEventListener('blur', storeIfValidPair);
+        // Auto-fill Address from registered customer data
+        if (addressInput) {
+            const registeredAddress = customerDB.get(`address:${nameValue}`);
+            if (registeredAddress && addressInput.value.trim() === "") {
+                addressInput.value = registeredAddress;
+                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered customer`);
+                filled = true;
+            }
+        }
+        
+        return filled;
     }
+    
+    // NEW: Function to auto-fill ALL customer data (Name, Sales Type, Address) from TIN
+    function autoFillFromTin(tinValue) {
+        if (!tinValue) return false;
+        const cleanTin = tinValue.trim();
+        const existingName = lookupNameByTin(cleanTin);
+        if (!existingName) return false;
+        
+        let filled = false;
+        
+        // Auto-fill Name
+        if (fields.nameInput && fields.nameInput.value.trim() === "") {
+            fields.nameInput.value = existingName;
+            fields.nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+            showAutoFillFeedback(fields.nameInput, '✓ Customer name auto-filled from registered TIN');
+            filled = true;
+        }
+        
+        // Auto-fill Sales Type from registered customer data
+        if (salesTypeSelect) {
+            const registeredSalesType = customerDB.get(`type:${existingName}`);
+            if (registeredSalesType && salesTypeSelect.value === "") {
+                salesTypeSelect.value = registeredSalesType;
+                salesTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                showAutoFillFeedback(salesTypeSelect, `✓ Sales Type auto-filled: ${registeredSalesType}`);
+                filled = true;
+            }
+        }
+        
+        // Auto-fill Address from registered customer data
+        if (addressInput) {
+            const registeredAddress = customerDB.get(`address:${existingName}`);
+            if (registeredAddress && addressInput.value.trim() === "") {
+                addressInput.value = registeredAddress;
+                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered customer`);
+                filled = true;
+            }
+        }
+        
+        return filled;
+    }
+    
+    // Name input: auto-fill TIN, Sales Type, and Address
+    fields.nameInput.addEventListener('blur', function(e) {
+        const nameVal = this.value.trim();
+        if (nameVal === "") return;
+        autoFillFromName(nameVal);
+    });
+    
+    // TIN input: auto-fill Name, Sales Type, and Address
+    fields.tinInput.addEventListener('blur', function(e) {
+        const tinVal = this.value.trim();
+        if (tinVal === "") return;
+        autoFillFromTin(tinVal);
+    });
+    
+    // Store valid pair with sales type and address
+    function storeIfValidPair() {
+        const nameVal = fields.nameInput?.value.trim() || "";
+        const tinVal = fields.tinInput?.value.trim() || "";
+        const salesType = salesTypeSelect ? salesTypeSelect.value : null;
+        const address = addressInput ? addressInput.value.trim() : null;
+        if (nameVal !== "" && tinVal !== "") {
+            addCustomerPair(nameVal, tinVal, salesType, address);
+        }
+    }
+    
+    fields.nameInput.addEventListener('blur', storeIfValidPair);
+    fields.tinInput.addEventListener('blur', storeIfValidPair);
+    
+    // Also store when sales type changes
+    if (salesTypeSelect) {
+        salesTypeSelect.addEventListener('change', function() {
+            const nameVal = fields.nameInput?.value.trim() || "";
+            const tinVal = fields.tinInput?.value.trim() || "";
+            const address = addressInput ? addressInput.value.trim() : null;
+            if (nameVal !== "" && tinVal !== "") {
+                addCustomerPair(nameVal, tinVal, this.value, address);
+                showAutoFillFeedback(this, `✓ Updated customer type to ${this.value}`);
+            }
+        });
+    }
+    
+    // Also store when address changes
+    if (addressInput) {
+        addressInput.addEventListener('blur', function() {
+            const nameVal = fields.nameInput?.value.trim() || "";
+            const tinVal = fields.tinInput?.value.trim() || "";
+            const salesType = salesTypeSelect ? salesTypeSelect.value : null;
+            if (nameVal !== "" && tinVal !== "") {
+                addCustomerPair(nameVal, tinVal, salesType, this.value.trim());
+                showAutoFillFeedback(this, '✓ Updated customer address');
+            }
+        });
+    }
+}
     
     function showAutoFillFeedback(element, message) {
         const toast = document.createElement('div');
@@ -1573,11 +1749,15 @@ td.selected {
     }
     
     window.deleteCustomerPair = function(name, tin) {
-        customerDB.delete(`name:${name}`);
-        customerDB.delete(`tin:${tin}`);
-        saveCustomerDB();
-        showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
-    };
+    customerDB.delete(`name:${name}`);
+    customerDB.delete(`tin:${tin}`);
+    customerDB.delete(`type:${name}`);
+    customerDB.delete(`type:${tin}`);
+    customerDB.delete(`address:${name}`);
+    customerDB.delete(`address:${tin}`);
+    saveCustomerDB();
+    showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
+};
     
     function initAutoFillSystem() {
         loadCustomerDB();
@@ -2075,6 +2255,11 @@ if (addBatchRowsBtn) {
     if (loadDataBtn) {
         loadDataBtn.addEventListener('click', loadDataFromFile);
     }
+
+    const loadMultipleFilesBtn = document.getElementById('loadMultipleFilesBtn');
+if (loadMultipleFilesBtn) {
+    loadMultipleFilesBtn.addEventListener('click', loadMultipleVatFiles);
+}
     
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
@@ -3463,16 +3648,18 @@ function exportToExcel() {
     let privateCount = 0;
     let governmentCount = 0;
     
-    // Collect customer summary data (Name + TIN with Net Sales totals)
-    const customerSummary = new Map();
+    // Collect customer summary data with enhanced fields (Sales Type, Address, Exempt Sales, Net Sales)
+    const customerSummary = new Map(); // key: customerName|TIN, value: { netSales, exemptSales, salesType, address }
     
     const rows = document.querySelectorAll('#tableBody tr');
     rows.forEach(row => {
         const paymentMode = row.querySelector('.payment-mode')?.value;
         const salesType = row.querySelector('.sales-type')?.value;
         const netSales = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
+        const exemptSales = parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
         const customerName = row.querySelector('.customer-name')?.value || '';
         const tinNumber = row.querySelector('.tin-number')?.value || '';
+        const address = row.querySelector('.address')?.value || '';
         
         if (paymentMode === 'Cash') {
             totalCashAmount += netSales;
@@ -3490,22 +3677,39 @@ function exportToExcel() {
             governmentCount++;
         }
         
-        // Build customer summary
-        if (customerName && tinNumber && netSales > 0) {
+        // Build enhanced customer summary with Sales Type, Address, Exempt Sales, and Net Sales
+        if (customerName && tinNumber && (netSales > 0 || exemptSales > 0)) {
             const key = `${customerName}|${tinNumber}`;
             if (customerSummary.has(key)) {
-                customerSummary.set(key, customerSummary.get(key) + netSales);
+                const existing = customerSummary.get(key);
+                existing.netSales += netSales;
+                existing.exemptSales += exemptSales;
+                // Keep the most recent sales type and address (or merge if needed)
+                if (salesType) existing.salesType = salesType;
+                if (address) existing.address = address;
             } else {
-                customerSummary.set(key, netSales);
+                customerSummary.set(key, {
+                    netSales: netSales,
+                    exemptSales: exemptSales,
+                    salesType: salesType || 'Not specified',
+                    address: address || ''
+                });
             }
         }
     });
     
     // Sort customers by total net sales (descending)
     const sortedCustomers = Array.from(customerSummary.entries())
-        .map(([key, total]) => {
+        .map(([key, data]) => {
             const [name, tin] = key.split('|');
-            return { name, tin, totalNetSales: total };
+            return { 
+                name, 
+                tin, 
+                totalNetSales: data.netSales,
+                totalExemptSales: data.exemptSales,
+                salesType: data.salesType,
+                address: data.address
+            };
         })
         .sort((a, b) => b.totalNetSales - a.totalNetSales);
     
@@ -3702,14 +3906,42 @@ function exportToExcel() {
                 .customer-summary-table td {
                     padding: 8px 10px;
                     border: 1px solid #dddddd;
+                    vertical-align: top;
                 }
                 
                 .customer-summary-table .numeric {
                     text-align: right;
                 }
                 
+                .badge-private {
+    background-color: #2196F3;
+    color: #000000;  /* Changed to black */
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 9pt;
+    display: inline-block;
+}
+
+.badge-government {
+    background-color: #f44336;
+    color: #000000;  /* Changed to black */
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 9pt;
+    display: inline-block;
+}
+
+.badge-pending {
+    background-color: #9e9e9e;
+    color: #000000;  /* Changed to black */
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 9pt;
+    display: inline-block;
+}
+                
                 .totals-section {
-                    margin-top: 25px;
+                    margixn-top: 25px;
                     background-color: #f0f9f5;
                     border: 1px solid #00cc7a;
                     padding: 15px;
@@ -3766,6 +3998,12 @@ function exportToExcel() {
                 .col-tax { width: 90px; }
                 .col-rate { width: 90px; }
                 .col-remarks { width: 120px; }
+                
+                .address-cell {
+                    max-width: 250px;
+                    word-wrap: break-word;
+                    white-space: normal;
+                }
             </style>
             <title>Vatable Sales Report - ${formattedDate}</title>
         </head>
@@ -3776,27 +4014,27 @@ function exportToExcel() {
                 <table class="company-info-table">
                     <tr>
                         <td class="company-label">Company Name:</td>
-                        <td class="company-value">${companyName}</td>
+                        <td class="company-value">${escapeHtml(companyName)}</td>
                         <td class="company-label">TIN Number:</td>
-                        <td class="company-value">${companyTIN}</td>
+                        <td class="company-value">${escapeHtml(companyTIN)}</td>
                     </tr>
                     <tr>
                         <td class="company-label">Address:</td>
-                        <td class="company-value">${companyAddress}</td>
+                        <td class="company-value">${escapeHtml(companyAddress)}</td>
                         <td class="company-label">Line of Business:</td>
-                        <td class="company-value">${lineOfBusiness}</td>
+                        <td class="company-value">${escapeHtml(lineOfBusiness)}</td>
                     </tr>
                     <tr>
                         <td class="company-label">Telephone:</td>
-                        <td class="company-value">${document.getElementById('telephone')?.value.trim() || 'N/A'}</td>
+                        <td class="company-value">${escapeHtml(document.getElementById('telephone')?.value.trim() || 'N/A')}</td>
                         <td class="company-label">Report Date:</td>
-                        <td class="company-value">${document.getElementById('reportDate')?.value || ''}</td>
+                        <td class="company-value">${escapeHtml(document.getElementById('reportDate')?.value || '')}</td>
                     </tr>
                     <tr>
                         <td class="company-label">Authorized Employee:</td>
-                        <td class="company-value">${authorizedEmployee}</td>
+                        <td class="company-value">${escapeHtml(authorizedEmployee)}</td>
                         <td class="company-label">Email:</td>
-                        <td class="company-value">${document.getElementById('email')?.value.trim() || 'N/A'}</td>
+                        <td class="company-value">${escapeHtml(document.getElementById('email')?.value.trim() || 'N/A')}</td>
                     </tr>
                 </table>
             </div>
@@ -3889,7 +4127,7 @@ function exportToExcel() {
                 <td class="text-center">${escapeHtml(paymentModeValue)}</td>
                 <td class="text-center">${escapeHtml(tinValue)}</td>
                 <td class="text-left">${escapeHtml(customerValue)}</td>
-                <td class="text-left">${escapeHtml(addressValue)}</td>
+                <td class="text-left address-cell">${escapeHtml(addressValue)}</td>
                 <td class="currency numeric">${grossSalesValue.toFixed(2)}</td>
                 <td class="currency numeric">${exemptSalesValue.toFixed(2)}</td>
                 <td class="text-center">${escapeHtml(salesTypeValue)}</td>
@@ -3920,38 +4158,56 @@ function exportToExcel() {
                         <td>-</td>
                     </tr>
                 </tfoot>
-            </table>
+            }</table>
             
-            <!-- CUSTOMER NAME & TIN SUMMARY TABLE -->
+            <!-- ENHANCED CUSTOMER SUMMARY TABLE with Sales Type, Address, Exempt Sales, and Net Sales -->
             <div class="section-title">Customer Summary by TIN and Name</div>
             <table class="customer-summary-table">
                 <thead>
                     <tr>
-                        <th width="45%">Customer Name</th>
-                        <th width="30%">TIN Number</th>
-                        <th width="25%">Total Net Sales (₱)</th>
+                        <th width="25%">Customer Name</th>
+                        <th width="15%">TIN Number</th>
+                        <th width="10%">Sales Type</th>
+                        <th width="20%">Address</th>
+                        <th width="15%">Total Exempt Sales (₱)</th>
+                        <th width="15%">Total Net Sales (₱)</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
     
     if (sortedCustomers.length === 0) {
-        htmlContent += '<tr><td colspan="3" style="text-align: center;">No customer data available</td></tr>';
+        htmlContent += '<tr><td colspan="6" style="text-align: center;">No customer data available</td></tr>';
     } else {
         let customerTotalNetSales = 0;
+        let customerTotalExemptSales = 0;
         sortedCustomers.forEach(customer => {
+            // Determine badge styling for sales type
+            let badgeClass = 'badge-pending';
+            let displaySalesType = customer.salesType;
+            if (customer.salesType === 'Private') {
+                badgeClass = 'badge-private';
+            } else if (customer.salesType === 'Government') {
+                badgeClass = 'badge-government';
+            }
+            
             htmlContent += `
                 <tr>
                     <td class="text-left">${escapeHtml(customer.name)}</td>
                     <td class="text-center">${escapeHtml(customer.tin)}</td>
+                    <td class="text-center"><span class="${badgeClass}">${escapeHtml(displaySalesType)}</span></td>
+                    <td class="text-left address-cell">${escapeHtml(customer.address || '—')}</td>
+                    <td class="currency numeric">${customer.totalExemptSales.toFixed(2)}</td>
                     <td class="currency numeric">${customer.totalNetSales.toFixed(2)}</td>
                 </tr>
             `;
             customerTotalNetSales += customer.totalNetSales;
+            customerTotalExemptSales += customer.totalExemptSales;
         });
         htmlContent += `
             <tr style="background-color: #fff2cc; font-weight: bold;">
-                <td class="text-right" colspan="2">TOTAL NET SALES (ALL CUSTOMERS):</td>
+                <td class="text-right" colspan="4">TOTALS:</td>
+                <td class="currency numeric">${customerTotalExemptSales.toFixed(2)}</td>
                 <td class="currency numeric">${customerTotalNetSales.toFixed(2)}</td>
             </tr>
         `;
@@ -3959,7 +4215,7 @@ function exportToExcel() {
     
     htmlContent += `
                 </tbody>
-            </table>
+            }</table>
             
             <div class="totals-section">
                 <div class="section-title">Financial Summary</div>
@@ -4017,7 +4273,7 @@ function exportToExcel() {
             
             <div class="footer">
                 <p>Report generated on ${formattedDate} at ${formattedTime}</p>
-                <p>Authorized by: ${authorizedEmployee} | Prepared by: Vatable Sales Data Tracker System</p>
+                <p>Authorized by: ${escapeHtml(authorizedEmployee)} | Prepared by: Vatable Sales Data Tracker System</p>
                 <p>This is a computer-generated report. No signature is required.</p>
                 <p>© ${new Date().getFullYear()} Vatable Sales Data Tracker - Professional VAT-Compliant Sales Tracking System</p>
             </div>
@@ -4040,7 +4296,7 @@ function exportToExcel() {
         URL.revokeObjectURL(url);
     }, 100);
     
-    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nFeatures:\n• Customer Summary Table (Name + TIN with Net Sales totals)\n• Professional formatting\n• Financial summary\n• Payment & customer distribution\n• Print-ready layout`);
+    alert(`✅ Excel report "${fileName}" has been generated successfully!\n\nEnhanced Features:\n• Customer Summary Table with:\n  - Customer Name\n  - TIN Number\n  - Sales Type (Private/Government with color badges)\n  - Address (full address with word wrap)\n  - Total Exempt Sales\n  - Total Net Sales\n• Professional formatting\n• Financial summary\n• Payment & customer distribution\n• Print-ready layout`);
 }
 
 // Helper function for escaping HTML
@@ -4049,6 +4305,333 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ===== LOAD MULTIPLE VAT FILES AND COMBINE =====
+function loadMultipleVatFiles() {
+    // Create file input that accepts multiple files
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.vat,.json';
+    fileInput.multiple = true;
+    
+    fileInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        
+        showToast(`📁 Loading ${files.length} file(s)...`, 'info');
+        
+        let allTableData = [];
+        let allCompanyInfo = null;
+        let filesProcessed = 0;
+        let errors = [];
+        
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(evt) {
+                try {
+                    const saveData = JSON.parse(evt.target.result);
+                    
+                    // Validate file format
+                    if (!saveData.version || !saveData.tableData) {
+                        throw new Error(`Invalid format in ${file.name}`);
+                    }
+                    
+                    // Collect table data from each file
+                    if (saveData.tableData && saveData.tableData.length > 0) {
+                        // Add source file name to each row for reference (optional)
+                        const rowsWithSource = saveData.tableData.map(row => ({
+                            ...row,
+                            _sourceFile: file.name
+                        }));
+                        allTableData.push(...rowsWithSource);
+                    }
+                    
+                    // Use company info from the first valid file that has it
+                    if (!allCompanyInfo && saveData.companyInfo) {
+                        allCompanyInfo = saveData.companyInfo;
+                    }
+                    
+                    filesProcessed++;
+                    
+                    // Check if all files are processed
+                    if (filesProcessed === files.length) {
+                        // Merge all data into the current table
+                        mergeDataIntoTable(allTableData, allCompanyInfo, errors, files.length);
+                    }
+                    
+                } catch (error) {
+                    console.error(`Error loading ${file.name}:`, error);
+                    errors.push(`${file.name}: ${error.message}`);
+                    filesProcessed++;
+                    
+                    if (filesProcessed === files.length) {
+                        mergeDataIntoTable(allTableData, allCompanyInfo, errors, files.length);
+                    }
+                }
+            };
+            
+            reader.onerror = function() {
+                errors.push(`${file.name}: Failed to read file`);
+                filesProcessed++;
+                if (filesProcessed === files.length) {
+                    mergeDataIntoTable(allTableData, allCompanyInfo, errors, files.length);
+                }
+            };
+            
+            reader.readAsText(file);
+        });
+    });
+    
+    fileInput.click();
+}
+
+// Helper function to merge data into the current table
+function mergeDataIntoTable(allTableData, allCompanyInfo, errors, totalFiles) {
+    if (allTableData.length === 0 && errors.length > 0) {
+        showToast(`❌ Failed to load ${errors.length} file(s). Check console for details.`, 'error');
+        return;
+    }
+    
+    // Ask user if they want to replace or append
+    const currentRowCount = document.querySelectorAll('#tableBody tr').length;
+    let action = 'append';
+    
+    if (currentRowCount > 1 || (currentRowCount === 1 && document.querySelector('#tableBody tr .customer-name')?.value !== '')) {
+        action = confirm(`Current table has ${currentRowCount} row(s).\n\nClick OK to APPEND ${allTableData.length} new row(s)\nClick Cancel to REPLACE all existing data`) ? 'append' : 'replace';
+    }
+    
+    // Show loading indicator
+    showToast(`📊 Merging ${allTableData.length} rows...`, 'info');
+    
+    // Use setTimeout to allow UI to update
+    setTimeout(() => {
+        try {
+            // Replace or append
+            if (action === 'replace') {
+                // Clear existing table
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';
+            }
+            
+            // Add all rows from combined files
+            let addedCount = 0;
+            const batchSize = 100;
+            
+            function addBatch(startIndex) {
+                const endIndex = Math.min(startIndex + batchSize, allTableData.length);
+                const fragment = document.createDocumentFragment();
+                
+                for (let i = startIndex; i < endIndex; i++) {
+                    const rowData = allTableData[i];
+                    const row = createSalesRow(rowData);
+                    fragment.appendChild(row);
+                    addedCount++;
+                }
+                
+                const tableBody = document.getElementById('tableBody');
+                tableBody.appendChild(fragment);
+                
+                if (endIndex < allTableData.length) {
+                    // Add next batch
+                    setTimeout(() => addBatch(endIndex), 10);
+                } else {
+                    // All rows added
+                    finishMerge(allCompanyInfo, addedCount, errors, totalFiles, action);
+                }
+            }
+            
+            addBatch(0);
+            
+        } catch (error) {
+            console.error('Error merging data:', error);
+            showToast('❌ Error merging data. Check console for details.', 'error');
+        }
+    }, 100);
+}
+
+// Helper function to finish the merge process
+function finishMerge(allCompanyInfo, addedCount, errors, totalFiles, action) {
+    // Load company info if available and if replacing or no existing company info
+    if (allCompanyInfo && (action === 'replace' || !localStorage.getItem('vatableSalesCompanyInfo'))) {
+        document.getElementById('companyName').value = allCompanyInfo.name || '';
+        document.getElementById('companyTIN').value = allCompanyInfo.tin || '';
+        document.getElementById('companyAddress').value = allCompanyInfo.address || '';
+        document.getElementById('lineOfBusiness').value = allCompanyInfo.business || '';
+        document.getElementById('telephone').value = allCompanyInfo.telephone || '';
+        document.getElementById('reportDate').value = allCompanyInfo.date || new Date().toISOString().split('T')[0];
+        document.getElementById('authorizedEmployee').value = allCompanyInfo.employee || '';
+        document.getElementById('email').value = allCompanyInfo.email || '';
+        saveCompanyInfo();
+        showAutoFillFeedback(null, '✓ Company info loaded from first file');
+    }
+    
+    // Update pagination
+    const totalRows = document.querySelectorAll('#tableBody tr').length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    // Update all stats
+    updateAllStats();
+    
+    // Show summary message
+    let message = `✅ Successfully loaded ${addedCount} rows from ${totalFiles - errors.length}/${totalFiles} file(s)!`;
+    if (errors.length > 0) {
+        message += `\n⚠️ ${errors.length} file(s) failed: ${errors.join(', ')}`;
+    }
+    showToast(message, errors.length > 0 ? 'warning' : 'success');
+    
+    // Refresh auto-fill bindings
+    if (typeof bindAutoFillToAllRows === 'function') {
+        setTimeout(() => bindAutoFillToAllRows(), 100);
+    }
+}
+
+// ===== LOAD MULTIPLE FILES WITH DUPLICATE DETECTION (Advanced Version) =====
+function loadMultipleVatFilesWithDeduplication() {
+    // Create file input that accepts multiple files
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.vat,.json';
+    fileInput.multiple = true;
+    
+    fileInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        
+        showToast(`📁 Loading ${files.length} file(s)...`, 'info');
+        
+        let allTableData = [];
+        let allCompanyInfo = null;
+        let filesProcessed = 0;
+        let errors = [];
+        
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(evt) {
+                try {
+                    const saveData = JSON.parse(evt.target.result);
+                    
+                    if (!saveData.version || !saveData.tableData) {
+                        throw new Error(`Invalid format in ${file.name}`);
+                    }
+                    
+                    if (saveData.tableData && saveData.tableData.length > 0) {
+                        allTableData.push(...saveData.tableData);
+                    }
+                    
+                    if (!allCompanyInfo && saveData.companyInfo) {
+                        allCompanyInfo = saveData.companyInfo;
+                    }
+                    
+                    filesProcessed++;
+                    
+                    if (filesProcessed === files.length) {
+                        // Ask about duplicate handling
+                        showDuplicateHandlingDialog(allTableData, allCompanyInfo, errors, files.length);
+                    }
+                    
+                } catch (error) {
+                    console.error(`Error loading ${file.name}:`, error);
+                    errors.push(`${file.name}: ${error.message}`);
+                    filesProcessed++;
+                    
+                    if (filesProcessed === files.length) {
+                        showDuplicateHandlingDialog(allTableData, allCompanyInfo, errors, files.length);
+                    }
+                }
+            };
+            
+            reader.onerror = function() {
+                errors.push(`${file.name}: Failed to read file`);
+                filesProcessed++;
+                if (filesProcessed === files.length) {
+                    showDuplicateHandlingDialog(allTableData, allCompanyInfo, errors, files.length);
+                }
+            };
+            
+            reader.readAsText(file);
+        });
+    });
+    
+    fileInput.click();
+}
+
+// Show dialog for duplicate handling options
+function showDuplicateHandlingDialog(allTableData, allCompanyInfo, errors, totalFiles) {
+    if (allTableData.length === 0) {
+        if (errors.length > 0) {
+            showToast(`❌ Failed to load ${errors.length} file(s).`, 'error');
+        } else {
+            showToast('No data found in selected files.', 'warning');
+        }
+        return;
+    }
+    
+    // Create custom dialog for duplicate handling
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10001;
+        backdrop-filter: blur(5px);
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: linear-gradient(135deg, #0a1628, #1a0a18); border: 2px solid #00ff9d; border-radius: 16px; padding: 25px; max-width: 500px; width: 90%; box-shadow: 0 0 50px rgba(0,255,157,0.3);">
+            <h3 style="color: #00ff9d; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-layer-group"></i> Load Multiple Files
+            </h3>
+            <p style="color: #e0e0ff; margin-bottom: 15px;">
+                Found <strong style="color: #00ff9d;">${allTableData.length}</strong> rows across <strong style="color: #00ff9d;">${totalFiles - errors.length}</strong> file(s).
+            </p>
+            <p style="color: #e0e0ff; margin-bottom: 20px;">
+                How would you like to handle the data?
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button id="mergeAppendBtn" style="background: linear-gradient(135deg, #006837, #008844); border: none; color: white; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                    <i class="fas fa-plus-circle"></i> Append All Rows (Keep Existing)
+                </button>
+                <button id="mergeReplaceBtn" style="background: linear-gradient(135deg, #ff6b6b, #cc4444); border: none; color: white; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                    <i class="fas fa-exchange-alt"></i> Replace Existing Data
+                </button>
+                <button id="mergeCancelBtn" style="background: rgba(100,100,100,0.3); border: 1px solid #888; color: #ccc; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+            ${errors.length > 0 ? `<p style="color: #ffaa66; font-size: 12px; margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">⚠️ ${errors.length} file(s) had errors</p>` : ''}
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('mergeAppendBtn').addEventListener('click', () => {
+        modal.remove();
+        mergeDataIntoTable(allTableData, allCompanyInfo, errors, totalFiles);
+    });
+    
+    document.getElementById('mergeReplaceBtn').addEventListener('click', () => {
+        modal.remove();
+        // Clear existing table first
+        const tableBody = document.getElementById('tableBody');
+        if (tableBody) tableBody.innerHTML = '';
+        mergeDataIntoTable(allTableData, allCompanyInfo, errors, totalFiles);
+    });
+    
+    document.getElementById('mergeCancelBtn').addEventListener('click', () => {
+        modal.remove();
+        showToast('Operation cancelled', 'info');
+    });
 }
 
 // ===== VISIBILITY TOGGLE FUNCTIONS =====
