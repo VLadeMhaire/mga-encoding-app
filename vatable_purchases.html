@@ -2653,6 +2653,7 @@ function getVisibleColumnCount() {
 }
 
 // ===== OPTIMIZED UPDATE SUMMARY ROW =====
+// ===== FIXED UPDATE SUMMARY ROW - PROPERLY HANDLES HIDDEN COLUMNS =====
 function updateSummaryRow() {
     let totalGrossPurchases = 0;
     let totalNetPurchases = 0;
@@ -2674,39 +2675,57 @@ function updateSummaryRow() {
     const headers = document.querySelectorAll('#vatablePurchasesTable thead th');
     const summaryRow = document.getElementById('summaryRow');
     
-    if (summaryRow) {
-        let summaryCells = '';
-        
-        for (let i = 0; i < headers.length; i++) {
-            if (!headers[i].classList.contains('hidden-column')) {
-                switch(i) {
-                    case 0:
-                        summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
-                        break;
-                    case 7:
-                        summaryCells += `<td class="uneditable">${totalGrossPurchases.toFixed(2)}</td>`;
-                        break;
-                    case 8:
-                        summaryCells += `<td class="uneditable">${totalNetPurchases.toFixed(2)}</td>`;
-                        break;
-                    case 9:
-                        summaryCells += `<td class="uneditable">${totalInputTax.toFixed(2)}</td>`;
-                        break;
-                    case 11:
-                        summaryCells += `<td class="uneditable">${totalWithholding.toFixed(2)}</td>`;
-                        break;
-                    case 12:
-                        summaryCells += `<td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>`;
-                        break;
-                    default:
-                        summaryCells += '<td></td>';
-                        break;
-                }
-            }
+    if (!summaryRow) return;
+    
+    // Build array of visible columns with their original indices
+    const visibleColumns = [];
+    headers.forEach((header, index) => {
+        if (!header.classList.contains('hidden-column')) {
+            visibleColumns.push({
+                originalIndex: index,
+                displayIndex: visibleColumns.length
+            });
         }
+    });
+    
+    // Create summary row cells based on visible columns
+    let summaryCells = '';
+    
+    visibleColumns.forEach(col => {
+        const originalIndex = col.originalIndex;
+        const displayIndex = col.displayIndex;
         
-        summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
-    }
+        // First column - show "TOTALS:" label
+        if (displayIndex === 0) {
+            summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+        }
+        // Gross Purchases column (original index 7)
+        else if (originalIndex === 7) {
+            summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalGrossPurchases.toFixed(2)}</td>`;
+        }
+        // Net Purchases column (original index 8)
+        else if (originalIndex === 8) {
+            summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalNetPurchases.toFixed(2)}</td>`;
+        }
+        // Input Tax column (original index 9)
+        else if (originalIndex === 9) {
+            summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalInputTax.toFixed(2)}</td>`;
+        }
+        // Withholding Amount column (original index 11)
+        else if (originalIndex === 11) {
+            summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalWithholding.toFixed(2)}</td>`;
+        }
+        // Gross - Withholding Tax column (original index 12)
+        else if (originalIndex === 12) {
+            summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalGrossMinusWithholding.toFixed(2)}</td>`;
+        }
+        // All other columns - show dash or empty
+        else {
+            summaryCells += '<td>-</td>';
+        }
+    });
+    
+    summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}<tr>`;
 }
 
 // ===== OPTIMIZED UPDATE TALLY SECTIONS =====
@@ -4899,21 +4918,26 @@ function initColumnVisibility() {
             
             // Add click handler
             checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                const isChecked = this.checked;
-                const columnKey = this.dataset.columnKey;
-                const columnIndex = parseInt(this.dataset.columnIndex);
-                
-                // Update visibility
-                toggleColumnVisibility(columnIndex, !isChecked);
-                
-                // Save state
-                columnVisibility[columnKey] = !isChecked;
-                localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
-                
-                // Update pagination (re-render current page)
-                renderCurrentPage();
-            });
+    e.stopPropagation();
+    const isChecked = this.checked;
+    const columnKey = this.dataset.columnKey;
+    const columnIndex = parseInt(this.dataset.columnIndex);
+    
+    // Update visibility
+    toggleColumnVisibility(columnIndex, !isChecked);
+    
+    // Save state
+    columnVisibility[columnKey] = !isChecked;
+    localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update pagination (re-render current page)
+    renderCurrentPage();
+    
+    // Force stats update to rebuild summary row correctly
+    setTimeout(() => {
+        updateAllStats();
+    }, 50);
+});
             
             columnList.appendChild(columnItem);
         });
@@ -4973,37 +4997,49 @@ function initColumnVisibility() {
     
     // Show all columns
     function showAllColumns() {
-        columns.forEach(column => {
-            columnVisibility[column.key] = false;
-            toggleColumnVisibility(column.index, false);
-        });
-        localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
-        
-        // Update checkboxes
-        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
-        });
-        
-        renderCurrentPage();
-        showToast('All columns are now visible', 'success');
-    }
+    columns.forEach(column => {
+        columnVisibility[column.key] = false;
+        toggleColumnVisibility(column.index, false);
+    });
+    localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update checkboxes
+    document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    
+    renderCurrentPage();
+    
+    // Force a complete stats update to rebuild summary row correctly
+    setTimeout(() => {
+        updateAllStats();
+    }, 50);
+    
+    showToast('All columns are now visible', 'success');
+}
     
     // Hide all columns
     function hideAllColumns() {
-        columns.forEach(column => {
-            columnVisibility[column.key] = true;
-            toggleColumnVisibility(column.index, true);
-        });
-        localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
-        
-        // Update checkboxes
-        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        
-        renderCurrentPage();
-        showToast('All columns are now hidden', 'info');
-    }
+    columns.forEach(column => {
+        columnVisibility[column.key] = true;
+        toggleColumnVisibility(column.index, true);
+    });
+    localStorage.setItem('purchasesColumnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update checkboxes
+    document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    renderCurrentPage();
+    
+    // Force a complete stats update to rebuild summary row correctly
+    setTimeout(() => {
+        updateAllStats();
+    }, 50);
+    
+    showToast('All columns are now hidden', 'info');
+}
     
     // Toggle dropdown
     function toggleDropdown() {

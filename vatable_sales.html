@@ -2057,11 +2057,11 @@ if (addBatchRowsBtn) {
     
     // Add event listeners to sidebar buttons
     if (addRowBtn) {
-        addRowBtn.addEventListener('click', function() {
-            addNewRow();
-            updateAllStats();
-        });
-    }
+    addRowBtn.addEventListener('click', function() {
+        addNewRow();
+        // updateAllStats is already called inside addNewRow
+    });
+}
     
     if (exportBtn) {
         exportBtn.addEventListener('click', exportToExcel);
@@ -2132,18 +2132,17 @@ if (addBatchRowsBtn) {
     // Add entry counter click handler
     const entryCounterBtn = document.getElementById('entryCounterBtn');
     if (entryCounterBtn) {
-        entryCounterBtn.addEventListener('click', function() {
-            addNewRow();
-            updateAllStats();
-            
-            // Flash the counter to indicate new row added
-            const entryCountSpan = document.getElementById('entryCount');
-            entryCountSpan.classList.add('pulse');
-            setTimeout(() => {
-                entryCountSpan.classList.remove('pulse');
-            }, 300);
-        });
-    }
+    entryCounterBtn.addEventListener('click', function() {
+        addNewRow();
+        
+        // Flash the counter to indicate new row added
+        const entryCountSpan = document.getElementById('entryCount');
+        entryCountSpan.classList.add('pulse');
+        setTimeout(() => {
+            entryCountSpan.classList.remove('pulse');
+        }, 300);
+    });
+}
     
     // Initialize select multiple functionality
     initSelectMultiple();
@@ -2465,7 +2464,7 @@ function renderCurrentPage() {
 }
 
 // Function to add a new row
-// ===== OPTIMIZED ADD NEW ROW (SALES) =====
+// Function to add a new row - FIXED for immediate stats update
 function addNewRow() {
     const tableBody = document.getElementById('tableBody');
     if (!tableBody) return;
@@ -2479,8 +2478,8 @@ function addNewRow() {
     currentPage = totalPages;
     renderCurrentPage();
     
-    // Debounced stats update
-    scheduleStatsUpdate();
+    // Force immediate stats update (not debounced for single row adds)
+    updateAllStats();
 }
 
 // ===== CREATE A SINGLE ROW (REUSED FOR BATCH OPERATIONS) =====
@@ -2564,11 +2563,11 @@ function attachSalesRowListeners(row) {
     editableInputs.forEach(input => {
         input.addEventListener('input', function() {
             updateCalculations(row);
-            scheduleStatsUpdate();
+            scheduleStatsUpdate();  // Debounced for typing
         });
         input.addEventListener('change', function() {
             updateCalculations(row);
-            scheduleStatsUpdate();
+            updateAllStats();  // Immediate for select changes
         });
     });
     
@@ -2599,7 +2598,7 @@ function attachSalesRowListeners(row) {
     }
 }
 
-// ===== OPTIMIZED BATCH ADD ROWS (SALES) =====
+// ===== OPTIMIZED BATCH ADD ROWS (FIXED FOR HIDDEN COLUMNS) =====
 function addMultipleRows(count) {
     const tableBody = document.getElementById('tableBody');
     if (!tableBody) return;
@@ -2614,8 +2613,26 @@ function addMultipleRows(count) {
     const fragment = document.createDocumentFragment();
     const rows = [];
     
+    // Get current column visibility state once
+    const columnVisibility = JSON.parse(localStorage.getItem('columnVisibility')) || {};
+    
     for (let i = 0; i < count; i++) {
         const row = createSalesRow();
+        
+        // Apply column visibility to each new row immediately
+        const columns = [
+            'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'tinNumber',
+            'customerName', 'address', 'grossSales', 'exemptSales', 'salesType',
+            'netSales', 'outputTax', 'withholdingRate', 'withholdingAmount',
+            'remarks', 'action'
+        ];
+        const cells = row.querySelectorAll('td');
+        columns.forEach((key, index) => {
+            if (columnVisibility[key] === true && cells[index]) {
+                cells[index].classList.add('hidden-column');
+            }
+        });
+        
         rows.push(row);
         fragment.appendChild(row);
     }
@@ -2629,8 +2646,10 @@ function addMultipleRows(count) {
     currentPage = totalPages;
     renderCurrentPage();
     
-    // Single stats update
-    updateAllStats();
+    // Force immediate stats update with requestAnimationFrame for smooth UI
+    requestAnimationFrame(() => {
+        updateAllStats();
+    });
     
     const endTime = performance.now();
     console.log(`Added ${count} rows in ${(endTime - startTime).toFixed(2)}ms`);
@@ -2640,7 +2659,7 @@ function addMultipleRows(count) {
     }
 }
 
-// ===== DEBOUNCED STATS UPDATE =====
+// DEBOUNCED STATS UPDATE - only for input changes, not for row additions
 let statsTimeout;
 
 function scheduleStatsUpdate() {
@@ -2677,9 +2696,6 @@ function deleteRow(rowId) {
 }
 
 // ===== OPTIMIZED UPDATE ALL STATS =====
-let statsUpdateScheduled = false;
-
-// Replace your entire updateAllStats function with this:
 let isUpdating = false;
 let pendingUpdate = false;
 
@@ -2691,26 +2707,26 @@ function updateAllStats() {
     
     isUpdating = true;
     
-    // Use requestIdleCallback for non-critical updates
-    const scheduleUpdate = window.requestIdleCallback || requestAnimationFrame;
-    
-    scheduleUpdate(() => {
+    // Use requestAnimationFrame for smooth UI updates
+    requestAnimationFrame(() => {
         try {
-            // Cache DOM queries - don't repeat them!
+            // Cache DOM queries
             const rows = document.querySelectorAll('#tableBody tr');
             const rowCount = rows.length;
             
-            // Use local variables (much faster than DOM access)
+            // Use local variables for calculations
             let totalGross = 0, totalExempt = 0, totalNet = 0;
             let totalOutput = 0, totalWithholding = 0;
             let cashTotal = 0, chargeTotal = 0, cashCount = 0, chargeCount = 0;
             let privateTotal = 0, govTotal = 0, privateCount = 0, govCount = 0;
             
-            // Single loop - do ALL calculations at once
+            // Single loop for all calculations
             for (let i = 0; i < rowCount; i++) {
                 const row = rows[i];
                 
-                // Use cached references
+                // Skip hidden rows (paginated)
+                if (row.style.display === 'none') continue;
+                
                 const gross = parseFloat(row.querySelector('.gross-sales')?.value) || 0;
                 const exempt = parseFloat(row.querySelector('.exempt-sales')?.value) || 0;
                 const net = parseFloat(row.querySelector('.net-sales')?.textContent) || 0;
@@ -2723,7 +2739,6 @@ function updateAllStats() {
                 totalOutput += output;
                 totalWithholding += withholding;
                 
-                // Payment mode tally
                 const paymentMode = row.querySelector('.payment-mode')?.value;
                 if (paymentMode === 'Cash') {
                     cashTotal += net;
@@ -2733,7 +2748,6 @@ function updateAllStats() {
                     chargeCount++;
                 }
                 
-                // Customer type tally
                 const salesType = row.querySelector('.sales-type')?.value;
                 if (salesType === 'Private') {
                     privateTotal += net;
@@ -2744,61 +2758,138 @@ function updateAllStats() {
                 }
             }
             
-            // Batch DOM updates (minimize reflows)
-            const updates = [
-                () => document.getElementById('totalGrossSales').textContent = totalGross.toFixed(2),
-                () => document.getElementById('totalExemptSales').textContent = totalExempt.toFixed(2),
-                () => document.getElementById('totalNetSales').textContent = totalNet.toFixed(2),
-                () => document.getElementById('totalOutputTax').textContent = totalOutput.toFixed(2),
-                () => document.getElementById('totalWithholding').textContent = totalWithholding.toFixed(2),
-                () => document.getElementById('entryCount').textContent = rowCount,
-                // Tally updates
-                () => document.getElementById('totalCashAmount').textContent = cashTotal.toFixed(2),
-                () => document.getElementById('totalChargeAmount').textContent = chargeTotal.toFixed(2),
-                () => document.getElementById('totalPrivateAmount').textContent = privateTotal.toFixed(2),
-                () => document.getElementById('totalGovernmentAmount').textContent = govTotal.toFixed(2),
-                () => document.getElementById('cashCount').textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`,
-                () => document.getElementById('chargeCount').textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`,
-                () => document.getElementById('privateCount').textContent = `${privateCount} transaction${privateCount !== 1 ? 's' : ''}`,
-                () => document.getElementById('governmentCount').textContent = `${govCount} transaction${govCount !== 1 ? 's' : ''}`,
-            ];
+            // Update all DOM elements
+            const totalGrossEl = document.getElementById('totalGrossSales');
+            const totalExemptEl = document.getElementById('totalExemptSales');
+            const totalNetEl = document.getElementById('totalNetSales');
+            const totalOutputEl = document.getElementById('totalOutputTax');
+            const totalWithholdingEl = document.getElementById('totalWithholding');
+            const entryCountEl = document.getElementById('entryCount');
             
-            // Apply all DOM updates at once
-            updates.forEach(update => update());
+            if (totalGrossEl) totalGrossEl.textContent = totalGross.toFixed(2);
+            if (totalExemptEl) totalExemptEl.textContent = totalExempt.toFixed(2);
+            if (totalNetEl) totalNetEl.textContent = totalNet.toFixed(2);
+            if (totalOutputEl) totalOutputEl.textContent = totalOutput.toFixed(2);
+            if (totalWithholdingEl) totalWithholdingEl.textContent = totalWithholding.toFixed(2);
+            if (entryCountEl) entryCountEl.textContent = rowCount;
+            
+            // Update tally sections
+            const cashAmountEl = document.getElementById('totalCashAmount');
+            const chargeAmountEl = document.getElementById('totalChargeAmount');
+            const privateAmountEl = document.getElementById('totalPrivateAmount');
+            const govAmountEl = document.getElementById('totalGovernmentAmount');
+            
+            if (cashAmountEl) cashAmountEl.textContent = cashTotal.toFixed(2);
+            if (chargeAmountEl) chargeAmountEl.textContent = chargeTotal.toFixed(2);
+            if (privateAmountEl) privateAmountEl.textContent = privateTotal.toFixed(2);
+            if (govAmountEl) govAmountEl.textContent = govTotal.toFixed(2);
+            
+            const cashCountEl = document.getElementById('cashCount');
+            const chargeCountEl = document.getElementById('chargeCount');
+            const privateCountEl = document.getElementById('privateCount');
+            const govCountEl = document.getElementById('governmentCount');
+            
+            if (cashCountEl) cashCountEl.textContent = `${cashCount} transaction${cashCount !== 1 ? 's' : ''}`;
+            if (chargeCountEl) chargeCountEl.textContent = `${chargeCount} transaction${chargeCount !== 1 ? 's' : ''}`;
+            if (privateCountEl) privateCountEl.textContent = `${privateCount} transaction${privateCount !== 1 ? 's' : ''}`;
+            if (govCountEl) govCountEl.textContent = `${govCount} transaction${govCount !== 1 ? 's' : ''}`;
+            
+            // Calculate percentages
+            const totalAmount = cashTotal + chargeTotal;
+            const cashPercent = totalAmount > 0 ? ((cashTotal / totalAmount) * 100).toFixed(1) : 0;
+            const chargePercent = totalAmount > 0 ? ((chargeTotal / totalAmount) * 100).toFixed(1) : 0;
+            const privatePercent = totalAmount > 0 ? ((privateTotal / totalAmount) * 100).toFixed(1) : 0;
+            const govPercent = totalAmount > 0 ? ((govTotal / totalAmount) * 100).toFixed(1) : 0;
+            
+            const cashPctEl = document.getElementById('cashPercentage');
+            const chargePctEl = document.getElementById('chargePercentage');
+            const privatePctEl = document.getElementById('privatePercentage');
+            const govPctEl = document.getElementById('governmentPercentage');
+            
+            if (cashPctEl) cashPctEl.textContent = `${cashPercent}% of total`;
+            if (chargePctEl) chargePctEl.textContent = `${chargePercent}% of total`;
+            if (privatePctEl) privatePctEl.textContent = `${privatePercent}% of total`;
+            if (govPctEl) govPctEl.textContent = `${govPercent}% of total`;
+            
+            const totalTallyEl = document.getElementById('totalTallyAmount');
+            const totalTallyCountEl = document.getElementById('totalTallyCount');
+            const totalNetTallyEl = document.getElementById('totalNetSalesTally');
+            
+            if (totalTallyEl) totalTallyEl.textContent = `₱ ${totalAmount.toFixed(2)}`;
+            if (totalTallyCountEl) totalTallyCountEl.textContent = `${rowCount} total transaction${rowCount !== 1 ? 's' : ''}`;
+            if (totalNetTallyEl) totalNetTallyEl.textContent = totalNet.toFixed(2);
             
             // Update summary row
             updateSummaryRowOptimized(totalGross, totalExempt, totalNet, totalOutput, totalWithholding);
             
+        } catch (error) {
+            console.error('Error updating stats:', error);
         } finally {
             isUpdating = false;
             if (pendingUpdate) {
                 pendingUpdate = false;
-                updateAllStats();
+                setTimeout(() => updateAllStats(), 10);
             }
         }
     });
 }
 
-// New optimized summary row function
+// Fixed summary row function - properly handles hidden columns
 function updateSummaryRowOptimized(gross, exempt, net, output, withholding) {
     const summaryRow = document.getElementById('summaryRow');
     if (!summaryRow) return;
     
-    const visibleCols = document.querySelectorAll('#vatableTable thead th:not(.hidden-column)').length;
+    // Get all headers and their visibility status
+    const headers = document.querySelectorAll('#vatableTable thead th');
+    const visibleColumns = [];
+    
+    // Build array of visible column indices and their original indices
+    headers.forEach((header, index) => {
+        if (!header.classList.contains('hidden-column')) {
+            visibleColumns.push({
+                originalIndex: index,
+                displayIndex: visibleColumns.length
+            });
+        }
+    });
+    
+    // Create summary row cells based on visible columns
     let html = '<tr class="summary-row">';
     
-    for (let i = 0; i < visibleCols; i++) {
-        if (i === 0) {
-            html += '<td style="text-align: right; font-weight: bold;">TOTALS:<\/td>';
-        } else if (i === 7) html += `<td class="uneditable">${gross.toFixed(2)}<\/td>`;
-        else if (i === 8) html += `<td class="uneditable">${exempt.toFixed(2)}<\/td>`;
-        else if (i === 10) html += `<td class="uneditable">${net.toFixed(2)}<\/td>`;
-        else if (i === 11) html += `<td class="uneditable">${output.toFixed(2)}<\/td>`;
-        else if (i === 13) html += `<td class="uneditable">${withholding.toFixed(2)}<\/td>`;
-        else html += '<td>-<\/td>';
-    }
+    visibleColumns.forEach(col => {
+        const originalIndex = col.originalIndex;
+        
+        // First column - show "TOTALS:" label
+        if (col.displayIndex === 0) {
+            html += '<td style="text-align: right; font-weight: bold;">TOTALS:</td>';
+        }
+        // Gross Sales column (original index 7)
+        else if (originalIndex === 7) {
+            html += `<td class="uneditable" style="font-weight: bold;">${gross.toFixed(2)}</td>`;
+        }
+        // Exempt Sales column (original index 8)
+        else if (originalIndex === 8) {
+            html += `<td class="uneditable" style="font-weight: bold;">${exempt.toFixed(2)}</td>`;
+        }
+        // Net Sales column (original index 10)
+        else if (originalIndex === 10) {
+            html += `<td class="uneditable" style="font-weight: bold;">${net.toFixed(2)}</td>`;
+        }
+        // Output Tax column (original index 11)
+        else if (originalIndex === 11) {
+            html += `<td class="uneditable" style="font-weight: bold;">${output.toFixed(2)}</td>`;
+        }
+        // Withholding Amount column (original index 13)
+        else if (originalIndex === 13) {
+            html += `<td class="uneditable" style="font-weight: bold;">${withholding.toFixed(2)}</td>`;
+        }
+        // All other columns - show dash
+        else {
+            html += '<td>-</td>';
+        }
+    });
     
-    html += '<\/tr>';
+    html += '</tr>';
     summaryRow.innerHTML = html;
 }
 // ===== OPTIMIZED UPDATE CALCULATIONS =====
@@ -4939,69 +5030,70 @@ function initColumnVisibility() {
             
             // Add click handler
             checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                const isChecked = this.checked;
-                const columnKey = this.dataset.columnKey;
-                const columnIndex = parseInt(this.dataset.columnIndex);
-                
-                // Update visibility
-                toggleColumnVisibility(columnIndex, !isChecked);
-                
-                // Save state
-                columnVisibility[columnKey] = !isChecked;
-                localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
-                
-                // Update pagination (re-render current page)
-                renderCurrentPage();
-            });
+    e.stopPropagation();
+    const isChecked = this.checked;
+    const columnKey = this.dataset.columnKey;
+    const columnIndex = parseInt(this.dataset.columnIndex);
+    
+    // Update visibility
+    toggleColumnVisibility(columnIndex, !isChecked);
+    
+    // Save state
+    columnVisibility[columnKey] = !isChecked;
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update pagination (re-render current page)
+    renderCurrentPage();
+    
+    // Force stats update to rebuild summary row correctly
+    setTimeout(() => {
+        updateAllStats();
+    }, 50);
+});
             
             columnList.appendChild(columnItem);
         });
     }
     
     // Function to toggle column visibility
-    function toggleColumnVisibility(columnIndex, hide) {
-        const table = document.getElementById('vatableTable');
-        if (!table) return;
-        
-        // Get all headers and cells for this column
-        const headers = table.querySelectorAll('thead th');
-        const rows = table.querySelectorAll('#tableBody tr');
-        const footRows = table.querySelectorAll('#summaryRow');
-        
-        // Toggle header
-        if (headers[columnIndex]) {
+    // Function to toggle column visibility - FIXED to update summary row
+function toggleColumnVisibility(columnIndex, hide) {
+    const table = document.getElementById('vatableTable');
+    if (!table) return;
+    
+    // Get all headers and cells for this column
+    const headers = table.querySelectorAll('thead th');
+    const rows = table.querySelectorAll('#tableBody tr');
+    const footRows = table.querySelectorAll('#summaryRow');
+    
+    // Toggle header
+    if (headers[columnIndex]) {
+        if (hide) {
+            headers[columnIndex].classList.add('hidden-column');
+        } else {
+            headers[columnIndex].classList.remove('hidden-column');
+        }
+    }
+    
+    // Toggle data rows
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells[columnIndex]) {
             if (hide) {
-                headers[columnIndex].classList.add('hidden-column');
+                cells[columnIndex].classList.add('hidden-column');
             } else {
-                headers[columnIndex].classList.remove('hidden-column');
+                cells[columnIndex].classList.remove('hidden-column');
             }
         }
-        
-        // Toggle data rows
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells[columnIndex]) {
-                if (hide) {
-                    cells[columnIndex].classList.add('hidden-column');
-                } else {
-                    cells[columnIndex].classList.remove('hidden-column');
-                }
-            }
-        });
-        
-        // Toggle summary row
-        footRows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells[columnIndex]) {
-                if (hide) {
-                    cells[columnIndex].classList.add('hidden-column');
-                } else {
-                    cells[columnIndex].classList.remove('hidden-column');
-                }
-            }
-        });
+    });
+    
+    // Toggle summary row - completely rebuild it instead of just toggling
+    // This ensures proper alignment
+    if (footRows.length > 0) {
+        // Force a complete stats update to rebuild summary row
+        updateAllStats();
     }
+}
     
     // Function to apply all saved column states
     function applyColumnVisibility() {
@@ -5013,37 +5105,49 @@ function initColumnVisibility() {
     
     // Show all columns
     function showAllColumns() {
-        columns.forEach(column => {
-            columnVisibility[column.key] = false;
-            toggleColumnVisibility(column.index, false);
-        });
-        localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
-        
-        // Update checkboxes
-        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
-        });
-        
-        renderCurrentPage();
-        showToast('All columns are now visible', 'success');
-    }
+    columns.forEach(column => {
+        columnVisibility[column.key] = false;
+        toggleColumnVisibility(column.index, false);
+    });
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update checkboxes
+    document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    
+    renderCurrentPage();
+    
+    // Force a complete stats update to rebuild summary row correctly
+    setTimeout(() => {
+        updateAllStats();
+    }, 50);
+    
+    showToast('All columns are now visible', 'success');
+}
     
     // Hide all columns
     function hideAllColumns() {
-        columns.forEach(column => {
-            columnVisibility[column.key] = true;
-            toggleColumnVisibility(column.index, true);
-        });
-        localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
-        
-        // Update checkboxes
-        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        
-        renderCurrentPage();
-        showToast('All columns are now hidden', 'info');
-    }
+    columns.forEach(column => {
+        columnVisibility[column.key] = true;
+        toggleColumnVisibility(column.index, true);
+    });
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update checkboxes
+    document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    renderCurrentPage();
+    
+    // Force a complete stats update to rebuild summary row correctly
+    setTimeout(() => {
+        updateAllStats();
+    }, 50);
+    
+    showToast('All columns are now hidden', 'info');
+}
     
     // Toggle dropdown
     function toggleDropdown() {

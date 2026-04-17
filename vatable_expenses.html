@@ -2931,10 +2931,12 @@ function renderCurrentPage() {
     }
     
     updatePagination();
+    
+    // IMPORTANT: Update summary row to reflect current page totals
+    updateSummaryRow();
 }
 
-// ===== TABLE ROW FUNCTIONS =====
-// ===== OPTIMIZED ADD NEW ROW (WITH NATURE DROPDOWN) =====
+// ===== FIXED ADD NEW ROW (WITH PROPER STRUCTURE) =====
 function addNewRow() {
     const tableBody = document.getElementById('tableBody');
     if (!tableBody) return;
@@ -2946,12 +2948,8 @@ function addNewRow() {
     row.id = rowId;
     
     row.innerHTML = `
-        <tr>
-            <input type="date" value="${today}" class="editable date-input">
-        </td>
-        <td>
-            <input type="text" class="editable invoice-number" placeholder="INV-001">
-        </td>
+        <td><input type="date" value="${today}" class="editable date-input"></td>
+        <td><input type="text" class="editable invoice-number" placeholder="INV-001"></td>
         <td>
             <select class="editable invoice-type">
                 <option value="">Select</option>
@@ -2963,7 +2961,6 @@ function addNewRow() {
                 <option value="CR">CR</option>
                 <option value="OTHERS">OTHERS</option>
             </select>
-        </div>
         </td>
         <td>
             <select class="editable payment-mode">
@@ -2978,35 +2975,22 @@ function addNewRow() {
                 <option value="Goods">Goods</option>
                 <option value="Services">Services</option>
             </select>
-        </div>
         </td>
         <td style="position: relative;">
             <input type="text" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
             <div class="validation-message" style="display: none;"></div>
         </div>
-        </td>
-        <td><input type="text" class="editable supplier-name" placeholder="Supplier name"></div>
-        </td>
-        <td><input type="text" class="editable address" placeholder="Supplier address"></div>
-        </td>
+        <td><input type="text" class="editable supplier-name" placeholder="Supplier name"></td>
+        <td><input type="text" class="editable address" placeholder="Supplier address"></td>
         <td><input type="number" step="0.01" min="0" class="editable gross-amount" placeholder="0.00" value=""></div>
-        </td>
         <td id="nature-cell-${rowId}" style="position: relative;"></div>
-        </td>
         <td><div class="uneditable net-expenses">0.00</div></div>
-        </td>
         <td><div class="uneditable input-tax">0.00</div></div>
-        </td>
         <td><div class="uneditable withholding-rate">0%</div></div>
-        </td>
         <td><div class="uneditable withholding-tax">0.00</div></div>
-        </td>
         <td><div class="uneditable gross-minus-withholding">0.00</div></div>
-        </td>
         <td><input type="text" class="editable remarks" placeholder="Enter remarks"></div>
-        </td>
         <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></div>
-        </td>
     `;
     
     tableBody.appendChild(row);
@@ -3024,7 +3008,7 @@ function addNewRow() {
     // Attach event listeners
     attachRowEventListeners(row);
     
-    // Apply column visibility
+    // Apply column visibility to the new row
     applyColumnVisibilityToRow(row);
     
     // Update pagination
@@ -3203,24 +3187,39 @@ function addMultipleRows(count) {
     }
 }
 
-// ===== APPLY COLUMN VISIBILITY TO A SINGLE ROW =====
+// ===== APPLY COLUMN VISIBILITY TO ALL ROWS AND SUMMARY =====
 function applyColumnVisibilityToRow(row) {
     const columnVisibility = JSON.parse(localStorage.getItem('expensesColumnVisibility')) || {};
     const columns = [
-    'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'transactionType',
-    'tinNumber', 'supplierName', 'address', 'grossAmount', 'natureExpense',
-    'netExpenses', 'inputTax', 'withholdingRate', 'withholdingTax',
-    'grossMinusWithholding', 'remarks', 'action'
-];
+        'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'transactionType',
+        'tinNumber', 'supplierName', 'address', 'grossAmount', 'natureExpense',
+        'netExpenses', 'inputTax', 'withholdingRate', 'withholdingTax',
+        'grossMinusWithholding', 'remarks', 'action'
+    ];
     
     const cells = row.querySelectorAll('td');
     columns.forEach((key, index) => {
-        if (columnVisibility[key] === true && cells[index]) {
-            cells[index].classList.add('hidden-column');
-        } else if (cells[index]) {
-            cells[index].classList.remove('hidden-column');
+        if (cells[index]) {
+            if (columnVisibility[key] === true) {
+                cells[index].classList.add('hidden-column');
+            } else {
+                cells[index].classList.remove('hidden-column');
+            }
         }
     });
+}
+
+// Apply visibility to ALL rows including summary
+function applyColumnVisibilityToAllRows() {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    // Apply to all data rows
+    const allRows = tableBody.querySelectorAll('tr');
+    allRows.forEach(row => applyColumnVisibilityToRow(row));
+    
+    // Apply to summary row
+    updateSummaryRow();
 }
 
 // Helper function for loading toast
@@ -3513,14 +3512,15 @@ function calculateAndUpdateTotals() {
     });
 }
 
-// ===== OPTIMIZED SUMMARY ROW UPDATE =====
+// ===== DYNAMIC SUMMARY ROW THAT RESPECTS COLUMN VISIBILITY =====
 function updateSummaryRow() {
     const summaryRow = document.getElementById('summaryRow');
     if (!summaryRow) return;
     
-    const rows = cachedElements.tableBody ? cachedElements.tableBody.children : [];
+    const rows = document.querySelectorAll('#tableBody tr');
     const headers = document.querySelectorAll('#vatableExpensesTable thead th');
     
+    // Calculate totals
     let totalGrossAmount = 0;
     let totalNetExpenses = 0;
     let totalInputTax = 0;
@@ -3529,6 +3529,9 @@ function updateSummaryRow() {
     
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
+        // Skip hidden rows (paginated)
+        if (row.classList.contains('page-hidden')) continue;
+        
         totalGrossAmount += parseFloat(row.querySelector('.gross-amount')?.value) || 0;
         totalNetExpenses += parseFloat(row.querySelector('.net-expenses')?.textContent) || 0;
         totalInputTax += parseFloat(row.querySelector('.input-tax')?.textContent) || 0;
@@ -3536,35 +3539,49 @@ function updateSummaryRow() {
         totalGrossMinusWithholding += parseFloat(row.querySelector('.gross-minus-withholding')?.textContent) || 0;
     }
     
+    // Get current column visibility
+    const columnVisibility = JSON.parse(localStorage.getItem('expensesColumnVisibility')) || {};
+    const columns = [
+        'date', 'invoiceNumber', 'invoiceType', 'paymentMode', 'transactionType',
+        'tinNumber', 'supplierName', 'address', 'grossAmount', 'natureExpense',
+        'netExpenses', 'inputTax', 'withholdingRate', 'withholdingTax',
+        'grossMinusWithholding', 'remarks', 'action'
+    ];
+    
+    // Build summary row cells based on visible columns
     let summaryCells = '';
     
-    for (let i = 0; i < headers.length; i++) {
-        if (!headers[i].classList.contains('hidden-column')) {
-            switch(i) {
-                case 0:
-                    summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
-                    break;
-                case 7:
-                    summaryCells += `<td class="uneditable">${totalGrossAmount.toFixed(2)}</td>`;
-                    break;
-                case 9:
-                    summaryCells += `<td class="uneditable">${totalNetExpenses.toFixed(2)}</td>`;
-                    break;
-                case 10:
-                    summaryCells += `<td class="uneditable">${totalInputTax.toFixed(2)}</td>`;
-                    break;
-                case 12:
-                    summaryCells += `<td class="uneditable">${totalWithholdingTax.toFixed(2)}</td>`;
-                    break;
-                case 13:
-                    summaryCells += `<td class="uneditable">${totalGrossMinusWithholding.toFixed(2)}</td>`;
-                    break;
-                default:
-                    summaryCells += '<td></td>';
-                    break;
+    headers.forEach((header, index) => {
+        const columnKey = columns[index];
+        const isHidden = columnVisibility[columnKey] === true;
+        
+        if (!isHidden) {
+            // Check which column this is to place totals
+            if (index === 0) {
+                // First column - show "TOTALS" text
+                summaryCells += '<td style="text-align: right; font-weight: bold; font-size: 14px;">TOTALS:</td>';
+            } 
+            else if (index === 8) { // Gross Amount column
+                summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalGrossAmount.toFixed(2)}</td>`;
+            }
+            else if (index === 10) { // Net Expenses column
+                summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalNetExpenses.toFixed(2)}</td>`;
+            }
+            else if (index === 11) { // Input Tax column
+                summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalInputTax.toFixed(2)}</td>`;
+            }
+            else if (index === 13) { // Withholding Tax column
+                summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalWithholdingTax.toFixed(2)}</td>`;
+            }
+            else if (index === 14) { // Gross - Withholding Tax column
+                summaryCells += `<td class="uneditable" style="font-weight: bold;">${totalGrossMinusWithholding.toFixed(2)}</td>`;
+            }
+            else {
+                // Empty cell for other columns
+                summaryCells += '<td></td>';
             }
         }
-    }
+    });
     
     summaryRow.innerHTML = `<tr class="summary-row">${summaryCells}</tr>`;
 }
@@ -5966,21 +5983,24 @@ function initColumnVisibility() {
             
             // Add click handler
             checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                const isChecked = this.checked;
-                const columnKey = this.dataset.columnKey;
-                const columnIndex = parseInt(this.dataset.columnIndex);
-                
-                // Update visibility
-                toggleColumnVisibility(columnIndex, !isChecked);
-                
-                // Save state
-                columnVisibility[columnKey] = !isChecked;
-                localStorage.setItem('expensesColumnVisibility', JSON.stringify(columnVisibility));
-                
-                // Update pagination (re-render current page)
-                renderCurrentPage();
-            });
+    e.stopPropagation();
+    const isChecked = this.checked;
+    const columnKey = this.dataset.columnKey;
+    const columnIndex = parseInt(this.dataset.columnIndex);
+    
+    // Update visibility
+    toggleColumnVisibility(columnIndex, !isChecked);
+    
+    // Save state
+    columnVisibility[columnKey] = !isChecked;
+    localStorage.setItem('expensesColumnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update summary row to reflect new column visibility
+    updateSummaryRow();
+    
+    // Update pagination (re-render current page)
+    renderCurrentPage();
+});
             
             columnList.appendChild(columnItem);
         });
@@ -6040,37 +6060,43 @@ function initColumnVisibility() {
     
     // Show all columns
     function showAllColumns() {
-        columns.forEach(column => {
-            columnVisibility[column.key] = false;
-            toggleColumnVisibility(column.index, false);
-        });
-        localStorage.setItem('expensesColumnVisibility', JSON.stringify(columnVisibility));
-        
-        // Update checkboxes
-        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
-        });
-        
-        renderCurrentPage();
-        showToast('All columns are now visible', 'success');
-    }
+    columns.forEach(column => {
+        columnVisibility[column.key] = false;
+        toggleColumnVisibility(column.index, false);
+    });
+    localStorage.setItem('expensesColumnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update checkboxes
+    document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    
+    // Update summary row
+    updateSummaryRow();
+    
+    renderCurrentPage();
+    showToast('All columns are now visible', 'success');
+}
     
     // Hide all columns
     function hideAllColumns() {
-        columns.forEach(column => {
-            columnVisibility[column.key] = true;
-            toggleColumnVisibility(column.index, true);
-        });
-        localStorage.setItem('expensesColumnVisibility', JSON.stringify(columnVisibility));
-        
-        // Update checkboxes
-        document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        
-        renderCurrentPage();
-        showToast('All columns are now hidden', 'info');
-    }
+    columns.forEach(column => {
+        columnVisibility[column.key] = true;
+        toggleColumnVisibility(column.index, true);
+    });
+    localStorage.setItem('expensesColumnVisibility', JSON.stringify(columnVisibility));
+    
+    // Update checkboxes
+    document.querySelectorAll('.column-item-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Update summary row
+    updateSummaryRow();
+    
+    renderCurrentPage();
+    showToast('All columns are now hidden', 'info');
+}
     
     // Toggle dropdown
     function toggleDropdown() {
