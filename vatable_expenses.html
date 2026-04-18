@@ -1150,6 +1150,11 @@ tr.page-hidden {
                     <i class="fas fa-folder-open"></i>
                     <span class="sidebar-btn-text">Load Data from File</span>
                 </button>
+
+                <button class="sidebar-btn" id="loadMultipleExpFilesBtn">
+    <i class="fas fa-folder-open"></i>
+    <span class="sidebar-btn-text">Load Multiple EXP Files</span>
+</button>
                 
                 <button class="sidebar-btn" id="clearBtn">
                     <i class="fas fa-trash-alt"></i>
@@ -2069,6 +2074,7 @@ function filterCategories(searchText) {
 }
 
 // Create enhanced nature of expense cell
+// Create enhanced nature of expense cell
 function createNatureExpenseCell(rowId, initialValue = '', rateCallback, row) {
     const container = document.createElement('div');
     container.className = 'nature-expense-container';
@@ -2114,121 +2120,125 @@ function createNatureExpenseCell(rowId, initialValue = '', rateCallback, row) {
         }
     }
     
+    // Updated: Show all categories initially when clicked, even without search text
     function showSuggestions() {
-    if (suggestionsDiv) suggestionsDiv.remove();
-    
-    const searchText = input.value;
-    const { groups, recent } = filterCategories(searchText);
-    
-    const hasRecent = recent.length > 0 && (!searchText || searchText.trim() !== "");
-    const hasGroups = groups.some(g => g.categories.length > 0);
-    
-    if (!hasRecent && !hasGroups) {
+        if (suggestionsDiv) suggestionsDiv.remove();
+        
+        const searchText = input.value;
+        // Filter categories based on search text (if any)
+        const { groups, recent } = filterCategories(searchText);
+        
+        // Always show suggestions - if no search text, show all categories
+        const hasRecent = recent.length > 0;
+        const hasGroups = groups.some(g => g.categories.length > 0);
+        
+        if (!hasRecent && !hasGroups) {
+            suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'expense-suggestions';
+            suggestionsDiv.innerHTML = '<div class="no-suggestions"><i class="fas fa-search"></i> No matching categories found</div>';
+            const rect = input.getBoundingClientRect();
+            suggestionsDiv.style.position = 'fixed';
+            suggestionsDiv.style.top = (rect.bottom + 5) + 'px';
+            suggestionsDiv.style.left = rect.left + 'px';
+            suggestionsDiv.style.width = Math.max(rect.width, 300) + 'px';
+            document.body.appendChild(suggestionsDiv);
+            return;
+        }
+        
         suggestionsDiv = document.createElement('div');
         suggestionsDiv.className = 'expense-suggestions';
-        suggestionsDiv.innerHTML = '<div class="no-suggestions"><i class="fas fa-search"></i> No matching categories found</div>';
-        // Position using fixed positioning
+        currentFilteredItems = [];
+        
+        // Show recent section only if there's no search text (or search text is empty)
+        if (hasRecent && (!searchText || searchText.trim() === "")) {
+            const recentSection = document.createElement('div');
+            recentSection.className = 'suggestion-group recent-section';
+            recentSection.innerHTML = `
+                <div class="suggestion-group-header">
+                    <i class="fas fa-history"></i> RECENTLY USED
+                </div>
+            `;
+            const recentList = document.createElement('div');
+            recent.forEach(cat => {
+                const rate = getWithholdingRateFromExpense(cat);
+                const ratePercent = (rate * 100).toFixed(0) + '%';
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <span class="suggestion-name">${escapeHtml(cat)}</span>
+                    <span class="suggestion-recent"><i class="fas fa-clock"></i> Recent</span>
+                    <span class="suggestion-rate">${ratePercent}</span>
+                `;
+                item.addEventListener('click', () => selectCategory(cat));
+                recentList.appendChild(item);
+                currentFilteredItems.push({ element: item, value: cat });
+            });
+            recentSection.appendChild(recentList);
+            suggestionsDiv.appendChild(recentSection);
+        }
+        
+        // Show all category groups (filtered by search text if any)
+        for (const group of groups) {
+            if (group.categories.length === 0) continue;
+            const groupSection = document.createElement('div');
+            groupSection.className = 'suggestion-group';
+            groupSection.innerHTML = `
+                <div class="suggestion-group-header">
+                    <i class="fas ${group.icon}"></i> ${group.name}
+                </div>
+            `;
+            const groupList = document.createElement('div');
+            for (const cat of group.categories) {
+                const rate = expenseCategories[cat] || getWithholdingRateFromExpense(cat);
+                const ratePercent = (rate * 100).toFixed(0) + '%';
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <span class="suggestion-name">${escapeHtml(cat)}</span>
+                    <span class="suggestion-rate">${ratePercent}</span>
+                `;
+                item.addEventListener('click', () => selectCategory(cat));
+                groupList.appendChild(item);
+                currentFilteredItems.push({ element: item, value: cat });
+            }
+            groupSection.appendChild(groupList);
+            suggestionsDiv.appendChild(groupSection);
+        }
+        
+        // Position using fixed positioning relative to input
         const rect = input.getBoundingClientRect();
         suggestionsDiv.style.position = 'fixed';
         suggestionsDiv.style.top = (rect.bottom + 5) + 'px';
         suggestionsDiv.style.left = rect.left + 'px';
-        suggestionsDiv.style.width = Math.max(rect.width, 300) + 'px';
+        suggestionsDiv.style.width = Math.max(rect.width, 320) + 'px';
+        
         document.body.appendChild(suggestionsDiv);
-        return;
+        currentSelectedIndex = -1;
+        
+        // Scroll to top
+        suggestionsDiv.scrollTop = 0;
     }
-    
-    suggestionsDiv = document.createElement('div');
-    suggestionsDiv.className = 'expense-suggestions';
-    currentFilteredItems = [];
-    
-    if (hasRecent && (!searchText || searchText.trim() === "")) {
-        const recentSection = document.createElement('div');
-        recentSection.className = 'suggestion-group recent-section';
-        recentSection.innerHTML = `
-            <div class="suggestion-group-header">
-                <i class="fas fa-history"></i> RECENTLY USED
-            </div>
-        `;
-        const recentList = document.createElement('div');
-        recent.forEach(cat => {
-            const rate = getWithholdingRateFromExpense(cat);
-            const ratePercent = (rate * 100).toFixed(0) + '%';
-            const item = document.createElement('div');
-            item.className = 'suggestion-item';
-            item.innerHTML = `
-                <span class="suggestion-name">${escapeHtml(cat)}</span>
-                <span class="suggestion-recent"><i class="fas fa-clock"></i> Recent</span>
-                <span class="suggestion-rate">${ratePercent}</span>
-            `;
-            item.addEventListener('click', () => selectCategory(cat));
-            recentList.appendChild(item);
-            currentFilteredItems.push({ element: item, value: cat });
-        });
-        recentSection.appendChild(recentList);
-        suggestionsDiv.appendChild(recentSection);
-    }
-    
-    for (const group of groups) {
-        if (group.categories.length === 0) continue;
-        const groupSection = document.createElement('div');
-        groupSection.className = 'suggestion-group';
-        groupSection.innerHTML = `
-            <div class="suggestion-group-header">
-                <i class="fas ${group.icon}"></i> ${group.name}
-            </div>
-        `;
-        const groupList = document.createElement('div');
-        for (const cat of group.categories) {
-            const rate = expenseCategories[cat] || getWithholdingRateFromExpense(cat);
-            const ratePercent = (rate * 100).toFixed(0) + '%';
-            const item = document.createElement('div');
-            item.className = 'suggestion-item';
-            item.innerHTML = `
-                <span class="suggestion-name">${escapeHtml(cat)}</span>
-                <span class="suggestion-rate">${ratePercent}</span>
-            `;
-            item.addEventListener('click', () => selectCategory(cat));
-            groupList.appendChild(item);
-            currentFilteredItems.push({ element: item, value: cat });
-        }
-        groupSection.appendChild(groupList);
-        suggestionsDiv.appendChild(groupSection);
-    }
-    
-    // Position using fixed positioning relative to input
-    const rect = input.getBoundingClientRect();
-    suggestionsDiv.style.position = 'fixed';
-    suggestionsDiv.style.top = (rect.bottom + 5) + 'px';
-    suggestionsDiv.style.left = rect.left + 'px';
-    suggestionsDiv.style.width = Math.max(rect.width, 320) + 'px';
-    
-    document.body.appendChild(suggestionsDiv);
-    currentSelectedIndex = -1;
-    
-    // Add scroll to top
-    suggestionsDiv.scrollTop = 0;
-}
     
     function hideSuggestions() {
-    if (suggestionsDiv && suggestionsDiv.parentNode) {
-        suggestionsDiv.remove();
-        suggestionsDiv = null;
+        if (suggestionsDiv && suggestionsDiv.parentNode) {
+            suggestionsDiv.remove();
+            suggestionsDiv = null;
+        }
+        currentSelectedIndex = -1;
+        currentFilteredItems = [];
     }
-    currentSelectedIndex = -1;
-    currentFilteredItems = [];
-}
     
     function selectCategory(value) {
-    input.value = value;
-    addToRecentExpenses(value);
-    updateBadge();
-    hideSuggestions();
-    if (rateCallback) rateCallback(value);
-    const event = new Event('input', { bubbles: true });
-    input.dispatchEvent(event);
-    const changeEvent = new Event('change', { bubbles: true });
-    input.dispatchEvent(changeEvent);
-}
+        input.value = value;
+        addToRecentExpenses(value);
+        updateBadge();
+        hideSuggestions();
+        if (rateCallback) rateCallback(value);
+        const event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+        const changeEvent = new Event('change', { bubbles: true });
+        input.dispatchEvent(changeEvent);
+    }
     
     let ratePreview = null;
     function showRatePreview() {
@@ -2247,14 +2257,17 @@ function createNatureExpenseCell(rowId, initialValue = '', rateCallback, row) {
         }, 2000);
     }
     
-    input.addEventListener('input', function(e) {
-        updateBadge();
+    // Updated: Show all categories on focus (including when input is empty or has value)
+    input.addEventListener('focus', function() {
+        // Always show the full dropdown with all categories when clicked/focused
         showSuggestions();
-        if (rateCallback) rateCallback(input.value);
     });
     
-    input.addEventListener('focus', function() {
-        if (input.value) showSuggestions();
+    input.addEventListener('input', function(e) {
+        updateBadge();
+        // Show filtered suggestions based on current input
+        showSuggestions();
+        if (rateCallback) rateCallback(input.value);
     });
     
     input.addEventListener('blur', function() {
@@ -2627,20 +2640,6 @@ loadRecentExpenses();
 
     initEnterKeyNavigation();
     
-    // Add event listeners for company info to save automatically
-    document.querySelectorAll('.company-info-sidebar input').forEach(input => {
-        input.addEventListener('input', saveCompanyInfo);
-        input.addEventListener('change', saveCompanyInfo);
-    });
-    
-    // Format company TIN input
-    const companyTIN = document.getElementById('companyTIN');
-    if (companyTIN) {
-        companyTIN.addEventListener('input', function(e) {
-            formatTIN(e.target);
-        });
-    }
-    
     // ===== SIDEBAR FUNCTIONALITY =====
     initSidebarFunctionality();
     
@@ -2748,48 +2747,6 @@ function initEnterKeyNavigation() {
             }
         }
     });
-}
-
-// ===== COMPANY INFO FUNCTIONS =====
-function saveCompanyInfo() {
-    const companyInfo = {
-        name: document.getElementById('companyName')?.value || '',
-        tin: document.getElementById('companyTIN')?.value || '',
-        address: document.getElementById('companyAddress')?.value || '',
-        business: document.getElementById('lineOfBusiness')?.value || '',
-        telephone: document.getElementById('telephone')?.value || '',
-        date: document.getElementById('reportDate')?.value || '',
-        employee: document.getElementById('authorizedEmployee')?.value || '',
-        email: document.getElementById('email')?.value || ''
-    };
-    localStorage.setItem('vatableExpensesCompanyInfo', JSON.stringify(companyInfo));
-}
-
-function loadCompanyInfo() {
-    const savedInfo = localStorage.getItem('vatableExpensesCompanyInfo');
-    if (savedInfo) {
-        const companyInfo = JSON.parse(savedInfo);
-        if (document.getElementById('companyName')) document.getElementById('companyName').value = companyInfo.name || '';
-        if (document.getElementById('companyTIN')) document.getElementById('companyTIN').value = companyInfo.tin || '';
-        if (document.getElementById('companyAddress')) document.getElementById('companyAddress').value = companyInfo.address || '';
-        if (document.getElementById('lineOfBusiness')) document.getElementById('lineOfBusiness').value = companyInfo.business || '';
-        if (document.getElementById('telephone')) document.getElementById('telephone').value = companyInfo.telephone || '';
-        if (document.getElementById('reportDate')) document.getElementById('reportDate').value = companyInfo.date || new Date().toISOString().split('T')[0];
-        if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = companyInfo.employee || '';
-        if (document.getElementById('email')) document.getElementById('email').value = companyInfo.email || '';
-    }
-}
-
-function clearCompanyInfo() {
-    if (document.getElementById('companyName')) document.getElementById('companyName').value = '';
-    if (document.getElementById('companyTIN')) document.getElementById('companyTIN').value = '';
-    if (document.getElementById('companyAddress')) document.getElementById('companyAddress').value = '';
-    if (document.getElementById('lineOfBusiness')) document.getElementById('lineOfBusiness').value = '';
-    if (document.getElementById('telephone')) document.getElementById('telephone').value = '';
-    if (document.getElementById('reportDate')) document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
-    if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = '';
-    if (document.getElementById('email')) document.getElementById('email').value = '';
-    localStorage.removeItem('vatableExpensesCompanyInfo');
 }
 
 // ===== PAGINATION FUNCTIONS =====
@@ -3315,53 +3272,6 @@ function updateCalculations(row) {
     const grossMinusWithholding = grossAmount - withholdingTax;
     const grossMinusWithholdingEl = row.querySelector('.gross-minus-withholding');
     if (grossMinusWithholdingEl) grossMinusWithholdingEl.textContent = grossMinusWithholding.toFixed(2);
-}
-
-// ===== TIN FORMATTING FUNCTIONS =====
-function formatTIN(input) {
-    if (!input) return;
-    
-    // Remove all non-digit characters
-    let value = input.value.replace(/\D/g, '');
-    
-    // Limit to 12 digits
-    if (value.length > 12) {
-        value = value.substring(0, 12);
-    }
-    
-    // Add dashes after every 3 digits
-    if (value.length > 9) {
-        value = value.substring(0, 9) + '-' + value.substring(9);
-    }
-    if (value.length > 6) {
-        value = value.substring(0, 6) + '-' + value.substring(6);
-    }
-    if (value.length > 3) {
-        value = value.substring(0, 3) + '-' + value.substring(3);
-    }
-    
-    input.value = value;
-}
-
-function validateTIN(input) {
-    if (!input) return;
-    
-    const value = input.value.replace(/\D/g, '');
-    const validationMessage = input.nextElementSibling;
-    
-    if (value.length === 12) {
-        if (validationMessage) validationMessage.style.display = 'none';
-        input.style.borderColor = '#00ff9d';
-        input.style.boxShadow = '0 0 5px rgba(0, 255, 157, 0.5), inset 0 0 10px rgba(0, 255, 157, 0.1)';
-    } else if (value.length > 0) {
-        if (validationMessage) validationMessage.style.display = 'block';
-        input.style.borderColor = '#ff6666';
-        input.style.boxShadow = '0 0 5px rgba(255, 102, 102, 0.5), inset 0 0 10px rgba(255, 102, 102, 0.1)';
-    } else {
-        if (validationMessage) validationMessage.style.display = 'none';
-        input.style.borderColor = 'rgba(0, 255, 157, 0.3)';
-        input.style.boxShadow = 'inset 0 0 10px rgba(0, 20, 15, 0.5)';
-    }
 }
 
 // Performance optimization caches
@@ -4679,6 +4589,305 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// ===== LOAD MULTIPLE EXP FILES AND COMBINE =====
+function loadMultipleExpFiles() {
+    // Create file input that accepts multiple files
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.exp,.json';
+    fileInput.multiple = true;
+    
+    fileInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        
+        showToast(`📁 Loading ${files.length} file(s)...`, 'info');
+        
+        let allTableData = [];
+        let allCompanyInfo = null;
+        let filesProcessed = 0;
+        let errors = [];
+        
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(evt) {
+                try {
+                    const saveData = JSON.parse(evt.target.result);
+                    
+                    // Validate file format
+                    if (!saveData.version || !saveData.tableData) {
+                        throw new Error(`Invalid format in ${file.name}`);
+                    }
+                    
+                    // Collect table data from each file
+                    if (saveData.tableData && saveData.tableData.length > 0) {
+                        allTableData.push(...saveData.tableData);
+                    }
+                    
+                    // Use company info from the first valid file that has it
+                    if (!allCompanyInfo && saveData.companyInfo) {
+                        allCompanyInfo = saveData.companyInfo;
+                    }
+                    
+                    filesProcessed++;
+                    
+                    // Check if all files are processed
+                    if (filesProcessed === files.length) {
+                        // Merge all data into the current table
+                        mergeExpensesDataIntoTable(allTableData, allCompanyInfo, errors, files.length);
+                    }
+                    
+                } catch (error) {
+                    console.error(`Error loading ${file.name}:`, error);
+                    errors.push(`${file.name}: ${error.message}`);
+                    filesProcessed++;
+                    
+                    if (filesProcessed === files.length) {
+                        mergeExpensesDataIntoTable(allTableData, allCompanyInfo, errors, files.length);
+                    }
+                }
+            };
+            
+            reader.onerror = function() {
+                errors.push(`${file.name}: Failed to read file`);
+                filesProcessed++;
+                if (filesProcessed === files.length) {
+                    mergeExpensesDataIntoTable(allTableData, allCompanyInfo, errors, files.length);
+                }
+            };
+            
+            reader.readAsText(file);
+        });
+    });
+    
+    fileInput.click();
+}
+
+// Helper function to merge expenses data into the current table
+function mergeExpensesDataIntoTable(allTableData, allCompanyInfo, errors, totalFiles) {
+    if (allTableData.length === 0 && errors.length > 0) {
+        showToast(`❌ Failed to load ${errors.length} file(s). Check console for details.`, 'error');
+        return;
+    }
+    
+    // Ask user if they want to replace or append
+    const currentRowCount = document.querySelectorAll('#tableBody tr').length;
+    let action = 'append';
+    
+    if (currentRowCount > 1 || (currentRowCount === 1 && document.querySelector('#tableBody tr .supplier-name')?.value !== '')) {
+        action = confirm(`Current table has ${currentRowCount} row(s).\n\nClick OK to APPEND ${allTableData.length} new row(s)\nClick Cancel to REPLACE all existing data`) ? 'append' : 'replace';
+    }
+    
+    // Show loading indicator
+    const loadingToast = showLoadingToast(`📊 Merging ${allTableData.length} rows...`);
+    
+    // Use setTimeout to allow UI to update
+    setTimeout(() => {
+        try {
+            // Replace or append
+            if (action === 'replace') {
+                // Clear existing table
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';
+            }
+            
+            // Add all rows from combined files
+            let addedCount = 0;
+            const batchSize = 100;
+            
+            function addBatch(startIndex) {
+                const endIndex = Math.min(startIndex + batchSize, allTableData.length);
+                const fragment = document.createDocumentFragment();
+                
+                for (let i = startIndex; i < endIndex; i++) {
+                    const rowData = allTableData[i];
+                    const row = createExpensesRowFromData(rowData);
+                    fragment.appendChild(row);
+                    addedCount++;
+                }
+                
+                const tableBody = document.getElementById('tableBody');
+                tableBody.appendChild(fragment);
+                
+                if (endIndex < allTableData.length) {
+                    // Add next batch
+                    setTimeout(() => addBatch(endIndex), 10);
+                } else {
+                    // All rows added
+                    finishExpensesMerge(allCompanyInfo, addedCount, errors, totalFiles, action, loadingToast);
+                }
+            }
+            
+            addBatch(0);
+            
+        } catch (error) {
+            console.error('Error merging data:', error);
+            if (loadingToast) loadingToast.remove();
+            showToast('❌ Error merging data. Check console for details.', 'error');
+        }
+    }, 100);
+}
+
+// Helper function to create a row from saved data for expenses
+function createExpensesRowFromData(rowData) {
+    const rowId = 'row_' + Date.now() + '_' + Math.random();
+    const today = new Date().toISOString().split('T')[0];
+    const rowDate = rowData.date || today;
+    
+    const row = document.createElement('tr');
+    row.id = rowId;
+    
+    row.innerHTML = `
+        <td><input type="date" value="${escapeHtml(rowDate)}" class="editable date-input"></div>
+        <td><input type="text" value="${escapeHtml(rowData.invoiceNumber || '')}" class="editable invoice-number" placeholder="INV-001"></div>
+        <td>
+            <select class="editable invoice-type">
+                <option value="">Select</option>
+                <option value="OR" ${rowData.invoiceType === 'OR' ? 'selected' : ''}>OR</option>
+                <option value="SI" ${rowData.invoiceType === 'SI' ? 'selected' : ''}>SI</option>
+                <option value="DR" ${rowData.invoiceType === 'DR' ? 'selected' : ''}>DR</option>
+                <option value="AR" ${rowData.invoiceType === 'AR' ? 'selected' : ''}>AR</option>
+                <option value="TR" ${rowData.invoiceType === 'TR' ? 'selected' : ''}>TR</option>
+                <option value="CR" ${rowData.invoiceType === 'CR' ? 'selected' : ''}>CR</option>
+                <option value="OTHERS" ${rowData.invoiceType === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
+            </select>
+        </div>
+        <td>
+            <select class="editable payment-mode">
+                <option value="">Select</option>
+                <option value="Cash" ${rowData.paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+                <option value="Charge" ${rowData.paymentMode === 'Charge' ? 'selected' : ''}>Charge</option>
+            </select>
+        </div>
+        <td>
+            <select class="editable transaction-type">
+                <option value="">Select</option>
+                <option value="Goods" ${rowData.transactionType === 'Goods' ? 'selected' : ''}>Goods</option>
+                <option value="Services" ${rowData.transactionType === 'Services' ? 'selected' : ''}>Services</option>
+            </select>
+        </div>
+        <td style="position: relative;">
+            <input type="text" value="${escapeHtml(rowData.tinNumber || '')}" class="editable tin-number tin-input" maxlength="15" placeholder="000-000-000-000">
+            <div class="validation-message" style="display: none;"></div>
+        </div>
+        <td><input type="text" value="${escapeHtml(rowData.supplierName || '')}" class="editable supplier-name" placeholder="Supplier name"></div>
+        <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></div>
+        <td><input type="number" step="0.01" min="0" value="${rowData.grossAmount || ''}" class="editable gross-amount" placeholder="0.00"></div>
+        <td id="nature-cell-${rowId}" style="position: relative;"></div>
+        <td><div class="uneditable net-expenses">0.00</div></div>
+        <td><div class="uneditable input-tax">0.00</div></div>
+        <td><div class="uneditable withholding-rate">0%</div></div>
+        <td><div class="uneditable withholding-tax">0.00</div></div>
+        <td><div class="uneditable gross-minus-withholding">0.00</div></div>
+        <td><input type="text" value="${escapeHtml(rowData.remarks || '')}" class="editable remarks" placeholder="Enter remarks"></div>
+        <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></div>
+    `;
+    
+    // Create enhanced nature of expense component with saved value
+    const natureCell = document.getElementById(`nature-cell-${rowId}`);
+    if (natureCell) {
+        const natureComponent = createNatureExpenseCell(rowId, rowData.natureExpense || '', (value) => {
+            updateCalculations(row);
+            updateAllStats();
+        }, row);
+        natureCell.appendChild(natureComponent);
+    }
+    
+    // Add event listeners to editable inputs
+    const editableInputs = row.querySelectorAll('.editable:not(.nature-expense-input)');
+    editableInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+        input.addEventListener('change', function() {
+            updateCalculations(row);
+            updateAllStats();
+        });
+    });
+    
+    // Format TIN input
+    const tinInput = row.querySelector('.tin-number');
+    if (tinInput) {
+        tinInput.addEventListener('input', function(e) {
+            formatTIN(e.target);
+        });
+        tinInput.addEventListener('blur', function(e) {
+            validateTIN(e.target);
+        });
+        if (tinInput.value) {
+            formatTIN(tinInput);
+            validateTIN(tinInput);
+        }
+    }
+    
+    // Apply column visibility
+    applyColumnVisibilityToRow(row);
+    
+    // Bind auto-fill for supplier
+    if (typeof attachAutoFillToRow === 'function') {
+        attachAutoFillToRow(row);
+    }
+    
+    // Trigger calculations for this row
+    updateCalculations(row);
+    
+    return row;
+}
+
+// Helper function to finish the expenses merge process
+function finishExpensesMerge(allCompanyInfo, addedCount, errors, totalFiles, action, loadingToast) {
+    // Load company info if available and if replacing or no existing company info
+    if (allCompanyInfo && (action === 'replace' || !localStorage.getItem('vatableExpensesCompanyInfo'))) {
+        document.getElementById('companyName').value = allCompanyInfo.name || '';
+        document.getElementById('companyTIN').value = allCompanyInfo.tin || '';
+        document.getElementById('companyAddress').value = allCompanyInfo.address || '';
+        document.getElementById('lineOfBusiness').value = allCompanyInfo.business || '';
+        document.getElementById('telephone').value = allCompanyInfo.telephone || '';
+        document.getElementById('reportDate').value = allCompanyInfo.date || new Date().toISOString().split('T')[0];
+        document.getElementById('authorizedEmployee').value = allCompanyInfo.employee || '';
+        document.getElementById('email').value = allCompanyInfo.email || '';
+        saveCompanyInfo();
+        showAutoFillFeedback(null, '✓ Company info loaded from first file');
+    }
+    
+    // Remove loading toast
+    if (loadingToast) loadingToast.remove();
+    
+    // Update pagination
+    const totalRows = document.querySelectorAll('#tableBody tr').length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = totalPages;
+    renderCurrentPage();
+    
+    // Update all stats
+    updateAllStats();
+    
+    // Show summary message
+    let message = `✅ Successfully loaded ${addedCount} rows from ${totalFiles - errors.length}/${totalFiles} file(s)!`;
+    if (errors.length > 0) {
+        message += `\n⚠️ ${errors.length} file(s) failed: ${errors.join(', ')}`;
+    }
+    showToast(message, errors.length > 0 ? 'warning' : 'success');
+    
+    // Refresh auto-fill bindings
+    if (typeof bindAutoFillToAllRows === 'function') {
+        setTimeout(() => bindAutoFillToAllRows(), 100);
+    }
+}
+
+// Helper function for loading toast
+function showLoadingToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
+    toast.style.background = 'rgba(0, 30, 20, 0.98)';
+    toast.style.borderColor = '#ffaa00';
+    document.body.appendChild(toast);
+    return toast;
+}
+
 // ===== FIXED: CALCULATE EXPENSE TALLY FOR EXPORT (ONLY SHOWS CATEGORIES WITH DATA) =====
 function calculateExpenseTallyForExport() {
     const rows = document.querySelectorAll('#tableBody tr');
@@ -4865,6 +5074,7 @@ function initButtonListeners() {
     const exportBtn = document.getElementById('exportBtn');
     const saveDataBtn = document.getElementById('saveDataBtn');
     const loadDataBtn = document.getElementById('loadDataBtn');
+    const loadMultipleExpFilesBtn = document.getElementById('loadMultipleExpFilesBtn');
     const clearBtn = document.getElementById('clearBtn');
     const clearInfoBtn = document.getElementById('clearInfoBtn');
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
@@ -4909,27 +5119,15 @@ if (addBatchRowsBtn) {
     if (loadDataBtn) {
         loadDataBtn.addEventListener('click', loadDataFromFile);
     }
+
+    if (loadMultipleExpFilesBtn) {
+        loadMultipleExpFilesBtn.addEventListener('click', loadMultipleExpFiles);
+    }
     
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
             if (confirm('Are you sure you want to clear all table data? This cannot be undone.')) {
                 clearAllData();
-            }
-        });
-    }
-    
-    if (clearInfoBtn) {
-        clearInfoBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all company information?')) {
-                clearCompanyInfo();
-            }
-        });
-    }
-    
-    if (clearInfoBtnSidebar) {
-        clearInfoBtnSidebar.addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all company information?')) {
-                clearCompanyInfo();
             }
         });
     }
@@ -6145,5 +6343,7 @@ function initColumnVisibility() {
     });
 }
     </script>
+
+    <script src="company_info.js"></script>
 </body>
 </html>

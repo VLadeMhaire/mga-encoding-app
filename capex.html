@@ -1493,20 +1493,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initEnterKeyNavigation();
     
-    // Add event listeners for company info to save automatically
-    document.querySelectorAll('.company-info-sidebar input').forEach(input => {
-        input.addEventListener('input', saveCompanyInfo);
-        input.addEventListener('change', saveCompanyInfo);
-    });
-    
-    // Format company TIN input
-    const companyTIN = document.getElementById('companyTIN');
-    if (companyTIN) {
-        companyTIN.addEventListener('input', function(e) {
-            formatTIN(e.target);
-        });
-    }
-    
     // ===== SIDEBAR FUNCTIONALITY =====
     initSidebarFunctionality();
     
@@ -1618,48 +1604,6 @@ function loadLogo() {
     };
     
     img.src = logoUrl;
-}
-
-// ===== COMPANY INFO FUNCTIONS =====
-function saveCompanyInfo() {
-    const companyInfo = {
-        name: document.getElementById('companyName')?.value || '',
-        tin: document.getElementById('companyTIN')?.value || '',
-        address: document.getElementById('companyAddress')?.value || '',
-        business: document.getElementById('lineOfBusiness')?.value || '',
-        telephone: document.getElementById('telephone')?.value || '',
-        date: document.getElementById('reportDate')?.value || '',
-        employee: document.getElementById('authorizedEmployee')?.value || '',
-        email: document.getElementById('email')?.value || ''
-    };
-    localStorage.setItem('capexCompanyInfo', JSON.stringify(companyInfo));
-}
-
-function loadCompanyInfo() {
-    const savedInfo = localStorage.getItem('capexCompanyInfo');
-    if (savedInfo) {
-        const companyInfo = JSON.parse(savedInfo);
-        if (document.getElementById('companyName')) document.getElementById('companyName').value = companyInfo.name || '';
-        if (document.getElementById('companyTIN')) document.getElementById('companyTIN').value = companyInfo.tin || '';
-        if (document.getElementById('companyAddress')) document.getElementById('companyAddress').value = companyInfo.address || '';
-        if (document.getElementById('lineOfBusiness')) document.getElementById('lineOfBusiness').value = companyInfo.business || '';
-        if (document.getElementById('telephone')) document.getElementById('telephone').value = companyInfo.telephone || '';
-        if (document.getElementById('reportDate')) document.getElementById('reportDate').value = companyInfo.date || new Date().toISOString().split('T')[0];
-        if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = companyInfo.employee || '';
-        if (document.getElementById('email')) document.getElementById('email').value = companyInfo.email || '';
-    }
-}
-
-function clearCompanyInfo() {
-    if (document.getElementById('companyName')) document.getElementById('companyName').value = '';
-    if (document.getElementById('companyTIN')) document.getElementById('companyTIN').value = '';
-    if (document.getElementById('companyAddress')) document.getElementById('companyAddress').value = '';
-    if (document.getElementById('lineOfBusiness')) document.getElementById('lineOfBusiness').value = '';
-    if (document.getElementById('telephone')) document.getElementById('telephone').value = '';
-    if (document.getElementById('reportDate')) document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
-    if (document.getElementById('authorizedEmployee')) document.getElementById('authorizedEmployee').value = '';
-    if (document.getElementById('email')) document.getElementById('email').value = '';
-    localStorage.removeItem('capexCompanyInfo');
 }
 
 // ===== PAGINATION FUNCTIONS =====
@@ -2272,7 +2216,7 @@ function saveDataToFile() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     
-    const fileName = `CAPEX_Data_${new Date().toISOString().split('T')[0]}.exp`;
+    const fileName = `CAPEX_Data_${new Date().toISOString().split('T')[0]}.capex`;
     link.href = url;
     link.download = fileName;
     document.body.appendChild(link);
@@ -2288,7 +2232,7 @@ function loadDataFromFile() {
     // Create file input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.accept = '.exp,.json';
+    fileInput.accept = '.capex,.json';
     
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -3079,22 +3023,6 @@ function initButtonListeners() {
         clearBtn.addEventListener('click', function() {
             if (confirm('Are you sure you want to clear all table data? This cannot be undone.')) {
                 clearAllData();
-            }
-        });
-    }
-    
-    if (clearInfoBtn) {
-        clearInfoBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all company information?')) {
-                clearCompanyInfo();
-            }
-        });
-    }
-    
-    if (clearInfoBtnSidebar) {
-        clearInfoBtnSidebar.addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all company information?')) {
-                clearCompanyInfo();
             }
         });
     }
@@ -4300,5 +4228,7 @@ function initColumnVisibility() {
     });
 }
     </script>
+
+    <script src="company_info.js"></script>
 </body>
 </html>
