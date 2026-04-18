@@ -4738,6 +4738,9 @@ function createExpensesRowFromData(rowData) {
     const row = document.createElement('tr');
     row.id = rowId;
     
+    // Get nature expense value for later use
+    const natureExpenseValue = rowData.natureExpense || '';
+    
     row.innerHTML = `
         <td><input type="date" value="${escapeHtml(rowDate)}" class="editable date-input"></div>
         <td><input type="text" value="${escapeHtml(rowData.invoiceNumber || '')}" class="editable invoice-number" placeholder="INV-001"></div>
@@ -4774,7 +4777,7 @@ function createExpensesRowFromData(rowData) {
         <td><input type="text" value="${escapeHtml(rowData.supplierName || '')}" class="editable supplier-name" placeholder="Supplier name"></div>
         <td><input type="text" value="${escapeHtml(rowData.address || '')}" class="editable address" placeholder="Supplier address"></div>
         <td><input type="number" step="0.01" min="0" value="${rowData.grossAmount || ''}" class="editable gross-amount" placeholder="0.00"></div>
-        <td id="nature-cell-${rowId}" style="position: relative;"></div>
+        <td class="nature-cell" data-rowid="${rowId}" style="position: relative;"></div>
         <td><div class="uneditable net-expenses">0.00</div></div>
         <td><div class="uneditable input-tax">0.00</div></div>
         <td><div class="uneditable withholding-rate">0%</div></div>
@@ -4784,17 +4787,7 @@ function createExpensesRowFromData(rowData) {
         <td><button class="delete-btn" onclick="deleteRow('${rowId}')" title="Delete row"><i class="fas fa-trash"></i></button></div>
     `;
     
-    // Create enhanced nature of expense component with saved value
-    const natureCell = document.getElementById(`nature-cell-${rowId}`);
-    if (natureCell) {
-        const natureComponent = createNatureExpenseCell(rowId, rowData.natureExpense || '', (value) => {
-            updateCalculations(row);
-            updateAllStats();
-        }, row);
-        natureCell.appendChild(natureComponent);
-    }
-    
-    // Add event listeners to editable inputs
+    // Add event listeners to editable inputs FIRST
     const editableInputs = row.querySelectorAll('.editable:not(.nature-expense-input)');
     editableInputs.forEach(input => {
         input.addEventListener('input', function() {
@@ -4820,6 +4813,16 @@ function createExpensesRowFromData(rowData) {
             formatTIN(tinInput);
             validateTIN(tinInput);
         }
+    }
+    
+    // Create nature of expense component AFTER row is built, using class selector
+    const natureCell = row.querySelector('.nature-cell');
+    if (natureCell) {
+        const natureComponent = createNatureExpenseCell(rowId, natureExpenseValue, (value) => {
+            updateCalculations(row);
+            updateAllStats();
+        }, row);
+        natureCell.appendChild(natureComponent);
     }
     
     // Apply column visibility
