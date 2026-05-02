@@ -360,6 +360,9 @@ th {
         padding: 8px 6px;
     }
 }
+th:first-child {
+    text-align: center !important;
+}
 td {
     padding: 0;
     border-right: 1px solid rgba(255, 77, 109, 0.08);
@@ -5671,5 +5674,742 @@ function toggleColumnVisibility(columnIndex, hide) {
     </script>
 
     <script src="company_info.js"></script>
+
+    <script>
+        /**
+ * Shows floating suggestion box with full customer details
+ */
+let activeSuggestionBox = null;
+
+function showTinSuggestions(inputElement, row) {
+    // Remove existing suggestion box
+    if (activeSuggestionBox) {
+        activeSuggestionBox.remove();
+        activeSuggestionBox = null;
+    }
+
+    const searchText = inputElement.value.trim().toLowerCase();
+    if (searchText.length < 1) return;
+
+    // Get registered customers with all details
+    let registeredCustomers = [];
+    if (typeof window.vatCustomerDB !== 'undefined' && window.vatCustomerDB.list) {
+        registeredCustomers = window.vatCustomerDB.list();
+    } else if (typeof window.getAllPairs === 'function') {
+        registeredCustomers = window.getAllPairs();
+    } else {
+        try {
+            const stored = localStorage.getItem('VAT_CUSTOMER_TIN_MAP');
+            if (stored) {
+                const map = new Map(Object.entries(JSON.parse(stored)));
+                for (let [key, value] of map.entries()) {
+                    if (key.startsWith('name:')) {
+                        const name = key.slice(5);
+                        const tin = value;
+                        const salesType = map.get(`type:${name}`) || 'Not specified';
+                        const address = map.get(`address:${name}`) || '';
+                        registeredCustomers.push({ name, tin, salesType, address });
+                    }
+                }
+                registeredCustomers.sort((a, b) => a.name.localeCompare(b.name));
+            }
+        } catch(e) { console.warn(e); }
+    }
+
+    // Filter matching TINs
+    const matches = registeredCustomers.filter(customer => 
+        customer.tin && customer.tin.toLowerCase().startsWith(searchText)
+    ).slice(0, 10);
+
+    if (matches.length === 0) return;
+
+    // Get position
+    const rect = inputElement.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+    // Create suggestion box
+    const suggestionBox = document.createElement('div');
+    suggestionBox.className = 'tin-suggestion-box';
+    suggestionBox.style.cssText = `
+        position: absolute;
+        z-index: 10000;
+        background: #1a1a2e;
+        border: 1px solid #4db8ff;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        max-height: 300px;
+        overflow-y: auto;
+        min-width: 300px;
+        font-size: 0.75rem;
+    `;
+    suggestionBox.style.top = (rect.bottom + scrollTop + 2) + 'px';
+    suggestionBox.style.left = (rect.left + scrollLeft) + 'px';
+    suggestionBox.style.width = (Math.max(rect.width, 280)) + 'px';
+
+    matches.forEach(customer => {
+        const item = document.createElement('div');
+        item.style.cssText = `
+            padding: 10px 12px;
+            cursor: pointer;
+            color: #e0e0ff;
+            border-bottom: 1px solid rgba(77,184,255,0.15);
+            transition: background 0.1s;
+        `;
+        
+        // Highlight matching part
+        const tinValue = customer.tin;
+        const searchLower = searchText;
+        const tinLower = tinValue.toLowerCase();
+        let highlightedTin = tinValue;
+        if (tinLower.startsWith(searchLower)) {
+            const matchLength = searchText.length;
+            highlightedTin = `<span style="color: #00ff9d; font-weight: bold;">${escapeHtml(tinValue.substring(0, matchLength))}</span>${escapeHtml(tinValue.substring(matchLength))}`;
+        } else {
+            highlightedTin = escapeHtml(tinValue);
+        }
+        
+        // Determine badge style for sales type
+        let badgeStyle = '';
+        let badgeText = customer.salesType || 'Pending';
+        if (customer.salesType === 'Private') {
+            badgeStyle = 'background: rgba(0, 100, 200, 0.3); color: #4db8ff;';
+        } else if (customer.salesType === 'Government') {
+            badgeStyle = 'background: rgba(200, 50, 50, 0.3); color: #ff6b6b;';
+        } else {
+            badgeStyle = 'background: rgba(100, 100, 100, 0.3); color: #ccc;';
+        }
+        
+        // Show address if available
+        const addressDisplay = customer.address ? 
+            `<div style="display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 0.65rem; color: #80cbc4;">
+                <i class="fas fa-map-marker-alt" style="font-size: 9px;"></i>
+                <span style="word-break: break-word;">${escapeHtml(customer.address.substring(0, 60))}${customer.address.length > 60 ? '...' : ''}</span>
+            </div>` : '';
+        
+        item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <strong style="font-family: monospace; font-size: 0.8rem;">${highlightedTin}</strong>
+                        <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; ${badgeStyle}">${escapeHtml(badgeText)}</span>
+                    </div>
+                    <div style="font-size: 0.7rem; color: #a7ffeb; margin-top: 3px;">
+                        <i class="fas fa-user" style="font-size: 9px; margin-right: 4px;"></i>${escapeHtml(customer.name)}
+                    </div>
+                    ${addressDisplay}
+                </div>
+            </div>
+        `;
+        
+        item.addEventListener('mouseenter', () => {
+            item.style.background = 'linear-gradient(135deg, rgba(77,184,255,0.2), rgba(255,77,109,0.2))';
+        });
+        item.addEventListener('mouseleave', () => {
+            item.style.background = 'transparent';
+        });
+        
+        item.addEventListener('click', () => {
+            // Fill TIN
+            inputElement.value = customer.tin;
+            if (typeof formatTIN === 'function') formatTIN(inputElement);
+            
+            // Auto-fill customer name
+            const nameInput = row.querySelector('.customer-name');
+            if (customer.name && nameInput && nameInput.value.trim() === '') {
+                nameInput.value = customer.name;
+                nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+            
+            // Auto-fill sales type
+            const salesTypeSelect = row.querySelector('.sales-type');
+            if (customer.salesType && salesTypeSelect && salesTypeSelect.value === '') {
+                salesTypeSelect.value = customer.salesType;
+                salesTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            
+            // Auto-fill address
+            const addressInput = row.querySelector('.address');
+            if (customer.address && addressInput && addressInput.value.trim() === '') {
+                addressInput.value = customer.address;
+                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            
+            if (typeof updateCalculations === 'function') updateCalculations(row);
+            if (typeof updateAllStats === 'function') updateAllStats();
+            
+            if (activeSuggestionBox) {
+                activeSuggestionBox.remove();
+                activeSuggestionBox = null;
+            }
+        });
+        
+        suggestionBox.appendChild(item);
+    });
+
+    document.body.appendChild(suggestionBox);
+    activeSuggestionBox = suggestionBox;
+
+    const closeHandler = (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== inputElement) {
+            suggestionBox.remove();
+            activeSuggestionBox = null;
+            document.removeEventListener('click', closeHandler);
+            window.removeEventListener('scroll', closeHandler);
+        }
+    };
+    
+    setTimeout(() => {
+        document.addEventListener('click', closeHandler);
+        window.addEventListener('scroll', closeHandler);
+    }, 0);
+}
+
+/**
+ * Updates a customer's address and sales type when those fields are filled
+ */
+function updateCustomerDetails(row) {
+    const tinInput = row.querySelector('.tin-number');
+    const nameInput = row.querySelector('.customer-name');
+    const salesTypeSelect = row.querySelector('.sales-type');
+    const addressInput = row.querySelector('.address');
+    
+    const tinVal = tinInput ? tinInput.value.trim() : '';
+    const nameVal = nameInput ? nameInput.value.trim() : '';
+    const salesType = salesTypeSelect ? salesTypeSelect.value : null;
+    const address = addressInput ? addressInput.value.trim() : null;
+    
+    if (tinVal !== '' && nameVal !== '') {
+        // Check if pair exists in database
+        let exists = false;
+        let existingCustomer = null;
+        
+        if (typeof window.getAllPairs === 'function') {
+            const pairs = window.getAllPairs();
+            existingCustomer = pairs.find(p => p.tin === tinVal && p.name === nameVal);
+            exists = !!existingCustomer;
+        }
+        
+        if (exists) {
+            // Update existing customer with new details if changed
+            let needsUpdate = false;
+            
+            if (salesType && existingCustomer.salesType !== salesType) {
+                needsUpdate = true;
+            }
+            if (address && existingCustomer.address !== address) {
+                needsUpdate = true;
+            }
+            
+            if (needsUpdate && typeof addCustomerPair === 'function') {
+                // Update the customer with new sales type and address
+                addCustomerPair(nameVal, tinVal, salesType, address);
+                forceRefreshRegisteredCustomers();
+                
+                // Show feedback
+                if (address && salesType) {
+                    showAutoFillFeedback?.(addressInput, `✓ Updated ${nameVal}: ${salesType} sector, address saved`);
+                } else if (address) {
+                    showAutoFillFeedback?.(addressInput, `✓ Updated address for ${nameVal}`);
+                } else if (salesType) {
+                    showAutoFillFeedback?.(salesTypeSelect, `✓ Updated ${nameVal} to ${salesType} sector`);
+                }
+            }
+        } else {
+            // New customer - register with all details
+            if (typeof addCustomerPair === 'function') {
+                addCustomerPair(nameVal, tinVal, salesType, address);
+                forceRefreshRegisteredCustomers();
+            }
+        }
+    }
+}
+
+/**
+ * Adds TIN dropdown with floating suggestions
+ */
+function addTinDropdownWithFloatingSuggestions() {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+
+    const rows = tableBody.querySelectorAll('tr');
+    rows.forEach(row => {
+        const tinCell = row.querySelector('td:nth-child(5)');
+        if (!tinCell) return;
+
+        if (tinCell.getAttribute('data-suggestions-enabled') === 'true') return;
+
+        const existingInput = tinCell.querySelector('.tin-number');
+        const currentValue = existingInput ? existingInput.value : '';
+
+        tinCell.innerHTML = '';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'tin-number';
+        input.placeholder = '000-000-000-000';
+        input.maxLength = '15';
+        input.value = currentValue;
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        input.style.cssText = `
+            width: 100%;
+            height: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            margin: 0;
+            font-size: 0.75rem;
+            background: transparent;
+            color: #e0e0ff;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+            font-family: inherit;
+        `;
+
+        tinCell.appendChild(input);
+        tinCell.setAttribute('data-suggestions-enabled', 'true');
+        input.setAttribute('data-row-id', row.id || '');
+
+        let suggestionTimer = null;
+
+        // Input event for suggestions
+        input.addEventListener('input', function(e) {
+            if (typeof formatTIN === 'function') formatTIN(this);
+            if (typeof validateTIN === 'function') validateTIN(this);
+            
+            if (suggestionTimer) clearTimeout(suggestionTimer);
+            suggestionTimer = setTimeout(() => {
+                if (this.value.trim().length >= 1) {
+                    showTinSuggestions(this, row);
+                }
+            }, 50);
+        });
+
+        // Focus event
+        input.addEventListener('focus', function() {
+            this.select();
+            if (this.value.trim().length >= 1) {
+                setTimeout(() => showTinSuggestions(this, row), 100);
+            }
+        });
+
+        // Blur event to register TIN/Name pair
+        input.addEventListener('blur', function() {
+            setTimeout(() => updateCustomerDetails(row), 150);
+        });
+        
+        // Listen for name field changes
+        const nameInput = row.querySelector('.customer-name');
+        if (nameInput && !nameInput.hasAttribute('data-registration-listener')) {
+            nameInput.setAttribute('data-registration-listener', 'true');
+            nameInput.addEventListener('blur', function() {
+                setTimeout(() => updateCustomerDetails(row), 100);
+            });
+        }
+        
+        // Listen for sales type changes to update customer
+        const salesTypeSelect = row.querySelector('.sales-type');
+        if (salesTypeSelect && !salesTypeSelect.hasAttribute('data-sales-listener')) {
+            salesTypeSelect.setAttribute('data-sales-listener', 'true');
+            salesTypeSelect.addEventListener('change', function() {
+                const tinVal = input.value.trim();
+                const nameVal = nameInput ? nameInput.value.trim() : '';
+                if (tinVal !== '' && nameVal !== '') {
+                    setTimeout(() => updateCustomerDetails(row), 50);
+                }
+            });
+        }
+        
+        // Listen for address changes to update customer
+        const addressInput = row.querySelector('.address');
+        if (addressInput && !addressInput.hasAttribute('data-address-listener')) {
+            addressInput.setAttribute('data-address-listener', 'true');
+            addressInput.addEventListener('blur', function() {
+                const tinVal = input.value.trim();
+                const nameVal = nameInput ? nameInput.value.trim() : '';
+                if (tinVal !== '' && nameVal !== '') {
+                    setTimeout(() => updateCustomerDetails(row), 50);
+                }
+            });
+        }
+        
+        // Keyboard navigation
+        input.addEventListener('keydown', function(e) {
+            if (!activeSuggestionBox) {
+                if (e.key === 'ArrowDown' && this.value.trim().length >= 1) {
+                    e.preventDefault();
+                    showTinSuggestions(this, row);
+                }
+                return;
+            }
+            
+            const items = activeSuggestionBox.querySelectorAll('div');
+            let currentIndex = -1;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].style.background && items[i].style.background !== 'transparent') {
+                    currentIndex = i;
+                    break;
+                }
+            }
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (currentIndex < items.length - 1) {
+                        if (currentIndex >= 0) items[currentIndex].style.background = 'transparent';
+                        items[currentIndex + 1].style.background = 'linear-gradient(135deg, rgba(77,184,255,0.3), rgba(255,77,109,0.3))';
+                        items[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    } else if (currentIndex === -1 && items.length > 0) {
+                        items[0].style.background = 'linear-gradient(135deg, rgba(77,184,255,0.3), rgba(255,77,109,0.3))';
+                    }
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        items[currentIndex].style.background = 'transparent';
+                        items[currentIndex - 1].style.background = 'linear-gradient(135deg, rgba(77,184,255,0.3), rgba(255,77,109,0.3))';
+                        items[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (currentIndex >= 0 && items[currentIndex]) {
+                        items[currentIndex].click();
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    activeSuggestionBox.remove();
+                    activeSuggestionBox = null;
+                    break;
+            }
+        });
+    });
+}
+
+/**
+ * Force refresh the registered customers display
+ */
+function forceRefreshRegisteredCustomers() {
+    if (typeof updateMonitorDisplay === 'function') {
+        updateMonitorDisplay();
+    }
+    
+    const monitorSection = document.getElementById('registeredCustomersMonitor');
+    if (monitorSection) {
+        if (typeof window.refreshAutoFillBindings === 'function') {
+            window.refreshAutoFillBindings();
+        }
+        if (typeof updateMonitorDisplay === 'function') {
+            updateMonitorDisplay();
+        } else if (window.vatCustomerDB && typeof window.vatCustomerDB.list === 'function') {
+            manuallyUpdateMonitorDisplay();
+        }
+    }
+}
+
+/**
+ * Manually update the registered customers monitor display with full details
+ */
+function manuallyUpdateMonitorDisplay() {
+    let monitorSection = document.getElementById('registeredCustomersMonitor');
+    if (!monitorSection) return;
+    
+    let pairs = [];
+    if (typeof window.getAllPairs === 'function') {
+        pairs = window.getAllPairs();
+    } else if (window.vatCustomerDB && typeof window.vatCustomerDB.list === 'function') {
+        pairs = window.vatCustomerDB.list();
+    } else {
+        try {
+            const stored = localStorage.getItem('VAT_CUSTOMER_TIN_MAP');
+            if (stored) {
+                const map = new Map(Object.entries(JSON.parse(stored)));
+                for (let [key, value] of map.entries()) {
+                    if (key.startsWith('name:')) {
+                        const name = key.slice(5);
+                        const tin = value;
+                        const salesType = map.get(`type:${name}`) || 'Not specified';
+                        const address = map.get(`address:${name}`) || '';
+                        pairs.push({ name, tin, salesType, address });
+                    }
+                }
+                pairs.sort((a, b) => a.name.localeCompare(b.name));
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    const countBadge = document.getElementById('customersCount');
+    if (countBadge) {
+        countBadge.textContent = `${pairs.length} customer(s)`;
+    }
+    
+    const container = document.getElementById('customersListContainer');
+    if (!container) return;
+    
+    if (pairs.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #80cbc4;">
+                <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>No registered customers yet.</p>
+                <p style="font-size: 12px;">Enter a Customer Name and TIN in the table to add them here.</p>
+                <p style="font-size: 11px; margin-top: 10px;">Address and Sales Type will appear here automatically when filled.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+    pairs.forEach(pair => {
+        let badgeStyle = '';
+        let badgeIcon = '';
+        let badgeText = pair.salesType;
+        
+        if (pair.salesType === 'Private') {
+            badgeStyle = 'background: rgba(0, 100, 200, 0.3); border-color: #4db8ff; color: #4db8ff;';
+            badgeIcon = '<i class="fas fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i>';
+        } else if (pair.salesType === 'Government') {
+            badgeStyle = 'background: rgba(200, 50, 50, 0.3); border-color: #ff6b6b; color: #ff6b6b;';
+            badgeIcon = '<i class="fas fa-landmark" style="font-size: 10px; margin-right: 4px;"></i>';
+        } else {
+            badgeStyle = 'background: rgba(100, 100, 100, 0.3); border-color: #888; color: #ccc;';
+            badgeIcon = '<i class="fas fa-question" style="font-size: 10px; margin-right: 4px;"></i>';
+            badgeText = 'Pending';
+        }
+        
+        let displayAddress = pair.address || '';
+        let addressHtml = '';
+        if (displayAddress) {
+            addressHtml = `
+                <div style="display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dotted rgba(128, 203, 196, 0.3);">
+                    <i class="fas fa-map-marker-alt" style="font-size: 12px; color: #80cbc4; margin-top: 2px;"></i>
+                    <span style="font-size: 12px; color: #a7ffeb; line-height: 1.4; word-break: break-word; white-space: normal; flex: 1;">${escapeHtml(displayAddress)}</span>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ff9d; transition: all 0.2s;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <i class="fas fa-user" style="color: #00ff9d; font-size: 16px;"></i>
+                        <span style="font-weight: 600; color: #e0f7e9;">${escapeHtml(pair.name)}</span>
+                        <span style="color: #80cbc4;">→</span>
+                        <span style="font-family: monospace; color: #a7ffeb;">${escapeHtml(pair.tin)}</span>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; ${badgeStyle} border: 1px solid;">
+                            ${badgeIcon} ${escapeHtml(badgeText)}
+                        </span>
+                    </div>
+                    ${addressHtml}
+                </div>
+                <button onclick="deleteCustomerPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
+                        style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-left: 10px; align-self: center;">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        `;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Convert a single new row
+ */
+function convertSingleRowTinToFloatingDropdown(row) {
+    const tinCell = row.querySelector('td:nth-child(5)');
+    if (!tinCell) return;
+
+    if (tinCell.getAttribute('data-suggestions-enabled') === 'true') return;
+
+    const existingInput = tinCell.querySelector('.tin-number');
+    const currentValue = existingInput ? existingInput.value : '';
+
+    tinCell.innerHTML = '';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'tin-number';
+    input.placeholder = '000-000-000-000';
+    input.maxLength = '15';
+    input.value = currentValue;
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.style.cssText = `
+        width: 100%;
+        height: 100%;
+        min-height: 38px;
+        padding: 8px 10px;
+        margin: 0;
+        font-size: 0.75rem;
+        background: transparent;
+        color: #e0e0ff;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+    `;
+
+    tinCell.appendChild(input);
+    tinCell.setAttribute('data-suggestions-enabled', 'true');
+    input.setAttribute('data-row-id', row.id || '');
+
+    let suggestionTimer = null;
+
+    input.addEventListener('input', function(e) {
+        if (typeof formatTIN === 'function') formatTIN(this);
+        if (typeof validateTIN === 'function') validateTIN(this);
+        
+        if (suggestionTimer) clearTimeout(suggestionTimer);
+        suggestionTimer = setTimeout(() => {
+            if (this.value.trim().length >= 1) {
+                showTinSuggestions(this, row);
+            }
+        }, 50);
+    });
+
+    input.addEventListener('focus', function() {
+        this.select();
+        if (this.value.trim().length >= 1) {
+            setTimeout(() => showTinSuggestions(this, row), 100);
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        setTimeout(() => updateCustomerDetails(row), 150);
+    });
+    
+    const nameInput = row.querySelector('.customer-name');
+    if (nameInput && !nameInput.hasAttribute('data-registration-listener')) {
+        nameInput.setAttribute('data-registration-listener', 'true');
+        nameInput.addEventListener('blur', function() {
+            setTimeout(() => updateCustomerDetails(row), 100);
+        });
+    }
+    
+    const salesTypeSelect = row.querySelector('.sales-type');
+    if (salesTypeSelect && !salesTypeSelect.hasAttribute('data-sales-listener')) {
+        salesTypeSelect.setAttribute('data-sales-listener', 'true');
+        salesTypeSelect.addEventListener('change', function() {
+            const tinVal = input.value.trim();
+            const nameVal = nameInput ? nameInput.value.trim() : '';
+            if (tinVal !== '' && nameVal !== '') {
+                setTimeout(() => updateCustomerDetails(row), 50);
+            }
+        });
+    }
+    
+    const addressInput = row.querySelector('.address');
+    if (addressInput && !addressInput.hasAttribute('data-address-listener')) {
+        addressInput.setAttribute('data-address-listener', 'true');
+        addressInput.addEventListener('blur', function() {
+            const tinVal = input.value.trim();
+            const nameVal = nameInput ? nameInput.value.trim() : '';
+            if (tinVal !== '' && nameVal !== '') {
+                setTimeout(() => updateCustomerDetails(row), 50);
+            }
+        });
+    }
+    
+    input.addEventListener('keydown', function(e) {
+        if (!activeSuggestionBox) {
+            if (e.key === 'ArrowDown' && this.value.trim().length >= 1) {
+                e.preventDefault();
+                showTinSuggestions(this, row);
+            }
+            return;
+        }
+        
+        const items = activeSuggestionBox.querySelectorAll('div');
+        let currentIndex = -1;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].style.background && items[i].style.background !== 'transparent') {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        switch(e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                if (currentIndex < items.length - 1) {
+                    if (currentIndex >= 0) items[currentIndex].style.background = 'transparent';
+                    items[currentIndex + 1].style.background = 'linear-gradient(135deg, rgba(77,184,255,0.3), rgba(255,77,109,0.3))';
+                    items[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                }
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    items[currentIndex].style.background = 'transparent';
+                    items[currentIndex - 1].style.background = 'linear-gradient(135deg, rgba(77,184,255,0.3), rgba(255,77,109,0.3))';
+                    items[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                }
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (currentIndex >= 0 && items[currentIndex]) items[currentIndex].click();
+                break;
+            case 'Escape':
+                e.preventDefault();
+                activeSuggestionBox.remove();
+                activeSuggestionBox = null;
+                break;
+        }
+    });
+}
+
+/**
+ * Observe new rows
+ */
+function observeNewRowsForSuggestions() {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1 && node.tagName === 'TR') {
+                    convertSingleRowTinToFloatingDropdown(node);
+                } else if (node.nodeType === 1 && node.querySelectorAll) {
+                    node.querySelectorAll('tr').forEach(row => convertSingleRowTinToFloatingDropdown(row));
+                }
+            });
+        });
+    });
+
+    observer.observe(tableBody, { childList: true, subtree: true });
+}
+
+/**
+ * Initialize the system
+ */
+function initTinSuggestionSystem() {
+    setTimeout(() => {
+        addTinDropdownWithFloatingSuggestions();
+        observeNewRowsForSuggestions();
+        
+        const originalAddCustomerPair = window.addCustomerPair;
+        if (originalAddCustomerPair) {
+            window.addCustomerPair = function(name, tin, salesType, address) {
+                const result = originalAddCustomerPair(name, tin, salesType, address);
+                forceRefreshRegisteredCustomers();
+                return result;
+            };
+        }
+        
+        console.log('TIN suggestion system initialized - Address and Sales Type auto-save enabled');
+    }, 200);
+}
+
+// Auto-initialize
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTinSuggestionSystem);
+} else {
+    initTinSuggestionSystem();
+}   
+    </script>
 </body>
 </html>

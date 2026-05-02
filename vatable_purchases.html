@@ -118,7 +118,8 @@ body.left-sidebar-expanded.right-sidebar-expanded .container {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 40px);
+    min-height: calc(100vh - 40px);
+    height: auto;
     border: 1px solid rgba(0, 255, 204, 0.4);
     backdrop-filter: blur(12px);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
@@ -320,8 +321,9 @@ td.hidden-column {
 /* TABLE WRAPPER */
 .table-wrapper {
     flex: 1;
-    min-height: 400px;
+    min-height: 300px; /* Give it a minimum height */
     overflow: auto !important;
+    max-height: 60vh; /* Limit max height for scrolling */
     position: relative;
     direction: rtl;
     background: rgba(5, 8, 12, 0.3);
@@ -384,6 +386,9 @@ th {
         font-size: 0.65rem;
         padding: 8px 6px;
     }
+}
+th:first-child {
+    text-align: center !important;
 }
 td {
     padding: 0;
@@ -1231,8 +1236,8 @@ td.selected {
 
     <script>
 // ============================================================
-// SUPPLIER NAME & TIN AUTO-FILL STORAGE SYSTEM (PURCHASES)
-// With REGISTERED SUPPLIERS MONITOR SECTION (TOGGLEABLE VIA SIDEBAR BUTTON)
+// ENHANCED SUPPLIER REGISTRATION SYSTEM WITH ADDRESS (PURCHASES)
+// Includes Registered Suppliers Monitor with Address Display
 // ============================================================
 
 (function() {
@@ -1272,7 +1277,7 @@ td.selected {
         return existingName && existingName !== name.trim();
     }
     
-    function addSupplierPair(supplierName, tinNumber) {
+    function addSupplierPair(supplierName, tinNumber, address = null) {
         if (!supplierName || !tinNumber) return false;
         
         const cleanName = supplierName.trim();
@@ -1284,11 +1289,18 @@ td.selected {
         const existingNameForTin = supplierDB.get(`tin:${cleanTin}`);
         
         if (existingTinForName === cleanTin && existingNameForTin === cleanName) {
+            // Update address if provided and different
+            if (address && supplierDB.get(`address:${cleanName}`) !== address) {
+                supplierDB.set(`address:${cleanName}`, address);
+                supplierDB.set(`address:${cleanTin}`, address);
+                saveSupplierDB();
+                showAutoFillFeedback(null, `✓ Updated address for "${cleanName}"`);
+            }
             return true;
         }
         
         if (existingTinForName && existingTinForName !== cleanTin) {
-            showWarningToast(`❌ Supplier "${cleanName}" already registered with TIN ${existingTinForName}. Cannot reassign.`);
+            showWarningToast(`❌ "${cleanName}" already registered with TIN ${existingTinForName}. Cannot reassign.`);
             return false;
         }
         
@@ -1300,8 +1312,14 @@ td.selected {
         supplierDB.set(`name:${cleanName}`, cleanTin);
         supplierDB.set(`tin:${cleanTin}`, cleanName);
         
+        // Store address if provided
+        if (address) {
+            supplierDB.set(`address:${cleanName}`, address);
+            supplierDB.set(`address:${cleanTin}`, address);
+        }
+        
         saveSupplierDB();
-        showAutoFillFeedback(null, `✓ Saved: "${cleanName}" ↔ ${cleanTin}`);
+        showAutoFillFeedback(null, `✓ Saved: "${cleanName}" ↔ ${cleanTin} ${address ? `📍 ${address.substring(0, 30)}...` : ''}`);
         return true;
     }
     
@@ -1319,7 +1337,10 @@ td.selected {
         const pairs = [];
         for (let [key, value] of supplierDB.entries()) {
             if (key.startsWith('name:')) {
-                pairs.push({ name: key.slice(5), tin: value });
+                const name = key.slice(5);
+                const tin = value;
+                const address = supplierDB.get(`address:${name}`) || '';
+                pairs.push({ name, tin, address });
             }
         }
         return pairs.sort((a, b) => a.name.localeCompare(b.name));
@@ -1329,6 +1350,8 @@ td.selected {
         if (confirm(`Delete supplier "${name}" (TIN: ${tin})? This cannot be undone.`)) {
             supplierDB.delete(`name:${name}`);
             supplierDB.delete(`tin:${tin}`);
+            supplierDB.delete(`address:${name}`);
+            supplierDB.delete(`address:${tin}`);
             saveSupplierDB();
             showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
         }
@@ -1338,12 +1361,15 @@ td.selected {
         const toggleBtn = document.getElementById('toggleSuppliersMonitorBtn');
         if (!toggleBtn) return;
         
+        const icon = toggleBtn.querySelector('i');
         const textSpan = toggleBtn.querySelector('.sidebar-btn-text');
         
         if (monitorVisible) {
             if (textSpan) textSpan.textContent = 'Hide Suppliers List';
+            if (icon) icon.className = 'fas fa-building';
         } else {
             if (textSpan) textSpan.textContent = 'Show Suppliers List';
+            if (icon) icon.className = 'fas fa-building';
         }
     }
     
@@ -1382,25 +1408,26 @@ td.selected {
             monitorSection.style.cssText = `
                 margin: 20px 30px;
                 background: linear-gradient(135deg, rgba(0, 40, 30, 0.85) 0%, rgba(0, 30, 25, 0.9) 100%);
-                border: 1px solid rgba(0, 255, 157, 0.3);
+                border: 1px solid rgba(0, 255, 204, 0.4);
                 border-radius: 12px;
                 overflow: hidden;
                 flex-shrink: 0;
                 display: ${monitorVisible ? 'block' : 'none'};
+                box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
             `;
             
             const headerHtml = `
-                <div style="padding: 15px 20px; background: rgba(0, 255, 157, 0.1); border-bottom: 1px solid rgba(0, 255, 157, 0.3); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="padding: 15px 20px; background: rgba(0, 255, 204, 0.08); border-bottom: 1px solid rgba(0, 255, 204, 0.3); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-building" style="color: #00ff9d; font-size: 20px;"></i>
-                        <h3 style="color: #00ff9d; margin: 0; font-weight: 600; text-shadow: 0 0 5px rgba(0,255,157,0.5);">REGISTERED SUPPLIERS</h3>
-                        <span id="suppliersCount" style="background: rgba(0,255,157,0.2); padding: 2px 10px; border-radius: 20px; font-size: 12px; color: #a7ffeb;">${pairs.length} supplier(s)</span>
+                        <i class="fas fa-truck" style="color: #00ffcc; font-size: 20px; text-shadow: 0 0 5px rgba(0,255,204,0.5);"></i>
+                        <h3 style="color: #00ffcc; margin: 0; font-weight: 600; text-shadow: 0 0 5px rgba(0,255,204,0.5);">REGISTERED SUPPLIERS</h3>
+                        <span id="suppliersCount" style="background: rgba(0,255,204,0.2); padding: 2px 10px; border-radius: 20px; font-size: 12px; color: #a7ffeb;">${pairs.length} supplier(s)</span>
                     </div>
-                    <button id="clearAllSuppliersBtn" style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; color: #ff8888; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px;">
+                    <button id="clearAllSuppliersBtn" style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; color: #ff8888; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s;">
                         <i class="fas fa-trash-alt"></i> Clear All
                     </button>
                 </div>
-                <div id="suppliersListContainer" style="max-height: 300px; overflow-y: auto; padding: 10px;">
+                <div id="suppliersListContainer" style="max-height: 400px; overflow-y: auto; padding: 10px;">
                     <div style="text-align: center; padding: 40px; color: #80cbc4;">Loading suppliers...</div>
                 </div>
             `;
@@ -1437,6 +1464,7 @@ td.selected {
                     <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
                     <p>No registered suppliers yet.</p>
                     <p style="font-size: 12px;">Enter a Supplier Name and TIN in the table to add them here.</p>
+                    <p style="font-size: 11px; margin-top: 10px;">Address will appear here automatically when filled.</p>
                 </div>
             `;
             return;
@@ -1444,18 +1472,32 @@ td.selected {
         
         let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
         pairs.forEach(pair => {
+            let displayAddress = pair.address || '';
+            let addressHtml = '';
+            if (displayAddress) {
+                addressHtml = `
+                    <div style="display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dotted rgba(0, 255, 204, 0.2);">
+                        <i class="fas fa-map-marker-alt" style="font-size: 12px; color: #80cbc4; margin-top: 2px;"></i>
+                        <span style="font-size: 12px; color: #a7ffeb; line-height: 1.4; word-break: break-word; white-space: normal; flex: 1;">${escapeHtml(displayAddress)}</span>
+                    </div>
+                `;
+            }
+            
             html += `
-                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ff9d;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ffcc; transition: all 0.2s;">
                     <div style="flex: 1;">
                         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                            <i class="fas fa-truck" style="color: #00ff9d; font-size: 16px;"></i>
+                            <i class="fas fa-truck" style="color: #00ffcc; font-size: 16px;"></i>
                             <span style="font-weight: 600; color: #e0f7e9;">${escapeHtml(pair.name)}</span>
                             <span style="color: #80cbc4;">→</span>
                             <span style="font-family: monospace; color: #a7ffeb;">${escapeHtml(pair.tin)}</span>
                         </div>
+                        ${addressHtml}
                     </div>
                     <button onclick="window.deleteSupplierPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
-                            style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+                            style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-left: 10px; align-self: center; transition: all 0.2s;"
+                            onmouseover="this.style.background='rgba(255,85,85,0.4)'" 
+                            onmouseout="this.style.background='rgba(255,85,85,0.2)'">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
@@ -1485,40 +1527,80 @@ td.selected {
         if (row.hasAttribute('data-autofill-bound')) return;
         row.setAttribute('data-autofill-bound', 'true');
         
+        const addressInput = row.querySelector('.address');
+        
+        // Auto-fill from name
         fields.nameInput.addEventListener('blur', function(e) {
             const nameVal = this.value.trim();
             if (nameVal === "") return;
+            
             const existingTin = lookupTinByName(nameVal);
             if (existingTin && fields.tinInput && fields.tinInput.value.trim() === "") {
                 fields.tinInput.value = existingTin;
                 if (typeof formatTIN === 'function') formatTIN(fields.tinInput);
                 if (typeof validateTIN === 'function') validateTIN(fields.tinInput);
                 fields.tinInput.dispatchEvent(new Event('input', { bubbles: true }));
-                showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled');
+                showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled from registered supplier');
+            }
+            
+            // Auto-fill Address from registered supplier
+            if (addressInput) {
+                const registeredAddress = supplierDB.get(`address:${nameVal}`);
+                if (registeredAddress && addressInput.value.trim() === "") {
+                    addressInput.value = registeredAddress;
+                    addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered supplier`);
+                }
             }
         });
         
+        // Auto-fill from TIN
         fields.tinInput.addEventListener('blur', function(e) {
             const tinVal = this.value.trim();
             if (tinVal === "") return;
+            
             const existingName = lookupNameByTin(tinVal);
             if (existingName && fields.nameInput && fields.nameInput.value.trim() === "") {
                 fields.nameInput.value = existingName;
                 fields.nameInput.dispatchEvent(new Event('input', { bubbles: true }));
-                showAutoFillFeedback(fields.nameInput, '✓ Supplier name auto-filled');
+                showAutoFillFeedback(fields.nameInput, '✓ Supplier name auto-filled from registered TIN');
+            }
+            
+            // Auto-fill Address from registered supplier
+            if (addressInput) {
+                const registeredAddress = supplierDB.get(`address:${tinVal}`);
+                if (registeredAddress && addressInput.value.trim() === "") {
+                    addressInput.value = registeredAddress;
+                    addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered supplier`);
+                }
             }
         });
         
+        // Store valid pair with address
         function storeIfValidPair() {
             const nameVal = fields.nameInput?.value.trim() || "";
             const tinVal = fields.tinInput?.value.trim() || "";
+            const address = addressInput ? addressInput.value.trim() : null;
             if (nameVal !== "" && tinVal !== "") {
-                addSupplierPair(nameVal, tinVal);
+                addSupplierPair(nameVal, tinVal, address);
             }
         }
         
         fields.nameInput.addEventListener('blur', storeIfValidPair);
         fields.tinInput.addEventListener('blur', storeIfValidPair);
+        
+        // Also store when address changes
+        if (addressInput) {
+            addressInput.addEventListener('blur', function() {
+                const nameVal = fields.nameInput?.value.trim() || "";
+                const tinVal = fields.tinInput?.value.trim() || "";
+                if (nameVal !== "" && tinVal !== "") {
+                    addSupplierPair(nameVal, tinVal, this.value.trim());
+                    showAutoFillFeedback(this, '✓ Updated supplier address');
+                }
+            });
+        }
     }
     
     function showAutoFillFeedback(element, message) {
@@ -1534,7 +1616,7 @@ td.selected {
             border-radius: 30px;
             font-size: 13px;
             font-weight: 500;
-            border-left: 4px solid #00ff9d;
+            border-left: 4px solid #00ffcc;
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             z-index: 9999;
             backdrop-filter: blur(8px);
@@ -1617,16 +1699,18 @@ td.selected {
     function exposeDebugTools() {
         window.vatSupplierDB = {
             list: () => getAllPairs(),
-            add: (name, tin) => addSupplierPair(name, tin),
+            add: (name, tin, address) => addSupplierPair(name, tin, address),
             clear: () => { supplierDB.clear(); saveSupplierDB(); console.log('Supplier DB cleared'); },
             stats: () => ({ size: supplierDB.size, pairs: getAllPairs().length })
         };
-        console.log('[Purchases AutoFill] Supplier DB loaded. Use window.vatSupplierDB to inspect.');
+        console.log('[Purchases AutoFill] Supplier DB loaded with address support. Use window.vatSupplierDB to inspect.');
     }
     
     window.deleteSupplierPair = function(name, tin) {
         supplierDB.delete(`name:${name}`);
         supplierDB.delete(`tin:${tin}`);
+        supplierDB.delete(`address:${name}`);
+        supplierDB.delete(`address:${tin}`);
         saveSupplierDB();
         showAutoFillFeedback(null, `🗑 Deleted: "${name}"`);
     };
@@ -1645,7 +1729,7 @@ td.selected {
         const loadDataBtn = document.getElementById('loadDataBtn');
         if (loadDataBtn) loadDataBtn.addEventListener('click', () => setTimeout(bindAutoFillToAllRows, 200));
         
-        console.log('✅ Purchases auto-fill active: Unique supplier name-TIN pairs only. Monitor section with toggle button integrated.');
+        console.log('✅ Purchases auto-fill active: Supplier name-TIN-address pairs saved. Monitor section with address toggle integrated.');
     }
     
     if (document.readyState === 'loading') {
@@ -1659,6 +1743,7 @@ td.selected {
     window.lookupSupplierNameByTin = lookupNameByTin;
     window.refreshPurchasesAutoFillBindings = bindAutoFillToAllRows;
     window.toggleSuppliersMonitor = toggleMonitorVisibility;
+    window.forceRefreshRegisteredSuppliers = updateMonitorDisplay;
 })();
 </script>
 
@@ -5281,5 +5366,766 @@ function initColumnVisibility() {
     </script>
 
     <script src="company_info.js"></script>
+
+    <script>
+        // ============================================================
+// ENHANCED SUPPLIER TIN DROPDOWN WITH FLOATING SUGGESTIONS
+// Supports: Manual entry, auto-registration, address & type updates
+// ============================================================
+
+let activeSuggestionBox = null;
+
+/**
+ * Shows floating suggestion box for supplier TIN
+ */
+function showSupplierTinSuggestions(inputElement, row) {
+    // Remove existing suggestion box
+    if (activeSuggestionBox) {
+        activeSuggestionBox.remove();
+        activeSuggestionBox = null;
+    }
+
+    const searchText = inputElement.value.trim().toLowerCase();
+    if (searchText.length < 1) return;
+
+    // Get registered suppliers with all details
+    let registeredSuppliers = [];
+    if (typeof window.vatSupplierDB !== 'undefined' && window.vatSupplierDB.list) {
+        registeredSuppliers = window.vatSupplierDB.list();
+    } else if (typeof window.getAllPairs === 'function') {
+        registeredSuppliers = window.getAllPairs();
+    } else {
+        try {
+            const stored = localStorage.getItem('VAT_SUPPLIER_TIN_MAP');
+            if (stored) {
+                const map = new Map(Object.entries(JSON.parse(stored)));
+                for (let [key, value] of map.entries()) {
+                    if (key.startsWith('name:')) {
+                        const name = key.slice(5);
+                        const tin = value;
+                        const supplierType = map.get(`type:${name}`) || '';
+                        const address = map.get(`address:${name}`) || '';
+                        registeredSuppliers.push({ name, tin, supplierType, address });
+                    }
+                }
+                registeredSuppliers.sort((a, b) => a.name.localeCompare(b.name));
+            }
+        } catch(e) { console.warn(e); }
+    }
+
+    // Filter matching TINs (starts with)
+    const matches = registeredSuppliers.filter(supplier => 
+        supplier.tin && supplier.tin.toLowerCase().startsWith(searchText)
+    ).slice(0, 10);
+
+    if (matches.length === 0) return;
+
+    // Get position of input element
+    const rect = inputElement.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+    // Create suggestion box
+    const suggestionBox = document.createElement('div');
+    suggestionBox.className = 'tin-suggestion-box';
+    suggestionBox.style.cssText = `
+        position: absolute;
+        z-index: 10000;
+        background: #1a1a2e;
+        border: 1px solid #00ffcc;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 15px rgba(0,255,204,0.2);
+        max-height: 300px;
+        overflow-y: auto;
+        min-width: 300px;
+        font-size: 0.75rem;
+    `;
+    suggestionBox.style.top = (rect.bottom + scrollTop + 2) + 'px';
+    suggestionBox.style.left = (rect.left + scrollLeft) + 'px';
+    suggestionBox.style.width = (Math.max(rect.width, 280)) + 'px';
+
+    matches.forEach(supplier => {
+        const item = document.createElement('div');
+        item.style.cssText = `
+            padding: 10px 12px;
+            cursor: pointer;
+            color: #e0e0ff;
+            border-bottom: 1px solid rgba(0,255,204,0.15);
+            transition: background 0.1s;
+        `;
+        
+        // Highlight matching part
+        const tinValue = supplier.tin;
+        let highlightedTin = tinValue;
+        if (tinValue.toLowerCase().startsWith(searchText)) {
+            const matchLength = searchText.length;
+            highlightedTin = `<span style="color: #00ffcc; font-weight: bold;">${escapeHtml(tinValue.substring(0, matchLength))}</span>${escapeHtml(tinValue.substring(matchLength))}`;
+        } else {
+            highlightedTin = escapeHtml(tinValue);
+        }
+        
+        // Determine badge style for supplier type
+        let badgeStyle = '';
+        let badgeText = supplier.supplierType || 'Pending';
+        if (supplier.supplierType === 'Private') {
+            badgeStyle = 'background: rgba(0, 100, 200, 0.3); color: #4db8ff;';
+        } else if (supplier.supplierType === 'Government') {
+            badgeStyle = 'background: rgba(200, 50, 50, 0.3); color: #ff6b6b;';
+        } else {
+            badgeStyle = 'background: rgba(100, 100, 100, 0.3); color: #ccc;';
+        }
+        
+        // Show address if available
+        const addressDisplay = supplier.address ? 
+            `<div style="display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 0.65rem; color: #80cbc4;">
+                <i class="fas fa-map-marker-alt" style="font-size: 9px;"></i>
+                <span style="word-break: break-word;">${escapeHtml(supplier.address.substring(0, 60))}${supplier.address.length > 60 ? '...' : ''}</span>
+            </div>` : '';
+        
+        item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <strong style="font-family: monospace; font-size: 0.8rem;">${highlightedTin}</strong>
+                        <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; ${badgeStyle}">${escapeHtml(badgeText)}</span>
+                    </div>
+                    <div style="font-size: 0.7rem; color: #a7ffeb; margin-top: 3px;">
+                        <i class="fas fa-truck" style="font-size: 9px; margin-right: 4px;"></i>${escapeHtml(supplier.name)}
+                    </div>
+                    ${addressDisplay}
+                </div>
+            </div>
+        `;
+        
+        item.addEventListener('mouseenter', () => {
+            item.style.background = 'linear-gradient(135deg, rgba(0,255,204,0.2), rgba(0,200,180,0.15))';
+        });
+        item.addEventListener('mouseleave', () => {
+            item.style.background = 'transparent';
+        });
+        
+        item.addEventListener('click', () => {
+            // Fill TIN
+            inputElement.value = supplier.tin;
+            if (typeof formatTIN === 'function') formatTIN(inputElement);
+            
+            // Auto-fill supplier name
+            const nameInput = row.querySelector('.supplier-name');
+            if (supplier.name && nameInput && nameInput.value.trim() === '') {
+                nameInput.value = supplier.name;
+                nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+            
+            // Auto-fill supplier type (if we add that column later)
+            // For purchases, we don't have supplier type column yet, but we can store it
+            
+            // Auto-fill address
+            const addressInput = row.querySelector('.address');
+            if (supplier.address && addressInput && addressInput.value.trim() === '') {
+                addressInput.value = supplier.address;
+                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            
+            if (typeof updateCalculations === 'function') updateCalculations(row);
+            if (typeof updateAllStats === 'function') updateAllStats();
+            
+            if (activeSuggestionBox) {
+                activeSuggestionBox.remove();
+                activeSuggestionBox = null;
+            }
+        });
+        
+        suggestionBox.appendChild(item);
+    });
+
+    document.body.appendChild(suggestionBox);
+    activeSuggestionBox = suggestionBox;
+
+    const closeHandler = (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== inputElement) {
+            suggestionBox.remove();
+            activeSuggestionBox = null;
+            document.removeEventListener('click', closeHandler);
+            window.removeEventListener('scroll', closeHandler);
+        }
+    };
+    
+    setTimeout(() => {
+        document.addEventListener('click', closeHandler);
+        window.addEventListener('scroll', closeHandler);
+    }, 0);
+}
+
+/**
+ * Updates a supplier's address and type when those fields are filled
+ */
+function updateSupplierDetails(row) {
+    const tinInput = row.querySelector('.tin-number');
+    const nameInput = row.querySelector('.supplier-name');
+    const addressInput = row.querySelector('.address');
+    // For purchases, we don't have a supplier type column yet, but we can add it later
+    
+    const tinVal = tinInput ? tinInput.value.trim() : '';
+    const nameVal = nameInput ? nameInput.value.trim() : '';
+    const address = addressInput ? addressInput.value.trim() : null;
+    // const supplierType = null; // Placeholder for future supplier type column
+    
+    if (tinVal !== '' && nameVal !== '') {
+        // Check if pair exists in database
+        let exists = false;
+        let existingSupplier = null;
+        
+        if (typeof window.getAllPairs === 'function') {
+            const pairs = window.getAllPairs();
+            existingSupplier = pairs.find(p => p.tin === tinVal && p.name === nameVal);
+            exists = !!existingSupplier;
+        } else if (window.vatSupplierDB && typeof window.vatSupplierDB.list === 'function') {
+            const pairs = window.vatSupplierDB.list();
+            existingSupplier = pairs.find(p => p.tin === tinVal && p.name === nameVal);
+            exists = !!existingSupplier;
+        }
+        
+        if (exists) {
+            // Update existing supplier with new details if changed
+            let needsUpdate = false;
+            let updateAddress = address && existingSupplier.address !== address;
+            
+            if (updateAddress) {
+                needsUpdate = true;
+            }
+            
+            if (needsUpdate && typeof addSupplierPair === 'function') {
+                // Update the supplier with new address (and type if available)
+                addSupplierPair(nameVal, tinVal);
+                
+                // Also update address separately (since addSupplierPair doesn't handle address)
+                if (updateAddress && window.supplierDB) {
+                    window.supplierDB.set(`address:${nameVal}`, address);
+                    window.supplierDB.set(`address:${tinVal}`, address);
+                    if (typeof window.saveSupplierDB === 'function') {
+                        window.saveSupplierDB();
+                    }
+                    forceRefreshRegisteredSuppliers();
+                    showAutoFillFeedback?.(addressInput, `✓ Updated address for ${nameVal}`);
+                }
+            }
+        } else {
+            // New supplier - register with details
+            if (typeof addSupplierPair === 'function') {
+                addSupplierPair(nameVal, tinVal);
+                
+                // Also store address if provided
+                if (address && window.supplierDB) {
+                    window.supplierDB.set(`address:${nameVal}`, address);
+                    window.supplierDB.set(`address:${tinVal}`, address);
+                    if (typeof window.saveSupplierDB === 'function') {
+                        window.saveSupplierDB();
+                    }
+                }
+                forceRefreshRegisteredSuppliers();
+            }
+        }
+    }
+}
+
+/**
+ * Force refresh the registered suppliers display
+ */
+function forceRefreshRegisteredSuppliers() {
+    if (typeof updateMonitorDisplay === 'function') {
+        updateMonitorDisplay();
+    }
+    
+    const monitorSection = document.getElementById('registeredSuppliersMonitor');
+    if (monitorSection) {
+        if (typeof window.refreshPurchasesAutoFillBindings === 'function') {
+            window.refreshPurchasesAutoFillBindings();
+        }
+        if (typeof updateMonitorDisplay === 'function') {
+            updateMonitorDisplay();
+        } else if (window.vatSupplierDB && typeof window.vatSupplierDB.list === 'function') {
+            manuallyUpdateSuppliersMonitorDisplay();
+        }
+    }
+}
+
+/**
+ * Manually update the registered suppliers monitor display with address
+ */
+function manuallyUpdateSuppliersMonitorDisplay() {
+    let monitorSection = document.getElementById('registeredSuppliersMonitor');
+    if (!monitorSection) return;
+    
+    let pairs = [];
+    if (typeof window.getAllPairs === 'function') {
+        pairs = window.getAllPairs();
+    } else if (window.vatSupplierDB && typeof window.vatSupplierDB.list === 'function') {
+        pairs = window.vatSupplierDB.list();
+    } else {
+        try {
+            const stored = localStorage.getItem('VAT_SUPPLIER_TIN_MAP');
+            if (stored) {
+                const map = new Map(Object.entries(JSON.parse(stored)));
+                for (let [key, value] of map.entries()) {
+                    if (key.startsWith('name:')) {
+                        const name = key.slice(5);
+                        const tin = value;
+                        const address = map.get(`address:${name}`) || '';
+                        pairs.push({ name, tin, address });
+                    }
+                }
+                pairs.sort((a, b) => a.name.localeCompare(b.name));
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    const countBadge = document.getElementById('suppliersCount');
+    if (countBadge) {
+        countBadge.textContent = `${pairs.length} supplier(s)`;
+    }
+    
+    const container = document.getElementById('suppliersListContainer');
+    if (!container) return;
+    
+    if (pairs.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #80cbc4;">
+                <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>No registered suppliers yet.</p>
+                <p style="font-size: 12px;">Enter a Supplier Name and TIN in the table to add them here.</p>
+                <p style="font-size: 11px; margin-top: 10px;">Address will appear here automatically when filled.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+    pairs.forEach(pair => {
+        let displayAddress = pair.address || '';
+        let addressHtml = '';
+        if (displayAddress) {
+            addressHtml = `
+                <div style="display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dotted rgba(128, 203, 196, 0.3);">
+                    <i class="fas fa-map-marker-alt" style="font-size: 12px; color: #80cbc4; margin-top: 2px;"></i>
+                    <span style="font-size: 12px; color: #a7ffeb; line-height: 1.4; word-break: break-word; white-space: normal; flex: 1;">${escapeHtml(displayAddress)}</span>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; background: rgba(0, 30, 20, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #00ffcc;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <i class="fas fa-truck" style="color: #00ffcc; font-size: 16px;"></i>
+                        <span style="font-weight: 600; color: #e0f7e9;">${escapeHtml(pair.name)}</span>
+                        <span style="color: #80cbc4;">→</span>
+                        <span style="font-family: monospace; color: #a7ffeb;">${escapeHtml(pair.tin)}</span>
+                    </div>
+                    ${addressHtml}
+                </div>
+                <button onclick="window.deleteSupplierPair('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
+                        style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-left: 10px; align-self: center;">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        `;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Adds TIN dropdown with floating suggestions for purchases
+ */
+function addSupplierTinDropdownWithFloatingSuggestions() {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+
+    const rows = tableBody.querySelectorAll('tr');
+    rows.forEach(row => {
+        const tinCell = row.querySelector('td:nth-child(5)'); // TIN column is 5th (index 4)
+        if (!tinCell) return;
+
+        if (tinCell.getAttribute('data-suggestions-enabled') === 'true') return;
+
+        const existingInput = tinCell.querySelector('.tin-number');
+        const currentValue = existingInput ? existingInput.value : '';
+
+        // Clear cell and create new input
+        tinCell.innerHTML = '';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'tin-number';
+        input.placeholder = '000-000-000-000';
+        input.maxLength = '15';
+        input.value = currentValue;
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        input.style.cssText = `
+            width: 100%;
+            height: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            margin: 0;
+            font-size: 0.75rem;
+            background: transparent;
+            color: #e0e0ff;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+            font-family: inherit;
+        `;
+
+        tinCell.appendChild(input);
+        tinCell.setAttribute('data-suggestions-enabled', 'true');
+        input.setAttribute('data-row-id', row.id || '');
+
+        let suggestionTimer = null;
+
+        // Input event - show suggestions after first character
+        input.addEventListener('input', function(e) {
+            if (typeof formatTIN === 'function') formatTIN(this);
+            if (typeof validateTIN === 'function') validateTIN(this);
+            
+            if (suggestionTimer) clearTimeout(suggestionTimer);
+            suggestionTimer = setTimeout(() => {
+                if (this.value.trim().length >= 1) {
+                    showSupplierTinSuggestions(this, row);
+                }
+            }, 50);
+        });
+
+        // Focus event
+        input.addEventListener('focus', function() {
+            this.select();
+            if (this.value.trim().length >= 1) {
+                setTimeout(() => showSupplierTinSuggestions(this, row), 100);
+            }
+        });
+
+        // Blur event to register TIN/Name pair
+        input.addEventListener('blur', function() {
+            setTimeout(() => updateSupplierDetails(row), 150);
+        });
+        
+        // Listen for name field changes
+        const nameInput = row.querySelector('.supplier-name');
+        if (nameInput && !nameInput.hasAttribute('data-registration-listener')) {
+            nameInput.setAttribute('data-registration-listener', 'true');
+            nameInput.addEventListener('blur', function() {
+                setTimeout(() => updateSupplierDetails(row), 100);
+            });
+        }
+        
+        // Listen for address changes to update supplier
+        const addressInput = row.querySelector('.address');
+        if (addressInput && !addressInput.hasAttribute('data-address-listener')) {
+            addressInput.setAttribute('data-address-listener', 'true');
+            addressInput.addEventListener('blur', function() {
+                const tinVal = input.value.trim();
+                const nameVal = nameInput ? nameInput.value.trim() : '';
+                if (tinVal !== '' && nameVal !== '') {
+                    setTimeout(() => updateSupplierDetails(row), 50);
+                }
+            });
+        }
+        
+        // Keyboard navigation for suggestions
+        input.addEventListener('keydown', function(e) {
+            if (!activeSuggestionBox) {
+                if (e.key === 'ArrowDown' && this.value.trim().length >= 1) {
+                    e.preventDefault();
+                    showSupplierTinSuggestions(this, row);
+                }
+                return;
+            }
+            
+            const items = activeSuggestionBox.querySelectorAll('div');
+            let currentIndex = -1;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].style.background && items[i].style.background !== 'transparent') {
+                    currentIndex = i;
+                    break;
+                }
+            }
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (currentIndex < items.length - 1) {
+                        if (currentIndex >= 0) items[currentIndex].style.background = 'transparent';
+                        items[currentIndex + 1].style.background = 'linear-gradient(135deg, rgba(0,255,204,0.3), rgba(0,200,180,0.25))';
+                        items[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    } else if (currentIndex === -1 && items.length > 0) {
+                        items[0].style.background = 'linear-gradient(135deg, rgba(0,255,204,0.3), rgba(0,200,180,0.25))';
+                    }
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        items[currentIndex].style.background = 'transparent';
+                        items[currentIndex - 1].style.background = 'linear-gradient(135deg, rgba(0,255,204,0.3), rgba(0,200,180,0.25))';
+                        items[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (currentIndex >= 0 && items[currentIndex]) {
+                        items[currentIndex].click();
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    activeSuggestionBox.remove();
+                    activeSuggestionBox = null;
+                    break;
+            }
+        });
+    });
+}
+
+/**
+ * Convert a single new row for purchases
+ */
+function convertSingleSupplierRowToFloatingDropdown(row) {
+    const tinCell = row.querySelector('td:nth-child(5)');
+    if (!tinCell) return;
+
+    if (tinCell.getAttribute('data-suggestions-enabled') === 'true') return;
+
+    const existingInput = tinCell.querySelector('.tin-number');
+    const currentValue = existingInput ? existingInput.value : '';
+
+    tinCell.innerHTML = '';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'tin-number';
+    input.placeholder = '000-000-000-000';
+    input.maxLength = '15';
+    input.value = currentValue;
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.style.cssText = `
+        width: 100%;
+        height: 100%;
+        min-height: 38px;
+        padding: 8px 10px;
+        margin: 0;
+        font-size: 0.75rem;
+        background: transparent;
+        color: #e0e0ff;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+    `;
+
+    tinCell.appendChild(input);
+    tinCell.setAttribute('data-suggestions-enabled', 'true');
+    input.setAttribute('data-row-id', row.id || '');
+
+    let suggestionTimer = null;
+
+    input.addEventListener('input', function(e) {
+        if (typeof formatTIN === 'function') formatTIN(this);
+        if (typeof validateTIN === 'function') validateTIN(this);
+        
+        if (suggestionTimer) clearTimeout(suggestionTimer);
+        suggestionTimer = setTimeout(() => {
+            if (this.value.trim().length >= 1) {
+                showSupplierTinSuggestions(this, row);
+            }
+        }, 50);
+    });
+
+    input.addEventListener('focus', function() {
+        this.select();
+        if (this.value.trim().length >= 1) {
+            setTimeout(() => showSupplierTinSuggestions(this, row), 100);
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        setTimeout(() => updateSupplierDetails(row), 150);
+    });
+    
+    const nameInput = row.querySelector('.supplier-name');
+    if (nameInput && !nameInput.hasAttribute('data-registration-listener')) {
+        nameInput.setAttribute('data-registration-listener', 'true');
+        nameInput.addEventListener('blur', function() {
+            setTimeout(() => updateSupplierDetails(row), 100);
+        });
+    }
+    
+    const addressInput = row.querySelector('.address');
+    if (addressInput && !addressInput.hasAttribute('data-address-listener')) {
+        addressInput.setAttribute('data-address-listener', 'true');
+        addressInput.addEventListener('blur', function() {
+            const tinVal = input.value.trim();
+            const nameVal = nameInput ? nameInput.value.trim() : '';
+            if (tinVal !== '' && nameVal !== '') {
+                setTimeout(() => updateSupplierDetails(row), 50);
+            }
+        });
+    }
+    
+    input.addEventListener('keydown', function(e) {
+        if (!activeSuggestionBox) {
+            if (e.key === 'ArrowDown' && this.value.trim().length >= 1) {
+                e.preventDefault();
+                showSupplierTinSuggestions(this, row);
+            }
+            return;
+        }
+        
+        const items = activeSuggestionBox.querySelectorAll('div');
+        let currentIndex = -1;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].style.background && items[i].style.background !== 'transparent') {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        switch(e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                if (currentIndex < items.length - 1) {
+                    if (currentIndex >= 0) items[currentIndex].style.background = 'transparent';
+                    items[currentIndex + 1].style.background = 'linear-gradient(135deg, rgba(0,255,204,0.3), rgba(0,200,180,0.25))';
+                    items[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                }
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    items[currentIndex].style.background = 'transparent';
+                    items[currentIndex - 1].style.background = 'linear-gradient(135deg, rgba(0,255,204,0.3), rgba(0,200,180,0.25))';
+                    items[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                }
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (currentIndex >= 0 && items[currentIndex]) items[currentIndex].click();
+                break;
+            case 'Escape':
+                e.preventDefault();
+                activeSuggestionBox.remove();
+                activeSuggestionBox = null;
+                break;
+        }
+    });
+}
+
+/**
+ * Observe new rows for purchases
+ */
+function observeNewSupplierRows() {
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1 && node.tagName === 'TR') {
+                    convertSingleSupplierRowToFloatingDropdown(node);
+                } else if (node.nodeType === 1 && node.querySelectorAll) {
+                    node.querySelectorAll('tr').forEach(row => convertSingleSupplierRowToFloatingDropdown(row));
+                }
+            });
+        });
+    });
+
+    observer.observe(tableBody, { childList: true, subtree: true });
+}
+
+/**
+ * Hook into supplier registration functions
+ */
+function integrateSupplierDropdownWithRegistration() {
+    // Hook into addSupplierPair
+    const originalAddSupplierPair = window.addSupplierPair;
+    if (originalAddSupplierPair) {
+        window.addSupplierPair = function(name, tin) {
+            const result = originalAddSupplierPair(name, tin);
+            forceRefreshRegisteredSuppliers();
+            return result;
+        };
+    }
+
+    // Hook into saveSupplierDB
+    const originalSaveSupplierDB = window.saveSupplierDB;
+    if (originalSaveSupplierDB) {
+        window.saveSupplierDB = function() {
+            originalSaveSupplierDB();
+            forceRefreshRegisteredSuppliers();
+        };
+    }
+
+    // Hook into addMultipleRows
+    const originalAddMultipleRows = window.addMultipleRows;
+    if (originalAddMultipleRows) {
+        window.addMultipleRows = function(count) {
+            originalAddMultipleRows(count);
+            setTimeout(() => {
+                addSupplierTinDropdownWithFloatingSuggestions();
+                forceRefreshRegisteredSuppliers();
+            }, 100);
+        };
+    }
+
+    // Hook into clearAllData
+    const originalClearAllData = window.clearAllData;
+    if (originalClearAllData) {
+        window.clearAllData = function() {
+            originalClearAllData();
+            setTimeout(() => {
+                addSupplierTinDropdownWithFloatingSuggestions();
+                forceRefreshRegisteredSuppliers();
+            }, 100);
+        };
+    }
+    
+    // Hook into loadDataFromFile
+    const originalLoadDataFromFile = window.loadDataFromFile;
+    if (originalLoadDataFromFile) {
+        window.loadDataFromFile = function() {
+            originalLoadDataFromFile();
+            setTimeout(() => {
+                addSupplierTinDropdownWithFloatingSuggestions();
+                forceRefreshRegisteredSuppliers();
+            }, 200);
+        };
+    }
+}
+
+/**
+ * Initialize the supplier TIN suggestion system for purchases
+ */
+function initSupplierTinSuggestionSystem() {
+    setTimeout(() => {
+        addSupplierTinDropdownWithFloatingSuggestions();
+        observeNewSupplierRows();
+        integrateSupplierDropdownWithRegistration();
+        
+        // Also update the monitor display to show addresses
+        setTimeout(() => {
+            forceRefreshRegisteredSuppliers();
+        }, 100);
+        
+        console.log('Supplier TIN suggestion system initialized - Address auto-save enabled');
+    }, 200);
+}
+
+// Auto-initialize for purchases
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSupplierTinSuggestionSystem);
+} else {
+    initSupplierTinSuggestionSystem();
+}
+    </script>
 </body>
 </html>
