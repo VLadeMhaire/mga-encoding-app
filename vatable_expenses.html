@@ -1538,37 +1538,6 @@ tr.page-hidden {
         return true;
     }
     
-    function updateSupplierAddress(supplierName, tinNumber, address) {
-        if (!supplierName || !tinNumber || !address) return false;
-        
-        const cleanName = supplierName.trim();
-        const cleanTin = tinNumber.trim();
-        const cleanAddress = address.trim();
-        
-        if (cleanAddress === "") return false;
-        
-        // Check if supplier exists by name or TIN
-        const existingNameRecord = supplierDB.get(`name:${cleanName}`);
-        const existingTinRecord = supplierDB.get(`tin:${cleanTin}`);
-        
-        if (existingNameRecord === cleanTin || existingTinRecord === cleanName || 
-            (existingNameRecord && existingTinRecord && existingNameRecord === existingTinRecord)) {
-            // Supplier exists, update address
-            const currentAddress = supplierDB.get(`address:${cleanName}`);
-            if (currentAddress !== cleanAddress) {
-                supplierDB.set(`address:${cleanName}`, cleanAddress);
-                supplierDB.set(`address:${cleanTin}`, cleanAddress);
-                saveSupplierDB();
-                showAutoFillFeedback(null, `✓ Updated address for "${cleanName}"`);
-                return true;
-            }
-        } else {
-            // Supplier not registered yet - register with address
-            return addSupplierPair(cleanName, cleanTin, cleanAddress);
-        }
-        return false;
-    }
-    
     function lookupTinByName(name) {
         if (!name) return null;
         return supplierDB.get(`name:${name.trim()}`) || null;
@@ -1648,6 +1617,12 @@ tr.page-hidden {
             toggleBtn.setAttribute('data-listener-attached', 'true');
             toggleBtn.addEventListener('click', toggleMonitorVisibility);
         }
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
     
     function updateMonitorDisplay() {
@@ -1763,293 +1738,12 @@ tr.page-hidden {
         container.innerHTML = html;
     }
     
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
     function getRowFields(row) {
         if (!row) return null;
         const tinInput = row.querySelector('.tin-number');
         const nameInput = row.querySelector('.supplier-name');
         return { tinInput, nameInput };
     }
-    
-    function attachAutoFillToRow(row) {
-    if (!row) return;
-    const fields = getRowFields(row);
-    if (!fields.tinInput || !fields.nameInput) return;
-    if (row.hasAttribute('data-autofill-bound') && row.getAttribute('data-autofill-bound') === 'true') return;
-    row.setAttribute('data-autofill-bound', 'true');
-    
-    const addressInput = row.querySelector('.address');
-    
-    // Function to register or update supplier with address
-    function registerOrUpdateSupplier(addressValue = null, forceUpdate = false) {
-        const nameVal = fields.nameInput?.value.trim() || "";
-        const tinVal = fields.tinInput?.value.trim() || "";
-        const address = addressValue !== null ? addressValue : (addressInput ? addressInput.value.trim() : null);
-        
-        if (nameVal !== "" && tinVal !== "") {
-            // Check if supplier already exists
-            const existingNameRecord = supplierDB.get(`name:${nameVal}`);
-            const existingTinRecord = supplierDB.get(`tin:${tinVal}`);
-            
-            if (existingNameRecord === tinVal || existingTinRecord === nameVal) {
-                // Supplier exists, update address if provided and different
-                if (address && address !== "") {
-                    const currentAddress = supplierDB.get(`address:${nameVal}`);
-                    if (currentAddress !== address) {
-                        supplierDB.set(`address:${nameVal}`, address);
-                        supplierDB.set(`address:${tinVal}`, address);
-                        saveSupplierDB();
-                        showAutoFillFeedback(addressInput || null, `✓ Address updated for "${nameVal}"`);
-                        refreshMonitorWithAnimation();
-                        return true;
-                    }
-                }
-            } else {
-                // New supplier - REGISTER IMMEDIATELY with all details
-                supplierDB.set(`name:${nameVal}`, tinVal);
-                supplierDB.set(`tin:${tinVal}`, nameVal);
-                
-                // Store address if provided
-                if (address && address !== "") {
-                    supplierDB.set(`address:${nameVal}`, address);
-                    supplierDB.set(`address:${tinVal}`, address);
-                    showAutoFillFeedback(addressInput || null, `✓ New supplier registered: "${nameVal}" with address`);
-                } else {
-                    showAutoFillFeedback(null, `✓ New supplier registered: "${nameVal}"`);
-                }
-                
-                saveSupplierDB();
-                refreshMonitorWithAnimation();
-                return true;
-            }
-            refreshMonitorWithAnimation();
-        }
-        return false;
-    }
-    
-    // Helper function to refresh monitor with visual feedback
-    function refreshMonitorWithAnimation() {
-        const monitorSection = document.getElementById('registeredExpensesSuppliersMonitor');
-        if (monitorSection && monitorSection.style.display !== 'none') {
-            monitorSection.style.transition = 'box-shadow 0.2s ease';
-            monitorSection.style.boxShadow = '0 0 30px rgba(91, 160, 208, 0.6)';
-            setTimeout(() => {
-                monitorSection.style.boxShadow = '0 0 20px rgba(80, 180, 255, 0.15)';
-            }, 300);
-        }
-        updateMonitorDisplay();
-    }
-    
-    // Register when Name loses focus
-    fields.nameInput.addEventListener('blur', function() {
-        setTimeout(() => registerOrUpdateSupplier(), 100);
-    });
-    
-    // Register when TIN loses focus
-    fields.tinInput.addEventListener('blur', function() {
-        setTimeout(() => registerOrUpdateSupplier(), 100);
-    });
-    
-    // Auto-fill from name (fills TIN and Address)
-    fields.nameInput.addEventListener('blur', function(e) {
-        const nameVal = this.value.trim();
-        if (nameVal === "") return;
-        
-        const existingTin = lookupTinByName(nameVal);
-        if (existingTin && fields.tinInput && fields.tinInput.value.trim() === "") {
-            fields.tinInput.value = existingTin;
-            if (typeof formatTIN === 'function') formatTIN(fields.tinInput);
-            if (typeof validateTIN === 'function') validateTIN(fields.tinInput);
-            fields.tinInput.dispatchEvent(new Event('input', { bubbles: true }));
-            showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled from registered supplier');
-            // Auto-register if address exists
-            setTimeout(() => registerOrUpdateSupplier(), 50);
-        }
-        
-        // Auto-fill Address from registered supplier
-        if (addressInput) {
-            const registeredAddress = lookupAddressByName(nameVal);
-            if (registeredAddress && addressInput.value.trim() === "") {
-                addressInput.value = registeredAddress;
-                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
-                addressInput.dispatchEvent(new Event('change', { bubbles: true }));
-                showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered supplier`);
-                setTimeout(() => registerOrUpdateSupplier(registeredAddress), 50);
-            }
-        }
-    });
-    
-    // Auto-fill from TIN (fills Name and Address)
-    fields.tinInput.addEventListener('blur', function(e) {
-        const tinVal = this.value.trim();
-        if (tinVal === "") return;
-        
-        const existingName = lookupNameByTin(tinVal);
-        if (existingName && fields.nameInput && fields.nameInput.value.trim() === "") {
-            fields.nameInput.value = existingName;
-            fields.nameInput.dispatchEvent(new Event('input', { bubbles: true }));
-            showAutoFillFeedback(fields.nameInput, '✓ Supplier name auto-filled from registered TIN');
-            setTimeout(() => registerOrUpdateSupplier(), 50);
-        }
-        
-        // Auto-fill Address from registered supplier
-        if (addressInput) {
-            const registeredAddress = lookupAddressByTin(tinVal);
-            if (registeredAddress && addressInput.value.trim() === "") {
-                addressInput.value = registeredAddress;
-                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
-                addressInput.dispatchEvent(new Event('change', { bubbles: true }));
-                showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered supplier`);
-                setTimeout(() => registerOrUpdateSupplier(registeredAddress), 50);
-            }
-        }
-    });
-    
-    // CRITICAL FIX: Address field - Register supplier IMMEDIATELY on blur
-    if (addressInput && !addressInput.hasAttribute('data-address-listener')) {
-        addressInput.setAttribute('data-address-listener', 'true');
-        
-        // Track previous values to detect changes
-        let previousAddress = addressInput.value.trim();
-        let previousName = fields.nameInput?.value.trim() || "";
-        let previousTin = fields.tinInput?.value.trim() || "";
-        
-        // Function to check if all fields are ready and register
-        function checkAndRegisterSupplier(showToastMessage = false) {
-            const currentName = fields.nameInput?.value.trim() || "";
-            const currentTin = fields.tinInput?.value.trim() || "";
-            const currentAddress = addressInput?.value.trim() || "";
-            
-            // If we have name AND tin, register immediately with address
-            if (currentName !== "" && currentTin !== "") {
-                const existingNameRecord = supplierDB.get(`name:${currentName}`);
-                const existingTinRecord = supplierDB.get(`tin:${currentTin}`);
-                const isNewSupplier = !(existingNameRecord === currentTin || existingTinRecord === currentName);
-                
-                // Register or update
-                supplierDB.set(`name:${currentName}`, currentTin);
-                supplierDB.set(`tin:${currentTin}`, currentName);
-                
-                if (currentAddress !== "") {
-                    supplierDB.set(`address:${currentName}`, currentAddress);
-                    supplierDB.set(`address:${currentTin}`, currentAddress);
-                }
-                
-                saveSupplierDB();
-                refreshMonitorWithAnimation();
-                
-                if (isNewSupplier && showToastMessage) {
-                    showAutoFillFeedback(addressInput, `✓ New supplier "${currentName}" registered with address!`);
-                } else if (showToastMessage && currentAddress !== "" && previousAddress !== currentAddress) {
-                    showAutoFillFeedback(addressInput, `✓ Address updated for "${currentName}"`);
-                }
-                
-                // Update previous values
-                previousName = currentName;
-                previousTin = currentTin;
-                previousAddress = currentAddress;
-                return true;
-            }
-            return false;
-        }
-        
-        // Register on blur (when Tab is pressed or focus leaves)
-        addressInput.addEventListener('blur', function(e) {
-            const currentAddress = this.value.trim();
-            const nameVal = fields.nameInput?.value.trim() || "";
-            const tinVal = fields.tinInput?.value.trim() || "";
-            
-            // If name and tin exist, register immediately
-            if (nameVal !== "" && tinVal !== "") {
-                checkAndRegisterSupplier(true);
-            } else {
-                // Show warning that name/TIN are needed
-                if (currentAddress !== "" && (nameVal === "" || tinVal === "")) {
-                    showAutoFillFeedback(addressInput, `⚠️ Please fill Supplier Name and TIN first`, 2000);
-                }
-            }
-        });
-        
-        // Also register when name or tin change after address is filled
-        fields.nameInput.addEventListener('blur', function() {
-            const currentAddress = addressInput?.value.trim() || "";
-            if (currentAddress !== "") {
-                checkAndRegisterSupplier(true);
-            } else {
-                checkAndRegisterSupplier(false);
-            }
-        });
-        
-        fields.tinInput.addEventListener('blur', function() {
-            const currentAddress = addressInput?.value.trim() || "";
-            if (currentAddress !== "") {
-                checkAndRegisterSupplier(true);
-            } else {
-                checkAndRegisterSupplier(false);
-            }
-        });
-        
-        // On change (for better responsiveness)
-        addressInput.addEventListener('change', function() {
-            const nameVal = fields.nameInput?.value.trim() || "";
-            const tinVal = fields.tinInput?.value.trim() || "";
-            if (nameVal !== "" && tinVal !== "") {
-                checkAndRegisterSupplier(true);
-            }
-        });
-        
-        // If name and tin are already filled when this function runs, register immediately
-        setTimeout(() => {
-            const nameVal = fields.nameInput?.value.trim() || "";
-            const tinVal = fields.tinInput?.value.trim() || "";
-            const addressVal = addressInput?.value.trim() || "";
-            if (nameVal !== "" && tinVal !== "" && addressVal !== "") {
-                checkAndRegisterSupplier(true);
-            }
-        }, 100);
-    }
-    
-    // Also attach to ensure existing supplier gets updated
-    const checkAndUpdateAddress = function() {
-        const nameVal = fields.nameInput?.value.trim() || "";
-        const tinVal = fields.tinInput?.value.trim() || "";
-        const addressVal = addressInput ? addressInput.value.trim() : "";
-        
-        if (nameVal !== "" && tinVal !== "" && addressVal !== "") {
-            const existingSupplier = supplierDB.get(`name:${nameVal}`);
-            if (existingSupplier === tinVal) {
-                const currentStoredAddress = supplierDB.get(`address:${nameVal}`);
-                if (currentStoredAddress !== addressVal) {
-                    updateSupplierAddress(nameVal, tinVal, addressVal);
-                    refreshMonitorWithAnimation();
-                }
-            } else {
-                // New supplier - register
-                supplierDB.set(`name:${nameVal}`, tinVal);
-                supplierDB.set(`tin:${tinVal}`, nameVal);
-                if (addressVal !== "") {
-                    supplierDB.set(`address:${nameVal}`, addressVal);
-                    supplierDB.set(`address:${tinVal}`, addressVal);
-                }
-                saveSupplierDB();
-                refreshMonitorWithAnimation();
-                showAutoFillFeedback(addressInput, `✓ Supplier "${nameVal}" registered with address`);
-            }
-        }
-    };
-    
-    // Add listeners to name and TIN
-    fields.nameInput.addEventListener('blur', checkAndUpdateAddress);
-    fields.tinInput.addEventListener('blur', checkAndUpdateAddress);
-    
-    // Initial check
-    setTimeout(checkAndUpdateAddress, 100);
-}
     
     function showAutoFillFeedback(element, message) {
         const toast = document.createElement('div');
@@ -2108,6 +1802,251 @@ tr.page-hidden {
         }, 3000);
     }
     
+    // ========== UPDATE SUPPLIER DETAILS - CRITICAL FUNCTION ==========
+    function updateSupplierDetails(row) {
+        const tinInput = row.querySelector('.tin-number');
+        const nameInput = row.querySelector('.supplier-name');
+        const addressInput = row.querySelector('.address');
+        
+        const tinVal = tinInput ? tinInput.value.trim() : '';
+        const nameVal = nameInput ? nameInput.value.trim() : '';
+        const address = addressInput ? addressInput.value.trim() : null;
+        
+        if (tinVal !== '' && nameVal !== '') {
+            let existingSupplier = null;
+            const pairs = getAllPairs();
+            existingSupplier = pairs.find(p => p.tin === tinVal && p.name === nameVal);
+            
+            if (existingSupplier) {
+                if (address && existingSupplier.address !== address) {
+                    supplierDB.set(`address:${nameVal}`, address);
+                    supplierDB.set(`address:${tinVal}`, address);
+                    saveSupplierDB();
+                    showAutoFillFeedback(addressInput, `✓ Updated address for ${nameVal}`);
+                    updateMonitorDisplay();
+                }
+            } else {
+                addSupplierPair(nameVal, tinVal, address);
+                updateMonitorDisplay();
+            }
+        }
+    }
+    
+    // ========== MAIN ATTACH FUNCTION - EXACT PATTERN FROM SALES ==========
+    function attachAutoFillToRow(row) {
+        if (!row) return;
+        const fields = getRowFields(row);
+        if (!fields.tinInput || !fields.nameInput) return;
+        if (row.hasAttribute('data-autofill-bound')) return;
+        row.setAttribute('data-autofill-bound', 'true');
+        
+        const addressInput = row.querySelector('.address');
+        
+        // Function to register or update supplier with address
+        function registerOrUpdateSupplier(addressValue = null, forceUpdate = false) {
+            const nameVal = fields.nameInput?.value.trim() || "";
+            const tinVal = fields.tinInput?.value.trim() || "";
+            const address = addressValue !== null ? addressValue : (addressInput ? addressInput.value.trim() : null);
+            
+            if (nameVal !== "" && tinVal !== "") {
+                // Check if supplier already exists
+                const existingNameRecord = supplierDB.get(`name:${nameVal}`);
+                const existingTinRecord = supplierDB.get(`tin:${tinVal}`);
+                
+                if (existingNameRecord === tinVal || existingTinRecord === nameVal) {
+                    // Supplier exists, update address if provided and different
+                    if (address && address !== "") {
+                        const currentAddress = supplierDB.get(`address:${nameVal}`);
+                        if (currentAddress !== address) {
+                            supplierDB.set(`address:${nameVal}`, address);
+                            supplierDB.set(`address:${tinVal}`, address);
+                            saveSupplierDB();
+                            showAutoFillFeedback(addressInput || null, `✓ Address updated for "${nameVal}"`);
+                            updateMonitorDisplay();
+                            return true;
+                        }
+                    }
+                } else {
+                    // New supplier - REGISTER IMMEDIATELY with all details
+                    supplierDB.set(`name:${nameVal}`, tinVal);
+                    supplierDB.set(`tin:${tinVal}`, nameVal);
+                    
+                    if (address && address !== "") {
+                        supplierDB.set(`address:${nameVal}`, address);
+                        supplierDB.set(`address:${tinVal}`, address);
+                        showAutoFillFeedback(addressInput || null, `✓ New supplier registered: "${nameVal}" with address`);
+                    } else {
+                        showAutoFillFeedback(null, `✓ New supplier registered: "${nameVal}"`);
+                    }
+                    
+                    saveSupplierDB();
+                    updateMonitorDisplay();
+                    return true;
+                }
+                updateMonitorDisplay();
+            }
+            return false;
+        }
+        
+        // Register when Name loses focus
+        fields.nameInput.addEventListener('blur', function() {
+            setTimeout(() => registerOrUpdateSupplier(), 50);
+        });
+        
+        // Register when TIN loses focus
+        fields.tinInput.addEventListener('blur', function() {
+            setTimeout(() => registerOrUpdateSupplier(), 50);
+        });
+        
+        // Auto-fill from name (fills TIN and Address)
+        fields.nameInput.addEventListener('blur', function(e) {
+            setTimeout(() => {
+                const nameVal = this.value.trim();
+                if (nameVal === "") return;
+                
+                const existingTin = lookupTinByName(nameVal);
+                if (existingTin && fields.tinInput && fields.tinInput.value.trim() === "") {
+                    fields.tinInput.value = existingTin;
+                    if (typeof formatTIN === 'function') formatTIN(fields.tinInput);
+                    if (typeof validateTIN === 'function') validateTIN(fields.tinInput);
+                    fields.tinInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    showAutoFillFeedback(fields.tinInput, '✓ TIN auto-filled from registered supplier');
+                    setTimeout(() => registerOrUpdateSupplier(), 50);
+                }
+                
+                if (addressInput) {
+                    const registeredAddress = lookupAddressByName(nameVal);
+                    if (registeredAddress && addressInput.value.trim() === "") {
+                        addressInput.value = registeredAddress;
+                        addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        addressInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered supplier`);
+                        setTimeout(() => registerOrUpdateSupplier(registeredAddress), 50);
+                    }
+                }
+            }, 50);
+        });
+        
+        // Auto-fill from TIN (fills Name and Address)
+        fields.tinInput.addEventListener('blur', function(e) {
+            setTimeout(() => {
+                const tinVal = this.value.trim();
+                if (tinVal === "") return;
+                
+                const existingName = lookupNameByTin(tinVal);
+                if (existingName && fields.nameInput && fields.nameInput.value.trim() === "") {
+                    fields.nameInput.value = existingName;
+                    fields.nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    showAutoFillFeedback(fields.nameInput, '✓ Supplier name auto-filled from registered TIN');
+                    setTimeout(() => registerOrUpdateSupplier(), 50);
+                }
+                
+                if (addressInput) {
+                    const registeredAddress = lookupAddressByTin(tinVal);
+                    if (registeredAddress && addressInput.value.trim() === "") {
+                        addressInput.value = registeredAddress;
+                        addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        addressInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        showAutoFillFeedback(addressInput, `✓ Address auto-filled from registered supplier`);
+                        setTimeout(() => registerOrUpdateSupplier(registeredAddress), 50);
+                    }
+                }
+            }, 50);
+        });
+        
+        // ========== CRITICAL: Address field listener - registers supplier immediately ==========
+        if (addressInput && !addressInput.hasAttribute('data-address-listener')) {
+            addressInput.setAttribute('data-address-listener', 'true');
+            
+            // Track previous values
+            let previousAddress = addressInput.value.trim();
+            let previousName = fields.nameInput?.value.trim() || "";
+            let previousTin = fields.tinInput?.value.trim() || "";
+            
+            function checkAndRegisterSupplier() {
+                const currentName = fields.nameInput?.value.trim() || "";
+                const currentTin = fields.tinInput?.value.trim() || "";
+                const currentAddress = addressInput?.value.trim() || "";
+                
+                if (currentName !== "" && currentTin !== "") {
+                    const existingNameRecord = supplierDB.get(`name:${currentName}`);
+                    const existingTinRecord = supplierDB.get(`tin:${currentTin}`);
+                    const isNewSupplier = !(existingNameRecord === currentTin || existingTinRecord === currentName);
+                    
+                    supplierDB.set(`name:${currentName}`, currentTin);
+                    supplierDB.set(`tin:${currentTin}`, currentName);
+                    
+                    if (currentAddress !== "") {
+                        supplierDB.set(`address:${currentName}`, currentAddress);
+                        supplierDB.set(`address:${currentTin}`, currentAddress);
+                    }
+                    
+                    saveSupplierDB();
+                    updateMonitorDisplay();
+                    
+                    if (isNewSupplier && currentAddress !== "") {
+                        showAutoFillFeedback(addressInput, `✓ New supplier "${currentName}" registered with address!`);
+                    } else if (currentAddress !== "" && previousAddress !== currentAddress) {
+                        showAutoFillFeedback(addressInput, `✓ Address updated for "${currentName}"`);
+                    }
+                    
+                    previousName = currentName;
+                    previousTin = currentTin;
+                    previousAddress = currentAddress;
+                    return true;
+                }
+                return false;
+            }
+            
+            addressInput.addEventListener('blur', function() {
+                const currentAddress = this.value.trim();
+                const nameVal = fields.nameInput?.value.trim() || "";
+                const tinVal = fields.tinInput?.value.trim() || "";
+                
+                if (nameVal !== "" && tinVal !== "") {
+                    checkAndRegisterSupplier();
+                } else {
+                    if (currentAddress !== "" && (nameVal === "" || tinVal === "")) {
+                        showAutoFillFeedback(addressInput, `⚠️ Please fill Supplier Name and TIN first`, 2000);
+                    }
+                }
+            });
+            
+            fields.nameInput.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (addressInput?.value.trim() !== "") {
+                        checkAndRegisterSupplier();
+                    }
+                }, 100);
+            });
+            
+            fields.tinInput.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (addressInput?.value.trim() !== "") {
+                        checkAndRegisterSupplier();
+                    }
+                }, 100);
+            });
+            
+            addressInput.addEventListener('change', function() {
+                const nameVal = fields.nameInput?.value.trim() || "";
+                const tinVal = fields.tinInput?.value.trim() || "";
+                if (nameVal !== "" && tinVal !== "") {
+                    checkAndRegisterSupplier();
+                }
+            });
+            
+            setTimeout(() => {
+                const nameVal = fields.nameInput?.value.trim() || "";
+                const tinVal = fields.tinInput?.value.trim() || "";
+                const addressVal = addressInput?.value.trim() || "";
+                if (nameVal !== "" && tinVal !== "" && addressVal !== "") {
+                    checkAndRegisterSupplier();
+                }
+            }, 100);
+        }
+    }
+    
     function bindAutoFillToAllRows() {
         const tableBody = document.getElementById('tableBody');
         if (!tableBody) return;
@@ -2149,11 +2088,10 @@ tr.page-hidden {
         window.vatExpensesSupplierDB = {
             list: () => getAllPairs(),
             add: (name, tin, address) => addSupplierPair(name, tin, address),
-            updateAddress: (name, tin, address) => updateSupplierAddress(name, tin, address),
             clear: () => { supplierDB.clear(); saveSupplierDB(); console.log('Expenses Supplier DB cleared'); },
             stats: () => ({ size: supplierDB.size, pairs: getAllPairs().length })
         };
-        console.log('[Expenses AutoFill] Supplier DB loaded with address support. Use window.vatExpensesSupplierDB to inspect.');
+        console.log('[Expenses AutoFill] Supplier DB loaded with address support. Address saves immediately!');
     }
     
     window.deleteExpensesSupplierPair = function(name, tin) {
@@ -2179,7 +2117,7 @@ tr.page-hidden {
         const loadDataBtn = document.getElementById('loadDataBtn');
         if (loadDataBtn) loadDataBtn.addEventListener('click', () => setTimeout(bindAutoFillToAllRows, 200));
         
-        console.log('✅ Expenses auto-fill active: Address saves immediately when you press Tab after filling address field.');
+        console.log('✅ Expenses AutoFill active: Address saves immediately when you press Tab after filling address field.');
     }
     
     if (document.readyState === 'loading') {
@@ -2189,7 +2127,6 @@ tr.page-hidden {
     }
     
     window.addExpensesSupplierPair = addSupplierPair;
-    window.updateExpensesSupplierAddress = updateSupplierAddress;
     window.lookupExpensesSupplierTinByName = lookupTinByName;
     window.lookupExpensesSupplierNameByTin = lookupNameByTin;
     window.lookupExpensesSupplierAddressByName = lookupAddressByName;
@@ -7448,5 +7385,287 @@ if (document.readyState === 'loading') {
     initSupplierTinSuggestionSystem();
 }
     </script>
+
+    <script>
+// ============================================================
+// DIRECT FIX: Force address to save and show in suppliers list
+// This runs after everything loads and hooks into existing functions
+// ============================================================
+
+(function fixExpensesAddressSaving() {
+    // Wait for page to fully load
+    setTimeout(function() {
+        console.log('[EXPENSES FIX] Initializing address save fix...');
+        
+        // Store original addSupplierPair if it exists
+        const originalAddSupplierPair = window.addExpensesSupplierPair || window.addSupplierPair;
+        
+        // Override to ensure monitor updates
+        if (typeof window.addExpensesSupplierPair === 'function') {
+            window.addExpensesSupplierPair = function(name, tin, address) {
+                const result = originalAddSupplierPair(name, tin, address);
+                // Force refresh the monitor
+                setTimeout(() => {
+                    if (typeof window.forceRefreshExpensesSuppliers === 'function') {
+                        window.forceRefreshExpensesSuppliers();
+                    }
+                    if (typeof updateMonitorDisplay === 'function') {
+                        updateMonitorDisplay();
+                    }
+                }, 50);
+                return result;
+            };
+        }
+        
+        // Find all address inputs and add direct save on blur
+        function addAddressSaveListeners() {
+            const addressInputs = document.querySelectorAll('#tableBody .address');
+            console.log('[EXPENSES FIX] Found ' + addressInputs.length + ' address inputs');
+            
+            addressInputs.forEach(function(addressInput) {
+                if (addressInput.hasAttribute('data-address-fix-applied')) return;
+                addressInput.setAttribute('data-address-fix-applied', 'true');
+                
+                addressInput.addEventListener('blur', function(e) {
+                    const addressVal = this.value.trim();
+                    if (addressVal === "") return;
+                    
+                    // Find the row
+                    const row = this.closest('tr');
+                    if (!row) return;
+                    
+                    // Get name and TIN from the row
+                    const nameInput = row.querySelector('.supplier-name');
+                    const tinInput = row.querySelector('.tin-number');
+                    
+                    const nameVal = nameInput ? nameInput.value.trim() : "";
+                    const tinVal = tinInput ? tinInput.value.trim() : "";
+                    
+                    console.log('[EXPENSES FIX] Address blur - Name:', nameVal, 'TIN:', tinVal, 'Address:', addressVal);
+                    
+                    if (nameVal !== "" && tinVal !== "") {
+                        // Directly save to localStorage
+                        const STORAGE_KEY = 'VAT_EXPENSES_SUPPLIER_TIN_MAP';
+                        let supplierDB = new Map();
+                        
+                        // Load existing data
+                        const stored = localStorage.getItem(STORAGE_KEY);
+                        if (stored) {
+                            try {
+                                const parsed = JSON.parse(stored);
+                                supplierDB = new Map(Object.entries(parsed));
+                            } catch(e) { console.warn(e); }
+                        }
+                        
+                        // Save the address
+                        supplierDB.set(`address:${nameVal}`, addressVal);
+                        supplierDB.set(`address:${tinVal}`, addressVal);
+                        
+                        // Also ensure name and tin are stored
+                        const existingNameRecord = supplierDB.get(`name:${nameVal}`);
+                        const existingTinRecord = supplierDB.get(`tin:${tinVal}`);
+                        
+                        if (existingNameRecord !== tinVal && existingTinRecord !== nameVal) {
+                            supplierDB.set(`name:${nameVal}`, tinVal);
+                            supplierDB.set(`tin:${tinVal}`, nameVal);
+                        }
+                        
+                        // Save back
+                        const obj = Object.fromEntries(supplierDB);
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+                        
+                        console.log('[EXPENSES FIX] Saved address for:', nameVal);
+                        
+                        // Show feedback
+                        const toast = document.createElement('div');
+                        toast.textContent = `✓ Address saved for "${nameVal}"`;
+                        toast.style.cssText = `
+                            position: fixed;
+                            bottom: 20px;
+                            right: 20px;
+                            background: #1e3a2f;
+                            color: #9effcf;
+                            padding: 8px 16px;
+                            border-radius: 30px;
+                            font-size: 13px;
+                            border-left: 4px solid #5ba0d0;
+                            z-index: 9999;
+                            pointer-events: none;
+                        `;
+                        document.body.appendChild(toast);
+                        setTimeout(() => toast.remove(), 2000);
+                        
+                        // Force refresh the monitor display
+                        refreshMonitorDisplay();
+                    } else {
+                        console.log('[EXPENSES FIX] Missing name or tin - showing warning');
+                        const toast = document.createElement('div');
+                        toast.textContent = `⚠️ Please fill Supplier Name and TIN first`;
+                        toast.style.cssText = `
+                            position: fixed;
+                            bottom: 20px;
+                            right: 20px;
+                            background: #3a2a1e;
+                            color: #ffaa66;
+                            padding: 8px 16px;
+                            border-radius: 30px;
+                            font-size: 13px;
+                            border-left: 4px solid #ffaa00;
+                            z-index: 9999;
+                            pointer-events: none;
+                        `;
+                        document.body.appendChild(toast);
+                        setTimeout(() => toast.remove(), 2000);
+                    }
+                });
+            });
+        }
+        
+        // Refresh the monitor display
+        function refreshMonitorDisplay() {
+            const monitorSection = document.getElementById('registeredExpensesSuppliersMonitor');
+            if (!monitorSection) return;
+            
+            const STORAGE_KEY = 'VAT_EXPENSES_SUPPLIER_TIN_MAP';
+            let pairs = [];
+            
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const map = new Map(Object.entries(JSON.parse(stored)));
+                    for (let [key, value] of map.entries()) {
+                        if (key.startsWith('name:')) {
+                            const name = key.slice(5);
+                            const tin = value;
+                            const address = map.get(`address:${name}`) || '';
+                            pairs.push({ name, tin, address });
+                        }
+                    }
+                    pairs.sort((a, b) => a.name.localeCompare(b.name));
+                }
+            } catch(e) { console.warn(e); }
+            
+            const countBadge = document.getElementById('expensesSuppliersCount');
+            if (countBadge) countBadge.textContent = `${pairs.length} supplier(s)`;
+            
+            const container = document.getElementById('expensesSuppliersListContainer');
+            if (!container) return;
+            
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            if (pairs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #80cbc4;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p>No registered suppliers yet.</p>
+                        <p style="font-size: 12px;">Enter a Supplier Name and TIN, then the address will appear here automatically.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+            pairs.forEach(pair => {
+                let displayAddress = pair.address || '';
+                let addressHtml = '';
+                if (displayAddress) {
+                    addressHtml = `
+                        <div style="display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dotted rgba(91, 160, 208, 0.25);">
+                            <i class="fas fa-map-marker-alt" style="font-size: 12px; color: #80cbc4; margin-top: 2px;"></i>
+                            <span style="font-size: 12px; color: #a7ffeb; line-height: 1.4; word-break: break-word; white-space: normal; flex: 1;">${escapeHtml(displayAddress)}</span>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div style="display: flex; align-items: flex-start; justify-content: space-between; background: rgba(25, 55, 80, 0.6); border-radius: 8px; padding: 12px 15px; border-left: 3px solid #5ba0d0;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                <i class="fas fa-receipt" style="color: #5ba0d0; font-size: 16px;"></i>
+                                <span style="font-weight: 600;">${escapeHtml(pair.name)}</span>
+                                <span style="color: #80cbc4;">→</span>
+                                <span style="font-family: monospace;">${escapeHtml(pair.tin)}</span>
+                            </div>
+                            ${addressHtml}
+                        </div>
+                        <button onclick="deleteExpensesSupplierPairFromFix('${escapeHtml(pair.name)}', '${escapeHtml(pair.tin)}')" 
+                                style="background: rgba(255,85,85,0.2); border: none; color: #ff8888; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-left: 10px; align-self: center;">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Delete function
+        window.deleteExpensesSupplierPairFromFix = function(name, tin) {
+            const STORAGE_KEY = 'VAT_EXPENSES_SUPPLIER_TIN_MAP';
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const map = new Map(Object.entries(JSON.parse(stored)));
+                    map.delete(`name:${name}`);
+                    map.delete(`tin:${tin}`);
+                    map.delete(`address:${name}`);
+                    map.delete(`address:${tin}`);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.fromEntries(map)));
+                }
+            } catch(e) { console.warn(e); }
+            refreshMonitorDisplay();
+        };
+        
+        // Monitor for new rows being added
+        function observeNewRows() {
+            const tableBody = document.getElementById('tableBody');
+            if (!tableBody) return;
+            
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1 && node.querySelectorAll) {
+                            const addressInputs = node.querySelectorAll('.address');
+                            if (addressInputs.length > 0) {
+                                setTimeout(addAddressSaveListeners, 50);
+                            }
+                        }
+                    });
+                });
+            });
+            
+            observer.observe(tableBody, { childList: true, subtree: true });
+        }
+        
+        // Initial setup
+        setTimeout(addAddressSaveListeners, 500);
+        observeNewRows();
+        
+        // Also listen for button clicks that add rows
+        const addRowBtn = document.getElementById('addRowBtn');
+        if (addRowBtn) {
+            addRowBtn.addEventListener('click', function() {
+                setTimeout(addAddressSaveListeners, 100);
+            });
+        }
+        
+        const addBatchRowsBtn = document.getElementById('addBatchRowsBtn');
+        if (addBatchRowsBtn) {
+            addBatchRowsBtn.addEventListener('click', function() {
+                setTimeout(addAddressSaveListeners, 200);
+            });
+        }
+        
+        console.log('[EXPENSES FIX] Address save fix initialized!');
+    }, 1000);
+})();
+</script>
+
+<script src="new_notif.js"></script>
 </body>
 </html>
