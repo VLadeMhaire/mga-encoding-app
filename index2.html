@@ -3,1360 +3,874 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes">
-    <title>VAT Tracking System - Kiosk Dashboard</title>
+    <title>VAT Tracking System | Professional Kiosk Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* CSS Variables — BRIGHTER blue & red professional mix */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --base-font-size: 16px;
-            --scale-factor: 1;
-            --primary-blue: #1e88e5;
-            --primary-red: #e53935;
-            --accent-gradient: linear-gradient(145deg, #1e88e5, #e53935);
-            --secondary-dark: #0f1e2f;
-            --card-bg: rgba(25, 45, 65, 0.9);
-            --header-bg: linear-gradient(135deg, rgba(10, 35, 55, 0.95) 0%, rgba(55, 30, 40, 0.98) 100%);
-            --text-color: #f0f8ff;
-            --text-secondary: #c6e2ff;
-            --sidebar-bg: rgba(8, 24, 40, 0.98);
-            --sidebar-width: 280px;
-            --sidebar-collapsed-width: 80px;
-            --glow-blue: rgba(30, 136, 229, 0.8);
-            --glow-red: rgba(229, 57, 53, 0.8);
-            --border-mix: rgba(230, 100, 120, 0.4);
+            --ink: #0d1117;
+            --ink-60: rgba(13,17,23,0.6);
+            --ink-30: rgba(13,17,23,0.3);
+            --ink-10: rgba(13,17,23,0.08);
+            --surface: #ffffff;
+            --surface-2: #f5f6f9;
+            --surface-3: #eef0f7;
+            --blue-vivid: #1a47cc;
+            --blue-mid: #2a5de8;
+            --blue-light: #dde8ff;
+            --blue-xlight: #f0f4ff;
+            --teal: #0d8a6e;
+            --teal-light: #d4f3eb;
+            --amber: #c47a0a;
+            --amber-light: #fef2d6;
+            --red: #c0352a;
+            --red-light: #fde8e6;
+            --purple: #6640c8;
+            --purple-light: #ede9ff;
+            --gold: #b8870e;
+            --gold-light: #fdf3d7;
+            --nav-h: 68px;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-        }
-        
-        html {
-            font-size: calc(var(--base-font-size) * var(--scale-factor));
-            overflow-x: hidden;
-            min-height: 100%;
-            scroll-behavior: smooth;
-        }
-        
+
+        html { scroll-behavior: smooth; }
+
         body {
-            background: linear-gradient(135deg, rgba(11, 26, 42, 0.82), rgba(26, 38, 53, 0.85)), url('retro.jpg') center/cover no-repeat fixed;
-            color: var(--text-color);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface-2);
+            color: var(--ink);
+            line-height: 1.55;
             min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
-            padding: clamp(10px, 2vw, 20px);
             position: relative;
-            font-size: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), margin-right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 1;
-            background-blend-mode: overlay;
-            animation: fadeInPage 0.6s ease-out;
         }
-        
-        @keyframes fadeInPage {
-            0% { opacity: 0; transform: translateY(10px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        
-        body.sidebar-expanded {
-            margin-left: var(--sidebar-width);
-        }
-        
-        .container {
-            max-width: min(95vw, 1400px);
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            min-height: calc(100vh - clamp(20px, 4vw, 40px));
-            width: 100%;
-            align-items: center;
-            position: relative;
-            transition: all 0.3s ease;
-            transform: scale(0.5);
-            transform-origin: top center;
-            width: 200%;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            left: -15%;
-            opacity: 1;
-            animation: containerScaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        
-        @keyframes containerScaleIn {
-            0% {
-                transform: scale(0.4) translateY(20px);
-                opacity: 0.8;
-                left: -15%;
-            }
-            60% {
-                transform: scale(0.52) translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0.5) translateY(0);
-                opacity: 1;
-                left: -15%;
-            }
-        }
-        
-        .floating-toggle {
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
             position: fixed;
-            left: 20px;
-            top: 20px;
-            width: clamp(45px, 4vw, 60px);
-            height: clamp(45px, 4vw, 60px);
-            background: var(--sidebar-bg);
-            border: 2px solid var(--border-mix);
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(30, 136, 229, 0.5);
-            opacity: 1;
-        }
-        
-        .floating-toggle:hover {
-            background: rgba(30, 136, 229, 0.25);
-            transform: scale(1.1) rotate(180deg);
-            border-color: var(--primary-red);
-        }
-        
-        .floating-toggle:hover i {
-            transform: rotate(180deg);
-        }
-
-        .floating-toggle-right {
-            position: fixed;
-            right: 20px;
-            top: 20px;
-            width: clamp(45px, 4vw, 60px);
-            height: clamp(45px, 4vw, 60px);
-            background: var(--sidebar-bg);
-            border: 2px solid var(--border-mix);
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(229, 57, 53, 0.5);
-            opacity: 1;
-        }
-
-        .floating-toggle-right:hover {
-            background: rgba(229, 57, 53, 0.25);
-            transform: scale(1.1) rotate(180deg);
-            border-color: var(--primary-blue);
-        }
-
-        .floating-toggle-right:hover i {
-            transform: rotate(180deg);
-        }
-
-        .floating-toggle-right i {
-            font-size: clamp(1.25rem, 1.8vw, 1.5rem);
-            background: linear-gradient(145deg, var(--primary-red), var(--primary-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        .sidebar {
-            position: fixed;
-            left: 0;
             top: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            box-shadow: 0 0 clamp(25px, 3vw, 40px) rgba(0, 0, 0, 0.8), 
-                        0 0 clamp(15px, 2vw, 25px) rgba(30, 136, 229, 0.4);
-            border-right: 2px solid var(--border-mix);
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue-vivid), var(--teal));
             z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            transform: translateX(-100%);
-        }
-        
-        .sidebar.sidebar-visible {
-            transform: translateX(0);
-        }
-        
-        .sidebar.sidebar-collapsed {
-            transform: translateX(-100%);
-        }
-        
-        header {
-            display: flex;
-            align-items: center;
-            text-align: left;
-            padding: clamp(15px, 2vw, 25px);
-            margin-bottom: clamp(15px, 2vw, 20px);
-            background: var(--header-bg);
-            border-radius: clamp(15px, 2vw, 20px);
-            width: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1;
-            box-shadow: 0 clamp(2px, 0.4vw, 4px) clamp(8px, 1vw, 12px) rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-mix);
-        }
-        
-        .logo-container {
-            width: clamp(80px, 12vw, 120px);
-            height: clamp(80px, 12vw, 120px);
-            margin: 0;
-            margin-right: clamp(20px, 3vw, 40px);
-            background: rgba(20, 45, 65, 0.9);
-            border-radius: clamp(15px, 2vw, 20px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding: clamp(5px, 1vw, 10px);
-            flex-shrink: 0;
-            opacity: 1;
-            box-shadow: 0 0 clamp(5px, 1vw, 10px) rgba(30, 136, 229, 0.6);
-            border: clamp(1px, 0.2vw, 2px) solid rgba(229, 57, 53, 0.3);
-        }
-        
-        .logo-img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            opacity: 1;
-        }
-        
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: clamp(15px, 2vw, 25px);
-            width: 100%;
-            max-width: min(1200px, 95vw);
-            aspect-ratio: 3 / 4;
-            margin: 0 auto;
-            opacity: 1;
-        }
-        
-        .kiosk-button {
-            background: linear-gradient(145deg, var(--card-bg) 0%, rgba(35, 55, 75, 0.95) 100%);
-            border: none;
-            border-radius: clamp(12px, 1.5vw, 18px);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: var(--text-color);
-            position: relative;
-            overflow: hidden;
-            aspect-ratio: 1 / 1;
-            width: 100%;
-            height: 100%;
-            padding: clamp(10px, 1.5vw, 20px);
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            box-shadow: 0 clamp(2px, 0.4vw, 4px) clamp(6px, 1vw, 10px) rgba(0, 0, 0, 0.4);
-            border: clamp(1px, 0.15vw, 2px) solid var(--border-mix);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            animation: buttonFlowIn 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
-            animation-delay: calc((var(--button-index) - 1) * 0.12s);
-        }
-        
-        @keyframes buttonFlowIn {
-            0% {
-                opacity: 0.5;
-                transform: scale(0.8) translateY(20px);
-                filter: blur(2px);
-            }
-            40% {
-                opacity: 1;
-                transform: scale(1.05) translateY(-5px);
-                filter: blur(0);
-            }
-            70% {
-                transform: scale(0.98) translateY(2px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-                filter: blur(0);
-            }
-        }
-        
-        .kiosk-button {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-        
-        .button-icon {
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            margin-bottom: clamp(8px, 1.2vw, 15px);
-            color: var(--primary-blue);
-            line-height: 1;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 0 5px rgba(30,136,229,0.5));
-        }
-        
-        .button-title {
-            font-size: clamp(0.875rem, 2vw, 1.25rem);
-            font-weight: 700;
-            margin-bottom: clamp(4px, 0.8vw, 8px);
-            color: #e2f0ff;
-            line-height: 1.2;
-            text-align: center;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        
-        .button-description {
-            font-size: clamp(0.65rem, 1.2vw, 0.85rem);
-            opacity: 0.85;
-            line-height: 1.3;
-            color: var(--text-secondary);
-            text-align: center;
-            width: 100%;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .button-badge {
-            position: absolute;
-            top: clamp(8px, 1.2vw, 12px);
-            right: clamp(8px, 1.2vw, 12px);
-            background: linear-gradient(145deg, var(--primary-blue), var(--primary-red));
-            color: white;
-            font-size: clamp(0.65rem, 1.2vw, 0.75rem);
-            font-weight: bold;
-            padding: clamp(2px, 0.4vw, 4px) clamp(6px, 1vw, 10px);
-            border-radius: clamp(12px, 1.5vw, 20px);
-            line-height: 1;
-            z-index: 2;
-            opacity: 1;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 12px rgba(229,57,53,0.7);
-        }
-        
-        .kiosk-button:nth-child(1) { --button-index: 1; }
-        .kiosk-button:nth-child(2) { --button-index: 2; }
-        .kiosk-button:nth-child(3) { --button-index: 3; }
-        .kiosk-button:nth-child(4) { --button-index: 4; }
-        .kiosk-button:nth-child(5) { --button-index: 5; }
-        .kiosk-button:nth-child(6) { --button-index: 6; }
-        .kiosk-button:nth-child(7) { --button-index: 7; }
-        .kiosk-button:nth-child(8) { --button-index: 8; }
-        .kiosk-button:nth-child(9) { --button-index: 9; }
-        .kiosk-button:nth-child(10) { --button-index: 10; }
-        
-        .header-text h1 {
-            font-size: clamp(1.5rem, 4vw, 2.625rem);
-            font-weight: 800;
-            margin-bottom: clamp(5px, 1vw, 10px);
-            background: linear-gradient(to right, #64b5f6, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            opacity: 1;
-            text-shadow: 0 0 10px rgba(30,136,229,0.3);
-        }
-        
-        .header-text p {
-            font-size: clamp(0.875rem, 2vw, 1.25rem);
-            opacity: 0.95;
-            color: var(--text-secondary);
-            max-width: min(90vw, 800px);
-            margin: 0;
-            line-height: 1.4;
-        }
-        
-        .dashboard-title {
-            text-align: center;
-            font-size: clamp(1.25rem, 3vw, 2rem);
-            margin: clamp(20px, 3vw, 30px) 0;
-            background: linear-gradient(145deg, var(--primary-blue), var(--primary-red));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            position: relative;
-            padding-bottom: clamp(10px, 1.5vw, 15px);
-            width: 100%;
-            opacity: 1;
-            text-shadow: 0 0 15px rgba(229,57,53,0.4);
-        }
-        
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            align-items: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .footer {
-            text-align: center;
-            padding: clamp(15px, 2vw, 25px);
-            margin-top: clamp(25px, 4vw, 40px);
-            color: #b8d6f0;
-            font-size: clamp(0.75rem, 1.5vw, 1rem);
-            border-top: 1px solid var(--border-mix);
-            background: rgba(15, 35, 50, 0.8);
-            border-radius: clamp(10px, 1.5vw, 15px);
-            box-shadow: 0 0 clamp(10px, 2vw, 20px) rgba(0, 0, 0, 0.4);
-            flex-shrink: 0;
-            width: 100%;
-            opacity: 1;
-        }
-        
-        .status-indicator {
-            width: clamp(8px, 1.2vw, 12px);
-            height: clamp(8px, 1.2vw, 12px);
-            border-radius: 50%;
-            background: var(--primary-blue);
-            opacity: 1;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 12px var(--primary-red);
-        }
-        
-        .system-status {
-            display: inline-flex;
-            align-items: center;
-            gap: clamp(5px, 1vw, 10px);
-            background: rgba(20, 45, 65, 0.8);
-            padding: clamp(5px, 0.8vw, 8px) clamp(15px, 2vw, 20px);
-            border-radius: clamp(15px, 2vw, 20px);
-            margin-top: clamp(5px, 1vw, 10px);
-            border: 1px solid var(--border-mix);
-            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-            opacity: 1;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); background: var(--primary-blue); }
-            50% { opacity: 0.8; transform: scale(1.1); background: var(--primary-red); }
-        }
-        
-        .kiosk-button {
-            box-shadow: 0 clamp(4px, 0.8vw, 8px) clamp(12px, 1.5vw, 20px) rgba(0, 0, 0, 0.5), 
-                        0 0 clamp(8px, 1.5vw, 15px) rgba(30, 136, 229, 0.3);
-            border-color: var(--border-mix);
-        }
-        
-        header {
-            box-shadow: 0 clamp(5px, 1vw, 10px) clamp(15px, 2vw, 30px) rgba(0, 0, 0, 0.6), 
-                        0 0 clamp(15px, 2vw, 30px) rgba(30, 136, 229, 0.25);
-        }
-        
-        .logo-container {
-            box-shadow: 0 0 clamp(10px, 2vw, 20px) rgba(30, 136, 229, 0.7), 
-                        inset 0 0 clamp(8px, 1.5vw, 15px) rgba(229, 57, 53, 0.3);
-        }
-        
-        .kiosk-button:hover, 
-        .kiosk-button:focus {
-            transform: translateY(clamp(-6px, -1vw, -10px)) scale(1.05) !important;
-            box-shadow: 0 clamp(12px, 2vw, 20px) clamp(20px, 3vw, 35px) rgba(0, 0, 0, 0.7), 
-                        0 0 clamp(20px, 3vw, 35px) rgba(30, 136, 229, 0.8),
-                        0 0 clamp(20px, 3vw, 35px) rgba(229, 57, 53, 0.6) !important;
-            border-color: rgba(229, 57, 53, 0.7) !important;
-            outline: none;
-        }
-        
-        .kiosk-button:hover .button-icon {
-            transform: scale(1.2);
-            text-shadow: 0 0 20px #1e88e5, 0 0 30px #e53935;
-            color: #ffffff;
-        }
-        
-        .kiosk-button:hover .button-title {
-            color: #ffffff;
-            text-shadow: 0 0 12px #1e88e5;
-        }
-        
-        .sidebar-header {
-            padding: clamp(20px, 2.5vw, 30px) clamp(15px, 2vw, 25px);
-            border-bottom: 1px solid var(--border-mix);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(15, 40, 55, 0.8);
-        }
-        
-        .sidebar-title {
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-            background: linear-gradient(145deg, #64b5f6, #ff8a80);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        
-        .sidebar-toggle {
-            background: rgba(30, 136, 229, 0.2);
-            border: 1px solid var(--border-mix);
-            color: var(--primary-blue);
-            width: clamp(35px, 3vw, 45px);
-            height: clamp(35px, 3vw, 45px);
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-        }
-        
-        .sidebar-toggle:hover {
-            background: rgba(229, 57, 53, 0.3);
-            transform: rotate(180deg);
-            color: var(--primary-red);
-        }
-        
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: clamp(15px, 2vw, 20px) 0;
-        }
-        
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: clamp(5px, 0.8vw, 10px);
-            padding: 0 clamp(10px, 1.5vw, 15px);
-        }
-        
-        .sidebar-btn {
-            display: flex;
-            align-items: center;
-            gap: clamp(12px, 1.5vw, 15px);
-            padding: clamp(12px, 1.5vw, 16px) clamp(15px, 2vw, 20px);
-            background: rgba(20, 45, 65, 0.7);
-            border: 1px solid var(--border-mix);
-            border-radius: 10px;
-            color: var(--text-color);
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .sidebar-btn:hover {
-            background: rgba(40, 70, 95, 0.8);
-            border-color: rgba(229, 57, 53, 0.6);
-            transform: translateX(8px);
-            box-shadow: 0 5px 20px rgba(30, 136, 229, 0.5);
-        }
-        
-        .sidebar-btn.active {
-            background: rgba(30, 136, 229, 0.25);
-            border-color: rgba(229, 57, 53, 0.7);
-            box-shadow: 0 5px 25px rgba(229, 57, 53, 0.5);
-        }
-        
-        .sidebar-btn i {
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-            color: var(--primary-blue);
-            width: clamp(20px, 2.5vw, 25px);
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 64, 1);
-        }
-        
-        .sidebar-btn:hover i {
-            transform: scale(1.2);
-            color: var(--primary-red);
-        }
-        
-        .sidebar-btn-text {
-            font-size: clamp(0.85rem, 1.2vw, 1rem);
-            font-weight: 500;
-            white-space: nowrap;
-            color: #d4edff;
-        }
-        
-        .sidebar-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary-blue), var(--primary-red), transparent);
-            margin: clamp(15px, 2vw, 20px) clamp(10px, 1.5vw, 15px);
-        }
-        
-        .sidebar-footer {
-            padding: clamp(15px, 2vw, 20px);
-            border-top: 1px solid var(--border-mix);
-            text-align: center;
-            font-size: clamp(0.75rem, 1vw, 0.85rem);
-            color: #b0d4f0;
-            background: rgba(8, 28, 40, 0.9);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-btn-text {
-            display: none;
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-title {
-            display: none;
-        }
-        
-        .sidebar.sidebar-collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-btn {
-            justify-content: center;
-            padding: clamp(12px, 1.5vw, 16px);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-toggle i {
-            transform: rotate(180deg);
-        }
-        
-        .sidebar.sidebar-collapsed .sidebar-header {
-            justify-content: center;
-            padding: 15px;
-        }
-        
-        .floating-toggle i {
-            font-size: clamp(1.25rem, 1.8vw, 1.5rem);
-            background: linear-gradient(145deg, var(--primary-blue), var(--primary-red));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 50%, rgba(30, 136, 229, 0.12) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(229, 57, 53, 0.08) 0%, transparent 50%);
-            z-index: -1;
+            transition: width 0.1s ease-out;
             pointer-events: none;
-            animation: subtleGlow 6s ease-in-out infinite;
         }
-        
-        @keyframes subtleGlow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+        /* DYNAMIC BACKGROUND LAYER WITH SMOOTH TRANSITION */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-        
-        .kiosk-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(30, 136, 229, 0.15) 0%, rgba(229, 57, 53, 0.1) 100%);
+        .bg-base {
+            background-image: url('MGAALogo.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+        }
+        .bg-overlay {
+            background-image: url('acct.jpg');
+            background-size: cover;
+            background-position: center;
             opacity: 0;
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .kiosk-button:hover::before {
-            opacity: 1;
-        }
-        
-        .kiosk-button:active {
-            transform: translateY(clamp(-2px, -0.4vw, -4px)) scale(1.02);
-            transition: transform 0.1s ease;
-        }
-        
-        .button-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-        }
-        
-        .kiosk-button:nth-child(1) .button-icon { color: #42a5f5; }
-        .kiosk-button:nth-child(2) .button-icon { color: #ef5350; }
-        .kiosk-button:nth-child(3) .button-icon { color: #ec407a; }
-        .kiosk-button:nth-child(4) .button-icon { color: #42a5f5; }
-        .kiosk-button:nth-child(5) .button-icon { color: #e57373; }
-        .kiosk-button:nth-child(6) .button-icon { color: #d81b60; }
-        .kiosk-button:nth-child(7) .button-icon { color: #1e88e5; }
-        .kiosk-button:nth-child(8) .button-icon { color: #e53935; }
-        .kiosk-button:nth-child(9) .button-icon { color: #d81b60; }
-        .kiosk-button:nth-child(10) .button-icon { color: #ffb74d; }
-        
-        .kiosk-button::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(30, 136, 229, 0.2), rgba(229, 57, 53, 0.15), transparent);
-            transition: left 0.7s;
-            pointer-events: none;
-            z-index: 2;
         }
 
-        .kiosk-button:hover::after {
-            left: 100%;
+        /* NAV */
+        .nav {
+            position: sticky; top: 0; z-index: 900;
+            height: var(--nav-h);
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(18px) saturate(180%);
+            border-bottom: 1px solid rgba(13,17,23,0.07);
+            transition: box-shadow 0.3s;
         }
-        
-        .tax-license-icon-container {
-            width: clamp(50px, 8vw, 70px);
-            height: clamp(50px, 8vw, 70px);
-            margin-bottom: clamp(8px, 1.2vw, 15px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .tax-license-icon {
-            width: 100%;
+        .nav.elevated { box-shadow: 0 2px 24px rgba(13,17,23,0.08); }
+
+        .nav-inner {
+            max-width: 1400px; margin: 0 auto;
+            padding: 0 32px;
             height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 8px rgba(30,136,229,0.8));
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        .kiosk-button:nth-child(8):hover .tax-license-icon {
-            filter: drop-shadow(0 0 18px rgba(229,57,53,0.9));
-            transform: scale(1.15);
-        }
-        
-        @media (max-width: 1024px) {
-            .grid-container { max-width: min(800px, 95vw); }
-            .button-description { -webkit-line-clamp: 2; }
-            .sidebar { width: 250px; }
-        }
-        @media (max-width: 768px) {
-            .grid-container { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); aspect-ratio: 2 / 2.5; }
-            .button-description { display: none; }
-        }
-        @media (max-width: 480px) {
-            .grid-container { grid-template-columns: 1fr; grid-template-rows: repeat(10, 1fr); aspect-ratio: 1 / 4; }
+            display: flex; align-items: center; justify-content: space-between; gap: 20px;
         }
 
-        /* Right Sidebar - TIN LIBRARY */
-        .right-sidebar {
-            position: fixed;
-            right: 0;
-            top: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            box-shadow: 0 0 clamp(25px, 3vw, 40px) rgba(0, 0, 0, 0.8), 0 0 clamp(15px, 2vw, 25px) rgba(229, 57, 53, 0.4);
-            border-left: 2px solid var(--border-mix);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
+        .brand {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; flex-shrink: 0;
+        }
+        .brand-mark {
+            width: 40px; height: 40px;
+            border-radius: 11px;
             overflow: hidden;
-            transform: translateX(100%);
+            border: 1px solid var(--ink-10);
+            background: var(--surface);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-words { line-height: 1.15; }
+        .brand-words strong {
+            display: block;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.95rem; font-weight: 700;
+            color: var(--ink); letter-spacing: -0.01em;
+        }
+        .brand-words em {
+            font-style: normal;
+            font-size: 0.65rem; font-weight: 500;
+            color: var(--blue-vivid);
+            background: var(--blue-xlight);
+            padding: 2px 8px; border-radius: 30px;
         }
 
-        .right-sidebar.right-sidebar-visible {
-            transform: translateX(0);
+        .nav-links {
+            display: flex; align-items: center; gap: 2px;
+            background: var(--surface-2);
+            border: 1px solid var(--ink-10);
+            border-radius: 50px;
+            padding: 4px 4px;
         }
-
-        .right-sidebar.right-sidebar-collapsed {
-            transform: translateX(100%);
-        }
-
-        .right-sidebar-header {
-            padding: clamp(20px, 2.5vw, 30px) clamp(15px, 2vw, 25px);
-            border-bottom: 1px solid var(--border-mix);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(15, 40, 55, 0.8);
-        }
-
-        .right-sidebar-toggle {
-            background: rgba(30, 136, 229, 0.2);
-            border: 1px solid var(--border-mix);
-            color: var(--primary-blue);
-            width: clamp(35px, 3vw, 45px);
-            height: clamp(35px, 3vw, 45px);
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-        }
-
-        .right-sidebar-toggle:hover {
-            background: rgba(229, 57, 53, 0.3);
-            transform: rotate(180deg);
-            color: var(--primary-red);
-        }
-
-        .tin-search-area {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-mix);
-        }
-        
-        .tin-search-box {
-            display: flex;
-            align-items: center;
-            background: rgba(20, 45, 65, 0.6);
+        .nav-link {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 7px 16px;
             border-radius: 40px;
-            padding: 5px 15px;
-            border: 1px solid var(--border-mix);
-            transition: all 0.2s ease;
+            font-size: 0.82rem; font-weight: 500;
+            color: var(--ink-60);
+            text-decoration: none;
+            transition: background 0.18s, color 0.18s;
+            white-space: nowrap;
         }
-        
-        .tin-search-box:focus-within {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 8px rgba(30,136,229,0.5);
+        .nav-link i { font-size: 0.78rem; opacity: 0.7; }
+        .nav-link:hover { background: var(--surface); color: var(--ink); }
+        .nav-link.active {
+            background: var(--surface);
+            color: var(--blue-vivid);
+            font-weight: 600;
+            box-shadow: 0 1px 6px rgba(13,17,23,0.1);
         }
-        
-        .tin-search-box input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 12px 8px;
+        .nav-link.active i { opacity: 1; }
+
+        .nav-right {
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+        }
+        .tin-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 18px;
+            background: var(--ink);
             color: white;
-            font-size: 0.9rem;
-            outline: none;
+            border: none; border-radius: 40px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem; font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
         }
-        
-        .tin-search-box input::placeholder {
-            color: #9bbcdb;
+        .tin-btn i { font-size: 0.78rem; }
+        .tin-btn:hover { background: #1e2836; transform: translateY(-1px); }
+
+        /* MAIN WRAP */
+        .wrap {
+            position: relative; z-index: 2;
+            max-width: 1400px; margin: 0 auto;
+            padding: 40px 32px 60px;
         }
-        
-        .search-icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--primary-blue);
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(130deg, #0d1f5c 0%, #1a3ba0 55%, #1555c2 100%);
+            border-radius: 28px;
+            padding: 48px 52px;
+            margin-bottom: 56px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px -12px rgba(26,71,204,0.35);
+        }
+
+        .hero-bg-img {
+            position: absolute; inset: 0;
+            background-image: url('retro.jpg');
+            background-size: cover;
+            background-position: center;
+            mix-blend-mode: soft-light;
+            opacity: 0.15;
+        }
+
+        .hero-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+        .hero-ring-1 { width: 320px; height: 320px; top: -80px; right: -60px; }
+        .hero-ring-2 { width: 200px; height: 200px; top: 20px; right: 100px; }
+        .hero-glow {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, rgba(100,160,255,0.18) 0%, transparent 70%);
+            width: 500px; height: 500px;
+            top: -120px; right: -80px;
+            pointer-events: none;
+        }
+
+        .hero-content { position: relative; z-index: 2; }
+
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 5px 14px; border-radius: 30px;
+            font-size: 0.72rem; font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 0.06em; text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .hero-eyebrow .pulse {
+            width: 7px; height: 7px;
+            background: #4ade80; border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.6rem; font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .hero h1 span { color: #93c5fd; }
+
+        .hero p {
+            font-size: 0.95rem; font-weight: 400;
+            color: rgba(255,255,255,0.72);
+            max-width: 520px;
+            line-height: 1.65;
+            margin-bottom: 32px;
+        }
+
+        .hero-stats {
+            display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+        }
+        .hero-stat {
+            display: flex; flex-direction: column;
+        }
+        .hero-stat strong {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem; font-weight: 700;
+            color: white; line-height: 1.1;
+        }
+        .hero-stat span {
+            font-size: 0.72rem; font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .stat-divider {
+            width: 1px; height: 36px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* SECTION HEADER */
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .section-label {
+            font-family: 'Syne', sans-serif;
             font-size: 1.25rem;
-            cursor: pointer;
-            padding: 8px 5px 8px 8px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.02em;
         }
-        
-        .search-icon-btn:hover {
-            color: var(--primary-red);
-            transform: scale(1.1);
-            background: rgba(229,57,53,0.15);
+        .section-label span {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 400;
+            color: var(--ink-60);
+            letter-spacing: 0;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
-        
-        .tin-add-section {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-mix);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .tin-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .tin-input-group label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-        }
-        
-        .tin-input-group input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-mix);
-            padding: 10px 12px;
-            border-radius: 12px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-            transition: 0.2s;
-        }
-        
-        .tin-input-group input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 8px var(--glow-blue);
-        }
-        
-        .add-tin-btn {
-            background: linear-gradient(145deg, #1e88e5, #e53935);
-            border: none;
-            padding: 10px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 6px;
-        }
-        
-        .add-tin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(229,57,53,0.5);
-        }
-        
-        .tin-list-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .tin-card {
-            background: rgba(20, 45, 65, 0.7);
-            border-radius: 16px;
-            padding: 14px;
-            border: 1px solid var(--border-mix);
-            transition: all 0.2s;
-            backdrop-filter: blur(4px);
-        }
-        
-        .tin-card:hover {
-            background: rgba(40, 70, 95, 0.9);
-            transform: translateX(-4px);
-            border-color: var(--primary-red);
-        }
-        
-        .tin-number {
-            font-family: monospace;
-            font-size: 1rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #ffb74d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed rgba(255,255,200,0.2);
-        }
-        
-        .tin-number span i {
-            margin-right: 6px;
-        }
-        
-        .tin-name {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            word-break: break-word;
-            padding-left: 4px;
-        }
-        
-        .tin-name i {
-            margin-right: 8px;
-            color: var(--primary-blue);
-        }
-        
-        .tin-actions-row {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 6px;
-            border-top: 1px solid rgba(255,255,240,0.1);
-            padding-top: 10px;
-        }
-        
-        .copy-icon, .delete-icon {
-            background: rgba(255,255,240,0.12);
-            padding: 6px 12px;
-            border-radius: 24px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .section-tag {
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            font-size: 0.75rem;
             font-weight: 500;
+            color: var(--teal);
+            background: var(--teal-light);
+            padding: 5px 14px;
+            border-radius: 30px;
         }
-        
-        .copy-icon:hover {
-            background: var(--primary-blue);
-            color: white;
-            transform: scale(1.02);
-        }
-        
-        .delete-icon:hover {
-            background: var(--primary-red);
-            color: white;
-            transform: scale(1.02);
-        }
-        
-        .copy-icon i, .delete-icon i {
-            font-size: 0.7rem;
-        }
-        
-        .empty-message {
-            text-align: center;
-            color: #9bbcdb;
-            padding: 30px 15px;
-            font-style: italic;
-            font-size: 0.85rem;
-        }
-        
-        .tin-list-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .tin-list-container::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-        }
-        
-        .tin-list-container::-webkit-scrollbar-thumb {
-            background: var(--primary-red);
-            border-radius: 10px;
-        }
-        
-        body.sidebar-right-expanded {
-            margin-right: var(--sidebar-width);
-        }
-        
-        @keyframes fadeOut {
-            0% { opacity: 1; transform: translateY(0); }
-            70% { opacity: 0.8; }
-            100% { opacity: 0; transform: translateY(10px); visibility: hidden; }
-        }
-        
-        /* Music control button */
-        .music-control {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 40px;
-            height: 40px;
-            background: rgba(0,0,0,0.6);
-            border-radius: 50%;
+
+        /* BUTTON ABOVE GRID */
+        .kiosk-actions {
             display: flex;
+            justify-content: flex-end;
+            margin-bottom: 28px;
+        }
+        .modules-trigger-btn {
+            background: var(--surface);
+            border: 1px solid var(--ink-10);
+            border-radius: 60px;
+            padding: 12px 32px;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 12px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--blue-vivid);
             cursor: pointer;
-            z-index: 998;
+            transition: all 0.25s var(--ease-out);
             backdrop-filter: blur(4px);
-            border: 1px solid var(--border-mix);
-            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.85);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
-        
-        .music-control:hover {
-            transform: scale(1.1);
-            background: rgba(30,136,229,0.4);
+        .modules-trigger-btn i {
+            font-size: 1rem;
+            transition: transform 0.3s var(--ease-out);
         }
-        
-        .music-control i {
-            color: white;
-            font-size: 1.2rem;
+        .modules-trigger-btn:hover {
+            background: var(--surface);
+            border-color: var(--blue-light);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px -12px rgba(26,71,204,0.2);
+        }
+        .modules-trigger-btn:hover i {
+            transform: translateY(2px);
+        }
+
+        /* GRID ANIMATION */
+        .grid-wrapper {
+            overflow: visible;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            transition: all 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: transform, opacity;
+        }
+        .grid-wrapper.animate-down .grid {
+            animation: smoothSlideDown 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        @keyframes smoothSlideDown {
+            0% { opacity: 0.3; transform: translateY(-35px); }
+            40% { opacity: 0.8; }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* REVEAL CARDS */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* CARD STYLES */
+        .card {
+            display: block;
+            background: var(--surface);
+            border-radius: 22px;
+            border: 1px solid rgba(13,17,23,0.07);
+            padding: 26px;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out), border-color 0.2s;
+            cursor: pointer;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--card-accent-from, transparent) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 22px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 48px -8px rgba(13,17,23,0.12);
+            border-color: rgba(13,17,23,0.13);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .card-top {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .card-icon {
+            width: 50px; height: 50px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+            transition: transform 0.25s var(--ease-out);
+            flex-shrink: 0;
+        }
+        .card:hover .card-icon { transform: scale(0.93) rotate(-3deg); }
+
+        .badge {
+            font-size: 0.62rem; font-weight: 700;
+            padding: 4px 11px; border-radius: 30px;
+            letter-spacing: 0.04em; text-transform: uppercase;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem; font-weight: 700;
+            color: var(--ink); letter-spacing: -0.01em;
+            margin-bottom: 6px;
+        }
+        .card-desc {
+            font-size: 0.8rem; font-weight: 400;
+            color: var(--ink-60);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+        .card-cta {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.75rem; font-weight: 600;
+            color: var(--blue-vivid);
+            transition: gap 0.2s;
+        }
+        .card:hover .card-cta { gap: 12px; }
+        .card-cta i { font-size: 0.7rem; }
+
+        /* Color themes */
+        .theme-ledger .card-icon { background: var(--purple-light); color: var(--purple); }
+        .theme-ledger { --card-accent-from: rgba(102,64,200,0.04); }
+        .theme-ledger .badge { background: var(--purple-light); color: var(--purple); }
+        .theme-vat .card-icon { background: var(--blue-light); color: var(--blue-vivid); }
+        .theme-vat { --card-accent-from: rgba(26,71,204,0.04); }
+        .theme-vat .badge { background: var(--blue-light); color: var(--blue-vivid); }
+        .theme-nonvat .card-icon { background: #d4f3f0; color: #0d7a72; }
+        .theme-nonvat { --card-accent-from: rgba(13,138,110,0.04); }
+        .theme-nonvat .badge { background: #d4f3f0; color: #0d7a72; }
+        .theme-capex .card-icon { background: var(--amber-light); color: var(--amber); }
+        .theme-capex { --card-accent-from: rgba(196,122,10,0.04); }
+        .theme-capex .badge { background: var(--amber-light); color: var(--amber); }
+        .theme-gov .card-icon { background: var(--teal-light); color: var(--teal); }
+        .theme-gov { --card-accent-from: rgba(13,138,110,0.04); }
+        .theme-gov .badge { background: var(--teal-light); color: var(--teal); }
+        .theme-returns .card-icon { background: var(--red-light); color: var(--red); }
+        .theme-returns { --card-accent-from: rgba(192,53,42,0.04); }
+        .theme-returns .badge { background: var(--red-light); color: var(--red); }
+
+        /* Footer */
+        .footer {
+            position: relative; z-index: 2;
+            background: var(--surface);
+            border-top: 1px solid var(--ink-10);
+            padding: 24px 0;
+        }
+        .footer-inner {
+            max-width: 1400px; margin: 0 auto;
+            padding: 0 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 14px;
+        }
+        .footer-copy {
+            font-size: 0.73rem; color: var(--ink-60);
+        }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a {
+            font-size: 0.73rem; font-weight: 500;
+            color: var(--ink-60); text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--blue-vivid); }
+
+        /* TIN MODAL */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(13,17,23,0.55);
+            backdrop-filter: blur(10px);
+            z-index: 1100;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: var(--surface);
+            width: 92%; max-width: 520px;
+            border-radius: 28px;
+            box-shadow: 0 32px 80px rgba(13,17,23,0.25);
+            overflow: hidden;
+            animation: slideUp 0.28s var(--ease-out);
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-head { padding: 22px 24px; border-bottom: 1px solid var(--ink-10); display: flex; align-items: center; justify-content: space-between; }
+        .modal-head h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; }
+        .modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--surface-2); cursor: pointer; color: var(--ink-60); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: background 0.2s, color 0.2s; }
+        .modal-close:hover { background: #fde8e6; color: var(--red); }
+        .modal-search { padding: 16px 24px; background: var(--surface-2); display: flex; gap: 10px; }
+        .modal-search input { flex: 1; padding: 10px 16px; border: 1px solid var(--ink-10); border-radius: 40px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; background: var(--surface); color: var(--ink); }
+        .modal-search input:focus { outline: none; border-color: var(--blue-mid); }
+        .modal-search button { padding: 10px 18px; background: var(--blue-vivid); color: white; border: none; border-radius: 40px; font-size: 0.8rem; cursor: pointer; transition: background 0.2s; }
+        .modal-search button:hover { background: #1240b8; }
+        .modal-form { padding: 20px 24px; border-bottom: 1px solid var(--surface-2); }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-60); margin-bottom: 6px; }
+        .field input { width: 100%; padding: 10px 16px; border: 1px solid var(--ink-10); border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; color: var(--ink); transition: border-color 0.2s; }
+        .field input:focus { outline: none; border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(42,93,232,0.1); }
+        .btn-add { width: 100%; padding: 11px; background: var(--ink); color: white; border: none; border-radius: 40px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-add:hover { background: #1e2836; }
+        .modal-list { padding: 16px 24px; max-height: 320px; overflow-y: auto; }
+        .tin-item { background: var(--surface-2); border-radius: 16px; padding: 13px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .tin-num { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600; color: var(--amber); margin-bottom: 3px; }
+        .tin-name { font-size: 0.8rem; font-weight: 500; color: var(--ink); }
+        .tin-acts { display: flex; gap: 6px; flex-shrink: 0; }
+        .tin-copy, .tin-del { padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 500; border: 1px solid var(--ink-10); background: var(--surface); cursor: pointer; transition: all 0.18s; }
+        .tin-copy:hover { background: var(--blue-vivid); color: white; border-color: var(--blue-vivid); }
+        .tin-del:hover { background: var(--red); color: white; border-color: var(--red); }
+        .toast { position: fixed; bottom: 28px; right: 28px; background: var(--ink); color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.8rem; z-index: 1300; animation: toastAnim 2.4s forwards; box-shadow: 0 8px 24px rgba(13,17,23,0.2); }
+        @keyframes toastAnim { 0% { opacity: 0; transform: translateY(10px); } 12% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+
+        @media (max-width: 900px) {
+            .hero { padding: 36px 32px; }
+            .hero h1 { font-size: 2rem; }
+            .nav-links { gap: 2px; }
+            .nav-link { padding: 6px 12px; font-size: 0.75rem; }
+        }
+        @media (max-width: 700px) {
+            .nav-inner { flex-wrap: wrap; height: auto; padding: 12px 20px; gap: 10px; }
+            .nav-links { order: 3; width: 100%; justify-content: center; padding: 4px; }
+            .wrap { padding: 24px 20px 48px; }
+            .hero { padding: 28px 24px; border-radius: 20px; }
+            .hero h1 { font-size: 1.65rem; }
+            .stat-divider { display: none; }
+            .kiosk-actions { justify-content: center; margin-bottom: 20px; }
         }
     </style>
 </head>
-<body id="mainBody">
-    <div class="floating-toggle" id="floatingToggle">
-        <i class="fas fa-bars"></i>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Dynamic background layers for smooth transition -->
+<div class="bg-layer bg-base" id="bgBase"></div>
+<div class="bg-layer bg-overlay" id="bgOverlay"></div>
+
+<nav class="nav" id="nav">
+    <div class="nav-inner">
+        <a class="brand" href="#">
+            <div class="brand-mark"><img src="MGAALogo.jpg" alt="MGAA" onerror="this.src='https://placehold.co/40x40/1a47cc/white?text=M'"></div>
+            <div class="brand-words"><em>Professional Kiosk</em><strong>VAT Tracking System</strong></div>
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Startup</a>
+            <a href="tax_facts.html" class="nav-link"><i class="fas fa-book-open"></i> Tax Facts</a>
+            <a href="tax_calculator.html" class="nav-link"><i class="fas fa-calculator"></i> Calculator</a>
+            <a href="compensation.html" class="nav-link"><i class="fas fa-money-check-alt"></i> Compensation</a>
+            <a href="tax_game.html" class="nav-link"><i class="fas fa-gamepad"></i> Tax Game</a>
+            <a href="quick_guide.html" class="nav-link"><i class="fas fa-compass"></i> Guide</a>
+            <a href="quick_guide.html" class="nav-link"><i class="fas fa-life-ring"></i> Help</a>
+        </div>
+        <div class="nav-right"><button class="tin-btn" id="openTinBtn"><i class="fas fa-id-card"></i> TIN Library</button></div>
     </div>
-    <div class="floating-toggle-right" id="floatingToggleRight">
-        <i class="fas fa-id-card"></i>
+</nav>
+
+<div class="wrap">
+    <section class="hero reveal" id="hero">
+        <div class="hero-bg-img"></div>
+        <div class="hero-ring hero-ring-1"></div>
+        <div class="hero-ring hero-ring-2"></div>
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+            <div class="hero-eyebrow"><span class="pulse"></span> All Modules Live</div>
+            <h1>VAT Compliance<br><span>Kiosk Dashboard</span></h1>
+            <p>Professional interface for tracking vatable sales, purchases, expenses, journal entries, and government remittances — all in one place.</p>
+            <div class="hero-stats"><div class="hero-stat"><strong>9</strong><span>Modules</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>12%</strong><span>VAT Rate</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>Auto</strong><span>Saved Locally</span></div></div>
+        </div>
+    </section>
+
+    <!-- Original header design: "Navigation Tracking Modules" + BIR VAT Compliant tag -->
+    <div class="section-header reveal" style="transition-delay: 0.1s;">
+        <div class="section-label"><span>Navigation</span>Tracking Modules</div>
+        <div class="section-tag"><i class="fas fa-shield-alt"></i> BIR VAT Compliant</div>
     </div>
+
+    <!-- Smooth action button -->
+    <div class="kiosk-actions reveal" style="transition-delay: 0.05s;">
+        <button class="modules-trigger-btn" id="smoothModulesBtn">
+            <i class="fas fa-arrow-circle-down"></i> View All Modules
+            <i class="fas fa-caret-down" style="font-size: 0.85rem;"></i>
+        </button>
+    </div>
+
+    <div class="grid-wrapper" id="gridWrapper">
+        <div class="grid" id="moduleGrid">
+            <a href="journal_entry.html" class="card theme-ledger reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-journal-whills"></i></div><span class="badge">Ledger</span></div><div class="card-title">Journal Entry</div><div class="card-desc">Tally table with debits & credits. Subtotals per section: Sales, Purchases, CAPEX, and more.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="vatable_sales.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Sales</div><div class="card-desc">Track vatable sales with automated 12% output VAT calculations and invoice summaries.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="vatable_purchases.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-shopping-cart"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Purchases</div><div class="card-desc">Track vatable purchases with input tax calculations and supplier TIN integration.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="vatable_expenses.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-money-bill-wave"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Expenses</div><div class="card-desc">Track vatable operational expenses with automated VAT calculations and period filters.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="non_vat_purchases.html" class="card theme-nonvat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-shopping-basket"></i></div><span class="badge">Non-VAT</span></div><div class="card-title">Non-VAT Purchases</div><div class="card-desc">Track exempt purchases and those from non-VAT registered suppliers accurately.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="non_vat_expenses.html" class="card theme-nonvat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-receipt"></i></div><span class="badge">Non-VAT</span></div><div class="card-title">Non-VAT Expenses</div><div class="card-desc">Track VAT-exempt operational expenses and zero-rated transactions.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="capex.html" class="card theme-capex reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-building"></i></div><span class="badge">CAPEX</span></div><div class="card-title">Capital Expenditures</div><div class="card-desc">Track asset acquisitions with VAT calculations and depreciation scheduling.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="taxes_licenses.html" class="card theme-gov reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-gavel"></i></div><span class="badge">Government</span></div><div class="card-title">Taxes & Licenses</div><div class="card-desc">Track BIR tax payments, government license fees, and regulatory compliance dues.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="purchase_returns.html" class="card theme-returns reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-undo-alt"></i></div><span class="badge">Returns</span></div><div class="card-title">Purchase Returns</div><div class="card-desc">Track purchase returns and adjustments with VAT reversals and debit note management.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner"><div class="footer-copy">© 2026 MGAA VAT Tracking System · Professional Kiosk v2.0</div><div class="footer-links"><a href="quick_guide.html"><i class="fas fa-compass"></i> Quick Guide</a><a href="quick_guide.html"><i class="fas fa-headset"></i> Help & Support</a></div><div class="footer-copy"><i class="fas fa-database"></i> Auto-saved locally</div></div>
+</footer>
+
+<div class="modal-overlay" id="tinModal"><div class="modal"><div class="modal-head"><h3><i class="fas fa-id-card" style="margin-right:8px;color:var(--blue-vivid)"></i>TIN Library</h3><button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button></div><div class="modal-search"><input type="text" id="tinSearch" placeholder="Search by name or TIN…"><button id="searchBtn"><i class="fas fa-search"></i></button></div><div class="modal-form"><div class="field"><label>Full Name</label><input type="text" id="tinName" placeholder="e.g., Maria Santos, ABC Corp"></div><div class="field"><label>TIN (12 digits)</label><input type="text" id="tinNum" placeholder="123-456-789-012" maxlength="15"></div><button class="btn-add" id="addTinBtn"><i class="fas fa-plus-circle" style="margin-right:6px"></i>Add to Library</button></div><div class="modal-list" id="tinList"></div></div></div>
+
+<script>
+(function(){
+    // Nav elevation
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('elevated', window.scrollY > 10), { passive: true });
     
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Navigation</h2>
-            <button class="sidebar-toggle" id="sidebarToggle">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-        </div>
-        <div class="sidebar-content">
-            <nav class="sidebar-nav">
-                <a href="index.html" class="sidebar-btn active"><i class="fas fa-home"></i><span class="sidebar-btn-text">Startup</span></a>
-                <div class="sidebar-divider"></div>
-                <a href="tax_facts.html" class="sidebar-btn"><i class="fas fa-book"></i><span class="sidebar-btn-text">Tax Facts</span></a>
-                <a href="tax_calculator.html" class="sidebar-btn"><i class="fas fa-calculator"></i><span class="sidebar-btn-text">Tax Calculator</span></a>
-                <a href="compensation.html" class="sidebar-btn"><i class="fas fa-money-check-alt"></i><span class="sidebar-btn-text">Compensation</span></a>
-                <a href="tax_game.html" class="sidebar-btn"><i class="fas fa-gamepad"></i><span class="sidebar-btn-text">Tax Game</span></a>
-                <div class="sidebar-divider"></div>
-                <a href="quick_guide.html" class="sidebar-btn"><i class="fas fa-compass"></i><span class="sidebar-btn-text">Quick Guide</span></a>
-                <a href="#" class="sidebar-btn" id="helpBtn"><i class="fas fa-life-ring"></i><span class="sidebar-btn-text">Help & Support</span></a>
-            </nav>
-        </div>
-        <div class="sidebar-footer"><p>MGAA VAT System v2.0</p><p>© 2026 All Rights Reserved</p></div>
-    </div>
+    // Intersection observer for reveal cards
+    const reveals = document.querySelectorAll('.reveal');
+    const cards = document.querySelectorAll('.card.reveal');
+    cards.forEach((card, i) => card.style.transitionDelay = `${0.08 * i}s`);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => observer.observe(el));
 
-    <!-- RIGHT SIDEBAR - TIN LIBRARY -->
-    <div class="right-sidebar" id="rightSidebar">
-        <div class="right-sidebar-header">
-            <h2 class="sidebar-title" style="background: linear-gradient(145deg, #ff8a80, #64b5f6); -webkit-background-clip:text;">Tin Library</h2>
-            <button class="right-sidebar-toggle" id="rightSidebarToggle"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        
-        <div class="tin-search-area">
-            <div class="tin-search-box">
-                <input type="text" id="tinSearchInput" placeholder="Search by name or TIN..." autocomplete="off">
-                <button class="search-icon-btn" id="searchTinBtn" aria-label="Search"><i class="fas fa-search"></i></button>
-            </div>
-        </div>
-        
-        <div class="tin-add-section">
-            <div class="tin-input-group"><label><i class="fas fa-user"></i> Unique Name</label><input type="text" id="tinNameInput" placeholder="e.g., John Santos, ABC Corp" autocomplete="off"></div>
-            <div class="tin-input-group"><label><i class="fas fa-hashtag"></i> 12-digit TIN (xxx-xxx-xxx-xxx)</label><input type="text" id="tinNumberInput" placeholder="123-456-789-012" maxlength="15" autocomplete="off"></div>
-            <button class="add-tin-btn" id="addTinBtn"><i class="fas fa-plus-circle"></i> Add to Library</button>
-        </div>
-        
-        <div class="tin-list-container" id="tinListContainer"><div class="empty-message"><i class="fas fa-database"></i> No TINs saved. Add your first TIN above.</div></div>
-        <div class="sidebar-footer" style="padding:12px; font-size:0.7rem; text-align:center;"><i class="fas fa-save"></i> Auto-saved in device</div>
-    </div>
-
-    <!-- MUSIC CONTROL BUTTON -->
-    <div class="music-control" id="musicControl" title="Toggle Music">
-        <i class="fas fa-music"></i>
-    </div>
-
-    <div class="container">
-        <header>
-            <div class="logo-container"><img src="MGAALogo.jpg" alt="MGAA Logo" class="logo-img" id="logoImage"></div>
-            <div class="header-text"><h1>VAT Tracking System</h1><p>Comprehensive Kiosk Interface for All VAT-Related Tracking Modules</p>
-                <div class="system-status" style="margin-top: 10px;"><i class="fas fa-info-circle" style="color: var(--primary-blue);"></i><span>New: Journal Entry module added! Track debits & credits with tally table.</span></div>
-            </div>
-        </header>
-        <div class="main-content"><h2 class="dashboard-title">Select Tracking Module</h2>
-            <div class="grid-container" id="gridContainer">
-                <!-- NEW JOURNAL ENTRY BUTTON - KIOSK BUTTON -->
-                <a href="journal_entry.html" class="kiosk-button" style="--button-index: 1;">
-                    <div class="button-content">
-                        <div class="button-icon"><i class="fas fa-journal-whills"></i></div>
-                        <div class="button-title">Journal Entry</div>
-                        <div class="button-description">Tally table · Debits & Credits · Subtotal per section (Sales, Purchases, CAPEX, etc.)</div>
-                    </div>
-                    <div class="button-badge">LEDGER</div>
-                </a>
-                <a href="vatable_sales.html" class="kiosk-button vat-button" style="--button-index: 2;"><div class="button-content"><div class="button-icon"><i class="fas fa-file-invoice-dollar"></i></div><div class="button-title">VAT Sales</div><div class="button-description">Track vatable sales with automated VAT calculations</div></div><div class="button-badge">VAT</div></a>
-                <a href="vatable_purchases.html" class="kiosk-button vat-button" style="--button-index: 3;"><div class="button-content"><div class="button-icon"><i class="fas fa-shopping-cart"></i></div><div class="button-title">VAT Purchases</div><div class="button-description">Track vatable purchases with input tax calculations</div></div><div class="button-badge">VAT</div></a>
-                <a href="vatable_expenses.html" class="kiosk-button vat-button" style="--button-index: 4;"><div class="button-content"><div class="button-icon"><i class="fas fa-money-bill-wave"></i></div><div class="button-title">VAT Expenses</div><div class="button-description">Track vatable expenses with automated VAT calculations</div></div><div class="button-badge">VAT</div></a>
-                <a href="non_vat_purchases.html" class="kiosk-button non-vat-button" style="--button-index: 6;"><div class="button-content"><div class="button-icon"><i class="fas fa-shopping-basket"></i></div><div class="button-title">Non-VAT Purchases</div><div class="button-description">Track purchases that are exempt from VAT</div></div><div class="button-badge">Non-VAT</div></a>
-                <a href="non_vat_expenses.html" class="kiosk-button non-vat-button" style="--button-index: 7;"><div class="button-content"><div class="button-icon"><i class="fas fa-receipt"></i></div><div class="button-title">Non-VAT Expenses</div><div class="button-description">Track expenses that are exempt from VAT</div></div><div class="button-badge">Non-VAT</div></a>
-                <a href="capex.html" class="kiosk-button other-button" style="--button-index: 8;"><div class="button-content"><div class="button-icon"><i class="fas fa-building"></i></div><div class="button-title">Capital Expenditures</div><div class="button-description">Track asset acquisitions with VAT calculations</div></div><div class="button-badge">CAPEX</div></a>
-                <a href="taxes_licenses.html" class="kiosk-button other-button" style="--button-index: 9;"><div class="button-content"><div class="tax-license-icon-container"><svg class="tax-license-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="40" width="60" height="40" rx="5" fill="#e53935" stroke="#1e88e5" stroke-width="3"/><rect x="30" y="30" width="40" height="10" rx="3" fill="#ef5350" stroke="#1e88e5" stroke-width="2"/><rect x="40" y="20" width="20" height="10" rx="3" fill="#ff8a80" stroke="#1e88e5" stroke-width="2"/><rect x="25" y="40" width="5" height="40" fill="#e53935" stroke="#1e88e5" stroke-width="2"/><rect x="70" y="40" width="5" height="40" fill="#e53935" stroke="#1e88e5" stroke-width="2"/><rect x="48" y="50" width="4" height="15" rx="1" fill="#ffcdd2" stroke="#1e88e5" stroke-width="1"/><rect x="32" y="50" width="8" height="8" rx="1" fill="#ffebee" stroke="#1e88e5" stroke-width="1"/><rect x="60" y="50" width="8" height="8" rx="1" fill="#ffebee" stroke="#1e88e5" stroke-width="1"/><rect x="15" y="65" width="12" height="15" rx="2" fill="#ffcdd2" stroke="#1e88e5" stroke-width="2"/><rect x="18" y="62" width="12" height="15" rx="2" fill="#ef9a9a" stroke="#1e88e5" stroke-width="2"/><rect x="21" y="59" width="12" height="15" rx="2" fill="#e53935" stroke="#1e88e5" stroke-width="2"/><circle cx="80" cy="65" r="8" fill="none" stroke="#1e88e5" stroke-width="3"/><path d="M77 65 L80 68 L83 62" stroke="#1e88e5" stroke-width="3" fill="none"/><path d="M80 25 L82 27 L80 29 L78 27 Z" fill="#1e88e5"/><text x="80" y="25" text-anchor="middle" fill="#1e88e5" font-size="8" font-weight="bold">₱</text></svg></div><div class="button-title">Taxes & Licenses</div><div class="button-description">Track tax payments and government license fees</div></div><div class="button-badge">GOV</div></a>
-                <a href="purchase_returns.html" class="kiosk-button other-button" style="--button-index: 10;"><div class="button-content"><div class="button-icon"><i class="fas fa-undo-alt"></i></div><div class="button-title">Purchase Returns</div><div class="button-description">Track purchase returns with VAT adjustments</div></div><div class="button-badge">RETURNS</div></a>
-            </div>
-        </div>
-        <div class="footer"><p>© 2026 MGAA VAT Tracking System | Professional VAT-Compliant Tracking System</p><p>Kiosk Interface v2.0 | Designed for Touch Screen Use</p>
-            <div class="system-status"><div class="status-indicator"></div><span id="statusText">System Status: Online | All Modules Available</span></div>
-            <div style="margin-top: 10px; font-size: 0.9rem;"><a href="quick_guide.html" style="color: var(--primary-red); text-decoration: none; font-weight: 600;"><i class="fas fa-compass"></i> Quick Guide</a> <span style="margin: 0 10px; color: var(--border-mix);">|</span><a href="#" id="helpLink" style="color: var(--primary-blue); text-decoration: none;"><i class="fas fa-question-circle"></i> Help</a></div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ========== MUSIC PLAYER ==========
-            let audioPlayer = null;
-            let isMusicPlaying = false;
-            const musicControl = document.getElementById('musicControl');
-            const musicIcon = musicControl ? musicControl.querySelector('i') : null;
-            
-            function initMusic() {
-                audioPlayer = new Audio('startup.mp3');
-                audioPlayer.loop = false;
-                audioPlayer.volume = 0.4;
-            }
-            
-            function playMusic() {
-                if (!audioPlayer) initMusic();
-                audioPlayer.play().then(() => {
-                    isMusicPlaying = true;
-                    if (musicIcon) {
-                        musicIcon.classList.remove('fa-music');
-                        musicIcon.classList.add('fa-stop');
-                    }
-                }).catch(e => console.log("Music play failed:", e));
-            }
-            
-            function stopMusic() {
-                if (audioPlayer) {
-                    audioPlayer.pause();
-                    isMusicPlaying = false;
-                    if (musicIcon) {
-                        musicIcon.classList.remove('fa-stop');
-                        musicIcon.classList.add('fa-music');
-                    }
-                }
-            }
-            
-            function toggleMusic() {
-                if (isMusicPlaying) {
-                    stopMusic();
-                } else {
-                    playMusic();
-                }
-            }
-            
-            if (musicControl) {
-                musicControl.addEventListener('click', toggleMusic);
-                setTimeout(() => {
-                    playMusic();
-                }, 500);
-            }
-            
-            // ========== SIDEBAR LOGIC ==========
-            const logoImage = document.getElementById('logoImage');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const floatingToggle = document.getElementById('floatingToggle');
-            const body = document.getElementById('mainBody');
-            const helpLink = document.getElementById('helpLink');
-            
-            if(helpLink) helpLink.addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'quick_guide.html'; });
-            
-            let isSidebarOpen = false;
-            function setBodyMargin() { isSidebarOpen ? body.classList.add('sidebar-expanded') : body.classList.remove('sidebar-expanded'); }
-            function toggleSidebar() { isSidebarOpen = !isSidebarOpen; if(isSidebarOpen) { sidebar.classList.remove('sidebar-collapsed'); sidebar.classList.add('sidebar-visible'); } else { sidebar.classList.remove('sidebar-visible'); sidebar.classList.add('sidebar-collapsed'); } setBodyMargin(); }
-            if(sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
-            if(floatingToggle) floatingToggle.addEventListener('click', toggleSidebar);
-            
-            setTimeout(() => { isSidebarOpen = true; sidebar.classList.add('sidebar-visible'); setBodyMargin(); }, 200);
-            
-            if(logoImage) logoImage.onerror = function() { this.src = 'https://via.placeholder.com/150/1e88e5/ffffff?text=MGAA'; };
-            
-            // ========== TIN LIBRARY ==========
-            let tinEntries = [];
-            function loadTinLibrary() {
-                const stored = localStorage.getItem('tin_library_data');
-                if(stored) { try { tinEntries = JSON.parse(stored); } catch(e) { tinEntries = []; } }
-                if(!tinEntries || !tinEntries.length) {
-                    tinEntries = [
-                        { id: Date.now()+1, name: "Maria Dela Cruz", tin: "123-456-789-012" },
-                        { id: Date.now()+2, name: "Ramon Enterprises", tin: "987-654-321-001" },
-                        { id: Date.now()+3, name: "VAT Solutions Inc", tin: "456-789-123-555" }
-                    ];
-                    saveTinLibrary();
-                }
-                renderTinList();
-            }
-            function saveTinLibrary() { localStorage.setItem('tin_library_data', JSON.stringify(tinEntries)); }
-            function addTinEntry(name, tinRaw) {
-                let cleanTin = tinRaw.replace(/-/g, '');
-                if(cleanTin.length !== 12 || !/^\d+$/.test(cleanTin)) { alert("Invalid TIN: Must be exactly 12 digits (xxx-xxx-xxx-xxx)"); return false; }
-                const formattedTin = cleanTin.slice(0,3)+'-'+cleanTin.slice(3,6)+'-'+cleanTin.slice(6,9)+'-'+cleanTin.slice(9,12);
-                const nameTrim = name.trim();
-                if(nameTrim === "") { alert("Please enter a unique name."); return false; }
-                if(tinEntries.some(entry => entry.name.toLowerCase() === nameTrim.toLowerCase())) { alert("Name already exists!"); return false; }
-                tinEntries.push({ id: Date.now(), name: nameTrim, tin: formattedTin });
-                saveTinLibrary();
-                renderTinList();
-                return true;
-            }
-            
-            function renderTinList(filterText = "") {
-                const container = document.getElementById('tinListContainer');
-                if(!container) return;
-                let filtered = [...tinEntries];
-                if(filterText && filterText.trim() !== "") {
-                    const lowerFilter = filterText.toLowerCase();
-                    filtered = tinEntries.filter(entry => 
-                        entry.name.toLowerCase().includes(lowerFilter) || 
-                        entry.tin.includes(lowerFilter)
-                    );
-                }
-                if(filtered.length === 0) {
-                    container.innerHTML = `<div class="empty-message"><i class="fas fa-search"></i> No matching TIN entries.</div>`;
-                    return;
-                }
-                container.innerHTML = filtered.map(entry => `
-                    <div class="tin-card" data-id="${entry.id}">
-                        <div class="tin-number"><span><i class="fas fa-hashtag" style="color:#ffb74d;"></i> ${escapeHtml(entry.tin)}</span></div>
-                        <div class="tin-name"><i class="fas fa-user-circle"></i> ${escapeHtml(entry.name)}</div>
-                        <div class="tin-actions-row">
-                            <span class="copy-icon" data-tin="${entry.tin}" title="Copy TIN"><i class="fas fa-copy"></i> Copy</span>
-                            <span class="delete-icon" data-id="${entry.id}" data-name="${escapeHtml(entry.name)}" title="Delete TIN"><i class="fas fa-trash-alt"></i> Delete</span>
-                        </div>
-                    </div>
-                `).join('');
-                document.querySelectorAll('.copy-icon').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const tinToCopy = el.getAttribute('data-tin');
-                        navigator.clipboard.writeText(tinToCopy).then(() => {
-                            const original = el.innerHTML;
-                            el.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                            setTimeout(() => { el.innerHTML = original; }, 1500);
-                        });
-                    });
-                });
-                document.querySelectorAll('.delete-icon').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseInt(el.getAttribute('data-id'));
-                        deleteTinEntry(id);
-                    });
-                });
-            }
-            
-            function deleteTinEntry(id) {
-                const entry = tinEntries.find(e => e.id === id);
-                const name = entry ? entry.name : 'this TIN';
-                if(confirm(`Delete "${name}" from your TIN library? This cannot be undone.`)) {
-                    tinEntries = tinEntries.filter(entry => entry.id !== id);
-                    saveTinLibrary();
-                    const searchInput = document.getElementById('tinSearchInput');
-                    renderTinList(searchInput ? searchInput.value : '');
-                    showTempMessage('TIN deleted successfully!');
-                }
-            }
-            
-            function showTempMessage(msg) {
-                const tempMsg = document.createElement('div');
-                tempMsg.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#1e88e5; color:white; padding:10px 20px; border-radius:8px; z-index:9999; animation:fadeOut 2s forwards;';
-                tempMsg.innerHTML = msg;
-                document.body.appendChild(tempMsg);
-                setTimeout(() => tempMsg.remove(), 2000);
-            }
-            
-            function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
-            
-            const searchBtn = document.getElementById('searchTinBtn');
-            const searchInput = document.getElementById('tinSearchInput');
-            function performSearch() { renderTinList(searchInput.value); }
-            if(searchBtn) searchBtn.addEventListener('click', performSearch);
-            if(searchInput) searchInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') performSearch(); });
-            
-            const addBtn = document.getElementById('addTinBtn');
-            const nameInput = document.getElementById('tinNameInput');
-            const tinNumberInput = document.getElementById('tinNumberInput');
-            if(addBtn) addBtn.addEventListener('click', () => { if(addTinEntry(nameInput.value.trim(), tinNumberInput.value.trim())) { tinNumberInput.value = ''; nameInput.value = ''; searchInput.value = ''; renderTinList(''); } });
-            if(tinNumberInput) tinNumberInput.addEventListener('input', function(e) { let val = e.target.value.replace(/-/g, '').replace(/\D/g, '').slice(0,12); let formatted = ''; if(val.length > 0) formatted = val.slice(0,3); if(val.length >= 4) formatted += '-' + val.slice(3,6); if(val.length >= 7) formatted += '-' + val.slice(6,9); if(val.length >= 10) formatted += '-' + val.slice(9,12); e.target.value = formatted; });
-            
-            const rightSidebar = document.getElementById('rightSidebar');
-            const rightToggleBtn = document.getElementById('rightSidebarToggle');
-            const floatingRight = document.getElementById('floatingToggleRight');
-            let isRightOpen = false;
-            function updateRightSidebarState(open) { isRightOpen = open; if(open) { rightSidebar.classList.remove('right-sidebar-collapsed'); rightSidebar.classList.add('right-sidebar-visible'); } else { rightSidebar.classList.remove('right-sidebar-visible'); rightSidebar.classList.add('right-sidebar-collapsed'); } if(isRightOpen) body.classList.add('sidebar-right-expanded'); else body.classList.remove('sidebar-right-expanded'); }
-            if(rightToggleBtn) rightToggleBtn.addEventListener('click', () => updateRightSidebarState(!isRightOpen));
-            if(floatingRight) floatingRight.addEventListener('click', () => updateRightSidebarState(!isRightOpen));
-            setTimeout(() => { updateRightSidebarState(true); }, 250);
-            
-            loadTinLibrary();
+    // Scroll Progress Bar
+    const scrollProgress = document.getElementById('scrollProgress');
+    if (scrollProgress) {
+        window.addEventListener('scroll', () => {
+            const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            scrollProgress.style.width = scrollPercent + '%';
         });
-    </script>
+    }
+
+    // Background scroll transition from MGAALogo.jpg (top) to acct.jpg (bottom)
+    const bgBase = document.getElementById('bgBase');
+    const bgOverlay = document.getElementById('bgOverlay');
+
+    // Set initial states
+    bgBase.style.opacity = '0.15'; // Base visible at top
+    bgOverlay.style.opacity = '0'; // Overlay hidden at top
+
+    // Function to update background based on scroll position
+    function updateBackgroundOnScroll() {
+        const scrollPosition = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        
+        // Calculate scroll percentage (0 to 1)
+        let scrollPercent = maxScroll > 0 ? scrollPosition / maxScroll : 0;
+        
+        // Apply easing for smoother transition (optional - uncomment for slower start)
+        // scrollPercent = Math.pow(scrollPercent, 0.8);
+        
+        // As we scroll down, fade out MGAALogo and fade in acct
+        const baseOpacity = Math.max(0, 0.15 * (1 - scrollPercent * 1.2));
+        const overlayOpacity = Math.min(0.25, scrollPercent * 0.35);
+        
+        bgBase.style.opacity = baseOpacity;
+        bgOverlay.style.opacity = overlayOpacity;
+    }
+
+    // Throttle the scroll event for performance
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateBackgroundOnScroll();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Smooth modules button (scroll + animation + background transition)
+    const btn = document.getElementById('smoothModulesBtn');
+    const gridWrapper = document.getElementById('gridWrapper');
+    if(btn && gridWrapper) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Scroll to kiosk grid area
+            const targetOffsetTop = document.getElementById('moduleGrid').getBoundingClientRect().top + window.scrollY - 95;
+            window.scrollTo({
+                top: targetOffsetTop,
+                behavior: 'smooth'
+            });
+            
+            // Add smooth grid animation
+            gridWrapper.classList.remove('animate-down');
+            void gridWrapper.offsetWidth;
+            gridWrapper.classList.add('animate-down');
+            
+            setTimeout(() => {
+                gridWrapper.classList.remove('animate-down');
+            }, 700);
+            
+            // Background will naturally transition during scroll
+            // The scroll event will handle the background update
+        });
+    }
+
+    // Initial call to set correct background position
+    updateBackgroundOnScroll();
+
+    // ----- TIN Library -----
+    let tins = [];
+    function save() { localStorage.setItem('vat_tin_pro_library', JSON.stringify(tins)); }
+    function load() {
+        const s = localStorage.getItem('vat_tin_pro_library');
+        if (s) { tins = JSON.parse(s); return; }
+        tins = [{ id: 1, name: 'Maria Dela Cruz', tin: '123-456-789-012' },{ id: 2, name: 'Ramon Enterprises', tin: '987-654-321-001' },{ id: 3, name: 'VAT Solutions Inc', tin: '456-789-123-555' }];
+        save();
+    }
+    function fmt(raw){ const d=raw.replace(/\D/g,'').slice(0,12); let f=d.slice(0,3); if(d.length>=4) f+='-'+d.slice(3,6); if(d.length>=7) f+='-'+d.slice(6,9); if(d.length>=10) f+='-'+d.slice(9,12); return f; }
+    function esc(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<i class="fas fa-check-circle" style="margin-right:6px;color:#4ade80"></i>${msg}`; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+    function render(filter){
+        const list=document.getElementById('tinList'); if(!list) return;
+        const f=(filter||'').trim().toLowerCase(); const items=f?tins.filter(t=>t.name.toLowerCase().includes(f)||t.tin.includes(f)):tins;
+        if(!items.length){ list.innerHTML='<div style="text-align:center;padding:32px;color:var(--ink-60);font-size:0.85rem"><i class="fas fa-folder-open" style="display:block;font-size:1.5rem;margin-bottom:8px;opacity:0.4"></i>No TINs found</div>'; return; }
+        list.innerHTML=items.map(t=>`<div class="tin-item" data-id="${t.id}"><div><div class="tin-num"><i class="fas fa-hashtag" style="font-size:0.65rem;margin-right:4px;opacity:0.6"></i>${esc(t.tin)}</div><div class="tin-name">${esc(t.name)}</div></div><div class="tin-acts"><button class="tin-copy" data-tin="${esc(t.tin)}"><i class="fas fa-copy"></i> Copy</button><button class="tin-del" data-id="${t.id}"><i class="fas fa-trash"></i> Del</button></div></div>`).join('');
+        list.querySelectorAll('.tin-copy').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation(); navigator.clipboard.writeText(btn.dataset.tin); toast('TIN copied');}));
+        list.querySelectorAll('.tin-del').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation(); if(!confirm('Delete?')) return; tins=tins.filter(t=>t.id!==+btn.dataset.id); save(); render(document.getElementById('tinSearch').value); toast('Deleted');}));
+    }
+    const modal=document.getElementById('tinModal');
+    document.getElementById('openTinBtn').addEventListener('click',()=>{ modal.classList.add('open'); render(document.getElementById('tinSearch').value); });
+    document.getElementById('closeModal').addEventListener('click',()=>modal.classList.remove('open'));
+    modal.addEventListener('click',e=>{ if(e.target===modal) modal.classList.remove('open'); });
+    document.getElementById('addTinBtn').addEventListener('click',()=>{
+        const name=document.getElementById('tinName').value.trim(); const raw=document.getElementById('tinNum').value.replace(/-/g,'');
+        if(!name){ toast('Enter a name'); return; } if(raw.length!==12||!/^\d+$/.test(raw)){ toast('TIN must be 12 digits'); return; }
+        const formatted=fmt(raw); if(tins.some(t=>t.name.toLowerCase()===name.toLowerCase())){ toast('Name exists'); return; }
+        tins.push({id:Date.now(),name,tin:formatted}); save(); document.getElementById('tinName').value=''; document.getElementById('tinNum').value=''; render(document.getElementById('tinSearch').value); toast('TIN added');
+    });
+    document.getElementById('searchBtn').addEventListener('click',()=>render(document.getElementById('tinSearch').value));
+    document.getElementById('tinSearch').addEventListener('keyup',e=>{ if(e.key==='Enter') render(e.target.value); });
+    document.getElementById('tinNum').addEventListener('input',function(){ this.value=fmt(this.value); });
+    load(); render('');
+})();
+</script>
+
+<script>
+// Continue music from welcome page - plays once on dashboard load
+(function() {
+    const musicShouldPlay = sessionStorage.getItem('musicPlaying') === 'true';
+    
+    if (musicShouldPlay) {
+        const savedTime = parseFloat(sessionStorage.getItem('musicCurrentTime')) || 0;
+        
+        // Create audio element - NO LOOP
+        const audio = new Audio('startup.mp3');
+        audio.loop = false;
+        audio.volume = 0.3;
+        audio.currentTime = savedTime;
+        
+        // Play the music when dashboard loads
+        setTimeout(() => {
+            audio.play().catch(error => {
+                console.log("Autoplay blocked - adding play button", error);
+                addPlayButton(audio);
+            });
+        }, 100); // Small delay to ensure page is ready
+        
+        window.backgroundMusic = audio;
+        
+        // Add music control button
+        addMusicControl(audio);
+    }
+    
+    function addPlayButton(audio) {
+        const playBtn = document.createElement('div');
+        playBtn.innerHTML = `
+            <div style="background: linear-gradient(135deg, #1a47cc, #e53935); padding: 12px 20px; border-radius: 40px; color: white; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <i class="fas fa-play"></i> Play Music
+            </div>
+        `;
+        playBtn.style.cssText = 'position: fixed; bottom: 80px; right: 20px; z-index: 1001;';
+        playBtn.onclick = () => {
+            audio.play();
+            playBtn.remove();
+        };
+        document.body.appendChild(playBtn);
+        
+        setTimeout(() => playBtn.remove(), 10000);
+    }
+    
+    function addMusicControl(audio) {
+        const controlBtn = document.createElement('button');
+        controlBtn.innerHTML = '<i class="fas fa-music"></i>';
+        controlBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(13,17,23,0.1);
+            color: #1a47cc;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.15);
+            font-family: 'DM Sans', sans-serif;
+        `;
+        
+        let isPlaying = true;
+        
+        controlBtn.onmouseenter = () => controlBtn.style.transform = 'scale(1.1)';
+        controlBtn.onmouseleave = () => controlBtn.style.transform = 'scale(1)';
+        
+        controlBtn.onclick = () => {
+            if (isPlaying) {
+                audio.pause();
+                controlBtn.style.background = 'rgba(13,17,23,0.95)';
+                controlBtn.style.color = '#e53935';
+                controlBtn.innerHTML = '<i class="fas fa-music-slash"></i>';
+                isPlaying = false;
+            } else {
+                audio.play().catch(e => console.log("Play failed"));
+                controlBtn.style.background = 'rgba(255,255,255,0.95)';
+                controlBtn.style.color = '#1a47cc';
+                controlBtn.innerHTML = '<i class="fas fa-music"></i>';
+                isPlaying = true;
+            }
+        };
+        
+        audio.addEventListener('ended', () => {
+            controlBtn.style.opacity = '0.5';
+            controlBtn.style.cursor = 'default';
+            controlBtn.onclick = null;
+        });
+        
+        document.body.appendChild(controlBtn);
+    }
+    
+    // Clear sessionStorage after music starts to prevent replay on refresh
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.removeItem('musicPlaying');
+        sessionStorage.removeItem('musicCurrentTime');
+    });
+})();
+</script>
 </body>
 </html>
