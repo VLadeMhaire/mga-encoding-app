@@ -184,6 +184,45 @@ body {
 .nav-btn.danger:hover{background:var(--red-50);color:var(--red-700)}
 .nav-btn.toggled{color:var(--blue-700);background:var(--blue-50)}
 
+/* ── SAVE SESSION BUTTON ── */
+.nav-btn.save-session-btn {
+  background: var(--blue-600);
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.nav-btn.save-session-btn i { color: white; }
+.nav-btn.save-session-btn:hover { background: var(--blue-700); color: white; }
+.nav-btn.save-session-btn.saved {
+  background: var(--green-500);
+}
+.nav-btn.save-session-btn.saved:hover { background: var(--green-700); }
+.session-save-time {
+  font-size: 10px;
+  color: var(--gray-400);
+  padding: 0 10px 8px;
+  display: flex; align-items: center; gap: 5px;
+}
+.session-save-time i { font-size: 9px; color: var(--green-500); }
+.autosave-indicator {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; color: var(--gray-400);
+  padding: 4px 10px 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.autosave-indicator.visible { opacity: 1; }
+.autosave-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green-500);
+  animation: pulse-dot 1s ease infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
 .sidebar-footer {
   padding: 12px 16px;
   border-top: 1px solid var(--gray-100);
@@ -409,16 +448,6 @@ table#vatableTable tfoot .sum-value {
 }
 
 /* ══════════════════════════════════════════
-   STATS SECTION
-══════════════════════════════════════════ */
-.stats-section {
-  background: white;
-  border-top: 1px solid var(--gray-200);
-  padding: 14px 20px;
-  flex-shrink: 0;
-}
-
-/* ══════════════════════════════════════════
    TALLY SECTION
 ══════════════════════════════════════════ */
 .tally-section {
@@ -607,6 +636,95 @@ table#vatableTable tfoot .sum-value {
   border-top: 1px solid var(--gray-100);
   font-size: 10px; color: var(--gray-400);
 }
+
+/* ══════════════════════════════════════════
+   INLINE CALENDAR PICKER  (FIXED)
+══════════════════════════════════════════ */
+.date-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: transparent;
+}
+.date-picker-popup {
+  position: fixed;          /* anchored via JS to button rect */
+  z-index: 9001;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  width: 268px;
+  animation: popIn .15s ease;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-6px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.dp-header {
+  background: var(--blue-900);
+  color: white;
+  padding: 12px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dp-month-year {
+  font-size: 14px; font-weight: 700;
+  flex: 1; text-align: center; letter-spacing: .3px;
+}
+.dp-nav-btn {
+  background: rgba(255,255,255,.15);
+  border: none; color: white;
+  width: 28px; height: 28px;
+  border-radius: 6px; cursor: pointer;
+  font-size: 13px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.dp-nav-btn:hover { background: rgba(255,255,255,.3); }
+.dp-weekdays {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  background: var(--blue-50);
+  border-bottom: 1px solid var(--gray-100);
+}
+.dp-weekdays span {
+  text-align: center; padding: 7px 0;
+  font-size: 10px; font-weight: 700;
+  color: var(--blue-700); text-transform: uppercase; letter-spacing: .5px;
+}
+.dp-days {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  padding: 6px 8px 10px;
+  gap: 2px;
+}
+.dp-day {
+  text-align: center; padding: 7px 2px;
+  font-size: 12px; border-radius: 6px; cursor: pointer;
+  border: none; background: none; color: var(--gray-700);
+  font-family: var(--font);
+  transition: background .1s, color .1s;
+  line-height: 1;
+}
+.dp-day:hover { background: var(--blue-100); color: var(--blue-800); }
+.dp-day.today { font-weight: 700; color: var(--blue-600); }
+.dp-day.selected { background: var(--blue-600); color: white; font-weight: 700; }
+.dp-day.selected:hover { background: var(--blue-700); }
+.dp-day.other-month { color: var(--gray-300); }
+.dp-day.other-month:hover { background: var(--gray-50); color: var(--gray-400); }
+.dp-footer {
+  border-top: 1px solid var(--gray-100);
+  padding: 8px 10px;
+  display: flex; gap: 6px; justify-content: flex-end;
+}
+.dp-footer button {
+  font-size: 12px; padding: 5px 12px; border-radius: 6px;
+  cursor: pointer; font-family: var(--font);
+  border: 1px solid var(--gray-200); background: white; color: var(--gray-600);
+  transition: var(--transition);
+}
+.dp-footer button:hover { background: var(--gray-50); }
+.dp-footer button.dp-today-btn {
+  background: var(--blue-600); color: white; border-color: var(--blue-600);
+}
+.dp-footer button.dp-today-btn:hover { background: var(--blue-700); }
 
 /* ══════════════════════════════════════════
    COLUMN VISIBILITY DROPDOWN
@@ -804,62 +922,30 @@ td.cell-selected {
 }
 
 /* TIN input formatting */
-#companyTIN {
-  font-family: var(--font-mono);
-  letter-spacing: 0.5px;
-}
+#companyTIN { font-family: var(--font-mono); letter-spacing: 0.5px; }
 
 /* Date update indicator animation */
-.date-updated {
-  animation: datePulse 0.5s ease;
-}
-
+.date-updated { animation: datePulse 0.5s ease; }
 @keyframes datePulse {
   0% { background-color: transparent; }
   50% { background-color: rgba(59, 130, 246, 0.2); }
   100% { background-color: transparent; }
 }
 
-/* Date column cell transition */
-table#vatableTable td .date-input {
-  transition: all 0.2s ease;
-}
-
 /* Report date info badge */
 .report-date-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--blue-100);
-  color: var(--blue-800);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 500;
-  margin-left: 10px;
-  cursor: pointer;
-  transition: var(--transition);
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--blue-100); color: var(--blue-800);
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 500;
+  margin-left: 10px; cursor: pointer; transition: var(--transition);
 }
-
-.report-date-badge:hover {
-  background: var(--blue-200);
-  transform: scale(1.02);
-}
-
-.report-date-badge i {
-  font-size: 10px;
-}
+.report-date-badge:hover { background: var(--blue-200); transform: scale(1.02); }
+.report-date-badge i { font-size: 10px; }
 
 /* Date input formatting */
-#reportDate {
-  font-family: var(--font-mono);
-  letter-spacing: 0.5px;
-}
-
-/* Date column styling */
-.date-input {
-  font-family: var(--font-mono);
-}
+#reportDate { font-family: var(--font-mono); letter-spacing: 0.5px; }
+.date-input { font-family: var(--font-mono); }
 </style>
 </head>
 <body>
@@ -915,6 +1001,18 @@ table#vatableTable td .date-input {
 
     <a href="index2.html" class="nav-btn"><i class="fas fa-home"></i>Dashboard</a>
 
+    <div class="nav-section">Session</div>
+    <!-- SAVE SESSION BUTTON -->
+    <button class="nav-btn save-session-btn" id="saveSessionBtn">
+      <i class="fas fa-cloud-upload-alt"></i>Save Session
+    </button>
+    <div class="autosave-indicator" id="autosaveIndicator">
+      <span class="autosave-dot"></span> Autosaving…
+    </div>
+    <div class="session-save-time" id="sessionSaveTime" style="display:none">
+      <i class="fas fa-check-circle"></i><span id="sessionSaveTimeText"></span>
+    </div>
+
     <div class="nav-section">Data Management</div>
     <button class="nav-btn" id="selectMultipleBtn"><i class="fas fa-check-double"></i>Select Multiple</button>
     <button class="nav-btn" id="addRowBtn"><i class="fas fa-plus-circle"></i>Add New Row</button>
@@ -926,6 +1024,7 @@ table#vatableTable td .date-input {
     <div class="nav-divider"></div>
     <button class="nav-btn danger" id="clearBtn"><i class="fas fa-trash-alt"></i>Clear Table Data</button>
     <button class="nav-btn danger" id="clearInfoBtn"><i class="fas fa-eraser"></i>Clear Company Info</button>
+    <button class="nav-btn danger" id="clearSessionBtn"><i class="fas fa-times-circle"></i>Clear Saved Session</button>
 
     <div class="nav-section">Visibility</div>
     <button class="nav-btn toggle-btn" id="toggleStatsBtn" data-target="statsSection"><i class="fas fa-chart-bar"></i>Hide Stats Bar</button>
@@ -1117,15 +1216,15 @@ table#vatableTable td .date-input {
       <input type="tel" id="telephone" placeholder="Telephone number">
     </div>
     <div class="field-group">
-  <label>Report Date</label>
-  <div style="display: flex; gap: 8px;">
-    <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex: 1;">
-    <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding: 7px 12px; width: auto;">
-      <i class="fas fa-calendar-alt"></i>
-    </button>
-  </div>
-  <small style="font-size: 9px; color: var(--gray-400); margin-top: 2px; display: block;">Format: MM/DD/YYYY (e.g., 12/25/2024)</small>
-</div>
+      <label>Report Date</label>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex: 1;" autocomplete="off">
+        <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding: 7px 12px; width: auto; flex-shrink:0;">
+          <i class="fas fa-calendar-alt"></i>
+        </button>
+      </div>
+      <small style="font-size: 9px; color: var(--gray-400); margin-top: 2px; display: block;">Format: MM/DD/YYYY (e.g., 12/25/2024)</small>
+    </div>
     <div class="field-group">
       <label>Authorized Employee <span class="req">*</span></label>
       <input type="text" id="authorizedEmployee" placeholder="Employee name">
@@ -1278,15 +1377,11 @@ function validateTIN(input){
 function saveCompanyInfo(){
   const fields=['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'];
   const data={};
-  fields.forEach(id=>{ 
-    const el=document.getElementById(id); 
-    if(el) {
-      if (id === 'reportDate' && el.value) {
-        // Convert display date to storage format (YYYY-MM-DD)
-        data[id] = displayToStorageDate(el.value);
-      } else {
-        data[id] = el.value;
-      }
+  fields.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      if(id==='reportDate'&&el.value){ data[id]=displayToStorageDate(el.value); }
+      else { data[id]=el.value; }
     }
   });
   localStorage.setItem('vatCompanyInfo', JSON.stringify(data));
@@ -1297,15 +1392,11 @@ function loadCompanyInfo(){
   if(!raw) return;
   try{
     const data=JSON.parse(raw);
-    Object.keys(data).forEach(id=>{ 
-      const el=document.getElementById(id); 
-      if(el) {
-        if (id === 'reportDate' && data[id]) {
-          // Convert storage format to display format (MM/DD/YYYY)
-          el.value = storageToDisplayDate(data[id]);
-        } else {
-          el.value = data[id];
-        }
+    Object.keys(data).forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){
+        if(id==='reportDate'&&data[id]){ el.value=storageToDisplayDate(data[id]); }
+        else { el.value=data[id]; }
       }
     });
   }catch(e){}
@@ -1316,6 +1407,343 @@ function clearCompanyInfo(){
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   localStorage.removeItem('vatCompanyInfo');
   showToast('Company info cleared','success');
+}
+
+/* ============================================================
+   FORMAT COMPANY TIN
+============================================================ */
+function formatCompanyTIN(input){
+  let value=input.value.replace(/\D/g,'');
+  if(value.length>12) value=value.slice(0,12);
+  let formatted='';
+  for(let i=0;i<value.length;i++){
+    if(i>0&&i%3===0&&i<12) formatted+='-';
+    formatted+=value[i];
+  }
+  input.value=formatted;
+}
+
+/* ============================================================
+   DATE HELPERS
+============================================================ */
+function displayToStorageDate(displayDate){
+  if(!displayDate) return '';
+  const parts=displayDate.split('/');
+  if(parts.length===3) return `${parts[2]}-${parts[0]}-${parts[1]}`;
+  return displayDate;
+}
+function storageToDisplayDate(storageDate){
+  if(!storageDate) return '';
+  const parts=storageDate.split('-');
+  if(parts.length===3) return `${parts[1]}/${parts[2]}/${parts[0]}`;
+  return storageDate;
+}
+function getTodayDisplayDate(){
+  const today=new Date();
+  const month=String(today.getMonth()+1).padStart(2,'0');
+  const day=String(today.getDate()).padStart(2,'0');
+  const year=today.getFullYear();
+  return `${month}/${day}/${year}`;
+}
+function validateDisplayDate(dateStr){
+  const dateRegex=/^(\d{2})\/(\d{2})\/(\d{4})$/;
+  if(!dateRegex.test(dateStr)) return false;
+  const [,month,day,year]=dateStr.match(dateRegex);
+  const date=new Date(year,month-1,day);
+  return date.getFullYear()===parseInt(year)&&date.getMonth()===parseInt(month)-1&&date.getDate()===parseInt(day);
+}
+function autoFormatReportDate(input){
+  let value=input.value.replace(/[^0-9]/g,'');
+  if(value.length>=2&&value.length<4){ value=value.slice(0,2)+'/'+value.slice(2); }
+  else if(value.length>=4&&value.length<6){ value=value.slice(0,2)+'/'+value.slice(2,4)+'/'+value.slice(4); }
+  else if(value.length>=6){ value=value.slice(0,2)+'/'+value.slice(2,4)+'/'+value.slice(4,8); }
+  input.value=value;
+}
+function validateReportDate(input){
+  if(!input.value) return true;
+  if(!validateDisplayDate(input.value)){
+    input.style.borderColor='var(--red-500)';
+    input.style.backgroundColor='var(--red-50)';
+    return false;
+  } else {
+    input.style.borderColor='var(--gray-200)';
+    input.style.backgroundColor='white';
+    return true;
+  }
+}
+
+/* ============================================================
+   INLINE CALENDAR PICKER  (FIXED - anchored to button)
+============================================================ */
+let dpState = { year: 0, month: 0, targetInput: null };
+
+function showDatePicker(anchorEl) {
+  // Remove any existing picker
+  closeDatePicker();
+
+  const input = document.getElementById('reportDate');
+  let initDate = new Date();
+  if (input.value && validateDisplayDate(input.value)) {
+    const parts = input.value.split('/');
+    initDate = new Date(parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
+  }
+  dpState.year  = initDate.getFullYear();
+  dpState.month = initDate.getMonth();
+  dpState.targetInput = input;
+
+  // Build overlay (captures outside clicks)
+  const overlay = document.createElement('div');
+  overlay.className = 'date-picker-overlay';
+  overlay.id = 'dpOverlay';
+  overlay.addEventListener('click', closeDatePicker);
+  document.body.appendChild(overlay);
+
+  // Build popup
+  const popup = document.createElement('div');
+  popup.className = 'date-picker-popup';
+  popup.id = 'dpPopup';
+  popup.addEventListener('click', e => e.stopPropagation()); // don't close on popup click
+  document.body.appendChild(popup);
+
+  renderCalendar();
+  positionPicker(anchorEl || document.getElementById('reportDatePickerBtn'));
+}
+
+function positionPicker(anchor) {
+  const popup = document.getElementById('dpPopup');
+  if (!popup || !anchor) return;
+
+  const rect   = anchor.getBoundingClientRect();
+  const vpH    = window.innerHeight;
+  const vpW    = window.innerWidth;
+  const popupW = 268;
+  const popupH = 320; // approximate
+
+  let top  = rect.bottom + 6;
+  let left = rect.right - popupW; // align right edge with button
+
+  // Flip upward if not enough space below
+  if (top + popupH > vpH - 10) top = rect.top - popupH - 6;
+  // Keep within left edge
+  if (left < 8) left = 8;
+  // Keep within right edge
+  if (left + popupW > vpW - 8) left = vpW - popupW - 8;
+
+  popup.style.top  = top  + 'px';
+  popup.style.left = left + 'px';
+}
+
+function closeDatePicker() {
+  document.getElementById('dpOverlay')?.remove();
+  document.getElementById('dpPopup')?.remove();
+}
+
+function renderCalendar() {
+  const popup = document.getElementById('dpPopup');
+  if (!popup) return;
+  const { year, month, targetInput } = dpState;
+
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+  const today  = new Date();
+  let selDay = null, selMonth = null, selYear = null;
+  if (targetInput && targetInput.value && validateDisplayDate(targetInput.value)) {
+    const p = targetInput.value.split('/');
+    selMonth = parseInt(p[0])-1; selDay = parseInt(p[1]); selYear = parseInt(p[2]);
+  }
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInPrev  = new Date(year, month, 0).getDate();
+
+  let daysHTML = '';
+  // Prev month tail
+  for (let i = firstDay-1; i >= 0; i--) {
+    const d = daysInPrev - i;
+    daysHTML += `<button class="dp-day other-month" data-y="${year}" data-m="${month-1}" data-d="${d}" type="button">${d}</button>`;
+  }
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    let cls = 'dp-day';
+    if (d===today.getDate() && month===today.getMonth() && year===today.getFullYear()) cls += ' today';
+    if (selDay===d && selMonth===month && selYear===year) cls += ' selected';
+    daysHTML += `<button class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}" type="button">${d}</button>`;
+  }
+  // Next month head
+  const total = firstDay + daysInMonth;
+  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let d = 1; d <= remaining; d++) {
+    daysHTML += `<button class="dp-day other-month" data-y="${year}" data-m="${month+1}" data-d="${d}" type="button">${d}</button>`;
+  }
+
+  popup.innerHTML = `
+    <div class="dp-header">
+      <button class="dp-nav-btn" id="dpPrev" type="button"><i class="fas fa-chevron-left"></i></button>
+      <span class="dp-month-year">${MONTHS[month]} ${year}</span>
+      <button class="dp-nav-btn" id="dpNext" type="button"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="dp-weekdays">${DAYS.map(d=>`<span>${d}</span>`).join('')}</div>
+    <div class="dp-days">${daysHTML}</div>
+    <div class="dp-footer">
+      <button class="dp-today-btn" id="dpTodayBtn" type="button"><i class="fas fa-crosshairs"></i> Today</button>
+      <button id="dpCancelBtn" type="button">Cancel</button>
+    </div>`;
+
+  // Prev month
+  popup.querySelector('#dpPrev').addEventListener('click', () => {
+    dpState.month--; if (dpState.month < 0) { dpState.month=11; dpState.year--; }
+    renderCalendar();
+  });
+  // Next month
+  popup.querySelector('#dpNext').addEventListener('click', () => {
+    dpState.month++; if (dpState.month > 11) { dpState.month=0; dpState.year++; }
+    renderCalendar();
+  });
+  // Today
+  popup.querySelector('#dpTodayBtn').addEventListener('click', () => {
+    const t = new Date();
+    dpState.year = t.getFullYear(); dpState.month = t.getMonth();
+    selectDate(t.getFullYear(), t.getMonth(), t.getDate());
+  });
+  // Cancel
+  popup.querySelector('#dpCancelBtn').addEventListener('click', closeDatePicker);
+
+  // Day selection
+  popup.querySelectorAll('.dp-day').forEach(btn => {
+    btn.addEventListener('click', () => {
+      let y = parseInt(btn.dataset.y);
+      let m = parseInt(btn.dataset.m);
+      let d = parseInt(btn.dataset.d);
+      // Handle month overflow from prev/next buttons
+      if (m < 0)  { m = 11; y--; }
+      if (m > 11) { m = 0;  y++; }
+      selectDate(y, m, d);
+    });
+  });
+}
+
+function selectDate(year, month, day) {
+  const input = dpState.targetInput;
+  if (!input) { closeDatePicker(); return; }
+  const mm = String(month+1).padStart(2,'0');
+  const dd = String(day).padStart(2,'0');
+  input.value = `${mm}/${dd}/${year}`;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+  closeDatePicker();
+}
+
+/* ============================================================
+   SESSION AUTOSAVE  (localStorage)
+============================================================ */
+const SESSION_KEY   = 'VAT_SESSION_TABLE';
+const SESSION_META  = 'VAT_SESSION_META';
+let   autoSaveTimer = null;
+let   isSilentSave  = false;  // true = autosave, false = manual
+
+function getTableData(){
+  return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({
+    date:        r.querySelector('.date-input')?.value||'',
+    invoiceNumber:r.querySelector('.invoice-number')?.value||'',
+    invoiceType: r.querySelector('.invoice-type')?.value||'',
+    paymentMode: r.querySelector('.payment-mode')?.value||'',
+    tinNumber:   r.querySelector('.tin-number')?.value||'',
+    customerName:r.querySelector('.customer-name')?.value||'',
+    address:     r.querySelector('.address')?.value||'',
+    grossSales:  r.querySelector('.gross-sales')?.value||'',
+    exemptSales: r.querySelector('.exempt-sales')?.value||'',
+    salesType:   r.querySelector('.sales-type')?.value||'',
+    withholdingRate:r.querySelector('.withholding-rate')?.value||'0',
+    remarks:     r.querySelector('.remarks')?.value||''
+  }));
+}
+
+function saveSession(manual=false){
+  try {
+    const data = { tableData: getTableData(), companyInfo: getCompanyData() };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    const now = new Date();
+    const meta = { savedAt: now.toISOString() };
+    localStorage.setItem(SESSION_META, JSON.stringify(meta));
+
+    updateSaveTimeUI(now);
+    if (manual) {
+      showToast('Session saved — '+ data.tableData.length +' rows stored', 'success');
+      flashSaveBtn();
+    }
+  } catch(e) {
+    if (manual) showToast('Save failed: storage may be full', 'error');
+  }
+}
+
+function flashSaveBtn() {
+  const btn = document.getElementById('saveSessionBtn');
+  if (!btn) return;
+  btn.classList.add('saved');
+  btn.innerHTML = '<i class="fas fa-check"></i>Saved!';
+  setTimeout(() => {
+    btn.classList.remove('saved');
+    btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>Save Session';
+  }, 2000);
+}
+
+function updateSaveTimeUI(date) {
+  const timeEl = document.getElementById('sessionSaveTime');
+  const textEl = document.getElementById('sessionSaveTimeText');
+  if (!timeEl || !textEl) return;
+  const timeStr = date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  const dateStr = date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  textEl.textContent = `Saved ${dateStr} ${timeStr}`;
+  timeEl.style.display = 'flex';
+}
+
+function loadLastSaveTime() {
+  try {
+    const raw = localStorage.getItem(SESSION_META);
+    if (!raw) return;
+    const meta = JSON.parse(raw);
+    if (meta.savedAt) updateSaveTimeUI(new Date(meta.savedAt));
+  } catch(e) {}
+}
+
+// Debounced autosave — triggers 1.5s after last change
+function scheduleAutoSave() {
+  clearTimeout(autoSaveTimer);
+  const ind = document.getElementById('autosaveIndicator');
+  if (ind) ind.classList.add('visible');
+  autoSaveTimer = setTimeout(() => {
+    saveSession(false);
+    if (ind) ind.classList.remove('visible');
+  }, 1500);
+}
+
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data || !Array.isArray(data.tableData)) return false;
+
+    if (data.companyInfo) setCompanyData(data.companyInfo);
+
+    document.getElementById('tableBody').innerHTML = '';
+    data.tableData.forEach(rd => addRow(rd));
+    if (data.tableData.length === 0) addRow();
+
+    currentPage = 1; renderCurrentPage(); updateAllStats();
+    loadLastSaveTime();
+    return data.tableData.length;
+  } catch(e) { return false; }
+}
+
+function clearSession() {
+  if (!confirm('Clear the saved session? Your current data on screen will stay, but the auto-saved backup will be deleted.')) return;
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_META);
+  const timeEl = document.getElementById('sessionSaveTime');
+  if (timeEl) timeEl.style.display = 'none';
+  showToast('Session backup cleared', 'success');
 }
 
 /* ============================================================
@@ -1453,7 +1881,6 @@ function createRow(data={}){
     <td><input type="text" value="${escH(data.remarks||'')}" class="remarks" placeholder="Remarks"></td>
     <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>
   `;
-  // Apply column visibility
   COLS.forEach((c,i)=>{ const td=tr.children[i]; if(td) td.classList.toggle('hidden-column',!!colVisibility[c.key]); });
   attachRowListeners(tr);
   calcRow(tr);
@@ -1464,8 +1891,8 @@ function attachRowListeners(row){
   if(row.dataset.listenersAttached) return;
   row.dataset.listenersAttached='1';
   row.querySelectorAll('input,select').forEach(el=>{
-    el.addEventListener('input',()=>{ calcRow(row); scheduleStatsUpdate(); });
-    el.addEventListener('change',()=>{ calcRow(row); scheduleStatsUpdate(); });
+    el.addEventListener('input', ()=>{ calcRow(row); scheduleStatsUpdate(); scheduleAutoSave(); });
+    el.addEventListener('change',()=>{ calcRow(row); scheduleStatsUpdate(); scheduleAutoSave(); });
   });
   const tin=row.querySelector('.tin-number');
   if(tin){
@@ -1478,19 +1905,14 @@ function attachRowListeners(row){
   if(name){
     name.addEventListener('blur',()=>{ tryAutoFillFromName(row); storeCustomerPair(row); });
   }
-      // Add date formatting for date column
-const dateInput = row.querySelector('.date-input');
-if (dateInput) {
-  dateInput.addEventListener('input', function() {
-    autoFormatReportDate(this);
-  });
-  dateInput.addEventListener('blur', function() {
-    validateReportDate(this);
-    if (this.value && !validateDisplayDate(this.value)) {
-      showToast('Invalid date format. Use MM/DD/YYYY', 'warning');
-    }
-  });
-}
+  const dateInput=row.querySelector('.date-input');
+  if(dateInput){
+    dateInput.addEventListener('input',function(){ autoFormatReportDate(this); });
+    dateInput.addEventListener('blur',function(){
+      validateReportDate(this);
+      if(this.value&&!validateDisplayDate(this.value)) showToast('Invalid date format. Use MM/DD/YYYY','warning');
+    });
+  }
   row.querySelector('.sales-type').addEventListener('change',()=>storeCustomerPair(row));
   row.querySelector('.address').addEventListener('blur',()=>storeCustomerPair(row));
 }
@@ -1538,23 +1960,6 @@ function storeCustomerPair(row){
   if(n&&t) addCustomerPair(n,t,st,addr);
 }
 
-// Format TIN for company info with automatic dashes (xxx-xxx-xxx-xxx)
-function formatCompanyTIN(input) {
-  let value = input.value.replace(/\D/g, ''); // Remove non-digits
-  if (value.length > 12) value = value.slice(0, 12); // Limit to 12 digits
-  
-  // Add dashes after every 3 digits
-  let formatted = '';
-  for (let i = 0; i < value.length; i++) {
-    if (i > 0 && i % 3 === 0 && i < 12) {
-      formatted += '-';
-    }
-    formatted += value[i];
-  }
-  
-  input.value = formatted;
-}
-
 /* ============================================================
    TIN SUGGESTION DROPDOWN
 ============================================================ */
@@ -1589,7 +1994,7 @@ function showTinSuggestions(input, row){
       const nm=row.querySelector('.customer-name'); if(nm&&!nm.value.trim()) nm.value=item.dataset.name;
       const st=row.querySelector('.sales-type'); if(st&&!st.value) st.value=item.dataset.type;
       const ad=row.querySelector('.address'); if(ad&&!ad.value.trim()) ad.value=item.dataset.addr;
-      calcRow(row); scheduleStatsUpdate();
+      calcRow(row); scheduleStatsUpdate(); scheduleAutoSave();
       box.remove(); activeSugBox=null;
     });
   });
@@ -1609,6 +2014,7 @@ function addRow(data={}){
   currentPage=Math.ceil(total/rowsPerPage);
   renderCurrentPage();
   scheduleStatsUpdate();
+  scheduleAutoSave();
   return row;
 }
 
@@ -1621,6 +2027,7 @@ function addBatchRows(count){
   currentPage=Math.ceil(total/rowsPerPage);
   renderCurrentPage();
   scheduleStatsUpdate();
+  scheduleAutoSave();
 }
 
 function deleteRow(rid){
@@ -1632,7 +2039,7 @@ function deleteRow(rid){
     row.remove();
     const total=document.querySelectorAll('#tableBody tr').length;
     if(currentPage>getTotalPages()) currentPage=Math.max(1,getTotalPages());
-    renderCurrentPage(); scheduleStatsUpdate();
+    renderCurrentPage(); scheduleStatsUpdate(); scheduleAutoSave();
   },200);
 }
 
@@ -1715,7 +2122,7 @@ function rebuildSummaryRow(gS,eS,nS,oT,wH){
 }
 
 /* ============================================================
-   SAVE / LOAD
+   SAVE / LOAD  (File)
 ============================================================ */
 function getCompanyData(){
   const f=(id)=>document.getElementById(id)?.value||'';
@@ -1728,22 +2135,6 @@ function setCompanyData(d){
     telephone:'telephone',date:'reportDate',employee:'authorizedEmployee',email:'email'};
   Object.keys(map).forEach(k=>{ const el=document.getElementById(map[k]); if(el&&d[k]) el.value=d[k]; });
   saveCompanyInfo();
-}
-function getTableData(){
-  return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({
-    date:r.querySelector('.date-input')?.value||'',
-    invoiceNumber:r.querySelector('.invoice-number')?.value||'',
-    invoiceType:r.querySelector('.invoice-type')?.value||'',
-    paymentMode:r.querySelector('.payment-mode')?.value||'',
-    tinNumber:r.querySelector('.tin-number')?.value||'',
-    customerName:r.querySelector('.customer-name')?.value||'',
-    address:r.querySelector('.address')?.value||'',
-    grossSales:r.querySelector('.gross-sales')?.value||'',
-    exemptSales:r.querySelector('.exempt-sales')?.value||'',
-    salesType:r.querySelector('.sales-type')?.value||'',
-    withholdingRate:r.querySelector('.withholding-rate')?.value||'0',
-    remarks:r.querySelector('.remarks')?.value||''
-  }));
 }
 
 function saveDataToFile(){
@@ -1814,223 +2205,59 @@ function mergeIntoTable(rows,companyInfo,errs,total){
   showToast(msg,errs.length?'warning':'success');
 }
 
-// Update all date column rows based on report date
-function updateAllDatesFromReportDate() {
-  const reportDate = document.getElementById('reportDate').value;
-  if (!reportDate) {
-    showToast('No report date set. Please set a report date first.', 'warning');
-    return;
-  }
-  
-  if (!validateDisplayDate(reportDate)) {
-    showToast('Invalid report date format. Please use MM/DD/YYYY', 'warning');
-    return;
-  }
-  
-  const dateInputs = document.querySelectorAll('#tableBody .date-input');
-  if (dateInputs.length === 0) {
-    showToast('No rows found to update.', 'info');
-    return;
-  }
-  
-  let updatedCount = 0;
-  dateInputs.forEach(input => {
-    if (input.value !== reportDate) {
-      input.value = reportDate;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+/* ============================================================
+   UPDATE ALL DATES
+============================================================ */
+function updateAllDatesFromReportDate(){
+  const reportDate=document.getElementById('reportDate').value;
+  if(!reportDate){ showToast('No report date set. Please set a report date first.','warning'); return; }
+  if(!validateDisplayDate(reportDate)){ showToast('Invalid report date format. Please use MM/DD/YYYY','warning'); return; }
+  const dateInputs=document.querySelectorAll('#tableBody .date-input');
+  if(dateInputs.length===0){ showToast('No rows found to update.','info'); return; }
+  let updatedCount=0;
+  dateInputs.forEach(input=>{
+    if(input.value!==reportDate){
+      input.value=reportDate;
+      input.dispatchEvent(new Event('change',{bubbles:true}));
       updatedCount++;
-      
-      // Add animation effect
-      const cell = input.closest('td');
+      const cell=input.closest('td');
       cell.classList.add('date-updated');
-      setTimeout(() => {
-        cell.classList.remove('date-updated');
-      }, 500);
+      setTimeout(()=>{ cell.classList.remove('date-updated'); },500);
     }
   });
-  
-  if (updatedCount > 0) {
-    showToast(`Updated ${updatedCount} row(s) to report date: ${reportDate}`, 'success');
-    scheduleStatsUpdate();
+  if(updatedCount>0){
+    showToast(`Updated ${updatedCount} row(s) to report date: ${reportDate}`,'success');
+    scheduleStatsUpdate(); scheduleAutoSave();
   } else {
-    showToast('All rows already have the current report date.', 'info');
+    showToast('All rows already have the current report date.','info');
   }
 }
 
-// Optional: Auto-update new rows when report date changes
-function setupAutoDateUpdate() {
-  const reportDateInput = document.getElementById('reportDate');
-  if (!reportDateInput) return;
-  
-  // Add a badge next to report date label
-  const reportDateGroup = reportDateInput.closest('.field-group');
-  if (reportDateGroup && !document.querySelector('.report-date-badge')) {
-    const badge = document.createElement('span');
-    badge.className = 'report-date-badge';
-    badge.innerHTML = '<i class="fas fa-calendar-alt"></i> Apply to all rows';
-    badge.title = 'Update all date rows to this report date';
-    badge.onclick = () => updateAllDatesFromReportDate();
+function setupAutoDateUpdate(){
+  const reportDateInput=document.getElementById('reportDate');
+  if(!reportDateInput) return;
+  const reportDateGroup=reportDateInput.closest('.field-group');
+  if(reportDateGroup&&!document.querySelector('.report-date-badge')){
+    const badge=document.createElement('span');
+    badge.className='report-date-badge';
+    badge.innerHTML='<i class="fas fa-calendar-alt"></i> Apply to all rows';
+    badge.title='Update all date rows to this report date';
+    badge.onclick=()=>updateAllDatesFromReportDate();
     reportDateGroup.querySelector('label')?.appendChild(badge);
   }
-  
-  // Ask to update existing rows when report date changes
-  let previousDate = reportDateInput.value;
-  reportDateInput.addEventListener('change', function() {
-    const newDate = this.value;
-    if (previousDate && newDate && newDate !== previousDate) {
-      const existingRows = document.querySelectorAll('#tableBody .date-input').length;
-      if (existingRows > 0) {
-        const shouldUpdate = confirm(`Do you want to update all ${existingRows} existing rows to the new report date (${newDate})?`);
-        if (shouldUpdate) {
-          updateAllDatesFromReportDate();
-        }
+  let previousDate=reportDateInput.value;
+  reportDateInput.addEventListener('change',function(){
+    const newDate=this.value;
+    if(previousDate&&newDate&&newDate!==previousDate){
+      const existingRows=document.querySelectorAll('#tableBody .date-input').length;
+      if(existingRows>0){
+        const shouldUpdate=confirm(`Do you want to update all ${existingRows} existing rows to the new report date (${newDate})?`);
+        if(shouldUpdate) updateAllDatesFromReportDate();
       }
     }
-    previousDate = newDate;
+    previousDate=newDate;
     saveCompanyInfo();
   });
-}
-
-// Convert MM/DD/YYYY to YYYY-MM-DD for storage/calculation
-function displayToStorageDate(displayDate) {
-  if (!displayDate) return '';
-  const parts = displayDate.split('/');
-  if (parts.length === 3) {
-    return `${parts[2]}-${parts[0]}-${parts[1]}`;
-  }
-  return displayDate;
-}
-
-// Convert YYYY-MM-DD to MM/DD/YYYY for display
-function storageToDisplayDate(storageDate) {
-  if (!storageDate) return '';
-  const parts = storageDate.split('-');
-  if (parts.length === 3) {
-    return `${parts[1]}/${parts[2]}/${parts[0]}`;
-  }
-  return storageDate;
-}
-
-// Get today's date in MM/DD/YYYY format
-function getTodayDisplayDate() {
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  const year = today.getFullYear();
-  return `${month}/${day}/${year}`;
-}
-
-// Get today's date in YYYY-MM-DD format for storage
-function getTodayStorageDate() {
-  const today = new Date();
-  return today.toISOString().split('T')[0];
-}
-
-// Auto-format date as user types (MM/DD/YYYY)
-function autoFormatReportDate(input) {
-  let value = input.value.replace(/[^0-9]/g, '');
-  if (value.length >= 2 && value.length < 4) {
-    value = value.slice(0, 2) + '/' + value.slice(2);
-  } else if (value.length >= 4 && value.length < 6) {
-    value = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4);
-  } else if (value.length >= 6) {
-    value = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4, 8);
-  }
-  input.value = value;
-}
-
-// Validate MM/DD/YYYY format
-function validateDisplayDate(dateStr) {
-  const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-  if (!dateRegex.test(dateStr)) return false;
-  
-  const [, month, day, year] = dateStr.match(dateRegex);
-  const date = new Date(year, month - 1, day);
-  return date.getFullYear() === parseInt(year) && 
-         date.getMonth() === parseInt(month) - 1 && 
-         date.getDate() === parseInt(day);
-}
-
-// Validate and format date input
-function validateReportDate(input) {
-  if (!input.value) return true;
-  
-  if (!validateDisplayDate(input.value)) {
-    input.style.borderColor = 'var(--red-500)';
-    input.style.backgroundColor = 'var(--red-50)';
-    return false;
-  } else {
-    input.style.borderColor = 'var(--gray-200)';
-    input.style.backgroundColor = 'white';
-    return true;
-  }
-}
-
-// Show native date picker (converts between formats)
-// Show native date picker (converts between formats)
-function showDatePicker() {
-  const dateInput = document.getElementById('reportDate');
-  
-  // Check if showPicker is supported
-  if (HTMLInputElement.prototype.showPicker) {
-    // Modern browsers - use showPicker
-    const tempInput = document.createElement('input');
-    tempInput.type = 'date';
-    tempInput.style.position = 'fixed';
-    tempInput.style.opacity = '0';
-    tempInput.style.pointerEvents = 'none';
-    
-    // Convert display date to storage format for the picker
-    if (dateInput.value && validateDisplayDate(dateInput.value)) {
-      tempInput.value = displayToStorageDate(dateInput.value);
-    }
-    
-    document.body.appendChild(tempInput);
-    tempInput.showPicker();
-    
-    tempInput.addEventListener('change', function() {
-      if (this.value) {
-        dateInput.value = storageToDisplayDate(this.value);
-        const changeEvent = new Event('change', { bubbles: true });
-        dateInput.dispatchEvent(changeEvent);
-      }
-      document.body.removeChild(tempInput);
-    });
-    
-    tempInput.addEventListener('blur', function() {
-      setTimeout(() => {
-        if (document.body.contains(tempInput)) {
-          document.body.removeChild(tempInput);
-        }
-      }, 100);
-    });
-  } else {
-    // Fallback for browsers that don't support showPicker
-    // Create a temporary date input and show it
-    const tempInput = document.createElement('input');
-    tempInput.type = 'date';
-    tempInput.style.position = 'absolute';
-    tempInput.style.top = '-100px';
-    tempInput.style.left = '-100px';
-    tempInput.style.opacity = '0';
-    
-    if (dateInput.value && validateDisplayDate(dateInput.value)) {
-      tempInput.value = displayToStorageDate(dateInput.value);
-    }
-    
-    document.body.appendChild(tempInput);
-    tempInput.focus();
-    tempInput.click();
-    
-    tempInput.addEventListener('change', function() {
-      if (this.value) {
-        dateInput.value = storageToDisplayDate(this.value);
-        const changeEvent = new Event('change', { bubbles: true });
-        dateInput.dispatchEvent(changeEvent);
-      }
-      document.body.removeChild(tempInput);
-    });
-  }
 }
 
 /* ============================================================
@@ -2263,7 +2490,7 @@ function initVisibilityToggles(){
     const el=document.getElementById(cfg.el);
     if(!btn||!el) return;
     const isHidden=saved[cfg.el]===true;
-    if(isHidden){ el.classList.add('hidden'); btn.querySelector('span.sidebar-btn-text, span:not(.fa)')?.innerText; updateToggleBtn(btn,cfg,true); }
+    if(isHidden){ el.classList.add('hidden'); updateToggleBtn(btn,cfg,true); }
     btn.addEventListener('click',()=>{
       const hidden=el.classList.toggle('hidden');
       updateToggleBtn(btn,cfg,hidden);
@@ -2306,8 +2533,6 @@ function initSidebarToggles(){
   }
   lBtn.addEventListener('click',()=>{ lOpen=!lOpen; applyLeft(); });
   rBtn.addEventListener('click',()=>{ rOpen=!rOpen; applyRight(); });
-  document.getElementById('leftSidebarToggle')?.addEventListener('click',()=>{ lOpen=false; applyLeft(); });
-  document.getElementById('rightSidebarToggle')?.addEventListener('click',()=>{ rOpen=false; applyRight(); });
   applyLeft(); applyRight();
   window.addEventListener('resize',()=>{ applyLeft(); applyRight(); });
 }
@@ -2401,72 +2626,111 @@ function initSelectionMouseEvents(){
 /* ============================================================
    INIT
 ============================================================ */
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('reportDate').value = getTodayDisplayDate();
+document.addEventListener('DOMContentLoaded', () => {
+  // Set default report date
+  const rdEl = document.getElementById('reportDate');
+  if (rdEl && !rdEl.value) rdEl.value = getTodayDisplayDate();
+
+  // Load saved company info
   loadCompanyInfo();
+
+  // Init subsystems
   initColVisibility();
   initPagination();
-  addRow();
-  updateAllStats();
   initSidebarToggles();
   initVisibilityToggles();
   initEnterNav();
   initTableFocusMode();
   initSelectionMouseEvents();
 
-  // Company info auto-save and TIN formatting
-['companyName','companyName','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email']
-  .forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',saveCompanyInfo); });
+  // ── RESTORE SESSION or start fresh ──
+  const restored = restoreSession();
+  if (restored === false || restored === 0) {
+    // No saved session or empty — start with one blank row
+    document.getElementById('tableBody').innerHTML = '';
+    addRow();
+    currentPage = 1; renderCurrentPage(); updateAllStats();
+  } else {
+    showToast(`Session restored — ${restored} row(s) loaded`, 'success');
+  }
 
-// Add TIN formatting for company info
-const companyTIN = document.getElementById('companyTIN');
-if (companyTIN) {
-  companyTIN.addEventListener('input', function() {
-    formatCompanyTIN(this);
-  });
-  companyTIN.addEventListener('blur', function() {
-    formatCompanyTIN(this);
-  });
-}
+  // Company info auto-save listeners
+  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => { saveCompanyInfo(); scheduleAutoSave(); });
+        el.addEventListener('input',  () => scheduleAutoSave());
+      }
+    });
 
-setupAutoDateUpdate();
+  // Company TIN formatting
+  const companyTIN = document.getElementById('companyTIN');
+  if (companyTIN) {
+    companyTIN.addEventListener('input', function() { formatCompanyTIN(this); });
+    companyTIN.addEventListener('blur',  function() { formatCompanyTIN(this); });
+  }
 
-// Add event listener for the date picker button
-const datePickerBtn = document.getElementById('reportDatePickerBtn');
-if (datePickerBtn) {
-  datePickerBtn.addEventListener('click', showDatePicker);
-}
+  // Report date field inline formatting
+  if (rdEl) {
+    rdEl.addEventListener('input', function() { autoFormatReportDate(this); });
+    rdEl.addEventListener('blur',  function() {
+      validateReportDate(this);
+      if (this.value && !validateDisplayDate(this.value)) showToast('Invalid date format. Use MM/DD/YYYY', 'warning');
+    });
+  }
+
+  setupAutoDateUpdate();
+
+  // ── CALENDAR PICKER BUTTON (FIXED) ──
+  const datePickerBtn = document.getElementById('reportDatePickerBtn');
+  if (datePickerBtn) {
+    datePickerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const popup = document.getElementById('dpPopup');
+      if (popup) { closeDatePicker(); return; } // toggle
+      showDatePicker(this);
+    });
+  }
+
+  // ── SAVE SESSION BUTTON ──
+  document.getElementById('saveSessionBtn').addEventListener('click', () => saveSession(true));
+
+  // ── CLEAR SESSION BUTTON ──
+  document.getElementById('clearSessionBtn').addEventListener('click', clearSession);
+
+  // Load last save timestamp into UI
+  loadLastSaveTime();
 
   // Sidebar nav buttons
-  document.getElementById('addRowBtn').addEventListener('click',()=>addRow());
-  document.getElementById('addRowBtnHead').addEventListener('click',()=>addRow());
+  document.getElementById('addRowBtn').addEventListener('click', () => addRow());
+  document.getElementById('addRowBtnHead').addEventListener('click', () => addRow());
   initLongPress(document.getElementById('addRowBtn'));
 
-  document.getElementById('addBatchRowsBtn').addEventListener('click',()=>{
-    const n=parseInt(prompt('How many rows?','10'));
-    if(n>0&&n<=5000) addBatchRows(n);
-    else if(n>5000) showToast('Max 5000 rows at a time','warning');
+  document.getElementById('addBatchRowsBtn').addEventListener('click', () => {
+    const n = parseInt(prompt('How many rows?', '10'));
+    if (n > 0 && n <= 5000) addBatchRows(n);
+    else if (n > 5000) showToast('Max 5000 rows at a time', 'warning');
   });
 
-  document.getElementById('exportBtn').addEventListener('click',exportToExcel);
-  document.getElementById('exportBtnHead').addEventListener('click',exportToExcel);
-  document.getElementById('saveDataBtn').addEventListener('click',saveDataToFile);
-  document.getElementById('loadDataBtn').addEventListener('click',loadDataFromFile);
-  document.getElementById('loadMultipleFilesBtn').addEventListener('click',loadMultipleVatFiles);
+  document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+  document.getElementById('exportBtnHead').addEventListener('click', exportToExcel);
+  document.getElementById('saveDataBtn').addEventListener('click', saveDataToFile);
+  document.getElementById('loadDataBtn').addEventListener('click', loadDataFromFile);
+  document.getElementById('loadMultipleFilesBtn').addEventListener('click', loadMultipleVatFiles);
 
-  document.getElementById('clearBtn').addEventListener('click',()=>{
-    if(confirm('Clear all table data? This cannot be undone.')){
-      document.getElementById('tableBody').innerHTML='';
-      addRow(); currentPage=1; renderCurrentPage(); updateAllStats();
-      showToast('Table cleared','success');
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if (confirm('Clear all table data? This cannot be undone.')) {
+      document.getElementById('tableBody').innerHTML = '';
+      addRow(); currentPage = 1; renderCurrentPage(); updateAllStats();
+      showToast('Table cleared', 'success');
     }
   });
-  document.getElementById('clearInfoBtn').addEventListener('click',clearCompanyInfo);
-  document.getElementById('clearInfoBtnPanel').addEventListener('click',clearCompanyInfo);
-  document.getElementById('selectMultipleBtn').addEventListener('click',toggleSelectMode);
-  document.getElementById('clearAllCustomersBtn').addEventListener('click',clearAllCustomers);
-
-  document.getElementById('entryCounterBtn').addEventListener('click',()=>addRow());
+  document.getElementById('clearInfoBtn').addEventListener('click', clearCompanyInfo);
+  document.getElementById('clearInfoBtnPanel').addEventListener('click', clearCompanyInfo);
+  document.getElementById('selectMultipleBtn').addEventListener('click', toggleSelectMode);
+  document.getElementById('clearAllCustomersBtn').addEventListener('click', clearAllCustomers);
+  document.getElementById('entryCounterBtn').addEventListener('click', () => addRow());
 });
 </script>
 </body>
