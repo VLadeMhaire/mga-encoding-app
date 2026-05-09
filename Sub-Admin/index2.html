@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes">
+    <title>VAT Tracking System | Professional Kiosk Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --ink: #0d1117;
+            --ink-60: rgba(13,17,23,0.6);
+            --ink-30: rgba(13,17,23,0.3);
+            --ink-10: rgba(13,17,23,0.08);
+            --surface: #ffffff;
+            --surface-2: #f5f6f9;
+            --surface-3: #eef0f7;
+            --blue-vivid: #1a47cc;
+            --blue-mid: #2a5de8;
+            --blue-light: #dde8ff;
+            --blue-xlight: #f0f4ff;
+            --teal: #0d8a6e;
+            --teal-light: #d4f3eb;
+            --amber: #c47a0a;
+            --amber-light: #fef2d6;
+            --red: #c0352a;
+            --red-light: #fde8e6;
+            --purple: #6640c8;
+            --purple-light: #ede9ff;
+            --gold: #b8870e;
+            --gold-light: #fdf3d7;
+            --nav-h: 68px;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface-2);
+            color: var(--ink);
+            line-height: 1.55;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue-vivid), var(--teal));
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+            pointer-events: none;
+        }
+
+        /* DYNAMIC BACKGROUND LAYER WITH SMOOTH TRANSITION */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .bg-base {
+            background-image: url('MGAALogo.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+        }
+        .bg-overlay {
+            background-image: url('acct.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+        }
+
+        /* NAV */
+        .nav {
+            position: sticky; top: 0; z-index: 900;
+            height: var(--nav-h);
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(18px) saturate(180%);
+            border-bottom: 1px solid rgba(13,17,23,0.07);
+            transition: box-shadow 0.3s;
+        }
+        .nav.elevated { box-shadow: 0 2px 24px rgba(13,17,23,0.08); }
+
+        .nav-inner {
+            max-width: 1400px; margin: 0 auto;
+            padding: 0 32px;
+            height: 100%;
+            display: flex; align-items: center; justify-content: space-between; gap: 20px;
+        }
+
+        .brand {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; flex-shrink: 0;
+        }
+        .brand-mark {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            overflow: hidden;
+            border: 1px solid var(--ink-10);
+            background: var(--surface);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-words { line-height: 1.15; }
+        .brand-words strong {
+            display: block;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.95rem; font-weight: 700;
+            color: var(--ink); letter-spacing: -0.01em;
+        }
+        .brand-words em {
+            font-style: normal;
+            font-size: 0.65rem; font-weight: 500;
+            color: var(--blue-vivid);
+            background: var(--blue-xlight);
+            padding: 2px 8px; border-radius: 30px;
+        }
+
+        .nav-links {
+            display: flex; align-items: center; gap: 2px;
+            background: var(--surface-2);
+            border: 1px solid var(--ink-10);
+            border-radius: 50px;
+            padding: 4px 4px;
+        }
+        .nav-link {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 7px 16px;
+            border-radius: 40px;
+            font-size: 0.82rem; font-weight: 500;
+            color: var(--ink-60);
+            text-decoration: none;
+            transition: background 0.18s, color 0.18s;
+            white-space: nowrap;
+        }
+        .nav-link i { font-size: 0.78rem; opacity: 0.7; }
+        .nav-link:hover { background: var(--surface); color: var(--ink); }
+        .nav-link.active {
+            background: var(--surface);
+            color: var(--blue-vivid);
+            font-weight: 600;
+            box-shadow: 0 1px 6px rgba(13,17,23,0.1);
+        }
+        .nav-link.active i { opacity: 1; }
+
+        .nav-right {
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+        }
+        .tin-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 18px;
+            background: var(--ink);
+            color: white;
+            border: none; border-radius: 40px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem; font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .tin-btn i { font-size: 0.78rem; }
+        .tin-btn:hover { background: #1e2836; transform: translateY(-1px); }
+
+        /* MAIN WRAP */
+        .wrap {
+            position: relative; z-index: 2;
+            max-width: 1400px; margin: 0 auto;
+            padding: 40px 32px 60px;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(130deg, #0d1f5c 0%, #1a3ba0 55%, #1555c2 100%);
+            border-radius: 28px;
+            padding: 48px 52px;
+            margin-bottom: 56px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px -12px rgba(26,71,204,0.35);
+        }
+
+        .hero-bg-img {
+            position: absolute; inset: 0;
+            background-image: url('retro.jpg');
+            background-size: cover;
+            background-position: center;
+            mix-blend-mode: soft-light;
+            opacity: 0.15;
+        }
+
+        .hero-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+        .hero-ring-1 { width: 320px; height: 320px; top: -80px; right: -60px; }
+        .hero-ring-2 { width: 200px; height: 200px; top: 20px; right: 100px; }
+        .hero-glow {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, rgba(100,160,255,0.18) 0%, transparent 70%);
+            width: 500px; height: 500px;
+            top: -120px; right: -80px;
+            pointer-events: none;
+        }
+
+        .hero-content { position: relative; z-index: 2; }
+
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 5px 14px; border-radius: 30px;
+            font-size: 0.72rem; font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 0.06em; text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .hero-eyebrow .pulse {
+            width: 7px; height: 7px;
+            background: #4ade80; border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.6rem; font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .hero h1 span { color: #93c5fd; }
+
+        .hero p {
+            font-size: 0.95rem; font-weight: 400;
+            color: rgba(255,255,255,0.72);
+            max-width: 520px;
+            line-height: 1.65;
+            margin-bottom: 32px;
+        }
+
+        .hero-stats {
+            display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+        }
+        .hero-stat {
+            display: flex; flex-direction: column;
+        }
+        .hero-stat strong {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem; font-weight: 700;
+            color: white; line-height: 1.1;
+        }
+        .hero-stat span {
+            font-size: 0.72rem; font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .stat-divider {
+            width: 1px; height: 36px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* SECTION HEADER */
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .section-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+        }
+        .section-label span {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 400;
+            color: var(--ink-60);
+            letter-spacing: 0;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--teal);
+            background: var(--teal-light);
+            padding: 5px 14px;
+            border-radius: 30px;
+        }
+
+        /* BUTTON ABOVE GRID */
+        .kiosk-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 28px;
+        }
+        .modules-trigger-btn {
+            background: var(--surface);
+            border: 1px solid var(--ink-10);
+            border-radius: 60px;
+            padding: 12px 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--blue-vivid);
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out);
+            backdrop-filter: blur(4px);
+            background: rgba(255,255,255,0.85);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .modules-trigger-btn i {
+            font-size: 1rem;
+            transition: transform 0.3s var(--ease-out);
+        }
+        .modules-trigger-btn:hover {
+            background: var(--surface);
+            border-color: var(--blue-light);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px -12px rgba(26,71,204,0.2);
+        }
+        .modules-trigger-btn:hover i {
+            transform: translateY(2px);
+        }
+
+        /* GRID ANIMATION */
+        .grid-wrapper {
+            overflow: visible;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            transition: all 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: transform, opacity;
+        }
+        .grid-wrapper.animate-down .grid {
+            animation: smoothSlideDown 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        @keyframes smoothSlideDown {
+            0% { opacity: 0.3; transform: translateY(-35px); }
+            40% { opacity: 0.8; }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* REVEAL CARDS */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* CARD STYLES */
+        .card {
+            display: block;
+            background: var(--surface);
+            border-radius: 22px;
+            border: 1px solid rgba(13,17,23,0.07);
+            padding: 26px;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out), border-color 0.2s;
+            cursor: pointer;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--card-accent-from, transparent) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 22px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 48px -8px rgba(13,17,23,0.12);
+            border-color: rgba(13,17,23,0.13);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .card-top {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .card-icon {
+            width: 50px; height: 50px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+            transition: transform 0.25s var(--ease-out);
+            flex-shrink: 0;
+        }
+        .card:hover .card-icon { transform: scale(0.93) rotate(-3deg); }
+
+        .badge {
+            font-size: 0.62rem; font-weight: 700;
+            padding: 4px 11px; border-radius: 30px;
+            letter-spacing: 0.04em; text-transform: uppercase;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem; font-weight: 700;
+            color: var(--ink); letter-spacing: -0.01em;
+            margin-bottom: 6px;
+        }
+        .card-desc {
+            font-size: 0.8rem; font-weight: 400;
+            color: var(--ink-60);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+        .card-cta {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.75rem; font-weight: 600;
+            color: var(--blue-vivid);
+            transition: gap 0.2s;
+        }
+        .card:hover .card-cta { gap: 12px; }
+        .card-cta i { font-size: 0.7rem; }
+
+        /* Color themes */
+        .theme-ledger .card-icon { background: var(--purple-light); color: var(--purple); }
+        .theme-ledger { --card-accent-from: rgba(102,64,200,0.04); }
+        .theme-ledger .badge { background: var(--purple-light); color: var(--purple); }
+        .theme-vat .card-icon { background: var(--blue-light); color: var(--blue-vivid); }
+        .theme-vat { --card-accent-from: rgba(26,71,204,0.04); }
+        .theme-vat .badge { background: var(--blue-light); color: var(--blue-vivid); }
+        .theme-nonvat .card-icon { background: #d4f3f0; color: #0d7a72; }
+        .theme-nonvat { --card-accent-from: rgba(13,138,110,0.04); }
+        .theme-nonvat .badge { background: #d4f3f0; color: #0d7a72; }
+        .theme-capex .card-icon { background: var(--amber-light); color: var(--amber); }
+        .theme-capex { --card-accent-from: rgba(196,122,10,0.04); }
+        .theme-capex .badge { background: var(--amber-light); color: var(--amber); }
+        .theme-gov .card-icon { background: var(--teal-light); color: var(--teal); }
+        .theme-gov { --card-accent-from: rgba(13,138,110,0.04); }
+        .theme-gov .badge { background: var(--teal-light); color: var(--teal); }
+        .theme-returns .card-icon { background: var(--red-light); color: var(--red); }
+        .theme-returns { --card-accent-from: rgba(192,53,42,0.04); }
+        .theme-returns .badge { background: var(--red-light); color: var(--red); }
+
+        /* Footer */
+        .footer {
+            position: relative; z-index: 2;
+            background: var(--surface);
+            border-top: 1px solid var(--ink-10);
+            padding: 24px 0;
+        }
+        .footer-inner {
+            max-width: 1400px; margin: 0 auto;
+            padding: 0 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 14px;
+        }
+        .footer-copy {
+            font-size: 0.73rem; color: var(--ink-60);
+        }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a {
+            font-size: 0.73rem; font-weight: 500;
+            color: var(--ink-60); text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--blue-vivid); }
+
+        /* TIN MODAL */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(13,17,23,0.55);
+            backdrop-filter: blur(10px);
+            z-index: 1100;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: var(--surface);
+            width: 92%; max-width: 520px;
+            border-radius: 28px;
+            box-shadow: 0 32px 80px rgba(13,17,23,0.25);
+            overflow: hidden;
+            animation: slideUp 0.28s var(--ease-out);
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-head { padding: 22px 24px; border-bottom: 1px solid var(--ink-10); display: flex; align-items: center; justify-content: space-between; }
+        .modal-head h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; }
+        .modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--surface-2); cursor: pointer; color: var(--ink-60); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: background 0.2s, color 0.2s; }
+        .modal-close:hover { background: #fde8e6; color: var(--red); }
+        .modal-search { padding: 16px 24px; background: var(--surface-2); display: flex; gap: 10px; }
+        .modal-search input { flex: 1; padding: 10px 16px; border: 1px solid var(--ink-10); border-radius: 40px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; background: var(--surface); color: var(--ink); }
+        .modal-search input:focus { outline: none; border-color: var(--blue-mid); }
+        .modal-search button { padding: 10px 18px; background: var(--blue-vivid); color: white; border: none; border-radius: 40px; font-size: 0.8rem; cursor: pointer; transition: background 0.2s; }
+        .modal-search button:hover { background: #1240b8; }
+        .modal-form { padding: 20px 24px; border-bottom: 1px solid var(--surface-2); }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-60); margin-bottom: 6px; }
+        .field input { width: 100%; padding: 10px 16px; border: 1px solid var(--ink-10); border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; color: var(--ink); transition: border-color 0.2s; }
+        .field input:focus { outline: none; border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(42,93,232,0.1); }
+        .btn-add { width: 100%; padding: 11px; background: var(--ink); color: white; border: none; border-radius: 40px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-add:hover { background: #1e2836; }
+        .modal-list { padding: 16px 24px; max-height: 320px; overflow-y: auto; }
+        .tin-item { background: var(--surface-2); border-radius: 16px; padding: 13px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .tin-num { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600; color: var(--amber); margin-bottom: 3px; }
+        .tin-name { font-size: 0.8rem; font-weight: 500; color: var(--ink); }
+        .tin-acts { display: flex; gap: 6px; flex-shrink: 0; }
+        .tin-copy, .tin-del { padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 500; border: 1px solid var(--ink-10); background: var(--surface); cursor: pointer; transition: all 0.18s; }
+        .tin-copy:hover { background: var(--blue-vivid); color: white; border-color: var(--blue-vivid); }
+        .tin-del:hover { background: var(--red); color: white; border-color: var(--red); }
+        .toast { position: fixed; bottom: 28px; right: 28px; background: var(--ink); color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.8rem; z-index: 1300; animation: toastAnim 2.4s forwards; box-shadow: 0 8px 24px rgba(13,17,23,0.2); }
+        @keyframes toastAnim { 0% { opacity: 0; transform: translateY(10px); } 12% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+
+        @media (max-width: 900px) {
+            .hero { padding: 36px 32px; }
+            .hero h1 { font-size: 2rem; }
+            .nav-links { gap: 2px; }
+            .nav-link { padding: 6px 12px; font-size: 0.75rem; }
+        }
+        @media (max-width: 700px) {
+            .nav-inner { flex-wrap: wrap; height: auto; padding: 12px 20px; gap: 10px; }
+            .nav-links { order: 3; width: 100%; justify-content: center; padding: 4px; }
+            .wrap { padding: 24px 20px 48px; }
+            .hero { padding: 28px 24px; border-radius: 20px; }
+            .hero h1 { font-size: 1.65rem; }
+            .stat-divider { display: none; }
+            .kiosk-actions { justify-content: center; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Dynamic background layers for smooth transition -->
+<div class="bg-layer bg-base" id="bgBase"></div>
+<div class="bg-layer bg-overlay" id="bgOverlay"></div>
+
+<nav class="nav" id="nav">
+    <div class="nav-inner">
+        <a class="brand" href="#">
+            <div class="brand-mark"><img src="MGAALogo.jpg" alt="MGAA" onerror="this.src='https://placehold.co/40x40/1a47cc/white?text=M'"></div>
+            <div class="brand-words"><em>Professional Kiosk</em><strong>VAT Tracking System</strong></div>
+        </a>
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link active"><i class="fas fa-home"></i> Portal</a>
+            <a href="tax_facts.html" class="nav-link"><i class="fas fa-book-open"></i> Tax Facts</a>
+            <a href="tax_calculator.html" class="nav-link"><i class="fas fa-calculator"></i> Calculator</a>
+            <a href="compensation.html" class="nav-link"><i class="fas fa-money-check-alt"></i> Compensation</a>
+            <a href="tax_game.html" class="nav-link"><i class="fas fa-gamepad"></i> Tax Game</a>
+            <a href="quick_guide.html" class="nav-link"><i class="fas fa-compass"></i> Guide</a>
+            <a href="quick_guide.html" class="nav-link"><i class="fas fa-life-ring"></i> Help</a>
+        </div>
+        <div class="nav-right"><button class="tin-btn" id="openTinBtn"><i class="fas fa-id-card"></i> TIN Library</button></div>
+    </div>
+</nav>
+
+<div class="wrap">
+    <section class="hero reveal" id="hero">
+        <div class="hero-bg-img"></div>
+        <div class="hero-ring hero-ring-1"></div>
+        <div class="hero-ring hero-ring-2"></div>
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+            <div class="hero-eyebrow"><span class="pulse"></span> All Modules Live</div>
+            <h1>VAT Compliance<br><span>Kiosk Dashboard</span></h1>
+            <p>Professional interface for tracking vatable sales, purchases, expenses, journal entries, and government remittances — all in one place.</p>
+            <div class="hero-stats"><div class="hero-stat"><strong>9</strong><span>Modules</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>12%</strong><span>VAT Rate</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>Auto</strong><span>Saved Locally</span></div></div>
+        </div>
+    </section>
+
+    <!-- Original header design: "Navigation Tracking Modules" + BIR VAT Compliant tag -->
+    <div class="section-header reveal" style="transition-delay: 0.1s;">
+        <div class="section-label"><span>Navigation</span>Tracking Modules</div>
+        <div class="section-tag"><i class="fas fa-shield-alt"></i> BIR VAT Compliant</div>
+    </div>
+
+    <!-- Smooth action button -->
+    <div class="kiosk-actions reveal" style="transition-delay: 0.05s;">
+        <button class="modules-trigger-btn" id="smoothModulesBtn">
+            <i class="fas fa-arrow-circle-down"></i> View All Modules
+            <i class="fas fa-caret-down" style="font-size: 0.85rem;"></i>
+        </button>
+    </div>
+
+    <div class="grid-wrapper" id="gridWrapper">
+        <div class="grid" id="moduleGrid">
+            <a href="journal_entry.html" class="card theme-ledger reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-journal-whills"></i></div><span class="badge">Ledger</span></div><div class="card-title">Journal Entry</div><div class="card-desc">Tally table with debits & credits. Subtotals per section: Sales, Purchases, CAPEX, and more.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="vatable_sales.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Sales</div><div class="card-desc">Track vatable sales with automated 12% output VAT calculations and invoice summaries.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="vatable_purchases.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-shopping-cart"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Purchases</div><div class="card-desc">Track vatable purchases with input tax calculations and supplier TIN integration.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="vatable_expenses.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-money-bill-wave"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Expenses</div><div class="card-desc">Track vatable operational expenses with automated VAT calculations and period filters.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="non_vat_purchases.html" class="card theme-nonvat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-shopping-basket"></i></div><span class="badge">Non-VAT</span></div><div class="card-title">Non-VAT Purchases</div><div class="card-desc">Track exempt purchases and those from non-VAT registered suppliers accurately.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="non_vat_expenses.html" class="card theme-nonvat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-receipt"></i></div><span class="badge">Non-VAT</span></div><div class="card-title">Non-VAT Expenses</div><div class="card-desc">Track VAT-exempt operational expenses and zero-rated transactions.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="capex.html" class="card theme-capex reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-building"></i></div><span class="badge">CAPEX</span></div><div class="card-title">Capital Expenditures</div><div class="card-desc">Track asset acquisitions with VAT calculations and depreciation scheduling.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="taxes_licenses.html" class="card theme-gov reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-gavel"></i></div><span class="badge">Government</span></div><div class="card-title">Taxes & Licenses</div><div class="card-desc">Track BIR tax payments, government license fees, and regulatory compliance dues.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+            <a href="purchase_returns.html" class="card theme-returns reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-undo-alt"></i></div><span class="badge">Returns</span></div><div class="card-title">Purchase Returns</div><div class="card-desc">Track purchase returns and adjustments with VAT reversals and debit note management.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner"><div class="footer-copy">© 2026 MGAA VAT Tracking System · Professional Kiosk v2.0</div><div class="footer-links"><a href="quick_guide.html"><i class="fas fa-compass"></i> Quick Guide</a><a href="quick_guide.html"><i class="fas fa-headset"></i> Help & Support</a></div><div class="footer-copy"><i class="fas fa-database"></i> Auto-saved locally</div></div>
+</footer>
+
+<div class="modal-overlay" id="tinModal"><div class="modal"><div class="modal-head"><h3><i class="fas fa-id-card" style="margin-right:8px;color:var(--blue-vivid)"></i>TIN Library</h3><button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button></div><div class="modal-search"><input type="text" id="tinSearch" placeholder="Search by name or TIN…"><button id="searchBtn"><i class="fas fa-search"></i></button></div><div class="modal-form"><div class="field"><label>Full Name</label><input type="text" id="tinName" placeholder="e.g., Maria Santos, ABC Corp"></div><div class="field"><label>TIN (12 digits)</label><input type="text" id="tinNum" placeholder="123-456-789-012" maxlength="15"></div><button class="btn-add" id="addTinBtn"><i class="fas fa-plus-circle" style="margin-right:6px"></i>Add to Library</button></div><div class="modal-list" id="tinList"></div></div></div>
+
+<script>
+(function(){
+    // Nav elevation
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('elevated', window.scrollY > 10), { passive: true });
+    
+    // Intersection observer for reveal cards
+    const reveals = document.querySelectorAll('.reveal');
+    const cards = document.querySelectorAll('.card.reveal');
+    cards.forEach((card, i) => card.style.transitionDelay = `${0.08 * i}s`);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => observer.observe(el));
+
+    // Scroll Progress Bar
+    const scrollProgress = document.getElementById('scrollProgress');
+    if (scrollProgress) {
+        window.addEventListener('scroll', () => {
+            const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            scrollProgress.style.width = scrollPercent + '%';
+        });
+    }
+
+    // Background scroll transition from MGAALogo.jpg (top) to acct.jpg (bottom)
+    const bgBase = document.getElementById('bgBase');
+    const bgOverlay = document.getElementById('bgOverlay');
+
+    // Set initial states
+    bgBase.style.opacity = '0.15'; // Base visible at top
+    bgOverlay.style.opacity = '0'; // Overlay hidden at top
+
+    // Function to update background based on scroll position
+    function updateBackgroundOnScroll() {
+        const scrollPosition = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        
+        // Calculate scroll percentage (0 to 1)
+        let scrollPercent = maxScroll > 0 ? scrollPosition / maxScroll : 0;
+        
+        // Apply easing for smoother transition (optional - uncomment for slower start)
+        // scrollPercent = Math.pow(scrollPercent, 0.8);
+        
+        // As we scroll down, fade out MGAALogo and fade in acct
+        const baseOpacity = Math.max(0, 0.15 * (1 - scrollPercent * 1.2));
+        const overlayOpacity = Math.min(0.25, scrollPercent * 0.35);
+        
+        bgBase.style.opacity = baseOpacity;
+        bgOverlay.style.opacity = overlayOpacity;
+    }
+
+    // Throttle the scroll event for performance
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateBackgroundOnScroll();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Smooth modules button (scroll + animation + background transition)
+    const btn = document.getElementById('smoothModulesBtn');
+    const gridWrapper = document.getElementById('gridWrapper');
+    if(btn && gridWrapper) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Scroll to kiosk grid area
+            const targetOffsetTop = document.getElementById('moduleGrid').getBoundingClientRect().top + window.scrollY - 95;
+            window.scrollTo({
+                top: targetOffsetTop,
+                behavior: 'smooth'
+            });
+            
+            // Add smooth grid animation
+            gridWrapper.classList.remove('animate-down');
+            void gridWrapper.offsetWidth;
+            gridWrapper.classList.add('animate-down');
+            
+            setTimeout(() => {
+                gridWrapper.classList.remove('animate-down');
+            }, 700);
+            
+            // Background will naturally transition during scroll
+            // The scroll event will handle the background update
+        });
+    }
+
+    // Initial call to set correct background position
+    updateBackgroundOnScroll();
+
+    // ----- TIN Library -----
+    let tins = [];
+    function save() { localStorage.setItem('vat_tin_pro_library', JSON.stringify(tins)); }
+    function load() {
+        const s = localStorage.getItem('vat_tin_pro_library');
+        if (s) { tins = JSON.parse(s); return; }
+        tins = [{ id: 1, name: 'Maria Dela Cruz', tin: '123-456-789-012' },{ id: 2, name: 'Ramon Enterprises', tin: '987-654-321-001' },{ id: 3, name: 'VAT Solutions Inc', tin: '456-789-123-555' }];
+        save();
+    }
+    function fmt(raw){ const d=raw.replace(/\D/g,'').slice(0,12); let f=d.slice(0,3); if(d.length>=4) f+='-'+d.slice(3,6); if(d.length>=7) f+='-'+d.slice(6,9); if(d.length>=10) f+='-'+d.slice(9,12); return f; }
+    function esc(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<i class="fas fa-check-circle" style="margin-right:6px;color:#4ade80"></i>${msg}`; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+    function render(filter){
+        const list=document.getElementById('tinList'); if(!list) return;
+        const f=(filter||'').trim().toLowerCase(); const items=f?tins.filter(t=>t.name.toLowerCase().includes(f)||t.tin.includes(f)):tins;
+        if(!items.length){ list.innerHTML='<div style="text-align:center;padding:32px;color:var(--ink-60);font-size:0.85rem"><i class="fas fa-folder-open" style="display:block;font-size:1.5rem;margin-bottom:8px;opacity:0.4"></i>No TINs found</div>'; return; }
+        list.innerHTML=items.map(t=>`<div class="tin-item" data-id="${t.id}"><div><div class="tin-num"><i class="fas fa-hashtag" style="font-size:0.65rem;margin-right:4px;opacity:0.6"></i>${esc(t.tin)}</div><div class="tin-name">${esc(t.name)}</div></div><div class="tin-acts"><button class="tin-copy" data-tin="${esc(t.tin)}"><i class="fas fa-copy"></i> Copy</button><button class="tin-del" data-id="${t.id}"><i class="fas fa-trash"></i> Del</button></div></div>`).join('');
+        list.querySelectorAll('.tin-copy').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation(); navigator.clipboard.writeText(btn.dataset.tin); toast('TIN copied');}));
+        list.querySelectorAll('.tin-del').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation(); if(!confirm('Delete?')) return; tins=tins.filter(t=>t.id!==+btn.dataset.id); save(); render(document.getElementById('tinSearch').value); toast('Deleted');}));
+    }
+    const modal=document.getElementById('tinModal');
+    document.getElementById('openTinBtn').addEventListener('click',()=>{ modal.classList.add('open'); render(document.getElementById('tinSearch').value); });
+    document.getElementById('closeModal').addEventListener('click',()=>modal.classList.remove('open'));
+    modal.addEventListener('click',e=>{ if(e.target===modal) modal.classList.remove('open'); });
+    document.getElementById('addTinBtn').addEventListener('click',()=>{
+        const name=document.getElementById('tinName').value.trim(); const raw=document.getElementById('tinNum').value.replace(/-/g,'');
+        if(!name){ toast('Enter a name'); return; } if(raw.length!==12||!/^\d+$/.test(raw)){ toast('TIN must be 12 digits'); return; }
+        const formatted=fmt(raw); if(tins.some(t=>t.name.toLowerCase()===name.toLowerCase())){ toast('Name exists'); return; }
+        tins.push({id:Date.now(),name,tin:formatted}); save(); document.getElementById('tinName').value=''; document.getElementById('tinNum').value=''; render(document.getElementById('tinSearch').value); toast('TIN added');
+    });
+    document.getElementById('searchBtn').addEventListener('click',()=>render(document.getElementById('tinSearch').value));
+    document.getElementById('tinSearch').addEventListener('keyup',e=>{ if(e.key==='Enter') render(e.target.value); });
+    document.getElementById('tinNum').addEventListener('input',function(){ this.value=fmt(this.value); });
+    load(); render('');
+})();
+</script>
+
+<script>
+// Continue music from welcome page - plays once on dashboard load
+(function() {
+    const musicShouldPlay = sessionStorage.getItem('musicPlaying') === 'true';
+    
+    if (musicShouldPlay) {
+        const savedTime = parseFloat(sessionStorage.getItem('musicCurrentTime')) || 0;
+        
+        // Create audio element - NO LOOP
+        const audio = new Audio('startup.mp3');
+        audio.loop = false;
+        audio.volume = 0.3;
+        audio.currentTime = savedTime;
+        
+        // Play the music when dashboard loads
+        setTimeout(() => {
+            audio.play().catch(error => {
+                console.log("Autoplay blocked - adding play button", error);
+                addPlayButton(audio);
+            });
+        }, 100); // Small delay to ensure page is ready
+        
+        window.backgroundMusic = audio;
+        
+        // Add music control button
+        addMusicControl(audio);
+    }
+    
+    function addPlayButton(audio) {
+        const playBtn = document.createElement('div');
+        playBtn.innerHTML = `
+            <div style="background: linear-gradient(135deg, #1a47cc, #e53935); padding: 12px 20px; border-radius: 40px; color: white; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <i class="fas fa-play"></i> Play Music
+            </div>
+        `;
+        playBtn.style.cssText = 'position: fixed; bottom: 80px; right: 20px; z-index: 1001;';
+        playBtn.onclick = () => {
+            audio.play();
+            playBtn.remove();
+        };
+        document.body.appendChild(playBtn);
+        
+        setTimeout(() => playBtn.remove(), 10000);
+    }
+    
+    function addMusicControl(audio) {
+        const controlBtn = document.createElement('button');
+        controlBtn.innerHTML = '<i class="fas fa-music"></i>';
+        controlBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(13,17,23,0.1);
+            color: #1a47cc;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.15);
+            font-family: 'DM Sans', sans-serif;
+        `;
+        
+        let isPlaying = true;
+        
+        controlBtn.onmouseenter = () => controlBtn.style.transform = 'scale(1.1)';
+        controlBtn.onmouseleave = () => controlBtn.style.transform = 'scale(1)';
+        
+        controlBtn.onclick = () => {
+            if (isPlaying) {
+                audio.pause();
+                controlBtn.style.background = 'rgba(13,17,23,0.95)';
+                controlBtn.style.color = '#e53935';
+                controlBtn.innerHTML = '<i class="fas fa-music-slash"></i>';
+                isPlaying = false;
+            } else {
+                audio.play().catch(e => console.log("Play failed"));
+                controlBtn.style.background = 'rgba(255,255,255,0.95)';
+                controlBtn.style.color = '#1a47cc';
+                controlBtn.innerHTML = '<i class="fas fa-music"></i>';
+                isPlaying = true;
+            }
+        };
+        
+        audio.addEventListener('ended', () => {
+            controlBtn.style.opacity = '0.5';
+            controlBtn.style.cursor = 'default';
+            controlBtn.onclick = null;
+        });
+        
+        document.body.appendChild(controlBtn);
+    }
+    
+    // Clear sessionStorage after music starts to prevent replay on refresh
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.removeItem('musicPlaying');
+        sessionStorage.removeItem('musicCurrentTime');
+    });
+})();
+</script>
+</body>
+</html>

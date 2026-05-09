@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purchase Returns Data Tracker</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue-50:#EFF6FF;--blue-100:#DBEAFE;--blue-200:#BFDBFE;--blue-300:#93C5FD;
+  --blue-400:#60A5FA;--blue-500:#3B82F6;--blue-600:#2563EB;--blue-700:#1D4ED8;
+  --blue-800:#1E40AF;--blue-900:#1E3A8A;
+  --gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;--gray-300:#D1D5DB;
+  --gray-400:#9CA3AF;--gray-500:#6B7280;--gray-600:#4B5563;--gray-700:#374151;
+  --gray-800:#1F2937;--gray-900:#111827;
+  --red-50:#FEF2F2;--red-500:#EF4444;--red-700:#B91C1C;
+  --green-500:#22C55E;--amber-500:#F59E0B;--purple-500:#8B5CF6;--teal-500:#14B8A6;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.08),0 4px 6px rgba(0,0,0,.05);
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'Consolas','Courier New',monospace;
+  --sidebar-w:232px;--rightpanel-w:268px;--topbar-h:56px;
+  --transition:0.22s cubic-bezier(.4,0,.2,1);
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);display:flex;flex-direction:column}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--gray-100)}
+::-webkit-scrollbar-thumb{background:var(--blue-300);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--blue-500)}
+
+/* TOP BAR */
+.topbar{height:var(--topbar-h);background:var(--blue-900);display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;box-shadow:var(--shadow-md);z-index:100}
+.topbar-logo{width:36px;height:36px;background:var(--blue-600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:600;color:white;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-sub{font-size:11px;color:var(--blue-300);font-weight:400;display:block;margin-top:1px}
+.topbar-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.topbar-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--blue-200);font-weight:500;cursor:default}
+.topbar-badge strong{color:white;font-size:14px}
+.topbar-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:6px 13px;font-size:12px;color:white;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
+.topbar-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3)}
+.topbar-btn i{font-size:12px;opacity:.85}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:white;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;transition:width var(--transition),transform var(--transition);z-index:50}
+.sidebar.collapsed{width:0;overflow:hidden}
+.sidebar-brand{padding:14px 16px 12px;border-bottom:1px solid var(--gray-100);background:var(--blue-50)}
+.sidebar-brand-label{font-size:10px;font-weight:700;color:var(--blue-700);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.sidebar-brand-sub{font-size:11px;color:var(--gray-400)}
+.sidebar-nav{padding:8px;flex:1}
+.nav-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);padding:14px 8px 4px}
+.nav-divider{height:1px;background:var(--gray-100);margin:6px 0}
+.nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border:none;background:none;font-family:var(--font);font-size:13px;color:var(--gray-700);border-radius:6px;cursor:pointer;transition:var(--transition);text-align:left;white-space:nowrap;text-decoration:none}
+.nav-btn i{width:16px;text-align:center;font-size:13px;color:var(--gray-400);flex-shrink:0}
+.nav-btn:hover{background:var(--blue-50);color:var(--blue-700)}
+.nav-btn:hover i{color:var(--blue-500)}
+.nav-btn.active{background:var(--blue-50);color:var(--blue-800);font-weight:600}
+.nav-btn.danger:hover{background:var(--red-50);color:var(--red-700)}
+.nav-btn.toggled{color:var(--blue-700);background:var(--blue-50)}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400);line-height:1.7}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.content-header{background:white;border-bottom:1px solid var(--gray-200);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow-sm)}
+.content-header h2{font-size:15px;font-weight:600;color:var(--blue-900)}
+.content-header p{font-size:12px;color:var(--gray-400);margin-top:1px}
+.header-actions{display:flex;gap:8px}
+.btn-primary{display:flex;align-items:center;gap:6px;background:var(--blue-600);color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
+.btn-primary:hover{background:var(--blue-700);box-shadow:var(--shadow)}
+.btn-secondary{display:flex;align-items:center;gap:6px;background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
+.btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-300)}
+
+/* STATS BAR */
+.stats-bar{display:flex;gap:10px;padding:12px 20px;background:white;border-bottom:1px solid var(--gray-200);flex-shrink:0;overflow-x:auto}
+.stat-card{flex:1;min-width:120px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:8px;padding:10px 14px}
+.stat-card-label{font-size:11px;color:var(--blue-700);font-weight:500;white-space:nowrap;margin-bottom:4px}
+.stat-card-value{font-size:15px;font-weight:700;color:var(--blue-900);font-variant-numeric:tabular-nums}
+
+/* TABLE */
+.table-area{flex:1;overflow:auto;background:var(--gray-100)}
+table#purchaseReturnsTable{width:100%;min-width:960px;border-collapse:collapse;font-size:12px;background:white}
+table#purchaseReturnsTable thead{position:sticky;top:0;z-index:20}
+table#purchaseReturnsTable thead th{background:var(--blue-900);color:var(--blue-100);font-size:11px;font-weight:600;padding:10px 10px;text-align:left;white-space:nowrap;border-right:1px solid var(--blue-800);letter-spacing:.3px;user-select:none}
+table#purchaseReturnsTable thead th:last-child{border-right:none;text-align:center}
+table#purchaseReturnsTable thead th.hidden-column{display:none}
+table#purchaseReturnsTable tbody tr{border-bottom:1px solid var(--gray-100);background:white;transition:background .12s}
+table#purchaseReturnsTable tbody tr:nth-child(even){background:var(--blue-50)}
+table#purchaseReturnsTable tbody tr:nth-child(even):hover{background:#DBEAFE}
+table#purchaseReturnsTable tbody tr:hover{background:var(--blue-100)}
+table#purchaseReturnsTable td{padding:0;height:42px;vertical-align:middle;border-right:1px solid var(--gray-100)}
+table#purchaseReturnsTable td:last-child{border-right:none}
+table#purchaseReturnsTable td.hidden-column{display:none}
+table#purchaseReturnsTable td input,
+table#purchaseReturnsTable td select{width:100%;height:100%;padding:6px 9px;border:none;background:transparent;font-family:var(--font);font-size:12px;color:var(--gray-800);min-height:42px}
+table#purchaseReturnsTable td input:focus,
+table#purchaseReturnsTable td select:focus{outline:none;background:white;box-shadow:inset 0 0 0 2px var(--blue-400);position:relative;z-index:1}
+table#purchaseReturnsTable td select{cursor:pointer}
+table#purchaseReturnsTable td .auto-calc{width:100%;height:100%;padding:6px 9px;background:var(--gray-50);color:var(--gray-700);font-family:var(--font-mono);font-size:12px;display:flex;align-items:center;justify-content:flex-end;min-height:42px;border-left:2px solid var(--blue-100)}
+.delete-btn{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:13px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.delete-btn:hover{color:var(--red-500);background:var(--red-50)}
+table#purchaseReturnsTable tfoot tr{background:var(--blue-900);position:sticky;bottom:0;z-index:15}
+table#purchaseReturnsTable tfoot td{padding:9px 10px;color:var(--blue-200);font-size:12px;border-right:1px solid var(--blue-800)}
+table#purchaseReturnsTable tfoot td:last-child{border-right:none}
+table#purchaseReturnsTable tfoot .sum-label{text-align:right;font-weight:700;font-size:11px;letter-spacing:.5px;color:var(--blue-300);text-transform:uppercase}
+table#purchaseReturnsTable tfoot .sum-value{font-family:var(--font-mono);font-weight:700;font-size:13px;color:white;text-align:right}
+
+/* PAGINATION */
+.pagination-bar{background:white;border-top:1px solid var(--gray-200);padding:9px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;flex-wrap:wrap}
+.pagination-info{font-size:12px;color:var(--gray-500);display:flex;align-items:center;gap:12px}
+.rows-select{border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:12px;background:white;color:var(--gray-700);cursor:pointer;font-family:var(--font)}
+.page-btns{display:flex;gap:4px}
+.page-btn{width:30px;height:30px;background:white;color:var(--gray-600);border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-family:var(--font)}
+.page-btn:hover:not(:disabled){background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
+.page-btn:disabled{opacity:.4;cursor:not-allowed}
+.page-indicator{font-size:12px;font-weight:600;color:var(--gray-700);padding:0 8px;display:flex;align-items:center}
+
+/* TALLY */
+.tally-section{background:var(--gray-50);border-top:1px solid var(--gray-200);padding:16px 20px;flex-shrink:0}
+.section-header{font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-header i{color:var(--blue-500)}
+.tally-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.tally-card{background:white;border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;border-top:3px solid var(--blue-400)}
+.tally-card.gross-card{border-top-color:var(--blue-500)}
+.tally-card.net-card{border-top-color:var(--purple-500)}
+.tally-card.vat-card{border-top-color:var(--amber-500)}
+.tally-card.cash-card{border-top-color:var(--green-500)}
+.tally-card.credit-card{border-top-color:var(--teal-500)}
+.tally-card.total-card{background:var(--blue-50);border:1px solid var(--blue-200);border-top:3px solid var(--blue-700);grid-column:1/-1}
+.tally-card-label{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.tally-card-amount{font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:3px;font-variant-numeric:tabular-nums}
+.tally-card-sub{font-size:11px;color:var(--gray-400)}
+
+/* FOOTER */
+.footer{background:var(--blue-900);color:var(--blue-300);text-align:center;padding:10px 20px;font-size:11px;flex-shrink:0}
+
+/* RIGHT PANEL */
+.right-panel{width:var(--rightpanel-w);background:white;border-left:1px solid var(--gray-200);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;transition:width var(--transition);z-index:50}
+.right-panel.collapsed{width:0;overflow:hidden}
+.right-panel-header{padding:14px 16px;border-bottom:1px solid var(--gray-100);background:var(--blue-50);font-size:12px;font-weight:700;color:var(--blue-800);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.right-panel-body{padding:16px;flex:1}
+.field-group{margin-bottom:13px}
+.field-group label{display:block;font-size:11px;font-weight:600;color:var(--gray-600);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.field-group label .req{color:var(--blue-500);margin-left:2px}
+.field-group input,.field-group select{width:100%;border:1px solid var(--gray-200);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--gray-800);background:white;font-family:var(--font);transition:var(--transition)}
+.field-group input:focus,.field-group select:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+/* Report date — larger hit area & date-picker friendly */
+#reportDate{padding:7px 10px;font-size:13px;cursor:pointer;color:var(--gray-800);background:var(--blue-50);border-color:var(--blue-200)}
+#reportDate:focus{background:white;border-color:var(--blue-400)}
+#companyTIN{font-family:var(--font-mono);letter-spacing:.5px}
+.right-panel-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400)}
+
+/* COL VIS DROPDOWN */
+.col-vis-container{position:relative;display:inline-block}
+.col-vis-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:white;border:1px solid var(--gray-200);border-radius:10px;min-width:230px;z-index:1000;box-shadow:var(--shadow-lg);overflow:hidden;display:none}
+.col-vis-dropdown.open{display:block}
+.col-vis-head{padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:11px;font-weight:700;color:var(--blue-700);text-transform:uppercase;letter-spacing:.8px;background:var(--blue-50);display:flex;align-items:center;gap:6px}
+.col-vis-actions{padding:8px 10px;border-bottom:1px solid var(--gray-100);display:flex;gap:6px}
+.col-vis-actions button{flex:1;background:white;color:var(--gray-600);border:1px solid var(--gray-200);border-radius:5px;padding:5px;font-size:11px;cursor:pointer;font-family:var(--font);transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:4px}
+.col-vis-actions button:hover{background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
+.col-list{max-height:300px;overflow-y:auto;padding:6px 0}
+.col-item{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;transition:background .1s}
+.col-item:hover{background:var(--gray-50)}
+.col-item input[type="checkbox"]{accent-color:var(--blue-600);cursor:pointer}
+.col-item label{font-size:13px;color:var(--gray-700);cursor:pointer;flex:1}
+
+/* SELECTION MODE */
+.select-mode td{cursor:crosshair!important;user-select:none!important}
+.select-mode input,.select-mode select,.select-mode button{pointer-events:none!important;opacity:.7}
+td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid var(--blue-500);outline-offset:-1.5px}
+.selection-toolbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;border:1px solid var(--gray-200);border-radius:40px;padding:7px 16px;display:flex;gap:8px;align-items:center;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.sel-tb-info{font-size:12px;color:var(--gray-500);padding:0 8px;border-right:1px solid var(--gray-200);margin-right:4px}
+.sel-tb-btn{background:var(--gray-50);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--font);transition:var(--transition)}
+.sel-tb-btn:hover{background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
+.sel-tb-btn.exit{background:var(--blue-600);color:white;border-color:var(--blue-600)}
+.sel-tb-btn.exit:hover{background:var(--blue-700)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:white;border:1px solid var(--gray-200);border-left:4px solid var(--blue-500);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--gray-700);box-shadow:var(--shadow-lg);z-index:9999;max-width:360px;animation:toastIn .2s ease}
+@keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast.success{border-left-color:var(--green-500)}
+.toast.warning{border-left-color:var(--amber-500)}
+.toast.error{border-left-color:var(--red-500)}
+.toast.fade-out{opacity:0;transform:translateY(10px);transition:.25s}
+
+/* HIDDEN */
+.hidden{display:none!important}
+.stats-bar.hidden,.tally-section.hidden,.footer.hidden{display:none!important}
+.page-hidden{display:none!important}
+
+/* PULSE */
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.pulse{animation:pulse .25s ease}
+
+@media(max-width:900px){
+  .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;width:240px;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
+  .sidebar.mobile-open{transform:translateX(0);width:240px}
+  .right-panel{position:fixed;right:0;top:var(--topbar-h);bottom:0;width:260px;transform:translateX(100%);box-shadow:var(--shadow-lg)}
+  .right-panel.mobile-open{transform:translateX(0);width:260px}
+  .tally-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo"><i class="fas fa-undo-alt"></i></div>
+  <div>
+    <div class="topbar-title">Purchase Returns Data Tracker</div>
+    <span class="topbar-sub">Professional Purchase Returns Tracking with Automated VAT Calculations</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="col-vis-container">
+      <button class="topbar-btn" id="colVisBtn"><i class="fas fa-columns"></i> Columns</button>
+      <div class="col-vis-dropdown" id="colVisDropdown">
+        <div class="col-vis-head"><i class="fas fa-eye-slash"></i> Toggle Columns</div>
+        <div class="col-vis-actions">
+          <button id="showAllColsBtn"><i class="fas fa-eye"></i> Show All</button>
+          <button id="hideAllColsBtn"><i class="fas fa-eye-slash"></i> Hide All</button>
+        </div>
+        <div class="col-list" id="colList"></div>
+      </div>
+    </div>
+    <div class="topbar-badge" id="entryCounterBtn" title="Click to add row">
+      <i class="fas fa-table-list"></i> Entries: <strong id="entryCount">0</strong>
+    </div>
+    <button class="topbar-btn" id="headerLeftToggle"><i class="fas fa-bars"></i> Menu</button>
+    <button class="topbar-btn" id="headerRightToggle"><i class="fas fa-building"></i> Company</button>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- LEFT SIDEBAR -->
+<div class="sidebar" id="leftSidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-label">Purchase Returns Menu</div>
+    <div class="sidebar-brand-sub">MGAA System v2.0</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="index2.html" class="nav-btn"><i class="fas fa-home"></i>Dashboard</a>
+    <div class="nav-divider"></div>
+    <div class="nav-section">Data Management</div>
+    <button class="nav-btn" id="selectMultipleBtn"><i class="fas fa-check-double"></i>Select Multiple</button>
+    <button class="nav-btn" id="addRowBtn"><i class="fas fa-plus-circle"></i>Add New Row</button>
+    <button class="nav-btn" id="addBatchRowsBtn"><i class="fas fa-layer-group"></i>Add Multiple Rows</button>
+    <button class="nav-btn" id="exportBtn"><i class="fas fa-file-excel"></i>Export to Excel</button>
+    <button class="nav-btn" id="saveDataBtn"><i class="fas fa-save"></i>Save Data to File</button>
+    <button class="nav-btn" id="loadDataBtn"><i class="fas fa-folder-open"></i>Load Data from File</button>
+    <div class="nav-divider"></div>
+    <button class="nav-btn danger" id="clearBtn"><i class="fas fa-trash-alt"></i>Clear Table Data</button>
+    <button class="nav-btn danger" id="clearInfoBtn"><i class="fas fa-eraser"></i>Clear Company Info</button>
+    <div class="nav-section">Visibility</div>
+    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Hide Stats Bar</button>
+    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Hide Tally</button>
+    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Hide Footer</button>
+    <div class="nav-divider"></div>
+    <button class="nav-btn" id="hideAllBtn"><i class="fas fa-eye-slash"></i>Hide All Sections</button>
+    <button class="nav-btn" id="showAllBtn"><i class="fas fa-eye"></i>Show All Sections</button>
+    <button class="nav-btn" id="tableFocusBtn"><i class="fas fa-expand"></i>Table Focus Mode</button>
+    <div class="nav-divider"></div>
+    <a href="index2.html" class="nav-btn"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>
+  </div>
+  <div class="sidebar-footer">
+    <div>MGAA Purchase Returns v2.0</div>
+    <div>© 2026 All Rights Reserved</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="content-header">
+    <div>
+      <h2><i class="fas fa-undo-alt" style="color:var(--blue-500);margin-right:6px"></i>Purchase Returns Data</h2>
+      <p>Gross Returns · Net Returns · Input Tax Return · VAT Calculations (÷ 1.12)</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
+      <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
+    </div>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar" id="statsSection">
+    <div class="stat-card">
+      <div class="stat-card-label"><i class="fas fa-receipt" style="margin-right:4px;color:var(--blue-400)"></i>Gross Returns</div>
+      <div class="stat-card-value">₱ <span id="totalGrossReturns">0.00</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label"><i class="fas fa-file-invoice" style="margin-right:4px;color:var(--blue-400)"></i>Net Returns</div>
+      <div class="stat-card-value">₱ <span id="totalNetReturns">0.00</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label"><i class="fas fa-percent" style="margin-right:4px;color:var(--blue-400)"></i>Input Tax Return</div>
+      <div class="stat-card-value">₱ <span id="totalInputTax">0.00</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label"><i class="fas fa-coins" style="margin-right:4px;color:var(--blue-400)"></i>Net Refund</div>
+      <div class="stat-card-value">₱ <span id="netRefundAmount">0.00</span></div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-area">
+    <table id="purchaseReturnsTable">
+      <thead>
+        <tr>
+          <th data-col="returnDate">Return Date</th>
+          <th data-col="returnNumber">Return Number</th>
+          <th data-col="originalInvoice">Original Invoice No.</th>
+          <th data-col="returnMode">Mode of Return</th>
+          <th data-col="grossReturns">Gross Returns</th>
+          <th data-col="netReturns">Net Returns</th>
+          <th data-col="inputTax">Input Tax Return</th>
+          <th data-col="remarks">Remarks</th>
+          <th data-col="action" style="width:48px;text-align:center">Del</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot id="summaryRow"></tfoot>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-bar">
+    <div class="pagination-info">
+      <span>Showing <strong><span id="startEntry">0</span>–<span id="endEntry">0</span></strong> of <strong><span id="totalEntries">0</span></strong></span>
+      <select class="rows-select" id="rowsPerPage">
+        <option value="10">10 rows</option>
+        <option value="25" selected>25 rows</option>
+        <option value="50">50 rows</option>
+        <option value="100">100 rows</option>
+        <option value="9999">All rows</option>
+      </select>
+    </div>
+    <div class="page-btns">
+      <button class="page-btn" id="firstPageBtn">«</button>
+      <button class="page-btn" id="prevPageBtn">‹</button>
+      <span class="page-indicator">Page <strong id="currentPageDisplay">1</strong> / <span id="totalPages">1</span></span>
+      <button class="page-btn" id="nextPageBtn">›</button>
+      <button class="page-btn" id="lastPageBtn">»</button>
+    </div>
+  </div>
+
+  <!-- Tally -->
+  <div class="tally-section" id="tallySection">
+    <div class="section-header"><i class="fas fa-chart-pie"></i>Purchase Returns Category Tally</div>
+    <div class="tally-grid">
+      <div class="tally-card gross-card">
+        <div class="tally-card-label"><i class="fas fa-receipt" style="color:var(--blue-500)"></i>Gross Returns</div>
+        <div class="tally-card-amount">₱ <span id="tallyGross">0.00</span></div>
+        <div class="tally-card-sub"><span id="tallyGrossCount">0 transactions</span></div>
+      </div>
+      <div class="tally-card net-card">
+        <div class="tally-card-label"><i class="fas fa-file-invoice" style="color:var(--purple-500)"></i>Net Returns</div>
+        <div class="tally-card-amount">₱ <span id="tallyNet">0.00</span></div>
+        <div class="tally-card-sub"><span id="tallyNetCount">0 transactions</span></div>
+      </div>
+      <div class="tally-card vat-card">
+        <div class="tally-card-label"><i class="fas fa-percent" style="color:var(--amber-500)"></i>Input Tax (12%)</div>
+        <div class="tally-card-amount">₱ <span id="tallyInputTax">0.00</span></div>
+        <div class="tally-card-sub"><span id="tallyInputTaxCount">0 transactions</span></div>
+      </div>
+      <div class="tally-card cash-card">
+        <div class="tally-card-label"><i class="fas fa-money-bill-wave" style="color:var(--green-500)"></i>Cash Refund</div>
+        <div class="tally-card-amount">₱ <span id="tallyCash">0.00</span></div>
+        <div class="tally-card-sub"><span id="tallyCashCount">0 transactions</span></div>
+      </div>
+      <div class="tally-card credit-card">
+        <div class="tally-card-label"><i class="fas fa-file-alt" style="color:var(--teal-500)"></i>Credit Memo</div>
+        <div class="tally-card-amount">₱ <span id="tallyCredit">0.00</span></div>
+        <div class="tally-card-sub"><span id="tallyCreditCount">0 transactions</span></div>
+      </div>
+      <div class="tally-card total-card">
+        <div class="tally-card-label" style="color:var(--blue-700)"><i class="fas fa-sigma" style="color:var(--blue-600)"></i>Net Refund Amount</div>
+        <div class="tally-card-amount">₱ <span id="tallyTotal">0.00</span></div>
+        <div class="tally-card-sub"><span id="tallyTotalCount">0 total transactions</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer" id="footerEl">
+    © 2026 Purchase Returns Data Tracker &nbsp;·&nbsp; Professional Purchase Returns Tracking with Automated VAT Calculations
+  </div>
+
+</div><!-- /main -->
+
+<!-- RIGHT PANEL -->
+<div class="right-panel" id="rightPanel">
+  <div class="right-panel-header"><i class="fas fa-building" style="color:var(--blue-600)"></i>Company Information</div>
+  <div class="right-panel-body">
+    <div class="field-group"><label>Company Name <span class="req">*</span></label><input type="text" id="companyName" placeholder="Company name"></div>
+    <div class="field-group"><label>TIN Number <span class="req">*</span></label><input type="text" id="companyTIN" placeholder="000-000-000" maxlength="11"></div>
+    <div class="field-group"><label>Address <span class="req">*</span></label><input type="text" id="companyAddress" placeholder="Company address"></div>
+    <div class="field-group"><label>Line of Business <span class="req">*</span></label><input type="text" id="lineOfBusiness" placeholder="Line of business"></div>
+    <div class="field-group"><label>Telephone</label><input type="tel" id="telephone" placeholder="Telephone number"></div>
+    <div class="field-group">
+      <label>Report Date</label>
+      <input type="date" id="reportDate">
+    </div>
+    <div class="field-group"><label>Authorized Employee <span class="req">*</span></label><input type="text" id="authorizedEmployee" placeholder="Employee name"></div>
+    <div class="field-group"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
+    <button class="btn-secondary" id="clearInfoBtnPanel" style="width:100%;justify-content:center;margin-top:4px">
+      <i class="fas fa-eraser"></i> Clear Company Info
+    </button>
+  </div>
+  <div class="right-panel-footer">Required fields marked with <span style="color:var(--blue-500)">*</span></div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+/* ============================================================
+   UTILITY
+============================================================ */
+function escH(t){ const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
+function showToast(msg,type='info'){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.classList.add('fade-out'); setTimeout(()=>t.remove(),300); },2800);
+}
+
+/* ============================================================
+   COMPANY INFO
+============================================================ */
+function saveCompanyInfo(){
+  const fields=['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'];
+  const data={}; fields.forEach(id=>{const el=document.getElementById(id);if(el)data[id]=el.value;});
+  localStorage.setItem('purchaseReturnsCompanyInfo',JSON.stringify(data));
+}
+function loadCompanyInfo(){
+  const raw=localStorage.getItem('purchaseReturnsCompanyInfo'); if(!raw) return;
+  try{ const d=JSON.parse(raw); Object.keys(d).forEach(id=>{const el=document.getElementById(id);if(el)el.value=d[id];}); }catch(e){}
+}
+function clearCompanyInfo(){
+  if(!confirm('Clear all company information?')) return;
+  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  localStorage.removeItem('purchaseReturnsCompanyInfo');
+  showToast('Company info cleared','success');
+}
+
+/* TIN auto-format xxx-xxx-xxx */
+function formatTIN(input){
+  let v=input.value.replace(/\D/g,'');
+  if(v.length>9) v=v.slice(0,9);
+  const parts=[v.slice(0,3),v.slice(3,6),v.slice(6,9)].filter(p=>p!=='');
+  input.value=parts.join('-');
+}
+
+/* ============================================================
+   COLUMN VISIBILITY
+============================================================ */
+const COLS=[
+  {key:'returnDate',name:'Return Date'},{key:'returnNumber',name:'Return Number'},
+  {key:'originalInvoice',name:'Original Invoice No.'},{key:'returnMode',name:'Mode of Return'},
+  {key:'grossReturns',name:'Gross Returns'},{key:'netReturns',name:'Net Returns'},
+  {key:'inputTax',name:'Input Tax Return'},{key:'remarks',name:'Remarks'},
+  {key:'action',name:'Del'}
+];
+let colVis={};
+function initColVisibility(){
+  colVis=JSON.parse(localStorage.getItem('purchaseReturnsColVis')||'{}');
+  const list=document.getElementById('colList');
+  COLS.forEach((c)=>{
+    const item=document.createElement('div'); item.className='col-item';
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.id='cv_'+c.key; cb.checked=!colVis[c.key];
+    const lbl=document.createElement('label'); lbl.htmlFor='cv_'+c.key; lbl.textContent=c.name;
+    cb.addEventListener('change',()=>{ colVis[c.key]=!cb.checked; applyColVis(); localStorage.setItem('purchaseReturnsColVis',JSON.stringify(colVis)); });
+    item.appendChild(cb); item.appendChild(lbl); list.appendChild(item);
+  });
+  applyColVis();
+  document.getElementById('showAllColsBtn').addEventListener('click',()=>{
+    COLS.forEach(c=>{ colVis[c.key]=false; const cb=document.getElementById('cv_'+c.key); if(cb) cb.checked=true; });
+    applyColVis(); localStorage.setItem('purchaseReturnsColVis',JSON.stringify(colVis)); showToast('All columns visible','success');
+  });
+  document.getElementById('hideAllColsBtn').addEventListener('click',()=>{
+    COLS.forEach(c=>{ colVis[c.key]=true; const cb=document.getElementById('cv_'+c.key); if(cb) cb.checked=false; });
+    applyColVis(); localStorage.setItem('purchaseReturnsColVis',JSON.stringify(colVis)); showToast('All columns hidden','info');
+  });
+  const btn=document.getElementById('colVisBtn'), dd=document.getElementById('colVisDropdown');
+  btn.addEventListener('click',e=>{ e.stopPropagation(); dd.classList.toggle('open'); });
+  document.addEventListener('click',e=>{ if(!dd.contains(e.target)&&e.target!==btn) dd.classList.remove('open'); });
+}
+function applyColVis(){
+  const table=document.getElementById('purchaseReturnsTable');
+  const ths=table.querySelectorAll('thead th');
+  COLS.forEach((c,i)=>{
+    const hide=!!colVis[c.key];
+    ths[i].classList.toggle('hidden-column',hide);
+    table.querySelectorAll('tbody tr,tfoot tr').forEach(row=>{ const td=row.children[i]; if(td) td.classList.toggle('hidden-column',hide); });
+  });
+  rebuildSummaryRow();
+}
+function applyColVisToRow(row){
+  COLS.forEach((c,i)=>{ const td=row.children[i]; if(td) td.classList.toggle('hidden-column',!!colVis[c.key]); });
+}
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+let currentPage=1,rowsPerPage=25;
+function getTotalPages(){ return Math.max(1,Math.ceil(document.querySelectorAll('#tableBody tr').length/rowsPerPage)); }
+function updatePagination(){
+  const total=document.querySelectorAll('#tableBody tr').length, totalP=getTotalPages();
+  const start=total===0?0:(currentPage-1)*rowsPerPage+1, end=Math.min(currentPage*rowsPerPage,total);
+  document.getElementById('startEntry').textContent=start;
+  document.getElementById('endEntry').textContent=end;
+  document.getElementById('totalEntries').textContent=total;
+  document.getElementById('totalPages').textContent=totalP;
+  document.getElementById('currentPageDisplay').textContent=currentPage;
+  document.getElementById('entryCount').textContent=total;
+  document.getElementById('firstPageBtn').disabled=currentPage===1;
+  document.getElementById('prevPageBtn').disabled=currentPage===1;
+  document.getElementById('nextPageBtn').disabled=currentPage>=totalP;
+  document.getElementById('lastPageBtn').disabled=currentPage>=totalP;
+}
+function renderCurrentPage(){
+  const rows=Array.from(document.querySelectorAll('#tableBody tr'));
+  const start=(currentPage-1)*rowsPerPage, end=Math.min(start+rowsPerPage,rows.length);
+  rows.forEach((r,i)=>{ r.classList.toggle('page-hidden',!(i>=start&&i<end)); });
+  updatePagination();
+}
+function initPagination(){
+  document.getElementById('rowsPerPage').addEventListener('change',function(){ rowsPerPage=parseInt(this.value); currentPage=1; renderCurrentPage(); });
+  document.getElementById('firstPageBtn').addEventListener('click',()=>{ currentPage=1; renderCurrentPage(); });
+  document.getElementById('prevPageBtn').addEventListener('click',()=>{ if(currentPage>1){currentPage--;renderCurrentPage();} });
+  document.getElementById('nextPageBtn').addEventListener('click',()=>{ if(currentPage<getTotalPages()){currentPage++;renderCurrentPage();} });
+  document.getElementById('lastPageBtn').addEventListener('click',()=>{ currentPage=getTotalPages(); renderCurrentPage(); });
+}
+
+/* ============================================================
+   ROW CREATION
+============================================================ */
+function getTableDate(){
+  return document.getElementById('reportDate')?.value || new Date().toISOString().split('T')[0];
+}
+
+function createRow(data={}){
+  const rid='r'+(Date.now()+'').slice(-8)+'_'+Math.floor(Math.random()*1000);
+  const tr=document.createElement('tr'); tr.id=rid;
+  const today=getTableDate();
+  const returnModes=['Cash Refund','Credit Memo','Exchange','Store Credit','Others'];
+  const modeOpts=returnModes.map(m=>`<option value="${m}"${data.returnMode===m?' selected':''}>${m}</option>`).join('');
+  tr.innerHTML=`
+    <td><input type="date" value="${data.returnDate||today}" class="return-date"></td>
+    <td><input type="text" value="${escH(data.returnNumber||'')}" class="return-number" placeholder="RTN-001"></td>
+    <td><input type="text" value="${escH(data.originalInvoice||'')}" class="original-invoice" placeholder="INV-001"></td>
+    <td><select class="return-mode"><option value="">Select</option>${modeOpts}</select></td>
+    <td><input type="number" value="${data.grossReturns||''}" step="0.01" min="0" class="gross-returns" placeholder="0.00"></td>
+    <td><div class="auto-calc net-returns">${data.netReturns||'0.00'}</div></td>
+    <td><div class="auto-calc input-tax">${data.inputTax||'0.00'}</div></td>
+    <td><input type="text" value="${escH(data.remarks||'')}" class="remarks" placeholder="Remarks"></td>
+    <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>
+  `;
+  applyColVisToRow(tr);
+  attachRowListeners(tr);
+  recalcRow(tr);
+  return tr;
+}
+
+function recalcRow(row){
+  const gross=parseFloat(row.querySelector('.gross-returns')?.value)||0;
+  const net=gross/1.12;
+  const tax=net*0.12;
+  const netEl=row.querySelector('.net-returns'); if(netEl) netEl.textContent=net.toFixed(2);
+  const taxEl=row.querySelector('.input-tax'); if(taxEl) taxEl.textContent=tax.toFixed(2);
+}
+
+function attachRowListeners(row){
+  if(row.dataset.listenersAttached) return;
+  row.dataset.listenersAttached='1';
+  row.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('input',()=>{ recalcRow(row); scheduleStats(); });
+    el.addEventListener('change',()=>{ recalcRow(row); scheduleStats(); });
+  });
+}
+
+/* ============================================================
+   ADD / DELETE ROWS
+============================================================ */
+function addRow(data={}){
+  const tb=document.getElementById('tableBody');
+  const row=createRow(data); tb.appendChild(row);
+  currentPage=Math.ceil(tb.children.length/rowsPerPage);
+  renderCurrentPage(); scheduleStats();
+}
+function addBatchRows(count){
+  const tb=document.getElementById('tableBody');
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<count;i++) frag.appendChild(createRow());
+  tb.appendChild(frag);
+  currentPage=Math.ceil(tb.children.length/rowsPerPage);
+  renderCurrentPage(); scheduleStats();
+}
+window.deleteRow=function(rid){
+  const row=document.getElementById(rid);
+  if(!row||!confirm('Delete this row?')) return;
+  row.style.transition='opacity .2s,transform .2s'; row.style.opacity='0'; row.style.transform='translateX(-10px)';
+  setTimeout(()=>{ row.remove(); if(currentPage>getTotalPages()) currentPage=Math.max(1,getTotalPages()); renderCurrentPage(); scheduleStats(); },200);
+};
+
+/* ============================================================
+   STATS / TALLY
+============================================================ */
+let statsTimer=null;
+function scheduleStats(){ clearTimeout(statsTimer); statsTimer=setTimeout(updateAllStats,60); }
+
+window.updateAllStats=function(){
+  requestAnimationFrame(()=>{
+    const rows=document.querySelectorAll('#tableBody tr');
+    let gross=0,net=0,tax=0,cash=0,credit=0,exch=0,store=0,other=0;
+    let cnt=rows.length;
+    rows.forEach(r=>{
+      const g=parseFloat(r.querySelector('.gross-returns')?.value)||0;
+      const n=parseFloat(r.querySelector('.net-returns')?.textContent)||0;
+      const t=parseFloat(r.querySelector('.input-tax')?.textContent)||0;
+      const mode=r.querySelector('.return-mode')?.value||'';
+      gross+=g; net+=n; tax+=t;
+      if(mode==='Cash Refund') cash+=g;
+      else if(mode==='Credit Memo') credit+=g;
+      else if(mode==='Exchange') exch+=g;
+      else if(mode==='Store Credit') store+=g;
+      else if(mode==='Others') other+=g;
+    });
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    // Stats bar
+    set('totalGrossReturns',gross.toFixed(2));
+    set('totalNetReturns',net.toFixed(2));
+    set('totalInputTax',tax.toFixed(2));
+    set('netRefundAmount',gross.toFixed(2));
+    // Tally
+    set('tallyGross',gross.toFixed(2)); set('tallyGrossCount',cnt+' transaction'+(cnt!==1?'s':''));
+    set('tallyNet',net.toFixed(2)); set('tallyNetCount',cnt+' transaction'+(cnt!==1?'s':''));
+    set('tallyInputTax',tax.toFixed(2)); set('tallyInputTaxCount',cnt+' transaction'+(cnt!==1?'s':''));
+    set('tallyCash',cash.toFixed(2));
+    set('tallyCashCount',(rows.length?Array.from(rows).filter(r=>r.querySelector('.return-mode')?.value==='Cash Refund').length:0)+' transactions');
+    set('tallyCredit',credit.toFixed(2));
+    set('tallyCreditCount',(rows.length?Array.from(rows).filter(r=>r.querySelector('.return-mode')?.value==='Credit Memo').length:0)+' transactions');
+    set('tallyTotal',gross.toFixed(2)); set('tallyTotalCount',cnt+' total transaction'+(cnt!==1?'s':''));
+    const ec=document.getElementById('entryCount'); if(ec){ec.textContent=cnt;ec.classList.add('pulse');setTimeout(()=>ec.classList.remove('pulse'),300);}
+    rebuildSummaryRow(gross,net,tax);
+  });
+};
+
+function rebuildSummaryRow(gross,net,tax){
+  const foot=document.getElementById('summaryRow'); if(!foot) return;
+  if(gross===undefined){
+    gross=0;net=0;tax=0;
+    document.querySelectorAll('#tableBody tr').forEach(r=>{
+      gross+=parseFloat(r.querySelector('.gross-returns')?.value)||0;
+      net+=parseFloat(r.querySelector('.net-returns')?.textContent)||0;
+      tax+=parseFloat(r.querySelector('.input-tax')?.textContent)||0;
+    });
+  }
+  const ths=document.querySelectorAll('#purchaseReturnsTable thead th');
+  let cells=''; let first=true;
+  ths.forEach((th,i)=>{
+    if(th.classList.contains('hidden-column')) return;
+    let c='';
+    if(first){c='<span class="sum-label">TOTALS</span>';first=false;}
+    else if(i===4) c='<span class="sum-value">'+gross.toFixed(2)+'</span>';
+    else if(i===5) c='<span class="sum-value">'+net.toFixed(2)+'</span>';
+    else if(i===6) c='<span class="sum-value">'+tax.toFixed(2)+'</span>';
+    cells+=`<td>${c}</td>`;
+  });
+  foot.innerHTML='<tr>'+cells+'</tr>';
+}
+
+/* ============================================================
+   SAVE / LOAD  (.rpurch)
+============================================================ */
+function getCompanyData(){
+  const f=id=>document.getElementById(id)?.value||'';
+  return{name:f('companyName'),tin:f('companyTIN'),address:f('companyAddress'),business:f('lineOfBusiness'),telephone:f('telephone'),date:f('reportDate'),employee:f('authorizedEmployee'),email:f('email')};
+}
+function setCompanyData(d){
+  const map={name:'companyName',tin:'companyTIN',address:'companyAddress',business:'lineOfBusiness',telephone:'telephone',date:'reportDate',employee:'authorizedEmployee',email:'email'};
+  Object.keys(map).forEach(k=>{const el=document.getElementById(map[k]);if(el&&d[k])el.value=d[k];});
+  saveCompanyInfo();
+}
+function getTableData(){
+  return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({
+    returnDate:r.querySelector('.return-date')?.value||'',
+    returnNumber:r.querySelector('.return-number')?.value||'',
+    originalInvoice:r.querySelector('.original-invoice')?.value||'',
+    returnMode:r.querySelector('.return-mode')?.value||'',
+    grossReturns:r.querySelector('.gross-returns')?.value||'',
+    remarks:r.querySelector('.remarks')?.value||''
+  }));
+}
+function saveDataToFile(){
+  const blob=new Blob([JSON.stringify({version:'1.0',type:'purchase-returns',timestamp:new Date().toISOString(),companyInfo:getCompanyData(),tableData:getTableData()},null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='Purchase_Returns_'+new Date().toISOString().split('T')[0]+'.rpurch';
+  a.click(); URL.revokeObjectURL(a.href); showToast('Data saved to .rpurch file','success');
+}
+function loadDataFromFile(){
+  const fi=document.createElement('input'); fi.type='file'; fi.accept='.rpurch,.json';
+  fi.addEventListener('change',function(){
+    const f=this.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        const d=JSON.parse(e.target.result);
+        if(!d.version||!d.tableData) throw new Error('Invalid format');
+        if(d.companyInfo) setCompanyData(d.companyInfo);
+        document.getElementById('tableBody').innerHTML='';
+        d.tableData.forEach(rd=>addRow(rd));
+        if(!d.tableData.length) addRow();
+        currentPage=1; renderCurrentPage(); updateAllStats();
+        showToast('Loaded '+d.tableData.length+' rows','success');
+      }catch(ex){ showToast('Error: '+ex.message,'error'); }
+    };
+    r.readAsText(f);
+  });
+  fi.click();
+}
+
+/* ============================================================
+   EXPORT TO EXCEL
+============================================================ */
+function exportToExcel(){
+  const co=getCompanyData();
+  if(!co.name||!co.tin||!co.address||!co.business||!co.employee){ alert('Please fill all required company fields (*) before exporting.'); return; }
+  const rows=document.querySelectorAll('#tableBody tr');
+  const gross=parseFloat(document.getElementById('totalGrossReturns').textContent)||0;
+  const net=parseFloat(document.getElementById('totalNetReturns').textContent)||0;
+  const tax=parseFloat(document.getElementById('totalInputTax').textContent)||0;
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><style>
+  *{font-family:Calibri,Arial,sans-serif}
+  .title{font-size:20pt;font-weight:bold;color:#1E3A8A;text-align:center;border-bottom:2px solid #2563EB;padding-bottom:8px;margin-bottom:12px}
+  .co-table{width:100%;border-collapse:collapse;margin-bottom:16px;background:#EFF6FF}
+  .co-table td{padding:5px 10px;border:1px solid #BFDBFE}
+  .co-lbl{font-weight:bold;color:#1D4ED8;width:180px}
+  .dt{width:100%;border-collapse:collapse;margin-top:12px;font-size:9.5pt}
+  .dt th{background:#1E3A8A;color:#DBEAFE;font-weight:bold;text-align:center;padding:8px 6px;border:1px solid #1E40AF}
+  .dt td{padding:6px;border:1px solid #D1D5DB}
+  .dt tr:nth-child(even){background:#EFF6FF}
+  .num{text-align:right;font-family:Consolas,monospace}
+  .sum-row{background:#FEF3C7;font-weight:bold;border-top:2px solid #F59E0B}
+  .sec-ttl{font-size:13pt;font-weight:bold;color:#1E3A8A;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #93C5FD;padding-bottom:4px}
+  .fin-table{width:60%;margin-left:auto;border-collapse:collapse}
+  .fin-table td{padding:7px 14px;border-bottom:1px dotted #D1D5DB;font-size:10.5pt}
+  .fin-lbl{text-align:right;color:#1D4ED8;font-weight:bold}
+  .fin-val{text-align:right;font-family:Consolas,monospace;color:#111827}
+  .footer{margin-top:24px;padding-top:12px;border-top:1px solid #D1D5DB;color:#6B7280;font-size:9pt;text-align:center}
+  </style></head><body>
+  <div class="title">PURCHASE RETURNS DATA REPORT</div>
+  <table class="co-table">
+    <tr><td class="co-lbl">Company Name:</td><td>${escH(co.name)}</td><td class="co-lbl">TIN Number:</td><td>${escH(co.tin)}</td></tr>
+    <tr><td class="co-lbl">Address:</td><td>${escH(co.address)}</td><td class="co-lbl">Line of Business:</td><td>${escH(co.business)}</td></tr>
+    <tr><td class="co-lbl">Telephone:</td><td>${escH(co.telephone||'N/A')}</td><td class="co-lbl">Report Date:</td><td>${escH(co.date||'')}</td></tr>
+    <tr><td class="co-lbl">Authorized Employee:</td><td>${escH(co.employee)}</td><td class="co-lbl">Email:</td><td>${escH(co.email||'N/A')}</td></tr>
+  </table>
+  <div class="sec-ttl">Purchase Returns Transactions</div>
+  <table class="dt"><thead><tr><th>Return Date</th><th>Return Number</th><th>Original Invoice No.</th><th>Mode of Return</th><th>Gross Returns (₱)</th><th>Net Returns (₱)</th><th>Input Tax Return (₱)</th><th>Remarks</th></tr></thead><tbody>`;
+  rows.forEach((r,idx)=>{
+    const g=parseFloat(r.querySelector('.gross-returns')?.value)||0;
+    const n=g/1.12, t=n*0.12;
+    html+=`<tr${idx%2===0?'':' style="background:#EFF6FF"'}>
+      <td style="text-align:center">${escH(r.querySelector('.return-date')?.value||'')}</td>
+      <td>${escH(r.querySelector('.return-number')?.value||'')}</td>
+      <td>${escH(r.querySelector('.original-invoice')?.value||'')}</td>
+      <td style="text-align:center">${escH(r.querySelector('.return-mode')?.value||'')}</td>
+      <td class="num">${g.toFixed(2)}</td>
+      <td class="num">${n.toFixed(2)}</td>
+      <td class="num">${t.toFixed(2)}</td>
+      <td>${escH(r.querySelector('.remarks')?.value||'')}</td>
+    </tr>`;
+  });
+  html+=`</tbody><tfoot><tr class="sum-row"><td colspan="4" style="text-align:right;font-weight:bold">TOTALS:</td><td class="num">${gross.toFixed(2)}</td><td class="num">${net.toFixed(2)}</td><td class="num">${tax.toFixed(2)}</td><td>-</td></tr></tfoot></table>
+  <div class="sec-ttl">Financial Summary</div>
+  <table class="fin-table">
+    <tr><td class="fin-lbl">Total Gross Purchase Returns:</td><td class="fin-val">₱ ${gross.toFixed(2)}</td></tr>
+    <tr><td class="fin-lbl">Total Net Purchase Returns:</td><td class="fin-val">₱ ${net.toFixed(2)}</td></tr>
+    <tr><td class="fin-lbl">Total Input Tax Return (12%):</td><td class="fin-val">₱ ${tax.toFixed(2)}</td></tr>
+    <tr style="border-top:2px solid #2563EB"><td class="fin-lbl" style="color:#1E3A8A">Net Refund Amount:</td><td class="fin-val" style="color:#1E3A8A;font-weight:bold">₱ ${gross.toFixed(2)}</td></tr>
+  </table>
+  <div class="footer">
+    <p>Report generated on ${dateStr} at ${timeStr}</p>
+    <p>Authorized by: ${escH(co.employee)} &nbsp;·&nbsp; Purchase Returns Data Tracker</p>
+    <p>© ${now.getFullYear()} Purchase Returns Data Tracker – Professional Purchase Returns Tracking System</p>
+  </div></body></html>`;
+  const blob=new Blob([html],{type:'application/vnd.ms-excel'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='Purchase_Returns_'+co.name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.xls';
+  a.click(); URL.revokeObjectURL(a.href); showToast('Excel report exported','success');
+}
+
+/* ============================================================
+   SELECT MULTIPLE
+============================================================ */
+let selectMode=false,isDragging=false,dragStart=null,selectedCells=new Set();
+function toggleSelectMode(){
+  selectMode=!selectMode;
+  const tb=document.getElementById('tableBody'), btn=document.getElementById('selectMultipleBtn');
+  if(selectMode){ tb.classList.add('select-mode'); btn.classList.add('active'); btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection'; createSelToolbar(); showToast('Selection mode on','info'); document.body.style.userSelect='none'; }
+  else { tb.classList.remove('select-mode'); btn.classList.remove('active'); btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple'; clearCellSel(); document.querySelector('.selection-toolbar')?.remove(); document.body.style.userSelect=''; }
+}
+function createSelToolbar(){
+  if(document.querySelector('.selection-toolbar')) return;
+  const tb=document.createElement('div'); tb.className='selection-toolbar';
+  tb.innerHTML=`<span class="sel-tb-info"><span id="selCount">0</span> cells</span>
+    <button class="sel-tb-btn" id="selCopyBtn"><i class="fas fa-copy"></i> Copy</button>
+    <button class="sel-tb-btn" id="selDelBtn"><i class="fas fa-trash"></i> Clear</button>
+    <button class="sel-tb-btn exit" id="selExitBtn"><i class="fas fa-times"></i> Exit</button>`;
+  document.body.appendChild(tb);
+  document.getElementById('selCopyBtn').addEventListener('click',copySelCells);
+  document.getElementById('selDelBtn').addEventListener('click',delSelCells);
+  document.getElementById('selExitBtn').addEventListener('click',toggleSelectMode);
+}
+function getCellCoords(c){ const r=c.parentElement; const rows=Array.from(r.parentElement.children); return{row:rows.indexOf(r),col:Array.from(r.children).indexOf(c)}; }
+function selectRange(s,e){
+  clearCellSel();
+  const allRows=Array.from(document.querySelectorAll('#tableBody tr'));
+  const r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);
+  for(let r=r1;r<=r2;r++){ const row=allRows[r]; if(!row) continue; for(let c=c1;c<=c2;c++){ const cell=row.children[c]; if(!cell) continue; cell.classList.add('cell-selected'); selectedCells.add(cell); } }
+  const sc=document.getElementById('selCount'); if(sc) sc.textContent=selectedCells.size;
+}
+function clearCellSel(){ document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected')); selectedCells.clear(); const sc=document.getElementById('selCount'); if(sc) sc.textContent=0; }
+function getCellValue(c){ const inp=c.querySelector('input,select'); if(inp) return inp.value; const d=c.querySelector('.auto-calc'); if(d) return d.textContent.trim(); return c.textContent.trim(); }
+function setCellValue(c,v){ const inp=c.querySelector('input'); if(inp){ inp.value=v; inp.dispatchEvent(new Event('input',{bubbles:true})); return true; } const sel=c.querySelector('select'); if(sel){ const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v); if(opt) sel.value=opt.value; sel.dispatchEvent(new Event('change',{bubbles:true})); return true; } return false; }
+function copySelCells(){ if(!selectedCells.size){showToast('No cells selected','warning');return;} const coords=[...selectedCells].map(c=>({cell:c,...getCellCoords(c)})); const minR=Math.min(...coords.map(c=>c.row)),minC=Math.min(...coords.map(c=>c.col)),maxR=Math.max(...coords.map(c=>c.row)),maxC=Math.max(...coords.map(c=>c.col)); const grid=[]; for(let r=minR;r<=maxR;r++){const row=[];for(let c=minC;c<=maxC;c++){const f=coords.find(x=>x.row===r&&x.col===c);row.push(f?getCellValue(f.cell):'');}grid.push(row);} navigator.clipboard.writeText(grid.map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+selectedCells.size+' cells','success')).catch(()=>showToast('Clipboard error','error')); }
+function delSelCells(){ if(!selectedCells.size){showToast('No cells selected','warning');return;} let cnt=0; selectedCells.forEach(c=>{if(setCellValue(c,''))cnt++;}); clearCellSel(); showToast('Cleared '+cnt+' cells','success'); scheduleStats(); }
+
+/* ============================================================
+   VISIBILITY TOGGLES
+============================================================ */
+const TOGGLE_SECTIONS={
+  toggleStatsBtn:{el:'statsSection',show:'Hide Stats Bar',hide:'Show Stats Bar'},
+  toggleTallyBtn:{el:'tallySection',show:'Hide Tally',hide:'Show Tally'},
+  toggleFooterBtn:{el:'footerEl',show:'Hide Footer',hide:'Show Footer'}
+};
+function initVisibilityToggles(){
+  const saved=JSON.parse(localStorage.getItem('purchaseReturnsVisStates')||'{}');
+  Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
+    const btn=document.getElementById(btnId), el=document.getElementById(cfg.el);
+    if(!btn||!el) return;
+    if(saved[cfg.el]===true){ el.classList.add('hidden'); updateToggleBtn(btn,cfg,true); }
+    btn.addEventListener('click',()=>{ const hidden=el.classList.toggle('hidden'); updateToggleBtn(btn,cfg,hidden); const s=JSON.parse(localStorage.getItem('purchaseReturnsVisStates')||'{}'); s[cfg.el]=hidden; localStorage.setItem('purchaseReturnsVisStates',JSON.stringify(s)); });
+  });
+  document.getElementById('hideAllBtn').addEventListener('click',()=>{ Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{ const el=document.getElementById(cfg.el); const btn=document.getElementById(btnId); if(el&&!el.classList.contains('hidden')){ el.classList.add('hidden'); updateToggleBtn(btn,cfg,true); } }); const s={}; Object.values(TOGGLE_SECTIONS).forEach(c=>s[c.el]=true); localStorage.setItem('purchaseReturnsVisStates',JSON.stringify(s)); });
+  document.getElementById('showAllBtn').addEventListener('click',()=>{ Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{ const el=document.getElementById(cfg.el); const btn=document.getElementById(btnId); if(el){ el.classList.remove('hidden'); updateToggleBtn(btn,cfg,false); } }); localStorage.setItem('purchaseReturnsVisStates','{}'); });
+}
+function updateToggleBtn(btn,cfg,isHidden){ if(!btn) return; const spans=btn.querySelectorAll('span'); const last=spans[spans.length-1]; if(last) last.textContent=isHidden?cfg.hide:cfg.show; btn.classList.toggle('toggled',!isHidden); }
+
+/* ============================================================
+   SIDEBAR TOGGLES
+============================================================ */
+function initSidebarToggles(){
+  const left=document.getElementById('leftSidebar'), right=document.getElementById('rightPanel');
+  const lBtn=document.getElementById('headerLeftToggle'), rBtn=document.getElementById('headerRightToggle');
+  const isMobile=()=>window.innerWidth<=900;
+  let lOpen=!isMobile(), rOpen=!isMobile();
+  function applyLeft(){ if(isMobile()){left.classList.toggle('mobile-open',lOpen);left.classList.remove('collapsed');}else{left.classList.toggle('collapsed',!lOpen);left.classList.remove('mobile-open');} }
+  function applyRight(){ if(isMobile()){right.classList.toggle('mobile-open',rOpen);right.classList.remove('collapsed');}else{right.classList.toggle('collapsed',!rOpen);right.classList.remove('mobile-open');} }
+  lBtn.addEventListener('click',()=>{lOpen=!lOpen;applyLeft();});
+  rBtn.addEventListener('click',()=>{rOpen=!rOpen;applyRight();});
+  applyLeft(); applyRight();
+  window.addEventListener('resize',()=>{applyLeft();applyRight();});
+}
+
+/* ============================================================
+   TABLE FOCUS MODE
+============================================================ */
+function initTableFocusMode(){
+  document.getElementById('tableFocusBtn').addEventListener('click',function(){
+    const inFocus=document.body.classList.toggle('table-focus');
+    if(inFocus){ document.querySelectorAll('.stats-bar,.tally-section,.footer').forEach(el=>el.classList.add('hidden')); this.innerHTML='<i class="fas fa-compress"></i>Exit Focus Mode'; }
+    else { document.querySelectorAll('.stats-bar,.tally-section,.footer').forEach(el=>el.classList.remove('hidden')); this.innerHTML='<i class="fas fa-expand"></i>Table Focus Mode'; }
+  });
+}
+
+/* ============================================================
+   ENTER KEY NAVIGATION
+============================================================ */
+function initEnterNav(){
+  document.getElementById('tableBody').addEventListener('keydown',e=>{
+    if(e.key!=='Enter') return;
+    const el=document.activeElement;
+    if(!el||!['INPUT','SELECT'].includes(el.tagName)) return;
+    const td=el.closest('td'); if(!td) return;
+    const tr=td.parentElement;
+    let nextTr=tr.nextElementSibling;
+    if(!nextTr){ e.preventDefault(); addRow(); const rows=document.querySelectorAll('#tableBody tr'); if(rows.length) nextTr=rows[rows.length-1]; }
+    if(!nextTr) return;
+    const idx=Array.from(tr.children).indexOf(td);
+    const nextTd=nextTr.children[idx]; if(!nextTd) return;
+    const nextEl=nextTd.querySelector('input,select');
+    if(nextEl){ e.preventDefault(); nextEl.focus(); if(nextEl.tagName==='INPUT') nextEl.select(); }
+  });
+}
+
+/* ============================================================
+   SELECTION MOUSE EVENTS
+============================================================ */
+function initSelectionMouseEvents(){
+  const tb=document.getElementById('tableBody');
+  tb.addEventListener('mousedown',e=>{
+    if(!selectMode) return;
+    const td=e.target.closest('td'); if(!td) return;
+    e.preventDefault(); isDragging=true; dragStart=getCellCoords(td);
+    clearCellSel(); td.classList.add('cell-selected'); selectedCells.add(td);
+    const sc=document.getElementById('selCount'); if(sc) sc.textContent=1;
+  });
+  tb.addEventListener('mousemove',e=>{
+    if(!selectMode||!isDragging) return;
+    const td=e.target.closest('td'); if(!td) return;
+    selectRange(dragStart,getCellCoords(td));
+  });
+  document.addEventListener('mouseup',()=>{ if(isDragging) isDragging=false; });
+  document.addEventListener('keydown',e=>{
+    if(!selectMode) return;
+    if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelCells();}
+    if(e.key==='Delete'){e.preventDefault();delSelCells();}
+    if(e.key==='Escape'){if(selectedCells.size>0)clearCellSel();else toggleSelectMode();}
+  });
+}
+
+/* ============================================================
+   REPORT DATE → TABLE DATE SYNC
+============================================================ */
+function initReportDateSync(){
+  const rdInput=document.getElementById('reportDate');
+  if(!rdInput) return;
+  rdInput.addEventListener('change',function(){
+    const newDate=this.value; if(!newDate) return;
+    saveCompanyInfo();
+    if(confirm('Update all table dates to match the new report date ('+newDate+')?')){
+      document.querySelectorAll('#tableBody tr .return-date').forEach(di=>{ di.value=newDate; });
+      showToast('All dates updated to '+newDate,'success');
+    }
+  });
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('reportDate').value=new Date().toISOString().split('T')[0];
+  loadCompanyInfo();
+  initColVisibility();
+  initPagination();
+  addRow();
+  updateAllStats();
+  initSidebarToggles();
+  initVisibilityToggles();
+  initEnterNav();
+  initTableFocusMode();
+  initSelectionMouseEvents();
+  initReportDateSync();
+
+  // Company info auto-save
+  ['companyName','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email']
+    .forEach(id=>{const el=document.getElementById(id);if(el) el.addEventListener('change',saveCompanyInfo);});
+
+  // TIN auto-format xxx-xxx-xxx
+  const cTIN=document.getElementById('companyTIN');
+  if(cTIN){
+    cTIN.addEventListener('input',()=>formatTIN(cTIN));
+    cTIN.addEventListener('change',()=>{ formatTIN(cTIN); saveCompanyInfo(); });
+  }
+
+  // Nav buttons
+  document.getElementById('addRowBtn').addEventListener('click',()=>addRow());
+  document.getElementById('addRowBtnHead').addEventListener('click',()=>addRow());
+
+  document.getElementById('addBatchRowsBtn').addEventListener('click',()=>{
+    const n=parseInt(prompt('How many rows?','10'));
+    if(n>0&&n<=5000) addBatchRows(n);
+    else if(n>5000) showToast('Max 5000 rows at a time','warning');
+  });
+
+  document.getElementById('exportBtn').addEventListener('click',exportToExcel);
+  document.getElementById('exportBtnHead').addEventListener('click',exportToExcel);
+  document.getElementById('saveDataBtn').addEventListener('click',saveDataToFile);
+  document.getElementById('loadDataBtn').addEventListener('click',loadDataFromFile);
+
+  document.getElementById('clearBtn').addEventListener('click',()=>{
+    if(confirm('Clear all table data? Cannot be undone.')){
+      document.getElementById('tableBody').innerHTML='';
+      addRow(); currentPage=1; renderCurrentPage(); updateAllStats();
+      showToast('Table cleared','success');
+    }
+  });
+  document.getElementById('clearInfoBtn').addEventListener('click',clearCompanyInfo);
+  document.getElementById('clearInfoBtnPanel').addEventListener('click',clearCompanyInfo);
+  document.getElementById('selectMultipleBtn').addEventListener('click',toggleSelectMode);
+  document.getElementById('entryCounterBtn').addEventListener('click',()=>addRow());
+});
+</script>
+</body>
+</html>
