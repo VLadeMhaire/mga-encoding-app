@@ -15,8 +15,9 @@
   --gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;--gray-300:#D1D5DB;
   --gray-400:#9CA3AF;--gray-500:#6B7280;--gray-600:#4B5563;--gray-700:#374151;
   --gray-800:#1F2937;--gray-900:#111827;
-  --red-50:#FEF2F2;--red-500:#EF4444;--red-700:#B91C1C;
-  --green-500:#22C55E;--amber-500:#F59E0B;--purple-500:#8B5CF6;
+  --red-50:#FEF2F2;--red-200:#FECACA;--red-500:#EF4444;--red-700:#B91C1C;
+  --green-50:#F0FDF4;--green-500:#22C55E;--green-700:#15803D;
+  --amber-500:#F59E0B;--purple-500:#8B5CF6;
   --shadow-sm:0 1px 2px rgba(0,0,0,.06);
   --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
   --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
@@ -44,6 +45,17 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .topbar-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:6px 13px;font-size:12px;color:white;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
 .topbar-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3)}
 .topbar-btn i{font-size:12px;opacity:.85}
+.backend-pill{display:flex;align-items:center;gap:5px;font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.15)}
+.backend-pill.online{background:rgba(34,197,94,.15);color:#86efac}
+.backend-pill.offline{background:rgba(239,68,68,.15);color:#fca5a5}
+.backend-pill.checking{background:rgba(251,191,36,.15);color:#fde68a}
+.bp-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.online .bp-dot{background:#22c55e;animation:bpulse 2s infinite}
+.offline .bp-dot{background:#ef4444}
+.checking .bp-dot{background:#fbbf24;animation:bpulse 1s infinite}
+@keyframes bpulse{0%,100%{opacity:1}50%{opacity:.3}}
+.monthly-context-badge{display:flex;align-items:center;gap:6px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.4);border-radius:20px;padding:5px 14px;font-size:12px;color:#fde68a;font-weight:600}
+.monthly-context-badge i{font-size:11px}
 
 /* LAYOUT */
 .layout{display:flex;flex:1;overflow:hidden}
@@ -64,6 +76,10 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .nav-btn.active{background:var(--blue-50);color:var(--blue-800);font-weight:600}
 .nav-btn.danger:hover{background:var(--red-50);color:var(--red-700)}
 .nav-btn.toggled{color:var(--blue-700);background:var(--blue-50)}
+.autosave-indicator{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--gray-400);padding:4px 10px 0;opacity:0;transition:opacity 0.3s}
+.autosave-indicator.visible{opacity:1}
+.autosave-dot{width:6px;height:6px;border-radius:50%;background:var(--green-500);animation:pulse-dot 1s ease infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .sidebar-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400);line-height:1.7}
 
 /* MAIN */
@@ -76,6 +92,8 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .btn-primary:hover{background:var(--blue-700);box-shadow:var(--shadow)}
 .btn-secondary{display:flex;align-items:center;gap:6px;background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
 .btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-300)}
+.btn-submit{display:flex;align-items:center;gap:6px;background:var(--blue-600);color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none}
+.btn-submit:hover{background:var(--blue-700);box-shadow:var(--shadow)}
 
 /* STATS BAR */
 .stats-bar{display:flex;gap:10px;padding:12px 20px;background:white;border-bottom:1px solid var(--gray-200);flex-shrink:0;overflow-x:auto}
@@ -84,16 +102,27 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .stat-card-value{font-size:15px;font-weight:700;color:var(--blue-900);font-variant-numeric:tabular-nums}
 
 /* TABLE */
-.table-area{flex:1;overflow:auto;background:var(--gray-100)}
-table#capexTable{width:100%;min-width:1600px;border-collapse:collapse;font-size:12px;background:white}
+.table-area{flex:1;overflow:auto;background:var(--gray-100);position:relative}
+.table-area::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background-image:url('MGAALogo.jpg');background-size:cover;background-repeat:no-repeat;background-position:center;opacity:0.07;pointer-events:none;z-index:0}
+table#capexTable{width:100%;min-width:1600px;border-collapse:collapse;font-size:12px;background:white;position:relative;z-index:1}
 table#capexTable thead{position:sticky;top:0;z-index:20}
 table#capexTable thead th{background:var(--blue-900);color:var(--blue-100);font-size:11px;font-weight:600;padding:10px 10px;text-align:left;white-space:nowrap;border-right:1px solid var(--blue-800);letter-spacing:.3px;user-select:none}
 table#capexTable thead th:last-child{border-right:none;text-align:center}
 table#capexTable thead th.hidden-column{display:none}
+
+/* Row color distinctions */
 table#capexTable tbody tr{border-bottom:1px solid var(--gray-100);background:white;transition:background .12s}
-table#capexTable tbody tr:nth-child(even){background:var(--blue-50)}
-table#capexTable tbody tr:nth-child(even):hover{background:#DBEAFE}
-table#capexTable tbody tr:hover{background:var(--blue-100)}
+table#capexTable tbody tr.row-cash{border-left:3px solid #22C55E;background:#F0FDF4}
+table#capexTable tbody tr.row-cash:nth-child(even){background:#DCFCE7}
+table#capexTable tbody tr.row-cash:hover{background:#BBF7D0 !important}
+table#capexTable tbody tr.row-charge{border-left:3px solid #3B82F6;background:#EFF6FF}
+table#capexTable tbody tr.row-charge:nth-child(even){background:#DBEAFE}
+table#capexTable tbody tr.row-charge:hover{background:#BFDBFE !important}
+table#capexTable tbody tr.row-vatable{border-left:3px solid #8B5CF6}
+table#capexTable tbody tr.row-nonvat{border-left:3px solid #F59E0B}
+table#capexTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge){background:var(--blue-50)}
+table#capexTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge):hover{background:#DBEAFE}
+table#capexTable tbody tr:not(.row-cash):not(.row-charge):hover{background:var(--blue-100)}
 table#capexTable td{padding:0;height:42px;vertical-align:middle;border-right:1px solid var(--gray-100)}
 table#capexTable td:last-child{border-right:none}
 table#capexTable td.hidden-column{display:none}
@@ -198,13 +227,121 @@ table#capexTable tfoot .sum-value{font-family:var(--font-mono);font-weight:700;f
 .select-mode td{cursor:crosshair!important;user-select:none!important}
 .select-mode input,.select-mode select,.select-mode button{pointer-events:none!important;opacity:.7}
 td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid var(--blue-500);outline-offset:-1.5px}
-.selection-toolbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;border:1px solid var(--gray-200);border-radius:40px;padding:7px 16px;display:flex;gap:8px;align-items:center;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease}
+
+/* Selection info bar */
+.selection-info-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--blue-900);color:var(--blue-100);border-radius:40px;padding:7px 18px;font-size:12px;display:flex;align-items:center;gap:8px;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;white-space:nowrap}
 @keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-.sel-tb-info{font-size:12px;color:var(--gray-500);padding:0 8px;border-right:1px solid var(--gray-200);margin-right:4px}
-.sel-tb-btn{background:var(--gray-50);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--font);transition:var(--transition)}
-.sel-tb-btn:hover{background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
-.sel-tb-btn.exit{background:var(--blue-600);color:white;border-color:var(--blue-600)}
-.sel-tb-btn.exit:hover{background:var(--blue-700)}
+.sel-info-dot{width:6px;height:6px;border-radius:50%;background:#60A5FA}
+.sel-info-hint{color:var(--blue-300);font-size:11px}
+
+/* Context menu */
+.ctx-menu{position:fixed;background:white;border:1px solid var(--gray-200);border-radius:10px;box-shadow:var(--shadow-lg);z-index:10001;min-width:220px;overflow:hidden;animation:fadeIn .1s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.ctx-menu-header{padding:9px 14px;font-size:11px;font-weight:700;color:var(--blue-700);background:var(--blue-50);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:6px}
+.ctx-count-badge{background:var(--blue-600);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.ctx-item{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border:none;background:none;font-family:var(--font);font-size:13px;color:var(--gray-700);cursor:pointer;text-align:left;transition:background .1s}
+.ctx-item:hover{background:var(--blue-50);color:var(--blue-700)}
+.ctx-item.danger:hover{background:var(--red-50);color:var(--red-700)}
+.ctx-item.exit-item:hover{background:var(--gray-50)}
+.ctx-item i{width:16px;text-align:center;font-size:12px;color:var(--gray-400)}
+.ctx-item:hover i{color:var(--blue-500)}
+.ctx-item.danger:hover i{color:var(--red-500)}
+.ctx-divider{height:1px;background:var(--gray-100);margin:2px 0}
+
+/* Row legend */
+.row-legend{display:flex;align-items:center;gap:12px;padding:6px 20px;background:white;border-bottom:1px solid var(--gray-100);flex-shrink:0;font-size:11px;color:var(--gray-500)}
+.row-legend-item{display:flex;align-items:center;gap:5px}
+.row-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.legend-cash{background:#22C55E}
+.legend-charge{background:#3B82F6}
+.legend-vatable{background:#8B5CF6}
+.legend-nonvat{background:#F59E0B}
+
+/* Notification overlay */
+.notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10050;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease}
+.notif-box{background:white;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25);width:440px;max-width:95vw;overflow:hidden;animation:notifIn .2s cubic-bezier(.34,1.56,.64,1)}
+@keyframes notifIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.notif-box-header{padding:18px 24px 14px;display:flex;align-items:flex-start;gap:14px}
+.notif-box-header.success{background:var(--green-50);border-bottom:1px solid #BBF7D0}
+.notif-box-header.warning{background:#FFF7ED;border-bottom:1px solid #FED7AA}
+.notif-box-header.error{background:var(--red-50);border-bottom:1px solid #FECACA}
+.notif-icon-wrap{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
+.notif-box-header.success .notif-icon-wrap{background:#BBF7D0;color:#059669}
+.notif-box-header.warning .notif-icon-wrap{background:#FED7AA;color:#D97706}
+.notif-box-header.error .notif-icon-wrap{background:#FECACA;color:#DC2626}
+.notif-title{font-size:15px;font-weight:700;color:var(--gray-900)}
+.notif-box-header.success .notif-title{color:#065F46}
+.notif-box-header.warning .notif-title{color:#92400E}
+.notif-box-header.error .notif-title{color:#7F1D1D}
+.notif-subtitle{font-size:12px;font-weight:500;opacity:.75}
+.notif-body{padding:18px 24px 22px}
+.notif-detail-row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px}
+.notif-detail-row.success-row{background:var(--green-50);border:1px solid #BBF7D0}
+.notif-detail-row.warning-row{background:#FFF7ED;border:1px solid #FED7AA}
+.notif-detail-row.error-row{background:var(--red-50);border:1px solid #FECACA}
+.notif-detail-icon{font-size:16px;margin-top:1px;flex-shrink:0}
+.notif-detail-row.success-row .notif-detail-icon{color:#059669}
+.notif-detail-row.warning-row .notif-detail-icon{color:#D97706}
+.notif-detail-row.error-row .notif-detail-icon{color:#DC2626}
+.notif-detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:2px}
+.notif-detail-value{font-size:14px;font-weight:700;color:var(--gray-900);font-family:var(--font-mono)}
+.notif-message{font-size:13px;color:var(--gray-600);line-height:1.6;margin-top:10px}
+.notif-footer{padding:0 24px 20px;display:flex;justify-content:flex-end}
+.notif-close-btn{background:var(--blue-600);color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:var(--transition);display:flex;align-items:center;gap:8px}
+.notif-close-btn:hover{background:var(--blue-700);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+
+/* Banners */
+.monthly-banner{background:var(--blue-800);color:var(--blue-100);padding:8px 20px;font-size:12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.monthly-banner i{color:var(--blue-300)}
+.monthly-banner .back-link{margin-left:auto;color:var(--blue-200);text-decoration:none;font-size:12px;display:flex;align-items:center;gap:5px}
+.monthly-banner .back-link:hover{color:white}
+.portal-banner{background:#FEF3C7;border-bottom:2px solid #F59E0B;padding:8px 20px;font-size:12px;color:#92400E;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.portal-banner i{color:#D97706}
+.portal-banner strong{font-weight:700}
+.portal-banner-close{margin-left:auto;background:none;border:none;cursor:pointer;color:#92400E;font-size:13px;padding:2px 6px;border-radius:4px}
+.portal-banner-close:hover{background:rgba(0,0,0,.08)}
+
+/* Date */
+.date-updated{animation:datePulse 0.5s ease}
+@keyframes datePulse{0%{background-color:transparent}50%{background-color:rgba(59,130,246,.2)}100%{background-color:transparent}}
+.report-date-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-100);color:var(--blue-800);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;margin-left:10px;cursor:pointer;transition:var(--transition)}
+.report-date-badge:hover{background:var(--blue-200);transform:scale(1.02)}
+.report-date-badge i{font-size:10px}
+#reportDate,#companyTIN{font-family:var(--font-mono);letter-spacing:0.5px}
+.date-input{font-family:var(--font-mono)}
+
+/* Saving overlay */
+.saving-overlay{position:fixed;top:var(--topbar-h);left:50%;transform:translateX(-50%);background:rgba(30,58,138,.92);color:white;font-size:12px;font-weight:600;padding:7px 18px;border-radius:0 0 10px 10px;z-index:9000;display:flex;align-items:center;gap:7px;box-shadow:var(--shadow-md)}
+.saving-overlay i{animation:spin .7s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Submit modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:14px;padding:28px;width:380px;max-width:95vw;box-shadow:var(--shadow-lg)}
+.modal-title{font-size:16px;font-weight:700;color:var(--blue-900);margin-bottom:8px}
+.modal-body{font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:18px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+
+/* Date picker */
+.date-picker-overlay{position:fixed;inset:0;z-index:9990}
+.date-picker-popup{position:fixed;background:white;border:1px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow-lg);z-index:9991;width:268px;overflow:hidden}
+.dp-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--blue-900);color:white}
+.dp-month-year{font-size:13px;font-weight:600}
+.dp-nav-btn{background:none;border:none;color:white;cursor:pointer;padding:4px 8px;border-radius:5px;font-size:12px;transition:background .1s}
+.dp-nav-btn:hover{background:rgba(255,255,255,.2)}
+.dp-weekdays{display:grid;grid-template-columns:repeat(7,1fr);background:var(--blue-50);padding:4px 8px}
+.dp-weekdays span{text-align:center;font-size:10px;font-weight:700;color:var(--blue-700);padding:4px 0}
+.dp-days{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 8px;gap:2px}
+.dp-day{width:100%;aspect-ratio:1;border:none;background:none;cursor:pointer;border-radius:6px;font-size:12px;color:var(--gray-700);transition:background .1s;font-family:var(--font)}
+.dp-day:hover{background:var(--blue-100)}
+.dp-day.today{background:var(--blue-100);color:var(--blue-700);font-weight:700}
+.dp-day.selected{background:var(--blue-600);color:white;font-weight:700}
+.dp-day.other-month{color:var(--gray-300)}
+.dp-footer{display:flex;gap:8px;padding:8px 10px;border-top:1px solid var(--gray-100)}
+.dp-today-btn{flex:1;background:var(--blue-600);color:white;border:none;border-radius:6px;padding:6px;font-size:11px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:4px}
+.dp-today-btn:hover{background:var(--blue-700)}
+.dp-footer button:last-child{background:var(--gray-50);color:var(--gray-600);border:1px solid var(--gray-200);border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:var(--font)}
+.dp-footer button:last-child:hover{background:var(--gray-100)}
 
 /* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;background:white;border:1px solid var(--gray-200);border-left:4px solid var(--blue-500);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--gray-700);box-shadow:var(--shadow-lg);z-index:9999;max-width:360px;animation:toastIn .2s ease}
@@ -240,9 +377,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   <div class="topbar-logo"><i class="fas fa-building"></i></div>
   <div>
     <div class="topbar-title">Capital Expenditures (CAPEX) Data Tracker</div>
-    <span class="topbar-sub">Professional Asset Acquisition Tracking · Net = Vatable ÷ 1.12 · Input Tax = Net × 12%</span>
+    <span class="topbar-sub" id="topbarSub">Professional Asset Acquisition Tracking · Net = Vatable ÷ 1.12 · Input Tax = Net × 12%</span>
   </div>
   <div class="topbar-actions">
+    <div class="backend-pill checking" id="backendPill"><div class="bp-dot"></div><span id="backendPillText">Connecting…</span></div>
+    <div id="monthlyContextBadge" class="monthly-context-badge hidden"><i class="fas fa-calendar-alt"></i><span id="monthlyContextLabel">—</span></div>
     <div class="col-vis-container">
       <button class="topbar-btn" id="colVisBtn"><i class="fas fa-columns"></i> Columns</button>
       <div class="col-vis-dropdown" id="colVisDropdown">
@@ -269,10 +408,13 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 <div class="sidebar" id="leftSidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-label">CAPEX Menu</div>
-    <div class="sidebar-brand-sub">MGAA System v2.0</div>
+    <div class="sidebar-brand-sub" id="sidebarBrandSub">MGAA System v2.0</div>
   </div>
   <div class="sidebar-nav">
+    <a href="monthly_capex.html" class="nav-btn"><i class="fas fa-calendar-alt"></i>Monthly Records</a>
     <a href="index2.html" class="nav-btn"><i class="fas fa-home"></i>Dashboard</a>
+    <div class="nav-section">Session</div>
+    <div class="autosave-indicator" id="autosaveIndicator"><span class="autosave-dot"></span> Autosaving…</div>
     <div class="nav-divider"></div>
     <div class="nav-section">Data Management</div>
     <button class="nav-btn" id="selectMultipleBtn"><i class="fas fa-check-double"></i>Select Multiple</button>
@@ -286,16 +428,16 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <button class="nav-btn danger" id="clearBtn"><i class="fas fa-trash-alt"></i>Clear Table Data</button>
     <button class="nav-btn danger" id="clearInfoBtn"><i class="fas fa-eraser"></i>Clear Company Info</button>
     <div class="nav-section">Visibility</div>
-    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Hide Stats Bar</button>
-    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Hide Tally</button>
-    <button class="nav-btn toggle-btn" id="toggleSuppliersBtn"><i class="fas fa-truck"></i>Hide Suppliers</button>
-    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Hide Footer</button>
+    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Show Stats Bar</button>
+    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Show Tally</button>
+    <button class="nav-btn toggle-btn" id="toggleSuppliersBtn"><i class="fas fa-truck"></i>Show Suppliers</button>
+    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Show Footer</button>
     <div class="nav-divider"></div>
     <button class="nav-btn" id="hideAllBtn"><i class="fas fa-eye-slash"></i>Hide All Sections</button>
     <button class="nav-btn" id="showAllBtn"><i class="fas fa-eye"></i>Show All Sections</button>
     <button class="nav-btn" id="tableFocusBtn"><i class="fas fa-expand"></i>Table Focus Mode</button>
     <div class="nav-divider"></div>
-    <a href="index2.html" class="nav-btn"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>
+    <a href="../index.html" class="nav-btn"><i class="fas fa-arrow-left"></i>Back to Portal</a>
   </div>
   <div class="sidebar-footer">
     <div>MGAA CAPEX System v2.0</div>
@@ -304,7 +446,20 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 </div>
 
 <!-- MAIN -->
-<div class="main">
+<div class="main" id="mainArea">
+
+  <div class="monthly-banner hidden" id="monthlyBanner">
+    <i class="fas fa-calendar-check"></i>
+    <span>Editing monthly record: <strong id="monthlyBannerLabel">—</strong></span>
+    <span style="font-size:11px;color:rgba(191,219,254,.7)" id="monthlyBannerKey"></span>
+    <a class="back-link" href="monthly_expenses.html"><i class="fas fa-arrow-left"></i> Back to Records</a>
+  </div>
+
+  <div class="portal-banner hidden" id="portalBanner">
+    <i class="fas fa-file-import"></i>
+    <span>File loaded from portal: <strong id="portalBannerFilename"></strong></span>
+    <button class="portal-banner-close" onclick="document.getElementById('portalBanner').classList.add('hidden')" title="Dismiss"><i class="fas fa-times"></i></button>
+  </div>
 
   <div class="content-header">
     <div>
@@ -312,13 +467,23 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>Net Purchases = Vatable Gross ÷ 1.12 · Input Tax = Net × 12% · Withholding Tax entered manually</p>
     </div>
     <div class="header-actions">
+      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-arrow-right"></i>Go to Portal</button>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
   </div>
 
-  <!-- Stats Bar -->
-  <div class="stats-bar" id="statsSection">
+  <!-- Row legend -->
+  <div class="row-legend">
+    <span style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px">Legend:</span>
+    <div class="row-legend-item"><div class="row-legend-dot legend-cash"></div>Cash</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-charge"></div>Charge</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-vatable"></div>Vatable</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-nonvat"></div>Non-VAT</div>
+  </div>
+
+  <!-- Stats Bar — hidden by default -->
+  <div class="stats-bar hidden" id="statsSection">
     <div class="stat-card">
       <div class="stat-card-label"><i class="fas fa-receipt" style="margin-right:4px;color:var(--blue-400)"></i>Non-VAT Gross</div>
       <div class="stat-card-value">₱ <span id="totalNonVatPurchases">0.00</span></div>
@@ -390,8 +555,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <!-- Tally -->
-  <div class="tally-section" id="tallySection">
+  <!-- Tally — hidden by default -->
+  <div class="tally-section hidden" id="tallySection">
     <div class="section-header"><i class="fas fa-chart-pie"></i>CAPEX Financial Tally</div>
     <div class="tally-grid">
       <div class="tally-card nvat-card">
@@ -432,8 +597,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <!-- Registered Suppliers -->
-  <div class="suppliers-section" id="suppliersSection">
+  <!-- Registered Suppliers — hidden by default -->
+  <div class="suppliers-section hidden" id="suppliersSection">
     <div class="suppliers-header">
       <div class="suppliers-header-left">
         <i class="fas fa-truck" style="color:var(--blue-600)"></i>
@@ -452,7 +617,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="footer" id="footerEl">
+  <div class="footer hidden" id="footerEl">
     © 2026 Capital Expenditures (CAPEX) Data Tracker &nbsp;·&nbsp; Professional Asset Acquisition Tracking System
   </div>
 
@@ -469,7 +634,10 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <div class="field-group"><label>Telephone</label><input type="tel" id="telephone" placeholder="Telephone number"></div>
     <div class="field-group">
       <label>Report Date</label>
-      <input type="date" id="reportDate">
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" style="font-family:var(--font-mono);letter-spacing:.5px">
+        <button class="btn-secondary" id="reportDatePickerBtn" title="Pick date" style="padding:7px 10px;flex-shrink:0"><i class="fas fa-calendar-alt"></i></button>
+      </div>
     </div>
     <div class="field-group"><label>Authorized Employee <span class="req">*</span></label><input type="text" id="authorizedEmployee" placeholder="Employee name"></div>
     <div class="field-group"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
@@ -481,6 +649,43 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 </div>
 
 </div><!-- /layout -->
+
+<!-- SAVING OVERLAY -->
+<div class="saving-overlay hidden" id="savingOverlay"><i class="fas fa-circle-notch"></i><span id="savingOverlayText">Saving…</span></div>
+
+<!-- NOTIFICATION BOX -->
+<div class="notif-overlay hidden" id="notifOverlay">
+  <div class="notif-box">
+    <div class="notif-box-header success" id="notifHeader">
+      <div class="notif-icon-wrap" id="notifIconWrap"><i class="fas fa-check-circle" id="notifIcon"></i></div>
+      <div><div class="notif-title" id="notifTitle">Notification</div><div class="notif-subtitle" id="notifSubtitle"></div></div>
+    </div>
+    <div class="notif-body">
+      <div class="notif-detail-row success-row" id="notifDetailRow1" style="display:none">
+        <i class="fas fa-user notif-detail-icon"></i>
+        <div><div class="notif-detail-label" id="notifD1Label">Name</div><div class="notif-detail-value" id="notifD1Value"></div></div>
+      </div>
+      <div class="notif-detail-row success-row" id="notifDetailRow2" style="display:none">
+        <i class="fas fa-id-card notif-detail-icon"></i>
+        <div><div class="notif-detail-label" id="notifD2Label">TIN</div><div class="notif-detail-value" id="notifD2Value"></div></div>
+      </div>
+      <div class="notif-message" id="notifMessage"></div>
+    </div>
+    <div class="notif-footer"><button class="notif-close-btn" id="notifCloseBtn"><i class="fas fa-check"></i> OK</button></div>
+  </div>
+</div>
+
+<!-- GO TO PORTAL MODAL -->
+<div class="modal-overlay hidden" id="submitModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title"><i class="fas fa-arrow-right" style="color:var(--blue-500);margin-right:8px"></i>Go to Portal</div>
+    <div class="modal-body">Your current data will be saved before navigating to the portal. Continue?</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="submitModalCancelBtn">Cancel</button>
+      <button class="btn-submit" id="submitModalConfirmBtn"><i class="fas fa-arrow-right"></i> Go to Portal</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ============================================================
