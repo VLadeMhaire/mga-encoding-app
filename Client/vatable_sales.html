@@ -42,7 +42,6 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .topbar-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:6px 13px;font-size:12px;color:white;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none;}
 .topbar-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3);}
 .topbar-btn i{font-size:12px;opacity:.85;}
-/* Backend status pill */
 .backend-pill{display:flex;align-items:center;gap:5px;font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.15);}
 .backend-pill.online{background:rgba(34,197,94,.15);color:#86efac;}
 .backend-pill.offline{background:rgba(239,68,68,.15);color:#fca5a5;}
@@ -52,7 +51,6 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .offline .bp-dot{background:#ef4444;}
 .checking .bp-dot{background:#fbbf24;animation:bpulse 1s infinite;}
 @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.3}}
-/* Monthly context badge */
 .monthly-context-badge{display:flex;align-items:center;gap:6px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.4);border-radius:20px;padding:5px 14px;font-size:12px;color:#fde68a;font-weight:600;}
 .monthly-context-badge i{font-size:11px;}
 .layout{display:flex;flex:1;overflow:hidden;}
@@ -101,10 +99,24 @@ table#vatableTable thead{position:sticky;top:0;z-index:20;}
 table#vatableTable thead th{background:var(--blue-900);color:var(--blue-100);font-size:11px;font-weight:600;padding:10px 10px;text-align:left;white-space:nowrap;border-right:1px solid var(--blue-800);letter-spacing:.3px;user-select:none;}
 table#vatableTable thead th:last-child{border-right:none;text-align:center;}
 table#vatableTable thead th.hidden-column{display:none;}
+
+/* ── CHANGE 5: Row color distinctions ── */
 table#vatableTable tbody tr{border-bottom:1px solid var(--gray-100);background:white;transition:background .12s;}
-table#vatableTable tbody tr:nth-child(even){background:var(--blue-50);}
-table#vatableTable tbody tr:nth-child(even):hover{background:#DBEAFE;}
-table#vatableTable tbody tr:hover{background:var(--blue-100);}
+/* Rows with any gross sales entry get a subtle left accent via data attribute */
+table#vatableTable tbody tr.row-has-data{border-left:3px solid transparent;}
+table#vatableTable tbody tr.row-cash{border-left:3px solid #22C55E;background:#F0FDF4;}
+table#vatableTable tbody tr.row-cash:nth-child(even){background:#DCFCE7;}
+table#vatableTable tbody tr.row-cash:hover{background:#BBF7D0 !important;}
+table#vatableTable tbody tr.row-charge{border-left:3px solid #3B82F6;background:#EFF6FF;}
+table#vatableTable tbody tr.row-charge:nth-child(even){background:#DBEAFE;}
+table#vatableTable tbody tr.row-charge:hover{background:#BFDBFE !important;}
+table#vatableTable tbody tr.row-private{border-left:3px solid #8B5CF6;}
+table#vatableTable tbody tr.row-govt{border-left:3px solid #F59E0B;}
+/* Rows without data stay default */
+table#vatableTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge){background:var(--blue-50);}
+table#vatableTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge):hover{background:#DBEAFE;}
+table#vatableTable tbody tr:not(.row-cash):not(.row-charge):hover{background:var(--blue-100);}
+
 table#vatableTable td{padding:0;height:42px;vertical-align:middle;border-right:1px solid var(--gray-100);}
 table#vatableTable td:last-child{border-right:none;}
 table#vatableTable td.hidden-column{display:none;}
@@ -219,14 +231,30 @@ table#vatableTable tfoot .sum-value{font-family:var(--font-mono);font-weight:700
 .select-mode td{cursor:crosshair!important;user-select:none!important;}
 .select-mode input,.select-mode select,.select-mode button{pointer-events:none!important;opacity:.7;}
 td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid var(--blue-500);outline-offset:-1.5px;}
-.selection-toolbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;border:1px solid var(--gray-200);border-radius:40px;padding:7px 16px;display:flex;gap:8px;align-items:center;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;}
+
+/* ── CHANGE 3: Right-click context menu (replaces floating toolbar) ── */
+.ctx-menu{position:fixed;z-index:10100;background:white;border:1px solid var(--gray-200);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);min-width:190px;overflow:hidden;animation:ctxIn .12s ease;}
+@keyframes ctxIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.ctx-menu-header{padding:8px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue-700);background:var(--blue-50);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:6px;}
+.ctx-item{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:13px;color:var(--gray-700);cursor:pointer;transition:background .1s;border:none;background:none;width:100%;font-family:var(--font);text-align:left;}
+.ctx-item i{width:16px;text-align:center;font-size:12px;color:var(--gray-400);}
+.ctx-item:hover{background:var(--blue-50);color:var(--blue-700);}
+.ctx-item:hover i{color:var(--blue-500);}
+.ctx-item.danger{color:var(--red-700);}
+.ctx-item.danger i{color:var(--red-400);}
+.ctx-item.danger:hover{background:var(--red-50);}
+.ctx-item.exit-item{color:var(--blue-700);font-weight:600;}
+.ctx-item.exit-item i{color:var(--blue-500);}
+.ctx-item.exit-item:hover{background:var(--blue-100);}
+.ctx-divider{height:1px;background:var(--gray-100);margin:3px 0;}
+.ctx-count-badge{margin-left:auto;background:var(--blue-100);color:var(--blue-700);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+
+/* Slim selection info bar (no action buttons, just count) */
+.selection-info-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--blue-900);color:white;border-radius:20px;padding:7px 18px;font-size:12px;display:flex;align-items:center;gap:8px;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;pointer-events:none;}
 @keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-.sel-tb-info{font-size:12px;color:var(--gray-500);padding:0 8px;border-right:1px solid var(--gray-200);margin-right:4px;}
-.sel-tb-btn{background:var(--gray-50);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--font);transition:var(--transition);}
-.sel-tb-btn:hover{background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700);}
-.sel-tb-btn.danger:hover{background:var(--red-50);border-color:var(--red-200);color:var(--red-700);}
-.sel-tb-btn.exit{background:var(--blue-600);color:white;border-color:var(--blue-600);}
-.sel-tb-btn.exit:hover{background:var(--blue-700);}
+.sel-info-dot{width:7px;height:7px;border-radius:50%;background:#60A5FA;animation:bpulse 1.5s infinite;}
+.sel-info-hint{font-size:10px;color:var(--blue-300);margin-left:4px;}
+
 .toast{position:fixed;bottom:20px;right:20px;background:white;border:1px solid var(--gray-200);border-left:4px solid var(--blue-500);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--gray-700);box-shadow:var(--shadow-lg);z-index:9999;max-width:360px;animation:toastIn .2s ease;}
 @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 .toast.success{border-left-color:var(--green-500);}
@@ -273,7 +301,6 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 .portal-banner strong{font-weight:700;}
 .portal-banner-close{margin-left:auto;background:none;border:none;cursor:pointer;color:#92400E;font-size:13px;padding:2px 6px;border-radius:4px;}
 .portal-banner-close:hover{background:rgba(0,0,0,.08);}
-/* Monthly period banner */
 .monthly-banner{background:linear-gradient(135deg,#1E3A8A,#1D4ED8);border-bottom:2px solid #60A5FA;padding:8px 20px;font-size:12px;color:#BFDBFE;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .monthly-banner i{color:#60A5FA;}
 .monthly-banner strong{color:white;font-size:13px;}
@@ -303,11 +330,20 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 .report-date-badge i{font-size:10px;}
 #reportDate{font-family:var(--font-mono);letter-spacing:0.5px;}
 .date-input{font-family:var(--font-mono);}
-/* Saving overlay */
 .saving-overlay{position:fixed;top:70px;right:20px;background:var(--blue-900);color:white;border-radius:8px;padding:8px 16px;font-size:12px;z-index:9998;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);transition:opacity .3s;}
 .saving-overlay.hidden{opacity:0;pointer-events:none;}
 .saving-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Row legend */
+.row-legend{display:flex;align-items:center;gap:12px;padding:6px 20px;background:white;border-bottom:1px solid var(--gray-100);flex-shrink:0;font-size:11px;color:var(--gray-500);}
+.row-legend-item{display:flex;align-items:center;gap:5px;}
+.row-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.legend-cash{background:#22C55E;}
+.legend-charge{background:#3B82F6;}
+.legend-private{background:#8B5CF6;}
+.legend-govt{background:#F59E0B;}
+
 @media(max-width:900px){
   :root{--sidebar-w:0px;--rightpanel-w:0px;}
   .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;width:240px;transform:translateX(-100%);box-shadow:var(--shadow-lg);}
@@ -371,11 +407,12 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <div class="nav-divider"></div>
     <button class="nav-btn danger" id="clearBtn"><i class="fas fa-trash-alt"></i>Clear Table Data</button>
     <button class="nav-btn danger" id="clearInfoBtn"><i class="fas fa-eraser"></i>Clear Company Info</button>
+    <!-- CHANGE 4: renamed to "Show X", all sections hidden by default -->
     <div class="nav-section">Visibility</div>
-    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Hide Stats Bar</button>
-    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Hide Tally</button>
-    <button class="nav-btn toggle-btn" id="toggleCustomersBtn"><i class="fas fa-address-card"></i>Hide Customers</button>
-    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Hide Footer</button>
+    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Show Stats Bar</button>
+    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Show Tally</button>
+    <button class="nav-btn toggle-btn" id="toggleCustomersBtn"><i class="fas fa-address-card"></i>Show Customers</button>
+    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Show Footer</button>
     <div class="nav-divider"></div>
     <button class="nav-btn" id="hideAllBtn"><i class="fas fa-eye-slash"></i>Hide All Sections</button>
     <button class="nav-btn" id="showAllBtn"><i class="fas fa-eye"></i>Show All Sections</button>
@@ -391,7 +428,6 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 
 <div class="main" id="mainArea">
 
-  <!-- Monthly period banner -->
   <div class="monthly-banner hidden" id="monthlyBanner">
     <i class="fas fa-calendar-check"></i>
     <span>Editing monthly record: <strong id="monthlyBannerLabel">—</strong></span>
@@ -399,7 +435,6 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <a class="back-link" href="monthly_record.html"><i class="fas fa-arrow-left"></i> Back to Records</a>
   </div>
 
-  <!-- Portal file loaded banner -->
   <div class="portal-banner hidden" id="portalBanner">
     <i class="fas fa-file-import"></i>
     <span>File loaded from portal: <strong id="portalBannerFilename"></strong></span>
@@ -418,12 +453,23 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="stats-bar" id="statsSection">
+  <!-- CHANGE 4: Stats bar hidden by default -->
+  <div class="stats-bar hidden" id="statsSection">
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-receipt" style="margin-right:4px;color:var(--blue-400)"></i>Gross Sales</div><div class="stat-card-value">₱ <span id="totalGrossSales">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-ban" style="margin-right:4px;color:var(--blue-400)"></i>Exempt Sales</div><div class="stat-card-value">₱ <span id="totalExemptSales">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-coins" style="margin-right:4px;color:var(--blue-400)"></i>Net Sales</div><div class="stat-card-value">₱ <span id="totalNetSales">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-percent" style="margin-right:4px;color:var(--blue-400)"></i>Output Tax</div><div class="stat-card-value">₱ <span id="totalOutputTax">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-hand-holding-usd" style="margin-right:4px;color:var(--blue-400)"></i>Withholding</div><div class="stat-card-value">₱ <span id="totalWithholding">0.00</span></div></div>
+  </div>
+
+  <!-- Row color legend -->
+  <div class="row-legend">
+    <span style="font-weight:600;color:var(--gray-600);">Row Colors:</span>
+    <div class="row-legend-item"><div class="row-legend-dot legend-cash"></div>Cash</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-charge"></div>Charge</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-private"></div>Private Sector</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-govt"></div>Government</div>
+    <span style="margin-left:4px;font-style:italic;font-size:10px;">(Right-click rows in selection mode for options)</span>
   </div>
 
   <div class="table-area">
@@ -473,7 +519,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="tally-section" id="tallySection">
+  <!-- CHANGE 4: Tally hidden by default -->
+  <div class="tally-section hidden" id="tallySection">
     <div class="section-header"><i class="fas fa-chart-pie"></i>Payment &amp; Customer Type Tally</div>
     <div class="tally-grid">
       <div class="tally-card cash-card"><div class="tally-card-label"><i class="fas fa-money-bill-wave" style="color:var(--green-500)"></i>Cash</div><div class="tally-card-amount">₱ <span id="totalCashAmount">0.00</span></div><div class="tally-card-sub"><span id="cashCount">0 transactions</span> · <span id="cashPercentage">0%</span></div></div>
@@ -488,7 +535,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="customers-section" id="customersSection">
+  <!-- CHANGE 4: Customers hidden by default -->
+  <div class="customers-section hidden" id="customersSection">
     <div class="customers-header">
       <div class="customers-header-left"><i class="fas fa-address-card"></i>Registered Customers<span class="customers-count" id="customersCount">0</span></div>
       <button class="btn-secondary" id="clearAllCustomersBtn" style="font-size:11px;padding:5px 10px"><i class="fas fa-trash-alt"></i> Clear All</button>
@@ -498,7 +546,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="footer" id="footerEl">© 2025 Vatable Sales Data Tracker &nbsp;·&nbsp; Professional VAT-Compliant Sales Tracking System</div>
+  <!-- CHANGE 4: Footer hidden by default -->
+  <div class="footer hidden" id="footerEl">© 2025 Vatable Sales Data Tracker &nbsp;·&nbsp; Professional VAT-Compliant Sales Tracking System</div>
 </div>
 
 <div class="right-panel" id="rightPanel">
@@ -526,13 +575,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 
 </div>
 
-<!-- Saving overlay -->
 <div class="saving-overlay hidden" id="savingOverlay">
   <div class="saving-spinner"></div>
   <span id="savingOverlayText">Saving…</span>
 </div>
 
-<!-- Submit Modal -->
 <div class="submit-modal-overlay hidden" id="submitModalOverlay">
   <div class="submit-modal">
     <div class="submit-modal-title"><i class="fas fa-paper-plane"></i>Submit to Portal</div>
@@ -551,7 +598,6 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   </div>
 </div>
 
-<!-- Big Notification Box -->
 <div class="notif-overlay hidden" id="notifOverlay">
   <div class="notif-box" id="notifBox">
     <div class="notif-box-header" id="notifHeader">
@@ -635,7 +681,6 @@ const APP_ROLE = (function(){
   return 'Main';
 })();
 
-// Monthly context — set by monthly_record.html via sessionStorage
 const MONTHLY_CTX = {
   key:   sessionStorage.getItem('VAT_MONTHLY_CONTEXT_KEY')   || null,
   year:  sessionStorage.getItem('VAT_MONTHLY_CONTEXT_YEAR')  || null,
@@ -645,7 +690,6 @@ const MONTHLY_CTX = {
 };
 const IS_MONTHLY = !!(MONTHLY_CTX.key && MONTHLY_CTX.year && MONTHLY_CTX.month);
 
-// Namespace keys — per role, per month/year when in monthly mode
 const STORAGE_NS = {
   Client:   { CUSTOMER_TIN_MAP:'VAT_CUSTOMER_TIN_MAP_Client',   COMPANY_INFO:'vatCompanyInfo_Client',   COL_VISIBILITY:'colVisibility_Client',   VIS_STATES:'visStates_Client' },
   SubAdmin: { CUSTOMER_TIN_MAP:'VAT_CUSTOMER_TIN_MAP_SubAdmin', COMPANY_INFO:'vatCompanyInfo_SubAdmin', COL_VISIBILITY:'colVisibility_SubAdmin', VIS_STATES:'visStates_SubAdmin' },
@@ -653,9 +697,6 @@ const STORAGE_NS = {
 };
 const NS = STORAGE_NS[APP_ROLE];
 
-// Derive the active localStorage key for table session data
-// In monthly mode → unique key per month/year
-// In normal mode → role-based key (backward compatible)
 function getActiveSessionKey() {
   if (IS_MONTHLY) return MONTHLY_CTX.key;
   return `VAT_SESSION_TABLE_${APP_ROLE}`;
@@ -667,107 +708,63 @@ function getActiveCompanyKey() {
 
 /* ============================================================
    FASTAPI DATA LAYER
-   All read/write goes through these functions.
-   API → SQLite when online; localStorage fallback always.
 ============================================================ */
-
-/** Build the API record identifier for this session */
 function getApiRecordId() {
   if (IS_MONTHLY) return `${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`;
   return `${APP_ROLE}_general`;
 }
 
-/** Save full session (tableData + companyInfo) to API + localStorage */
 async function apiSaveSession(tableData, companyInfo) {
   const payload = {
-    record_id: getApiRecordId(),
-    role: APP_ROLE,
+    record_id: getApiRecordId(), role: APP_ROLE,
     year: MONTHLY_CTX.year ? parseInt(MONTHLY_CTX.year) : null,
     month: MONTHLY_CTX.month ? parseInt(MONTHLY_CTX.month) : null,
-    label: MONTHLY_CTX.label || 'General',
-    table_data: tableData,
-    company_info: companyInfo,
-    saved_at: new Date().toISOString(),
+    label: MONTHLY_CTX.label || 'General', table_data: tableData,
+    company_info: companyInfo, saved_at: new Date().toISOString(),
   };
-
-  // Always write to localStorage first (instant, offline-safe)
   const localData = { version:'1.0', timestamp: payload.saved_at, tableData, companyInfo };
   localStorage.setItem(getActiveSessionKey(), JSON.stringify(localData));
   localStorage.setItem(getActiveCompanyKey(), JSON.stringify(companyInfo));
-
-  // Then persist to API/SQLite if available
   if (USE_API) {
     try {
-      await fetch(`${API_BASE}/vat-records`, {
-        method: 'POST',
-        headers: apiHeaders(),
-        body: JSON.stringify(payload),
-      });
-    } catch(_) { /* localStorage already saved */ }
+      await fetch(`${API_BASE}/vat-records`, { method:'POST', headers:apiHeaders(), body:JSON.stringify(payload) });
+    } catch(_) {}
   }
 }
 
-/** Load session from API (preferred) or localStorage fallback */
 async function apiLoadSession() {
   if (USE_API) {
     try {
       const r = await fetch(`${API_BASE}/vat-records/${getApiRecordId()}`, { headers: apiHeaders() });
       if (r.ok) {
         const d = await r.json();
-        // Cache to localStorage for offline access
         if (d.table_data) {
-          localStorage.setItem(getActiveSessionKey(), JSON.stringify({
-            version:'1.0', timestamp: d.saved_at,
-            tableData: d.table_data, companyInfo: d.company_info || {}
-          }));
+          localStorage.setItem(getActiveSessionKey(), JSON.stringify({ version:'1.0', timestamp: d.saved_at, tableData: d.table_data, companyInfo: d.company_info || {} }));
           if (d.company_info) localStorage.setItem(getActiveCompanyKey(), JSON.stringify(d.company_info));
         }
         return { tableData: d.table_data || [], companyInfo: d.company_info || {} };
       }
     } catch(_) {}
   }
-  // localStorage fallback
   const raw = localStorage.getItem(getActiveSessionKey());
   if (!raw) return null;
-  try {
-    const d = JSON.parse(raw);
-    return { tableData: d.tableData || [], companyInfo: d.companyInfo || {} };
-  } catch(e) { return null; }
+  try { const d = JSON.parse(raw); return { tableData: d.tableData || [], companyInfo: d.companyInfo || {} }; }
+  catch(e) { return null; }
 }
 
-/** Load company info */
-async function apiLoadCompanyInfo() {
-  if (USE_API) {
-    try {
-      const r = await fetch(`${API_BASE}/vat-records/${getApiRecordId()}/company`, { headers: apiHeaders() });
-      if (r.ok) { const d = await r.json(); return d; }
-    } catch(_) {}
-  }
-  const raw = localStorage.getItem(getActiveCompanyKey());
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch(e) { return null; }
-}
-
-/** Save customer TIN map to API + localStorage */
 async function apiSaveCustomers(dbObj) {
   const key = `${NS.CUSTOMER_TIN_MAP}`;
   localStorage.setItem(key, JSON.stringify(Object.fromEntries(dbObj)));
   if (USE_API) {
-    try {
-      await fetch(`${API_BASE}/customers`, {
-        method: 'POST',
-        headers: apiHeaders(),
-        body: JSON.stringify({ role: APP_ROLE, data: Object.fromEntries(dbObj) }),
-      });
-    } catch(_) {}
+    try { await fetch(`${API_BASE}/customers`, { method:'POST', headers:apiHeaders(), body:JSON.stringify({ role:APP_ROLE, data:Object.fromEntries(dbObj) }) }); }
+    catch(_) {}
   }
 }
 
-/** Load customer TIN map */
 async function apiLoadCustomers() {
   if (USE_API) {
     try {
-      const r = await fetch(`${API_BASE}/customers?role=${APP_ROLE}`, { headers: apiHeaders() });
+      const r = await fetch(`${API_BASE}/customers?role=${APP_ROLE}`, { headers:apiHeaders() });
       if (r.ok) {
         const d = await r.json();
         localStorage.setItem(NS.CUSTOMER_TIN_MAP, JSON.stringify(d.data || {}));
@@ -781,13 +778,9 @@ async function apiLoadCustomers() {
 }
 
 /* ============================================================
-   SAVING OVERLAY HELPERS
+   SAVING OVERLAY
 ============================================================ */
-function showSaving(msg='Saving…') {
-  const o = document.getElementById('savingOverlay');
-  document.getElementById('savingOverlayText').textContent = msg;
-  o.classList.remove('hidden');
-}
+function showSaving(msg='Saving…') { document.getElementById('savingOverlayText').textContent=msg; document.getElementById('savingOverlay').classList.remove('hidden'); }
 function hideSaving() { document.getElementById('savingOverlay').classList.add('hidden'); }
 
 /* ============================================================
@@ -806,10 +799,8 @@ function showNotification(type, title, subtitle, details, message) {
   icon.className='fas '+(icons[type]||'fa-info-circle');
   titleEl.textContent=title; subtitleEl.textContent=subtitle||''; msgEl.textContent=message||'';
   const rc=type+'-row'; row1.className='notif-detail-row '+rc; row2.className='notif-detail-row '+rc;
-  if(details&&details.name!==undefined){d1lbl.textContent='Customer Name';d1val.textContent=details.name||'—';row1.style.display='flex';}
-  else row1.style.display='none';
-  if(details&&details.tin!==undefined){d2lbl.textContent='TIN Number';d2val.textContent=details.tin||'—';row2.style.display='flex';}
-  else row2.style.display='none';
+  if(details&&details.name!==undefined){d1lbl.textContent='Customer Name';d1val.textContent=details.name||'—';row1.style.display='flex';}else row1.style.display='none';
+  if(details&&details.tin!==undefined){d2lbl.textContent='TIN Number';d2val.textContent=details.tin||'—';row2.style.display='flex';}else row2.style.display='none';
   overlay.classList.remove('hidden');
 }
 document.addEventListener('DOMContentLoaded',()=>{
@@ -822,16 +813,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 ============================================================ */
 (function(){
   let db = new Map();
-
-  async function loadDB() {
-    db = await apiLoadCustomers();
-    renderCustomersList();
-  }
-
-  async function saveDB() {
-    await apiSaveCustomers(db);
-    renderCustomersList();
-  }
+  async function loadDB() { db = await apiLoadCustomers(); renderCustomersList(); }
+  async function saveDB() { await apiSaveCustomers(db); renderCustomersList(); }
 
   window.addCustomerPair = async function(name, tin, salesType, address, silent){
     if(!name) return false;
@@ -890,7 +873,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       return`<div class="customer-item"><div class="customer-info"><div class="customer-name-tin"><span class="customer-name">${escH(p.name)}</span><span class="customer-arrow">→</span><span class="customer-tin">${escH(p.tin||'No TIN')}</span><span class="badge ${bc}">${escH(p.salesType||'Pending')}</span></div>${addr}</div><button class="delete-customer-btn" onclick="deleteCustomerPair('${escH(p.name)}','${escH(p.tin)}')"><i class="fas fa-trash"></i></button></div>`;
     }).join('');
   };
-
   document.addEventListener('DOMContentLoaded', () => loadDB());
 })();
 
@@ -898,7 +880,6 @@ document.addEventListener('DOMContentLoaded',()=>{
    UTILITY
 ============================================================ */
 function escH(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
-
 function showToast(msg,type='info'){
   document.querySelectorAll('.toast').forEach(t=>t.remove());
   const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);
@@ -906,9 +887,61 @@ function showToast(msg,type='info'){
 }
 function showLPToast(msg){let t=document.querySelector('.long-press-toast');if(!t){t=document.createElement('div');t.className='long-press-toast';document.body.appendChild(t);}t.textContent=msg;}
 function hideLPToast(){const t=document.querySelector('.long-press-toast');if(t)t.remove();}
-
 function formatTIN(input){let v=input.value.replace(/\D/g,'');if(v.length>12)v=v.slice(0,12);const parts=[v.slice(0,3),v.slice(3,6),v.slice(6,9),v.slice(9,12)].filter(p=>p!=='');input.value=parts.join('-');}
 function validateTIN(input){const digits=input.value.replace(/\D/g,'');input.style.boxShadow=(digits.length>0&&digits.length<12)?'inset 0 0 0 2px #FECACA':'';}
+
+/* ============================================================
+   CHANGE 1: Format currency with commas (1,000.00)
+============================================================ */
+function formatCurrency(value) {
+  if (value === null || value === undefined || value === '') return '0.00';
+  const num = parseFloat(value);
+  if (isNaN(num)) return '0.00';
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/** Parse a potentially comma-formatted string back to a plain number string for inputs */
+function parseFormattedNumber(str) {
+  if (!str) return '';
+  return str.replace(/,/g, '');
+}
+
+/**
+ * Apply comma formatting to a numeric input on blur.
+ * The input stores its raw value in data-raw, displays formatted.
+ * On focus, show raw value for editing.
+ */
+function initCurrencyInput(input) {
+  // On focus: show raw number for editing
+  input.addEventListener('focus', function() {
+    const raw = this.dataset.raw || this.value.replace(/,/g,'');
+    this.value = raw;
+    this.select();
+  });
+  // On blur: format with commas
+  input.addEventListener('blur', function() {
+    const raw = this.value.replace(/,/g,'');
+    const num = parseFloat(raw);
+    if (!isNaN(num) && num !== 0) {
+      this.dataset.raw = raw;
+      this.value = formatCurrency(raw);
+    } else if (raw === '' || raw === '0') {
+      this.dataset.raw = '';
+      this.value = '';
+    }
+  });
+  // Ensure the raw value is used for calculations
+  input.addEventListener('input', function() {
+    this.dataset.raw = this.value.replace(/,/g,'');
+  });
+}
+
+/** Get numeric value from a currency input (handles commas) */
+function getInputNumber(input) {
+  if (!input) return 0;
+  const v = (input.dataset.raw !== undefined ? input.dataset.raw : input.value).replace(/,/g,'');
+  return parseFloat(v) || 0;
+}
 
 /* ============================================================
    COMPANY INFO
@@ -918,14 +951,10 @@ async function saveCompanyInfo() {
   ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
     const el=document.getElementById(id);if(el){if(id==='reportDate'&&el.value)data[id]=displayToStorageDate(el.value);else data[id]=el.value;}
   });
-  // Lightweight company-only save (no table data)
   localStorage.setItem(getActiveCompanyKey(), JSON.stringify(data));
   if (USE_API) {
-    try {
-      await fetch(`${API_BASE}/vat-records/${getApiRecordId()}/company`, {
-        method:'PATCH', headers:apiHeaders(), body:JSON.stringify(data)
-      });
-    } catch(_) {}
+    try { await fetch(`${API_BASE}/vat-records/${getApiRecordId()}/company`,{method:'PATCH',headers:apiHeaders(),body:JSON.stringify(data)}); }
+    catch(_) {}
   }
 }
 
@@ -933,10 +962,7 @@ function applyCompanyInfo(data) {
   if (!data) return;
   ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el&&data[id]!==undefined){
-      if(id==='reportDate'&&data[id]) el.value=storageToDisplayDate(data[id]);
-      else el.value=data[id];
-    }
+    if(el&&data[id]!==undefined){if(id==='reportDate'&&data[id])el.value=storageToDisplayDate(data[id]);else el.value=data[id];}
   });
 }
 
@@ -944,9 +970,7 @@ function clearCompanyInfo(){
   if(!confirm('Clear all company information?')) return;
   ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   localStorage.removeItem(getActiveCompanyKey());
-  if (USE_API) {
-    fetch(`${API_BASE}/vat-records/${getApiRecordId()}/company`,{method:'DELETE',headers:apiHeaders()}).catch(()=>{});
-  }
+  if(USE_API){fetch(`${API_BASE}/vat-records/${getApiRecordId()}/company`,{method:'DELETE',headers:apiHeaders()}).catch(()=>{});}
   showToast('Company info cleared','success');
 }
 
@@ -973,7 +997,7 @@ function renderCalendar(){const popup=document.getElementById('dpPopup');if(!pop
 function selectDate(year,month,day){const input=dpState.targetInput;if(!input){closeDatePicker();return;}const mm=String(month+1).padStart(2,'0'),dd=String(day).padStart(2,'0');input.value=`${mm}/${dd}/${year}`;input.dispatchEvent(new Event('change',{bubbles:true}));closeDatePicker();}
 
 /* ============================================================
-   AUTOSAVE — now writes to API+SQLite
+   AUTOSAVE
 ============================================================ */
 let autoSaveTimer=null;
 
@@ -986,8 +1010,8 @@ function getTableData(){
     tinNumber:r.querySelector('.tin-number')?.value||'',
     customerName:r.querySelector('.customer-name')?.value||'',
     address:r.querySelector('.address')?.value||'',
-    grossSales:r.querySelector('.gross-sales')?.value||'',
-    exemptSales:r.querySelector('.exempt-sales')?.value||'',
+    grossSales:getInputNumber(r.querySelector('.gross-sales'))+'',
+    exemptSales:getInputNumber(r.querySelector('.exempt-sales'))+'',
     salesType:r.querySelector('.sales-type')?.value||'',
     withholdingRate:r.querySelector('.withholding-rate')?.value||'0',
     remarks:r.querySelector('.remarks')?.value||''
@@ -1007,10 +1031,7 @@ async function saveSession() {
 function scheduleAutoSave() {
   clearTimeout(autoSaveTimer);
   const ind=document.getElementById('autosaveIndicator');if(ind)ind.classList.add('visible');
-  autoSaveTimer=setTimeout(async ()=>{
-    await saveSession();
-    if(ind) ind.classList.remove('visible');
-  }, 1500);
+  autoSaveTimer=setTimeout(async()=>{await saveSession();if(ind)ind.classList.remove('visible');},1500);
 }
 
 async function restoreSession() {
@@ -1051,22 +1072,36 @@ function checkPortalFileOnLoad(){
 }
 
 /* ============================================================
-   CLIENT: SUBMIT TO PORTAL
+   CHANGE 2: CLIENT SUBMIT TO PORTAL — save .vat to storage first
 ============================================================ */
 function openSubmitModal(){
-  if(APP_ROLE!=='Client')return;
+  if(APP_ROLE!=='Client') return;
   const co=getCompanyData(),rows=getTableData();
   const filename='VAT_Data_'+(co.name?co.name.replace(/[^a-zA-Z0-9]/g,'_')+'_':'')+new Date().toISOString().split('T')[0]+'.vat';
   document.getElementById('submitModalFileName').textContent=filename;
   document.getElementById('submitModalFileMeta').textContent=rows.length+' rows · '+(co.name||'No company name set');
   document.getElementById('submitModalOverlay').classList.remove('hidden');
-  document.getElementById('submitModalConfirmBtn').onclick=function(){
-    const payload=JSON.stringify({version:'1.0',timestamp:new Date().toISOString(),companyInfo:co,tableData:rows},null,2);
-    sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILE',payload);
-    sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILENAME',filename);
-    showToast('Redirecting to portal…','success');
+  document.getElementById('submitModalConfirmBtn').onclick = async function(){
+    // CHANGE 2: Build payload and save to BOTH sessionStorage AND localStorage before navigating
+    const payload = JSON.stringify({version:'1.0',timestamp:new Date().toISOString(),companyInfo:co,tableData:rows},null,2);
+
+    // Save to sessionStorage for portal pickup
+    sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILE', payload);
+    sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILENAME', filename);
+
+    // Also save to localStorage as persistent backup (keyed by filename)
+    try {
+      localStorage.setItem('VAT_SUBMIT_BACKUP_'+filename, payload);
+      localStorage.setItem('VAT_SUBMIT_BACKUP_LATEST', payload);
+      localStorage.setItem('VAT_SUBMIT_BACKUP_LATEST_NAME', filename);
+    } catch(e) { /* quota exceeded — non-fatal */ }
+
+    // Also trigger a full session save so nothing is lost
+    await saveSession();
+
+    showToast('Saving & redirecting to portal…', 'success');
     document.getElementById('submitModalOverlay').classList.add('hidden');
-    setTimeout(()=>{location.href='../index.html#submit';},400);
+    setTimeout(()=>{ location.href = '../index.html#submit'; }, 500);
   };
 }
 
@@ -1121,11 +1156,34 @@ function initPagination(){
 }
 
 /* ============================================================
+   CHANGE 5: Apply row color based on payment mode / sales type
+============================================================ */
+function updateRowColor(row) {
+  const pm = row.querySelector('.payment-mode')?.value || '';
+  const st = row.querySelector('.sales-type')?.value || '';
+  const gross = getInputNumber(row.querySelector('.gross-sales'));
+  // Remove all color classes first
+  row.classList.remove('row-has-data','row-cash','row-charge','row-private','row-govt');
+  if (!gross && !pm && !st) return; // empty row — no color
+  row.classList.add('row-has-data');
+  // Payment mode takes priority for green/blue
+  if (pm === 'Cash') { row.classList.add('row-cash'); return; }
+  if (pm === 'Charge') { row.classList.add('row-charge'); return; }
+  // Fallback to sales type
+  if (st === 'Private') { row.classList.add('row-private'); }
+  else if (st === 'Government') { row.classList.add('row-govt'); }
+}
+
+/* ============================================================
    ROW CREATION
 ============================================================ */
 function createRow(data={}){
   const today=getTodayDisplayDate(),rid='r'+(Date.now()+'').slice(-8)+'_'+Math.floor(Math.random()*1000);
   const tr=document.createElement('tr');tr.id=rid;
+  // For gross/exempt, format if they have values
+  const grossDisplay = data.grossSales ? formatCurrency(data.grossSales) : '';
+  const exemptDisplay = data.exemptSales ? formatCurrency(data.exemptSales) : '';
+
   tr.innerHTML=`
     <td><input type="text" value="${data.date||today}" class="date-input" placeholder="MM/DD/YYYY"></td>
     <td><input type="text" value="${escH(data.invoiceNumber||'')}" class="invoice-number" placeholder="INV-001"></td>
@@ -1134,8 +1192,8 @@ function createRow(data={}){
     <td><input type="text" value="${escH(data.tinNumber||'')}" class="tin-number" maxlength="15" placeholder="000-000-000-000" autocomplete="off"></td>
     <td><input type="text" value="${escH(data.customerName||'')}" class="customer-name" placeholder="Customer name"></td>
     <td><input type="text" value="${escH(data.address||'')}" class="address" placeholder="Address"></td>
-    <td><input type="number" value="${data.grossSales||''}" step="0.01" min="0" class="gross-sales" placeholder="0.00"></td>
-    <td><input type="number" value="${data.exemptSales||''}" step="0.01" min="0" class="exempt-sales" placeholder="0.00"></td>
+    <td><input type="text" value="${escH(grossDisplay)}" class="gross-sales" placeholder="0.00" data-raw="${escH(data.grossSales||'')}"></td>
+    <td><input type="text" value="${escH(exemptDisplay)}" class="exempt-sales" placeholder="0.00" data-raw="${escH(data.exemptSales||'')}"></td>
     <td><select class="sales-type"><option value="">Select</option>${['Private','Government'].map(v=>`<option${data.salesType===v?' selected':''}>${v}</option>`).join('')}</select></td>
     <td><div class="cell-computed net-sales">0.00</div></td>
     <td><div class="cell-computed output-tax">0.00</div></td>
@@ -1144,14 +1202,23 @@ function createRow(data={}){
     <td><input type="text" value="${escH(data.remarks||'')}" class="remarks" placeholder="Remarks"></td>
     <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>`;
   COLS.forEach((c,i)=>{const td=tr.children[i];if(td)td.classList.toggle('hidden-column',!!colVisibility[c.key]);});
-  attachRowListeners(tr);calcRow(tr);return tr;
+
+  // Init currency inputs
+  const grossInput = tr.querySelector('.gross-sales');
+  const exemptInput = tr.querySelector('.exempt-sales');
+  initCurrencyInput(grossInput);
+  initCurrencyInput(exemptInput);
+
+  attachRowListeners(tr);calcRow(tr);
+  updateRowColor(tr);
+  return tr;
 }
 
 function attachRowListeners(row){
   if(row.dataset.listenersAttached)return;row.dataset.listenersAttached='1';
   row.querySelectorAll('input,select').forEach(el=>{
-    el.addEventListener('input',()=>{calcRow(row);scheduleStatsUpdate();scheduleAutoSave();});
-    el.addEventListener('change',()=>{calcRow(row);scheduleStatsUpdate();scheduleAutoSave();});
+    el.addEventListener('input',()=>{calcRow(row);scheduleStatsUpdate();scheduleAutoSave();updateRowColor(row);});
+    el.addEventListener('change',()=>{calcRow(row);scheduleStatsUpdate();scheduleAutoSave();updateRowColor(row);});
   });
   const tin=row.querySelector('.tin-number');
   if(tin){tin.addEventListener('input',()=>formatTIN(tin));tin.addEventListener('blur',()=>{validateTIN(tin);tryAutoFillFromTin(row);storeCustomerPair(row);});tin.addEventListener('focus',()=>{tin.select();setTimeout(()=>showTinSuggestions(tin,row),80);});tin.addEventListener('input',()=>{setTimeout(()=>showTinSuggestions(tin,row),60);});}
@@ -1159,16 +1226,17 @@ function attachRowListeners(row){
   if(name){name.addEventListener('blur',()=>{tryAutoFillFromName(row);storeCustomerPair(row);});}
   const dateInput=row.querySelector('.date-input');
   if(dateInput){dateInput.addEventListener('input',function(){autoFormatReportDate(this);});dateInput.addEventListener('blur',function(){validateReportDate(this);if(this.value&&!validateDisplayDate(this.value))showToast('Invalid date format. Use MM/DD/YYYY','warning');});}
-  row.querySelector('.sales-type').addEventListener('change',()=>storeCustomerPair(row));
+  row.querySelector('.sales-type').addEventListener('change',()=>{storeCustomerPair(row);updateRowColor(row);});
   row.querySelector('.address').addEventListener('blur',()=>storeCustomerPair(row));
+  row.querySelector('.payment-mode').addEventListener('change',()=>updateRowColor(row));
 }
 
 function calcRow(row){
-  const gross=parseFloat(row.querySelector('.gross-sales').value)||0;
+  const gross = getInputNumber(row.querySelector('.gross-sales'));
   const net=gross/1.12,out=net*0.12,rate=parseFloat(row.querySelector('.withholding-rate').value)||0,wh=net*rate;
-  row.querySelector('.net-sales').textContent=net.toFixed(2);
-  row.querySelector('.output-tax').textContent=out.toFixed(2);
-  row.querySelector('.withholding-amount').textContent=wh.toFixed(2);
+  row.querySelector('.net-sales').textContent=formatCurrency(net);
+  row.querySelector('.output-tax').textContent=formatCurrency(out);
+  row.querySelector('.withholding-amount').textContent=formatCurrency(wh);
 }
 
 function tryAutoFillFromTin(row){const t=row.querySelector('.tin-number').value.trim();if(!t)return;const n=lookupNameByTin(t);if(n){const nameEl=row.querySelector('.customer-name');if(!nameEl.value.trim())nameEl.value=n;const d=lookupCustomerData(n);const st=row.querySelector('.sales-type');if(d.salesType&&!st.value)st.value=d.salesType;const addr=row.querySelector('.address');if(d.address&&!addr.value.trim())addr.value=d.address;}}
@@ -1189,7 +1257,7 @@ function addBatchRows(count){const tb=document.getElementById('tableBody');const
 function deleteRow(rid){const row=document.getElementById(rid);if(!row||!confirm('Delete this row?'))return;row.style.transition='opacity .2s,transform .2s';row.style.opacity='0';row.style.transform='translateX(-10px)';setTimeout(()=>{row.remove();if(currentPage>getTotalPages())currentPage=Math.max(1,getTotalPages());renderCurrentPage();scheduleStatsUpdate();scheduleAutoSave();},200);}
 
 /* ============================================================
-   STATS UPDATE
+   STATS UPDATE — uses getInputNumber for comma-formatted inputs
 ============================================================ */
 let statsTimer=null,statsRunning=false;
 function scheduleStatsUpdate(){clearTimeout(statsTimer);statsTimer=setTimeout(updateAllStats,60);}
@@ -1199,21 +1267,35 @@ function updateAllStats(){
     try{
       const rows=document.querySelectorAll('#tableBody tr');
       let gS=0,eS=0,nS=0,oT=0,wH=0,cash=0,charge=0,priv=0,govt=0,cC=0,chC=0,pC=0,gC=0;
-      rows.forEach(r=>{const g=parseFloat(r.querySelector('.gross-sales')?.value)||0,e=parseFloat(r.querySelector('.exempt-sales')?.value)||0,n=parseFloat(r.querySelector('.net-sales')?.textContent)||0,o=parseFloat(r.querySelector('.output-tax')?.textContent)||0,w=parseFloat(r.querySelector('.withholding-amount')?.textContent)||0;gS+=g;eS+=e;nS+=n;oT+=o;wH+=w;const pm=r.querySelector('.payment-mode')?.value,st=r.querySelector('.sales-type')?.value;if(pm==='Cash'){cash+=n;cC++;}else if(pm==='Charge'){charge+=n;chC++;}if(st==='Private'){priv+=n;pC++;}else if(st==='Government'){govt+=n;gC++;}});
+      rows.forEach(r=>{
+        const g=getInputNumber(r.querySelector('.gross-sales')),
+              e=getInputNumber(r.querySelector('.exempt-sales'));
+        // net/output/withholding are computed displays — parse removing commas
+        const nText=r.querySelector('.net-sales')?.textContent||'0';
+        const oText=r.querySelector('.output-tax')?.textContent||'0';
+        const wText=r.querySelector('.withholding-amount')?.textContent||'0';
+        const n=parseFloat(nText.replace(/,/g,''))||0;
+        const o=parseFloat(oText.replace(/,/g,''))||0;
+        const w=parseFloat(wText.replace(/,/g,''))||0;
+        gS+=g;eS+=e;nS+=n;oT+=o;wH+=w;
+        const pm=r.querySelector('.payment-mode')?.value,st=r.querySelector('.sales-type')?.value;
+        if(pm==='Cash'){cash+=n;cC++;}else if(pm==='Charge'){charge+=n;chC++;}
+        if(st==='Private'){priv+=n;pC++;}else if(st==='Government'){govt+=n;gC++;}
+      });
       const cnt=rows.length,tallyBase=nS||1;
       const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-      set('totalGrossSales',gS.toFixed(2));set('totalExemptSales',eS.toFixed(2));set('totalNetSales',nS.toFixed(2));set('totalOutputTax',oT.toFixed(2));set('totalWithholding',wH.toFixed(2));
-      set('totalCashAmount',cash.toFixed(2));set('cashCount',cC+' transaction'+(cC!==1?'s':''));set('cashPercentage',((cash/tallyBase)*100).toFixed(1)+'%');
-      set('totalChargeAmount',charge.toFixed(2));set('chargeCount',chC+' transaction'+(chC!==1?'s':''));set('chargePercentage',((charge/tallyBase)*100).toFixed(1)+'%');
-      set('totalPrivateAmount',priv.toFixed(2));set('privateCount',pC+' transaction'+(pC!==1?'s':''));set('privatePercentage',((priv/tallyBase)*100).toFixed(1)+'%');
-      set('totalGovernmentAmount',govt.toFixed(2));set('governmentCount',gC+' transaction'+(gC!==1?'s':''));set('governmentPercentage',((govt/tallyBase)*100).toFixed(1)+'%');
-      set('totalTallyAmount','₱ '+nS.toFixed(2));set('totalTallyCount',cnt+' transaction'+(cnt!==1?'s':''));set('totalNetSalesTally',nS.toFixed(2));
+      set('totalGrossSales',formatCurrency(gS));set('totalExemptSales',formatCurrency(eS));set('totalNetSales',formatCurrency(nS));set('totalOutputTax',formatCurrency(oT));set('totalWithholding',formatCurrency(wH));
+      set('totalCashAmount',formatCurrency(cash));set('cashCount',cC+' transaction'+(cC!==1?'s':''));set('cashPercentage',((cash/tallyBase)*100).toFixed(1)+'%');
+      set('totalChargeAmount',formatCurrency(charge));set('chargeCount',chC+' transaction'+(chC!==1?'s':''));set('chargePercentage',((charge/tallyBase)*100).toFixed(1)+'%');
+      set('totalPrivateAmount',formatCurrency(priv));set('privateCount',pC+' transaction'+(pC!==1?'s':''));set('privatePercentage',((priv/tallyBase)*100).toFixed(1)+'%');
+      set('totalGovernmentAmount',formatCurrency(govt));set('governmentCount',gC+' transaction'+(gC!==1?'s':''));set('governmentPercentage',((govt/tallyBase)*100).toFixed(1)+'%');
+      set('totalTallyAmount','₱ '+formatCurrency(nS));set('totalTallyCount',cnt+' transaction'+(cnt!==1?'s':''));set('totalNetSalesTally',formatCurrency(nS));
       const ec=document.getElementById('entryCount');if(ec){ec.textContent=cnt;ec.classList.add('pulse');setTimeout(()=>ec.classList.remove('pulse'),300);}
       rebuildSummaryRow(gS,eS,nS,oT,wH);
     }finally{statsRunning=false;}
   });
 }
-function rebuildSummaryRow(gS,eS,nS,oT,wH){const foot=document.getElementById('summaryRow');if(!foot)return;if(gS===undefined){const rows=document.querySelectorAll('#tableBody tr');gS=0;eS=0;nS=0;oT=0;wH=0;rows.forEach(r=>{gS+=parseFloat(r.querySelector('.gross-sales')?.value)||0;eS+=parseFloat(r.querySelector('.exempt-sales')?.value)||0;nS+=parseFloat(r.querySelector('.net-sales')?.textContent)||0;oT+=parseFloat(r.querySelector('.output-tax')?.textContent)||0;wH+=parseFloat(r.querySelector('.withholding-amount')?.textContent)||0;});}const ths=document.querySelectorAll('#vatableTable thead th');let cells='',firstVisible=true;ths.forEach((th,i)=>{if(th.classList.contains('hidden-column'))return;let content='';if(firstVisible){content='<span class="sum-label">TOTALS</span>';firstVisible=false;}else if(i===7)content='<span class="sum-value">'+gS.toFixed(2)+'</span>';else if(i===8)content='<span class="sum-value">'+eS.toFixed(2)+'</span>';else if(i===10)content='<span class="sum-value">'+nS.toFixed(2)+'</span>';else if(i===11)content='<span class="sum-value">'+oT.toFixed(2)+'</span>';else if(i===13)content='<span class="sum-value">'+wH.toFixed(2)+'</span>';cells+=`<td>${content}</td>`;});foot.innerHTML='<tr>'+cells+'</tr>';}
+function rebuildSummaryRow(gS,eS,nS,oT,wH){const foot=document.getElementById('summaryRow');if(!foot)return;if(gS===undefined){const rows=document.querySelectorAll('#tableBody tr');gS=0;eS=0;nS=0;oT=0;wH=0;rows.forEach(r=>{gS+=getInputNumber(r.querySelector('.gross-sales'));eS+=getInputNumber(r.querySelector('.exempt-sales'));const nt=r.querySelector('.net-sales')?.textContent||'0';const ot=r.querySelector('.output-tax')?.textContent||'0';const wt=r.querySelector('.withholding-amount')?.textContent||'0';nS+=parseFloat(nt.replace(/,/g,''))||0;oT+=parseFloat(ot.replace(/,/g,''))||0;wH+=parseFloat(wt.replace(/,/g,''))||0;});}const ths=document.querySelectorAll('#vatableTable thead th');let cells='',firstVisible=true;ths.forEach((th,i)=>{if(th.classList.contains('hidden-column'))return;let content='';if(firstVisible){content='<span class="sum-label">TOTALS</span>';firstVisible=false;}else if(i===7)content='<span class="sum-value">'+formatCurrency(gS)+'</span>';else if(i===8)content='<span class="sum-value">'+formatCurrency(eS)+'</span>';else if(i===10)content='<span class="sum-value">'+formatCurrency(nS)+'</span>';else if(i===11)content='<span class="sum-value">'+formatCurrency(oT)+'</span>';else if(i===13)content='<span class="sum-value">'+formatCurrency(wH)+'</span>';cells+=`<td>${content}</td>`;});foot.innerHTML='<tr>'+cells+'</tr>';}
 
 /* ============================================================
    SAVE / LOAD FILE
@@ -1230,16 +1312,28 @@ function updateAllDatesFromReportDate(){const reportDate=document.getElementById
 function setupAutoDateUpdate(){const rdInput=document.getElementById('reportDate');if(!rdInput)return;const rdGroup=rdInput.closest('.field-group');if(rdGroup&&!document.querySelector('.report-date-badge')){const badge=document.createElement('span');badge.className='report-date-badge';badge.innerHTML='<i class="fas fa-calendar-alt"></i> Apply to all rows';badge.title='Update all date rows to this report date';badge.onclick=()=>updateAllDatesFromReportDate();rdGroup.querySelector('label')?.appendChild(badge);}let prev=rdInput.value;rdInput.addEventListener('change',function(){const newDate=this.value;if(prev&&newDate&&newDate!==prev){const cnt=document.querySelectorAll('#tableBody .date-input').length;if(cnt>0&&confirm(`Update all ${cnt} rows to new report date (${newDate})?`))updateAllDatesFromReportDate();}prev=newDate;saveCompanyInfo();});}
 
 /* ============================================================
-   EXPORT TO EXCEL  (unchanged from original)
+   EXPORT TO EXCEL
 ============================================================ */
 function exportToExcel(){
   const co=getCompanyData();
   if(!co.name||!co.tin||!co.address||!co.business||!co.employee){alert('Please fill all required company fields (*) before exporting.');return;}
   const rows=document.querySelectorAll('#tableBody tr');
-  let gS=parseFloat(document.getElementById('totalGrossSales').textContent)||0,eS=parseFloat(document.getElementById('totalExemptSales').textContent)||0,nS=parseFloat(document.getElementById('totalNetSales').textContent)||0,oT=parseFloat(document.getElementById('totalOutputTax').textContent)||0,wH=parseFloat(document.getElementById('totalWithholding').textContent)||0;
+  let gS=parseFloat((document.getElementById('totalGrossSales').textContent||'0').replace(/,/g,''))||0,
+      eS=parseFloat((document.getElementById('totalExemptSales').textContent||'0').replace(/,/g,''))||0,
+      nS=parseFloat((document.getElementById('totalNetSales').textContent||'0').replace(/,/g,''))||0,
+      oT=parseFloat((document.getElementById('totalOutputTax').textContent||'0').replace(/,/g,''))||0,
+      wH=parseFloat((document.getElementById('totalWithholding').textContent||'0').replace(/,/g,''))||0;
   const now=new Date(),dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
   let custSummary=new Map(),cashT=0,chargeT=0,privT=0,govtT=0,cC=0,chC=0,pC=0,gC=0;
-  rows.forEach(r=>{const pm=r.querySelector('.payment-mode')?.value,st=r.querySelector('.sales-type')?.value,n=parseFloat(r.querySelector('.net-sales')?.textContent)||0,e=parseFloat(r.querySelector('.exempt-sales')?.value)||0,name=(r.querySelector('.customer-name')?.value||'').trim(),tin=(r.querySelector('.tin-number')?.value||'').trim(),addr=(r.querySelector('.address')?.value||'').trim();if(pm==='Cash'){cashT+=n;cC++;}else if(pm==='Charge'){chargeT+=n;chC++;}if(st==='Private'){privT+=n;pC++;}else if(st==='Government'){govtT+=n;gC++;}if((name||tin)&&(n>0||e>0)){const key=name&&tin?name+'|'+tin:name?'notin|'+name:'noname|'+tin;if(custSummary.has(key)){const x=custSummary.get(key);x.net+=n;x.exempt+=e;if(st)x.st=st;if(addr&&!x.addr)x.addr=addr;}else custSummary.set(key,{name:name||'—',tin:tin||'',net:n,exempt:e,st:st||'',addr:addr||''});}});
+  rows.forEach(r=>{
+    const pm=r.querySelector('.payment-mode')?.value,st=r.querySelector('.sales-type')?.value;
+    const n=parseFloat((r.querySelector('.net-sales')?.textContent||'0').replace(/,/g,''))||0;
+    const e=getInputNumber(r.querySelector('.exempt-sales'));
+    const name=(r.querySelector('.customer-name')?.value||'').trim(),tin=(r.querySelector('.tin-number')?.value||'').trim(),addr=(r.querySelector('.address')?.value||'').trim();
+    if(pm==='Cash'){cashT+=n;cC++;}else if(pm==='Charge'){chargeT+=n;chC++;}
+    if(st==='Private'){privT+=n;pC++;}else if(st==='Government'){govtT+=n;gC++;}
+    if((name||tin)&&(n>0||e>0)){const key=name&&tin?name+'|'+tin:name?'notin|'+name:'noname|'+tin;if(custSummary.has(key)){const x=custSummary.get(key);x.net+=n;x.exempt+=e;if(st)x.st=st;if(addr&&!x.addr)x.addr=addr;}else custSummary.set(key,{name:name||'—',tin:tin||'',net:n,exempt:e,st:st||'',addr:addr||''});}
+  });
   const custArr=Array.from(custSummary.values()).sort((a,b)=>b.net-a.net);
   const monthlyNote=IS_MONTHLY?` — ${MONTHLY_CTX.label}`:'';
   let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>*{font-family:Calibri,Arial,sans-serif}.rpt-title{font-size:20pt;font-weight:bold;color:#1E3A8A;text-align:center;border-bottom:2px solid #2563EB;padding-bottom:8px;margin-bottom:12px}.co-table{width:100%;border-collapse:collapse;margin-bottom:16px;background:#EFF6FF}.co-table td{padding:5px 10px;border:1px solid #BFDBFE;font-size:10pt}.co-lbl{font-weight:bold;color:#1D4ED8;width:180px}.dt{width:100%;border-collapse:collapse;margin-top:12px;font-size:9.5pt}.dt th{background:#1E3A8A;color:#DBEAFE;font-weight:bold;text-align:center;padding:8px 6px;border:1px solid #1E40AF}.dt td{padding:6px;border:1px solid #D1D5DB;vertical-align:middle}.dt tr:nth-child(even){background:#EFF6FF}.num{text-align:right;font-family:Consolas,monospace}.sum-row{background:#FEF3C7;font-weight:bold;border-top:2px solid #F59E0B}.sec-ttl{font-size:13pt;font-weight:bold;color:#1E3A8A;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #93C5FD;padding-bottom:4px}.cs-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:9.5pt}.cs-table th{background:#2563EB;color:white;font-weight:bold;padding:8px;border:1px solid #1D4ED8;text-align:center}.cs-table td{padding:7px 10px;border:1px solid #D1D5DB}.bp{background:#EDE9FE;color:#6D28D9;padding:2px 8px;border-radius:12px;font-size:9pt;font-weight:bold}.bg{background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:12px;font-size:9pt;font-weight:bold}.bx{background:#F3F4F6;color:#4B5563;padding:2px 8px;border-radius:12px;font-size:9pt;font-weight:bold}.no-tin{color:#9CA3AF;font-style:italic;font-size:9pt}.fin-table{width:60%;margin-left:auto;border-collapse:collapse}.fin-table td{padding:7px 14px;border-bottom:1px dotted #D1D5DB;font-size:10.5pt}.fin-lbl{text-align:right;color:#1D4ED8;font-weight:bold}.fin-val{text-align:right;font-family:Consolas,monospace;color:#111827}.footer{margin-top:24px;padding-top:12px;border-top:1px solid #D1D5DB;color:#6B7280;font-size:9pt;text-align:center}</style></head><body>
@@ -1247,11 +1341,31 @@ function exportToExcel(){
   <table class="co-table"><tr><td class="co-lbl">Company Name:</td><td>${escH(co.name)}</td><td class="co-lbl">TIN Number:</td><td>${escH(co.tin)}</td></tr><tr><td class="co-lbl">Address:</td><td>${escH(co.address)}</td><td class="co-lbl">Line of Business:</td><td>${escH(co.business)}</td></tr><tr><td class="co-lbl">Telephone:</td><td>${escH(co.telephone||'N/A')}</td><td class="co-lbl">Report Date:</td><td>${escH(co.date||'')}</td></tr><tr><td class="co-lbl">Authorized Employee:</td><td>${escH(co.employee)}</td><td class="co-lbl">Email:</td><td>${escH(co.email||'N/A')}</td></tr></table>
   <div class="sec-ttl">Sales Transactions</div>
   <table class="dt"><thead><tr><th>Date</th><th>Invoice No.</th><th>Invoice Type</th><th>Payment Mode</th><th>TIN Number</th><th>Customer Name</th><th>Address</th><th>Gross Sales</th><th>Exempt Sales</th><th>Sales Type</th><th>Net Sales</th><th>Output Tax</th><th>W/T Rate</th><th>W/T Amount</th><th>Remarks</th></tr></thead><tbody>`;
-  rows.forEach(r=>{const v=cls=>r.querySelector(cls);const rate=parseFloat(v('.withholding-rate')?.value)||0;html+=`<tr><td style="text-align:center">${escH(v('.date-input')?.value||'')}</td><td>${escH(v('.invoice-number')?.value||'')}</td><td style="text-align:center">${escH(v('.invoice-type')?.value||'')}</td><td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td><td style="text-align:center">${escH(v('.tin-number')?.value||'')}</td><td>${escH(v('.customer-name')?.value||'')}</td><td>${escH(v('.address')?.value||'')}</td><td class="num">${(parseFloat(v('.gross-sales')?.value)||0).toFixed(2)}</td><td class="num">${(parseFloat(v('.exempt-sales')?.value)||0).toFixed(2)}</td><td style="text-align:center">${escH(v('.sales-type')?.value||'')}</td><td class="num">${(parseFloat(v('.net-sales')?.textContent)||0).toFixed(2)}</td><td class="num">${(parseFloat(v('.output-tax')?.textContent)||0).toFixed(2)}</td><td style="text-align:center">${(rate*100).toFixed(0)}%</td><td class="num">${(parseFloat(v('.withholding-amount')?.textContent)||0).toFixed(2)}</td><td>${escH(v('.remarks')?.value||'')}</td></tr>`;});
+  rows.forEach(r=>{
+    const v=cls=>r.querySelector(cls);
+    const rate=parseFloat(v('.withholding-rate')?.value)||0;
+    const g=getInputNumber(v('.gross-sales')),e=getInputNumber(v('.exempt-sales'));
+    const n=parseFloat((v('.net-sales')?.textContent||'0').replace(/,/g,''))||0;
+    const o=parseFloat((v('.output-tax')?.textContent||'0').replace(/,/g,''))||0;
+    const w=parseFloat((v('.withholding-amount')?.textContent||'0').replace(/,/g,''))||0;
+    html+=`<tr><td style="text-align:center">${escH(v('.date-input')?.value||'')}</td><td>${escH(v('.invoice-number')?.value||'')}</td><td style="text-align:center">${escH(v('.invoice-type')?.value||'')}</td><td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td><td style="text-align:center">${escH(v('.tin-number')?.value||'')}</td><td>${escH(v('.customer-name')?.value||'')}</td><td>${escH(v('.address')?.value||'')}</td><td class="num">${g.toFixed(2)}</td><td class="num">${e.toFixed(2)}</td><td style="text-align:center">${escH(v('.sales-type')?.value||'')}</td><td class="num">${n.toFixed(2)}</td><td class="num">${o.toFixed(2)}</td><td style="text-align:center">${(rate*100).toFixed(0)}%</td><td class="num">${w.toFixed(2)}</td><td>${escH(v('.remarks')?.value||'')}</td></tr>`;
+  });
   html+=`</tbody><tfoot><tr class="sum-row"><td colspan="7" style="text-align:right;font-weight:bold">TOTALS:</td><td class="num">${gS.toFixed(2)}</td><td class="num">${eS.toFixed(2)}</td><td>-</td><td class="num">${nS.toFixed(2)}</td><td class="num">${oT.toFixed(2)}</td><td>-</td><td class="num">${wH.toFixed(2)}</td><td>-</td></tr></tfoot></table>`;
   let ctNet=0,ctExempt=0,ctOT=0,ctWT=0;
   html+=`<div class="sec-ttl">Customer Summary</div><table class="cs-table"><thead><tr><th>Customer Name</th><th>TIN Number</th><th>Sales Type</th><th>Address</th><th>Total Exempt Sales</th><th>Total Net Sales</th><th>Total Output Tax</th><th>Total W/T Amount</th></tr></thead><tbody>`;
-  custArr.forEach(c=>{const bc=c.st==='Private'?'bp':c.st==='Government'?'bg':'bx';let custOT=0,custWT=0;rows.forEach(r=>{const rName=(r.querySelector('.customer-name')?.value||'').trim(),rTin=(r.querySelector('.tin-number')?.value||'').trim();if(rName===c.name&&(c.tin?(rTin===c.tin):(rTin===''||rTin===c.tin))){custOT+=parseFloat(r.querySelector('.output-tax')?.textContent)||0;custWT+=parseFloat(r.querySelector('.withholding-amount')?.textContent)||0;}});html+=`<tr><td>${escH(c.name)}</td><td style="text-align:center;font-family:monospace">${c.tin?escH(c.tin):'<span class="no-tin">No TIN</span>'}</td><td style="text-align:center"><span class="${bc}">${escH(c.st||'Pending')}</span></td><td>${escH(c.addr||'—')}</td><td class="num">${c.exempt.toFixed(2)}</td><td class="num">${c.net.toFixed(2)}</td><td class="num">${custOT.toFixed(2)}</td><td class="num">${custWT.toFixed(2)}</td></tr>`;ctNet+=c.net;ctExempt+=c.exempt;ctOT+=custOT;ctWT+=custWT;});
+  custArr.forEach(c=>{
+    const bc=c.st==='Private'?'bp':c.st==='Government'?'bg':'bx';
+    let custOT=0,custWT=0;
+    rows.forEach(r=>{
+      const rName=(r.querySelector('.customer-name')?.value||'').trim(),rTin=(r.querySelector('.tin-number')?.value||'').trim();
+      if(rName===c.name&&(c.tin?(rTin===c.tin):(rTin===''||rTin===c.tin))){
+        custOT+=parseFloat((r.querySelector('.output-tax')?.textContent||'0').replace(/,/g,''))||0;
+        custWT+=parseFloat((r.querySelector('.withholding-amount')?.textContent||'0').replace(/,/g,''))||0;
+      }
+    });
+    html+=`<tr><td>${escH(c.name)}</td><td style="text-align:center;font-family:monospace">${c.tin?escH(c.tin):'<span class="no-tin">No TIN</span>'}</td><td style="text-align:center"><span class="${bc}">${escH(c.st||'Pending')}</span></td><td>${escH(c.addr||'—')}</td><td class="num">${c.exempt.toFixed(2)}</td><td class="num">${c.net.toFixed(2)}</td><td class="num">${custOT.toFixed(2)}</td><td class="num">${custWT.toFixed(2)}</td></tr>`;
+    ctNet+=c.net;ctExempt+=c.exempt;ctOT+=custOT;ctWT+=custWT;
+  });
   html+=`<tr class="sum-row"><td colspan="4" style="text-align:right">TOTALS:</td><td class="num">${ctExempt.toFixed(2)}</td><td class="num">${ctNet.toFixed(2)}</td><td class="num">${ctOT.toFixed(2)}</td><td class="num">${ctWT.toFixed(2)}</td></tr></tbody></table>
   <div class="sec-ttl">Financial Summary</div><table class="fin-table"><tr><td class="fin-lbl">Total Vatable Gross Sales:</td><td class="fin-val">₱ ${gS.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Exempt Sales:</td><td class="fin-val">₱ ${eS.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Net Sales:</td><td class="fin-val">₱ ${nS.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Output Tax (12%):</td><td class="fin-val">₱ ${oT.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Withholding Tax:</td><td class="fin-val">₱ ${wH.toFixed(2)}</td></tr><tr style="border-top:2px solid #2563EB"><td class="fin-lbl" style="color:#1E3A8A">Net Amount Receivable:</td><td class="fin-val" style="color:#1E3A8A;font-weight:bold">₱ ${(nS-wH).toFixed(2)}</td></tr></table>
   <div class="sec-ttl">Payment Distribution</div><table class="fin-table"><tr><td class="fin-lbl">Cash Transactions:</td><td class="fin-val">₱ ${cashT.toFixed(2)} (${cC} tx)</td></tr><tr><td class="fin-lbl">Charge Transactions:</td><td class="fin-val">₱ ${chargeT.toFixed(2)} (${chC} tx)</td></tr><tr><td class="fin-lbl">Private Sector:</td><td class="fin-val">₱ ${privT.toFixed(2)} (${pC} tx)</td></tr><tr><td class="fin-lbl">Government Sector:</td><td class="fin-val">₱ ${govtT.toFixed(2)} (${gC} tx)</td></tr></table>
@@ -1263,31 +1377,195 @@ function exportToExcel(){
 }
 
 /* ============================================================
-   SELECT MULTIPLE
+   CHANGE 3: SELECT MULTIPLE + RIGHT-CLICK CONTEXT MENU
 ============================================================ */
 let selectMode=false,isDragging=false,dragStart=null,selectedCells=new Set();
-function toggleSelectMode(){selectMode=!selectMode;const tb=document.getElementById('tableBody'),btn=document.getElementById('selectMultipleBtn');if(selectMode){tb.classList.add('select-mode');btn.classList.add('active');btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection';createSelectionToolbar();showToast('Selection mode on — drag to select cells','info');document.body.style.userSelect='none';}else{tb.classList.remove('select-mode');btn.classList.remove('active');btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple';clearCellSelection();document.querySelector('.selection-toolbar')?.remove();document.body.style.userSelect='';}}
-function createSelectionToolbar(){if(document.querySelector('.selection-toolbar'))return;const tb=document.createElement('div');tb.className='selection-toolbar';tb.innerHTML=`<span class="sel-tb-info"><span id="selCount">0</span> cells selected</span><button class="sel-tb-btn" id="selCopyBtn"><i class="fas fa-copy"></i> Copy</button><button class="sel-tb-btn" id="selPasteBtn"><i class="fas fa-paste"></i> Paste</button><button class="sel-tb-btn danger" id="selDeleteBtn"><i class="fas fa-trash"></i> Clear</button><button class="sel-tb-btn exit" id="selExitBtn"><i class="fas fa-times"></i> Exit</button>`;document.body.appendChild(tb);document.getElementById('selCopyBtn').addEventListener('click',copySelectedCells);document.getElementById('selPasteBtn').addEventListener('click',pasteToSelectedCells);document.getElementById('selDeleteBtn').addEventListener('click',deleteSelectedCells);document.getElementById('selExitBtn').addEventListener('click',toggleSelectMode);}
+
+function removeSelectionInfoBar() { document.querySelector('.selection-info-bar')?.remove(); }
+
+function createSelectionInfoBar() {
+  removeSelectionInfoBar();
+  const bar = document.createElement('div');
+  bar.className = 'selection-info-bar';
+  bar.innerHTML = `<div class="sel-info-dot"></div><span id="selCount">0</span> cells selected<span class="sel-info-hint">· Right-click for options</span>`;
+  document.body.appendChild(bar);
+}
+
+function updateSelectionInfoBar() {
+  const el = document.getElementById('selCount');
+  if (el) el.textContent = selectedCells.size;
+}
+
+function toggleSelectMode(){
+  selectMode=!selectMode;
+  const tb=document.getElementById('tableBody'),btn=document.getElementById('selectMultipleBtn');
+  if(selectMode){
+    tb.classList.add('select-mode');
+    btn.classList.add('active');
+    btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection';
+    createSelectionInfoBar();
+    showToast('Selection mode — drag to select, right-click for options','info');
+    document.body.style.userSelect='none';
+  } else {
+    tb.classList.remove('select-mode');
+    btn.classList.remove('active');
+    btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple';
+    clearCellSelection();
+    removeSelectionInfoBar();
+    closeCtxMenu();
+    document.body.style.userSelect='';
+  }
+}
+
+/* Right-click context menu */
+let activeCtxMenu = null;
+function closeCtxMenu() {
+  if (activeCtxMenu) { activeCtxMenu.remove(); activeCtxMenu = null; }
+}
+
+function showCtxMenu(x, y) {
+  closeCtxMenu();
+  const count = selectedCells.size;
+  const selectedRows = getSelectedFullRows();
+  const hasFullRows = selectedRows.length > 0;
+
+  const menu = document.createElement('div');
+  menu.className = 'ctx-menu';
+  menu.innerHTML = `
+    <div class="ctx-menu-header"><i class="fas fa-mouse-pointer"></i> Selection Actions <span class="ctx-count-badge">${count} cell${count!==1?'s':''}</span></div>
+    <button class="ctx-item" id="ctxCopy"><i class="fas fa-copy"></i> Copy Cells</button>
+    <button class="ctx-item" id="ctxPaste"><i class="fas fa-paste"></i> Paste Here</button>
+    <button class="ctx-item" id="ctxClear"><i class="fas fa-eraser"></i> Clear Cell Values</button>
+    <div class="ctx-divider"></div>
+    ${hasFullRows ? `<button class="ctx-item danger" id="ctxDeleteRows"><i class="fas fa-trash-alt"></i> Delete Selected Rows <span class="ctx-count-badge" style="background:#FECACA;color:#B91C1C">${selectedRows.length} row${selectedRows.length!==1?'s':''}</span></button><div class="ctx-divider"></div>` : ''}
+    <button class="ctx-item exit-item" id="ctxExit"><i class="fas fa-times-circle"></i> Exit Selection Mode</button>`;
+
+  // Position — keep in viewport
+  document.body.appendChild(menu);
+  activeCtxMenu = menu;
+  const mw = menu.offsetWidth, mh = menu.offsetHeight;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let left = x, top = y;
+  if (left + mw > vw - 8) left = vw - mw - 8;
+  if (top + mh > vh - 8) top = vh - mh - 8;
+  if (left < 8) left = 8;
+  if (top < 8) top = 8;
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+
+  menu.querySelector('#ctxCopy').addEventListener('click', () => { closeCtxMenu(); copySelectedCells(); });
+  menu.querySelector('#ctxPaste').addEventListener('click', () => { closeCtxMenu(); pasteToSelectedCells(); });
+  menu.querySelector('#ctxClear').addEventListener('click', () => { closeCtxMenu(); deleteSelectedCells(); });
+  if (hasFullRows) {
+    menu.querySelector('#ctxDeleteRows').addEventListener('click', () => { closeCtxMenu(); deleteSelectedRows(selectedRows); });
+  }
+  menu.querySelector('#ctxExit').addEventListener('click', () => { closeCtxMenu(); toggleSelectMode(); });
+
+  // Close on outside click
+  setTimeout(() => {
+    const close = e => {
+      if (!menu.contains(e.target)) { closeCtxMenu(); document.removeEventListener('mousedown', close); }
+    };
+    document.addEventListener('mousedown', close);
+  }, 0);
+}
+
+/** Returns rows where ALL visible, non-action cells are selected */
+function getSelectedFullRows() {
+  if (!selectedCells.size) return [];
+  // Group selected cells by row
+  const rowMap = new Map();
+  for (const cell of selectedCells) {
+    const row = cell.parentElement;
+    if (!rowMap.has(row)) rowMap.set(row, new Set());
+    rowMap.get(row).add(cell);
+  }
+  // A row is "fully selected" if all its non-action, non-hidden tds are selected
+  const fullRows = [];
+  for (const [row, cells] of rowMap) {
+    const allTds = Array.from(row.children).filter(td => !td.classList.contains('hidden-column') && !td.querySelector('.delete-btn'));
+    if (allTds.every(td => cells.has(td))) fullRows.push(row);
+  }
+  return fullRows;
+}
+
+function deleteSelectedRows(rows) {
+  if (!rows || !rows.length) return;
+  if (!confirm(`Delete ${rows.length} selected row${rows.length!==1?'s':''}?`)) return;
+  clearCellSelection();
+  rows.forEach(row => {
+    row.style.transition = 'opacity .15s,transform .15s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(-10px)';
+    setTimeout(() => row.remove(), 180);
+  });
+  setTimeout(() => {
+    if (currentPage > getTotalPages()) currentPage = Math.max(1, getTotalPages());
+    renderCurrentPage(); scheduleStatsUpdate(); scheduleAutoSave();
+    showToast(`Deleted ${rows.length} row${rows.length!==1?'s':''}`, 'success');
+  }, 220);
+}
+
 function getCellCoords(cell){const r=cell.parentElement;return{row:Array.from(r.parentElement.children).indexOf(r),col:Array.from(r.children).indexOf(cell)};}
-function selectRange(s,e){clearCellSelection();const allRows=Array.from(document.querySelectorAll('#tableBody tr')),r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);for(let r=r1;r<=r2;r++){const row=allRows[r];if(!row)continue;for(let c=c1;c<=c2;c++){const cell=row.children[c];if(!cell)continue;cell.classList.add('cell-selected');selectedCells.add(cell);}}const sc=document.getElementById('selCount');if(sc)sc.textContent=selectedCells.size;}
-function clearCellSelection(){document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected'));selectedCells.clear();const sc=document.getElementById('selCount');if(sc)sc.textContent=0;}
+function selectRange(s,e){clearCellSelection();const allRows=Array.from(document.querySelectorAll('#tableBody tr')),r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);for(let r=r1;r<=r2;r++){const row=allRows[r];if(!row)continue;for(let c=c1;c<=c2;c++){const cell=row.children[c];if(!cell)continue;cell.classList.add('cell-selected');selectedCells.add(cell);}}updateSelectionInfoBar();}
+function clearCellSelection(){document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected'));selectedCells.clear();updateSelectionInfoBar();}
 function getCellValue(c){const inp=c.querySelector('input,select');if(inp)return inp.value;const comp=c.querySelector('.cell-computed');if(comp)return comp.textContent;return c.textContent.trim();}
-function setCellValue(c,v){const inp=c.querySelector('input');if(inp){inp.value=v;inp.dispatchEvent(new Event('input',{bubbles:true}));return true;}const sel=c.querySelector('select');if(sel){const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v);if(opt)sel.value=opt.value;sel.dispatchEvent(new Event('change',{bubbles:true}));return true;}return false;}
+function setCellValue(c,v){const inp=c.querySelector('input');if(inp){inp.value=v;inp.dataset.raw=v.replace(/,/g,'');inp.dispatchEvent(new Event('input',{bubbles:true}));return true;}const sel=c.querySelector('select');if(sel){const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v);if(opt)sel.value=opt.value;sel.dispatchEvent(new Event('change',{bubbles:true}));return true;}return false;}
 function copySelectedCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}const coords=Array.from(selectedCells).map(c=>({cell:c,...getCellCoords(c)}));const minR=Math.min(...coords.map(c=>c.row)),minC=Math.min(...coords.map(c=>c.col)),maxR=Math.max(...coords.map(c=>c.row)),maxC=Math.max(...coords.map(c=>c.col));const grid=[];for(let r=minR;r<=maxR;r++){const row=[];for(let c=minC;c<=maxC;c++){const found=coords.find(x=>x.row===r&&x.col===c);row.push(found?getCellValue(found.cell):'');}grid.push(row);}navigator.clipboard.writeText(grid.map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+selectedCells.size+' cells','success')).catch(()=>showToast('Clipboard error','error'));}
 function pasteToSelectedCells(){navigator.clipboard.readText().then(text=>{const rows=text.split('\n').map(r=>r.split('\t'));const sorted=Array.from(selectedCells).sort((a,b)=>{const ca=getCellCoords(a),cb=getCellCoords(b);return ca.row!==cb.row?ca.row-cb.row:ca.col-cb.col;});let cnt=0;sorted.forEach((cell,i)=>{const r=Math.floor(i/rows[0].length),c2=i%rows[0].length;if(rows[r]&&rows[r][c2]!==undefined&&setCellValue(cell,rows[r][c2]))cnt++;});clearCellSelection();showToast('Pasted to '+cnt+' cells','success');updateAllStats();}).catch(()=>showToast('Clipboard read failed','error'));}
 function deleteSelectedCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}let cnt=0;selectedCells.forEach(c=>{if(setCellValue(c,''))cnt++;});clearCellSelection();showToast('Cleared '+cnt+' cells','success');updateAllStats();}
 
 /* ============================================================
-   VISIBILITY TOGGLES
+   CHANGE 4: VISIBILITY TOGGLES — default hidden, label is "Show X"
 ============================================================ */
-const TOGGLE_SECTIONS={toggleStatsBtn:{el:'statsSection',show:'Hide Stats Bar',hide:'Show Stats Bar'},toggleTallyBtn:{el:'tallySection',show:'Hide Tally',hide:'Show Tally'},toggleCustomersBtn:{el:'customersSection',show:'Hide Customers',hide:'Show Customers'},toggleFooterBtn:{el:'footerEl',show:'Hide Footer',hide:'Show Footer'}};
+// sections are already hidden in HTML. Buttons start as "Show X".
+// Toggling: if hidden → show (button becomes "Hide X"); if visible → hide (button becomes "Show X").
+const TOGGLE_SECTIONS={
+  toggleStatsBtn:    {el:'statsSection',    showLabel:'Show Stats Bar',  hideLabel:'Hide Stats Bar'},
+  toggleTallyBtn:    {el:'tallySection',    showLabel:'Show Tally',      hideLabel:'Hide Tally'},
+  toggleCustomersBtn:{el:'customersSection',showLabel:'Show Customers',  hideLabel:'Hide Customers'},
+  toggleFooterBtn:   {el:'footerEl',        showLabel:'Show Footer',     hideLabel:'Hide Footer'},
+};
+
 function initVisibilityToggles(){
-  const saved=JSON.parse(localStorage.getItem(NS.VIS_STATES)||'{}');
-  Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const btn=document.getElementById(btnId),el=document.getElementById(cfg.el);if(!btn||!el)return;if(saved[cfg.el]===true){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}btn.addEventListener('click',()=>{const hidden=el.classList.toggle('hidden');updateToggleBtn(btn,cfg,hidden);const s=JSON.parse(localStorage.getItem(NS.VIS_STATES)||'{}');s[cfg.el]=hidden;localStorage.setItem(NS.VIS_STATES,JSON.stringify(s));});});
-  document.getElementById('hideAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el&&!el.classList.contains('hidden')){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}});const s={};Object.values(TOGGLE_SECTIONS).forEach(c=>s[c.el]=true);localStorage.setItem(NS.VIS_STATES,JSON.stringify(s));});
-  document.getElementById('showAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el){el.classList.remove('hidden');updateToggleBtn(btn,cfg,false);}});localStorage.setItem(NS.VIS_STATES,'{}');});
+  // On init, all sections start hidden per HTML. Don't restore saved state — always start hidden.
+  // But we do save/restore state when user toggles during a session.
+  Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
+    const btn=document.getElementById(btnId),el=document.getElementById(cfg.el);
+    if(!btn||!el) return;
+    // Ensure hidden on load
+    el.classList.add('hidden');
+    updateToggleBtn(btn, cfg, true /* isHidden */);
+    btn.addEventListener('click',()=>{
+      const nowHidden=el.classList.toggle('hidden');
+      updateToggleBtn(btn, cfg, nowHidden);
+    });
+  });
+
+  document.getElementById('hideAllBtn').addEventListener('click',()=>{
+    Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
+      const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);
+      if(el){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}
+    });
+  });
+
+  document.getElementById('showAllBtn').addEventListener('click',()=>{
+    Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
+      const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);
+      if(el){el.classList.remove('hidden');updateToggleBtn(btn,cfg,false);}
+    });
+  });
 }
-function updateToggleBtn(btn,cfg,isHidden){if(!btn)return;const spans=btn.querySelectorAll('span'),lastSpan=spans[spans.length-1];if(lastSpan)lastSpan.textContent=isHidden?cfg.hide:cfg.show;btn.classList.toggle('toggled',!isHidden);}
+
+function updateToggleBtn(btn, cfg, isHidden) {
+  if (!btn) return;
+  // Find the text node (last span or direct text child)
+  // Simple: just set innerHTML with icon preserved
+  const icon = btn.querySelector('i');
+  const iconHTML = icon ? icon.outerHTML : '';
+  btn.innerHTML = iconHTML + (isHidden ? cfg.showLabel : cfg.hideLabel);
+  btn.classList.toggle('toggled', !isHidden);
+}
 
 /* ============================================================
    SIDEBAR TOGGLES
@@ -1310,68 +1588,78 @@ function initEnterNav(){document.getElementById('tableBody').addEventListener('k
 function initTableFocusMode(){document.getElementById('tableFocusBtn').addEventListener('click',function(){const inFocus=document.body.classList.toggle('table-focus');if(inFocus){document.querySelectorAll('.stats-bar,.tally-section,.customers-section,.footer').forEach(el=>el.classList.add('hidden'));this.innerHTML='<i class="fas fa-compress"></i>Exit Focus Mode';}else{document.querySelectorAll('.stats-bar,.tally-section,.customers-section,.footer').forEach(el=>el.classList.remove('hidden'));this.innerHTML='<i class="fas fa-expand"></i>Table Focus Mode';}});}
 
 /* ============================================================
-   SELECTION MOUSE EVENTS
+   SELECTION MOUSE EVENTS — now with right-click context menu
 ============================================================ */
-function initSelectionMouseEvents(){const tb=document.getElementById('tableBody');tb.addEventListener('mousedown',e=>{if(!selectMode)return;const td=e.target.closest('td');if(!td)return;e.preventDefault();isDragging=true;dragStart=getCellCoords(td);clearCellSelection();td.classList.add('cell-selected');selectedCells.add(td);const sc=document.getElementById('selCount');if(sc)sc.textContent=1;});tb.addEventListener('mousemove',e=>{if(!selectMode||!isDragging)return;const td=e.target.closest('td');if(!td)return;selectRange(dragStart,getCellCoords(td));});document.addEventListener('mouseup',()=>{if(isDragging)isDragging=false;});document.addEventListener('keydown',e=>{if(!selectMode)return;if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelectedCells();}if(e.ctrlKey&&e.key==='v'){e.preventDefault();pasteToSelectedCells();}if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();deleteSelectedCells();}if(e.key==='Escape'){if(selectedCells.size>0)clearCellSelection();else toggleSelectMode();}});}
+function initSelectionMouseEvents(){
+  const tb=document.getElementById('tableBody');
+  tb.addEventListener('mousedown',e=>{
+    if(!selectMode) return;
+    if(e.button===2) return; // let contextmenu handle right-click
+    const td=e.target.closest('td');if(!td)return;
+    e.preventDefault();isDragging=true;dragStart=getCellCoords(td);clearCellSelection();
+    td.classList.add('cell-selected');selectedCells.add(td);updateSelectionInfoBar();
+  });
+  tb.addEventListener('mousemove',e=>{
+    if(!selectMode||!isDragging)return;
+    const td=e.target.closest('td');if(!td)return;
+    selectRange(dragStart,getCellCoords(td));
+  });
+  // Right-click context menu on table body in select mode
+  tb.addEventListener('contextmenu',e=>{
+    if(!selectMode)return;
+    e.preventDefault();
+    // If clicked on a non-selected cell, select it first
+    const td=e.target.closest('td');
+    if(td&&!selectedCells.has(td)){
+      clearCellSelection();
+      td.classList.add('cell-selected');selectedCells.add(td);updateSelectionInfoBar();
+    }
+    showCtxMenu(e.clientX, e.clientY);
+  });
+  document.addEventListener('mouseup',()=>{if(isDragging)isDragging=false;});
+  document.addEventListener('keydown',e=>{
+    if(!selectMode)return;
+    if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelectedCells();}
+    if(e.ctrlKey&&e.key==='v'){e.preventDefault();pasteToSelectedCells();}
+    if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();deleteSelectedCells();}
+    if(e.key==='Escape'){if(activeCtxMenu){closeCtxMenu();}else if(selectedCells.size>0){clearCellSelection();}else{toggleSelectMode();}}
+  });
+}
 
 /* ============================================================
-   BEFOREUNLOAD — final save when navigating away
+   BEFOREUNLOAD
 ============================================================ */
 window.addEventListener('beforeunload', () => {
-  // Synchronous localStorage save as a safety net
-  const localData = {
-    version: '1.0',
-    timestamp: new Date().toISOString(),
-    tableData: getTableData(),
-    companyInfo: getCompanyData()
-  };
+  const localData = {version:'1.0',timestamp:new Date().toISOString(),tableData:getTableData(),companyInfo:getCompanyData()};
   localStorage.setItem(getActiveSessionKey(), JSON.stringify(localData));
   localStorage.setItem(getActiveCompanyKey(), JSON.stringify(localData.companyInfo));
-  // Note: async API call cannot be awaited here; localStorage is the reliable safety net
 });
 
 /* ============================================================
    INIT
 ============================================================ */
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Check backend
   await checkBackend();
 
-  // 2. Set up monthly context UI
   if (IS_MONTHLY) {
-    // Show monthly banner
-    const banner = document.getElementById('monthlyBanner');
-    const bannerLabel = document.getElementById('monthlyBannerLabel');
-    const bannerKey   = document.getElementById('monthlyBannerKey');
-    if (banner) { banner.classList.remove('hidden'); bannerLabel.textContent = MONTHLY_CTX.label; bannerKey.textContent = `[${MONTHLY_CTX.key}]`; }
-    // Show topbar context badge
-    const ctxBadge = document.getElementById('monthlyContextBadge');
-    const ctxLabel = document.getElementById('monthlyContextLabel');
-    if (ctxBadge) { ctxBadge.classList.remove('hidden'); ctxLabel.textContent = MONTHLY_CTX.label; }
-    // Update topbar subtitle
-    document.getElementById('topbarSub').textContent = `Monthly Record — ${MONTHLY_CTX.label}`;
-    document.getElementById('sidebarBrandSub').textContent = `${MONTHLY_CTX.label}`;
+    const banner=document.getElementById('monthlyBanner'),bannerLabel=document.getElementById('monthlyBannerLabel'),bannerKey=document.getElementById('monthlyBannerKey');
+    if(banner){banner.classList.remove('hidden');bannerLabel.textContent=MONTHLY_CTX.label;bannerKey.textContent=`[${MONTHLY_CTX.key}]`;}
+    const ctxBadge=document.getElementById('monthlyContextBadge'),ctxLabel=document.getElementById('monthlyContextLabel');
+    if(ctxBadge){ctxBadge.classList.remove('hidden');ctxLabel.textContent=MONTHLY_CTX.label;}
+    document.getElementById('topbarSub').textContent=`Monthly Record — ${MONTHLY_CTX.label}`;
+    document.getElementById('sidebarBrandSub').textContent=`${MONTHLY_CTX.label}`;
   }
 
-  // 3. Set report date default
-  const rdEl = document.getElementById('reportDate');
-  if (rdEl && !rdEl.value) {
-    if (IS_MONTHLY) {
-      // Set report date to the 1st of the selected month/year
-      const m = String(MONTHLY_CTX.month).padStart(2,'0');
-      const d = `${m}/01/${MONTHLY_CTX.year}`;
-      rdEl.value = d;
-    } else {
-      rdEl.value = getTodayDisplayDate();
-    }
+  const rdEl=document.getElementById('reportDate');
+  if(rdEl&&!rdEl.value){
+    if(IS_MONTHLY){const m=String(MONTHLY_CTX.month).padStart(2,'0');rdEl.value=`${m}/01/${MONTHLY_CTX.year}`;}
+    else{rdEl.value=getTodayDisplayDate();}
   }
 
-  // 4. Role UI
-  const sub = APP_ROLE==='Client'?'Client':APP_ROLE==='SubAdmin'?'Sub-Admin':'';
-  if (!IS_MONTHLY) document.getElementById('topbarSub').textContent = 'Professional VAT-Compliant Sales Tracking'+(sub?' · '+sub:'');
-  if (APP_ROLE==='Client') document.getElementById('submitPortalHeadBtn').classList.remove('hidden');
+  const sub=APP_ROLE==='Client'?'Client':APP_ROLE==='SubAdmin'?'Sub-Admin':'';
+  if(!IS_MONTHLY)document.getElementById('topbarSub').textContent='Professional VAT-Compliant Sales Tracking'+(sub?' · '+sub:'');
+  if(APP_ROLE==='Client')document.getElementById('submitPortalHeadBtn').classList.remove('hidden');
 
-  // 5. Init UI modules
   initColVisibility();
   initPagination();
   initSidebarToggles();
@@ -1380,22 +1668,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTableFocusMode();
   initSelectionMouseEvents();
 
-  // 6. Load data — priority: portal file > API/localStorage monthly > API/localStorage general
-  let startupDone = false;
-  if (APP_ROLE==='SubAdmin') startupDone = checkPortalFileOnLoad();
-
-  if (!startupDone) {
-    const restored = await restoreSession();
-    if (restored === false || restored === null) {
-      document.getElementById('tableBody').innerHTML = '';
-      addRow(); currentPage=1; renderCurrentPage(); updateAllStats();
-    } else {
-      const label = IS_MONTHLY ? MONTHLY_CTX.label : 'session';
-      showToast(`Loaded ${restored} row(s) from ${label}`, 'success');
-    }
+  let startupDone=false;
+  if(APP_ROLE==='SubAdmin')startupDone=checkPortalFileOnLoad();
+  if(!startupDone){
+    const restored=await restoreSession();
+    if(restored===false||restored===null){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();}
+    else{const label=IS_MONTHLY?MONTHLY_CTX.label:'session';showToast(`Loaded ${restored} row(s) from ${label}`,'success');}
   }
 
-  // 7. Company info listeners
   ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){el.addEventListener('change',()=>{saveCompanyInfo();scheduleAutoSave();});el.addEventListener('input',()=>scheduleAutoSave());}
@@ -1408,7 +1688,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const datePickerBtn=document.getElementById('reportDatePickerBtn');
   if(datePickerBtn){datePickerBtn.addEventListener('click',function(e){e.stopPropagation();if(document.getElementById('dpPopup')){closeDatePicker();return;}showDatePicker(this);});}
 
-  // 8. Action buttons
   document.getElementById('addRowBtn').addEventListener('click',()=>addRow());
   document.getElementById('addRowBtnHead').addEventListener('click',()=>addRow());
   initLongPress(document.getElementById('addRowBtn'));
@@ -1418,7 +1697,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('saveDataBtn').addEventListener('click',saveDataToFile);
   document.getElementById('loadDataBtn').addEventListener('click',loadDataFromFile);
   document.getElementById('loadMultipleFilesBtn').addEventListener('click',loadMultipleVatFiles);
-  document.getElementById('clearBtn').addEventListener('click',async ()=>{if(confirm('Clear all table data?')){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();await saveSession();showToast('Table cleared','success');}});
+  document.getElementById('clearBtn').addEventListener('click',async()=>{if(confirm('Clear all table data?')){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();await saveSession();showToast('Table cleared','success');}});
   document.getElementById('clearInfoBtn').addEventListener('click',clearCompanyInfo);
   document.getElementById('clearInfoBtnPanel').addEventListener('click',clearCompanyInfo);
   document.getElementById('selectMultipleBtn').addEventListener('click',toggleSelectMode);
@@ -1440,8 +1719,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 <script>
 (function(){
   let undoStack=[],redoStack=[],isUndoingOrRedoing=false;
-  function captureSnapshot(){const rows=document.querySelectorAll('#tableBody tr');const tableData=Array.from(rows).map(row=>({date:row.querySelector('.date-input')?.value||'',invoiceNumber:row.querySelector('.invoice-number')?.value||'',invoiceType:row.querySelector('.invoice-type')?.value||'',paymentMode:row.querySelector('.payment-mode')?.value||'',tinNumber:row.querySelector('.tin-number')?.value||'',customerName:row.querySelector('.customer-name')?.value||'',address:row.querySelector('.address')?.value||'',grossSales:row.querySelector('.gross-sales')?.value||'',exemptSales:row.querySelector('.exempt-sales')?.value||'',salesType:row.querySelector('.sales-type')?.value||'',withholdingRate:row.querySelector('.withholding-rate')?.value||'0',remarks:row.querySelector('.remarks')?.value||''}));const companyInfo={companyName:document.getElementById('companyName')?.value||'',companyTIN:document.getElementById('companyTIN')?.value||'',companyAddress:document.getElementById('companyAddress')?.value||'',lineOfBusiness:document.getElementById('lineOfBusiness')?.value||'',telephone:document.getElementById('telephone')?.value||'',reportDate:document.getElementById('reportDate')?.value||'',authorizedEmployee:document.getElementById('authorizedEmployee')?.value||'',email:document.getElementById('email')?.value||''};return{tableData,companyInfo};}
-  function restoreSnapshot(snapshot){if(!snapshot)return;isUndoingOrRedoing=true;const tbody=document.getElementById('tableBody');if(tbody&&snapshot.tableData){tbody.innerHTML='';snapshot.tableData.forEach(rd=>tbody.appendChild(createRow(rd)));if(!snapshot.tableData.length)addRow();if(typeof currentPage!=='undefined')currentPage=1;if(typeof renderCurrentPage==='function')renderCurrentPage();if(typeof updateAllStats==='function')updateAllStats();}if(snapshot.companyInfo){const map={companyName:'companyName',companyTIN:'companyTIN',companyAddress:'companyAddress',lineOfBusiness:'lineOfBusiness',telephone:'telephone',reportDate:'reportDate',authorizedEmployee:'authorizedEmployee',email:'email'};for(const[prop,id]of Object.entries(map)){const el=document.getElementById(id);if(el&&snapshot.companyInfo[prop]!==undefined)el.value=snapshot.companyInfo[prop];}if(typeof saveCompanyInfo==='function')saveCompanyInfo();}if(typeof renderCustomersList==='function')renderCustomersList();if(typeof updateAllStats==='function')updateAllStats();if(typeof scheduleAutoSave==='function')scheduleAutoSave();setTimeout(()=>{isUndoingOrRedoing=false;},10);}
+  function captureSnapshot(){
+    const rows=document.querySelectorAll('#tableBody tr');
+    const tableData=Array.from(rows).map(row=>({
+      date:row.querySelector('.date-input')?.value||'',
+      invoiceNumber:row.querySelector('.invoice-number')?.value||'',
+      invoiceType:row.querySelector('.invoice-type')?.value||'',
+      paymentMode:row.querySelector('.payment-mode')?.value||'',
+      tinNumber:row.querySelector('.tin-number')?.value||'',
+      customerName:row.querySelector('.customer-name')?.value||'',
+      address:row.querySelector('.address')?.value||'',
+      grossSales:(row.querySelector('.gross-sales')?.dataset.raw||row.querySelector('.gross-sales')?.value||'').replace(/,/g,''),
+      exemptSales:(row.querySelector('.exempt-sales')?.dataset.raw||row.querySelector('.exempt-sales')?.value||'').replace(/,/g,''),
+      salesType:row.querySelector('.sales-type')?.value||'',
+      withholdingRate:row.querySelector('.withholding-rate')?.value||'0',
+      remarks:row.querySelector('.remarks')?.value||''
+    }));
+    const companyInfo={companyName:document.getElementById('companyName')?.value||'',companyTIN:document.getElementById('companyTIN')?.value||'',companyAddress:document.getElementById('companyAddress')?.value||'',lineOfBusiness:document.getElementById('lineOfBusiness')?.value||'',telephone:document.getElementById('telephone')?.value||'',reportDate:document.getElementById('reportDate')?.value||'',authorizedEmployee:document.getElementById('authorizedEmployee')?.value||'',email:document.getElementById('email')?.value||''};
+    return{tableData,companyInfo};
+  }
+  function restoreSnapshot(snapshot){
+    if(!snapshot)return;
+    isUndoingOrRedoing=true;
+    const tbody=document.getElementById('tableBody');
+    if(tbody&&snapshot.tableData){tbody.innerHTML='';snapshot.tableData.forEach(rd=>tbody.appendChild(createRow(rd)));if(!snapshot.tableData.length)addRow();if(typeof currentPage!=='undefined')currentPage=1;if(typeof renderCurrentPage==='function')renderCurrentPage();if(typeof updateAllStats==='function')updateAllStats();}
+    if(snapshot.companyInfo){const map={companyName:'companyName',companyTIN:'companyTIN',companyAddress:'companyAddress',lineOfBusiness:'lineOfBusiness',telephone:'telephone',reportDate:'reportDate',authorizedEmployee:'authorizedEmployee',email:'email'};for(const[prop,id]of Object.entries(map)){const el=document.getElementById(id);if(el&&snapshot.companyInfo[prop]!==undefined)el.value=snapshot.companyInfo[prop];}if(typeof saveCompanyInfo==='function')saveCompanyInfo();}
+    if(typeof renderCustomersList==='function')renderCustomersList();
+    if(typeof updateAllStats==='function')updateAllStats();
+    if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+    setTimeout(()=>{isUndoingOrRedoing=false;},10);
+  }
   function pushToUndoStack(){if(isUndoingOrRedoing)return;redoStack=[];while(undoStack.length>50)undoStack.shift();undoStack.push(captureSnapshot());updateUndoRedoButtons();}
   function performUndo(){if(!undoStack.length){showToast('Nothing to undo','info');return;}const current=captureSnapshot();const previous=undoStack.pop();if(previous){redoStack.push(current);while(redoStack.length>50)redoStack.shift();restoreSnapshot(previous);showToast('Undo successful','success');updateUndoRedoButtons();}}
   function performRedo(){if(!redoStack.length){showToast('Nothing to redo','info');return;}const current=captureSnapshot();const next=redoStack.pop();if(next){undoStack.push(current);while(undoStack.length>50)undoStack.shift();restoreSnapshot(next);showToast('Redo successful','success');updateUndoRedoButtons();}}
@@ -1455,52 +1762,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 })();
 </script>
 
-<!--
-=================================================================
-  FASTAPI / SQLITE BACKEND CONTRACT
-=================================================================
-  Required endpoints (add to your FastAPI main.py):
-
-  POST   /api/vat-records
-         Body: { record_id, role, year, month, label,
-                 table_data: [...], company_info: {...}, saved_at }
-         → Upsert into vat_records table (SQLite)
-         → 200 OK
-
-  GET    /api/vat-records/{record_id}
-         → { record_id, role, year, month, label,
-             table_data, company_info, saved_at }
-
-  PATCH  /api/vat-records/{record_id}/company
-         Body: { name, tin, address, ... }
-         → Update only company_info column
-
-  DELETE /api/vat-records/{record_id}/company
-         → Clear company_info
-
-  POST   /api/customers
-         Body: { role, data: { "name:X": "TIN", ... } }
-         → Upsert customer map
-
-  GET    /api/customers?role=Main
-         → { role, data: { ... } }
-
-  SQLite schema (suggested):
-    CREATE TABLE IF NOT EXISTS vat_records (
-      record_id    TEXT PRIMARY KEY,
-      role         TEXT,
-      year         INTEGER,
-      month        INTEGER,
-      label        TEXT,
-      table_data   TEXT,   -- JSON array
-      company_info TEXT,   -- JSON object
-      saved_at     TEXT
-    );
-    CREATE TABLE IF NOT EXISTS customer_maps (
-      role   TEXT PRIMARY KEY,
-      data   TEXT  -- JSON object
-    );
-=================================================================
--->
 </body>
 </html>

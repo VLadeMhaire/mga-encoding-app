@@ -33,8 +33,6 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 ::-webkit-scrollbar-track{background:var(--gray-100)}
 ::-webkit-scrollbar-thumb{background:var(--blue-300);border-radius:99px}
 ::-webkit-scrollbar-thumb:hover{background:var(--blue-500)}
-
-/* TOP BAR */
 .topbar{height:var(--topbar-h);background:var(--blue-900);display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;box-shadow:var(--shadow-md);z-index:100}
 .topbar-logo{width:36px;height:36px;background:var(--blue-600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0}
 .topbar-title{font-size:15px;font-weight:600;color:white;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -45,7 +43,6 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .topbar-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:6px 13px;font-size:12px;color:white;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none}
 .topbar-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3)}
 .topbar-btn i{font-size:12px;opacity:.85}
-/* Backend pill */
 .backend-pill{display:flex;align-items:center;gap:5px;font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.15)}
 .backend-pill.online{background:rgba(34,197,94,.15);color:#86efac}
 .backend-pill.offline{background:rgba(239,68,68,.15);color:#fca5a5}
@@ -55,14 +52,9 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .offline .bp-dot{background:#ef4444}
 .checking .bp-dot{background:#fbbf24;animation:bpulse 1s infinite}
 @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.3}}
-/* Monthly context badge */
 .monthly-context-badge{display:flex;align-items:center;gap:6px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.4);border-radius:20px;padding:5px 14px;font-size:12px;color:#fde68a;font-weight:600}
 .monthly-context-badge i{font-size:11px}
-
-/* LAYOUT */
 .layout{display:flex;flex:1;overflow:hidden}
-
-/* SIDEBAR */
 .sidebar{width:var(--sidebar-w);background:white;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;transition:width var(--transition),transform var(--transition);z-index:50}
 .sidebar.collapsed{width:0;overflow:hidden}
 .sidebar-brand{padding:14px 16px 12px;border-bottom:1px solid var(--gray-100);background:var(--blue-50)}
@@ -83,8 +75,6 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .autosave-dot{width:6px;height:6px;border-radius:50%;background:var(--green-500);animation:pulse-dot 1s ease infinite}
 @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .sidebar-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400);line-height:1.7}
-
-/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .content-header{background:white;border-bottom:1px solid var(--gray-200);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow-sm)}
 .content-header h2{font-size:15px;font-weight:600;color:var(--blue-900)}
@@ -95,14 +85,13 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .btn-secondary{display:flex;align-items:center;gap:6px;background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none}
 .btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-300)}
 .btn-secondary i{font-size:11px;color:var(--gray-400)}
-
-/* STATS BAR */
+.btn-submit{display:flex;align-items:center;gap:6px;background:var(--blue-600);color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none}
+.btn-submit:hover{background:var(--blue-700);box-shadow:var(--shadow)}
+.btn-submit i{font-size:11px}
 .stats-bar{display:flex;gap:10px;padding:12px 20px;background:white;border-bottom:1px solid var(--gray-200);flex-shrink:0;overflow-x:auto}
 .stat-card{flex:1;min-width:120px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:8px;padding:10px 14px}
 .stat-card-label{font-size:11px;color:var(--blue-700);font-weight:500;white-space:nowrap;margin-bottom:4px}
 .stat-card-value{font-size:15px;font-weight:700;color:var(--blue-900);font-variant-numeric:tabular-nums}
-
-/* TABLE */
 .table-area{flex:1;overflow:auto;background:var(--gray-100);position:relative}
 .table-area::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background-image:url('MGAALogo.jpg');background-size:cover;background-repeat:no-repeat;background-position:center;opacity:0.07;pointer-events:none;z-index:0}
 table#vatableExpensesTable{width:100%;min-width:1500px;border-collapse:collapse;font-size:12px;background:white;position:relative;z-index:1}
@@ -110,10 +99,23 @@ table#vatableExpensesTable thead{position:sticky;top:0;z-index:20}
 table#vatableExpensesTable thead th{background:var(--blue-900);color:var(--blue-100);font-size:11px;font-weight:600;padding:10px 10px;text-align:left;white-space:nowrap;border-right:1px solid var(--blue-800);letter-spacing:.3px;user-select:none}
 table#vatableExpensesTable thead th:last-child{border-right:none;text-align:center}
 table#vatableExpensesTable thead th.hidden-column{display:none}
+
+/* CHANGE 5: Row color distinctions */
 table#vatableExpensesTable tbody tr{border-bottom:1px solid var(--gray-100);background:white;transition:background .12s}
-table#vatableExpensesTable tbody tr:nth-child(even){background:var(--blue-50)}
-table#vatableExpensesTable tbody tr:nth-child(even):hover{background:#DBEAFE}
-table#vatableExpensesTable tbody tr:hover{background:var(--blue-100)}
+table#vatableExpensesTable tbody tr.row-has-data{border-left:3px solid transparent}
+table#vatableExpensesTable tbody tr.row-cash{border-left:3px solid #22C55E;background:#F0FDF4}
+table#vatableExpensesTable tbody tr.row-cash:nth-child(even){background:#DCFCE7}
+table#vatableExpensesTable tbody tr.row-cash:hover{background:#BBF7D0 !important}
+table#vatableExpensesTable tbody tr.row-charge{border-left:3px solid #3B82F6;background:#EFF6FF}
+table#vatableExpensesTable tbody tr.row-charge:nth-child(even){background:#DBEAFE}
+table#vatableExpensesTable tbody tr.row-charge:hover{background:#BFDBFE !important}
+table#vatableExpensesTable tbody tr.row-services{border-left:3px solid #8B5CF6}
+table#vatableExpensesTable tbody tr.row-goods{border-left:3px solid #F59E0B}
+table#vatableExpensesTable tbody tr.row-rental{border-left:3px solid #EF4444}
+table#vatableExpensesTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge){background:var(--blue-50)}
+table#vatableExpensesTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge):hover{background:#DBEAFE}
+table#vatableExpensesTable tbody tr:not(.row-cash):not(.row-charge):hover{background:var(--blue-100)}
+
 table#vatableExpensesTable td{padding:0;height:42px;vertical-align:middle;border-right:1px solid var(--gray-100)}
 table#vatableExpensesTable td:last-child{border-right:none}
 table#vatableExpensesTable td.hidden-column{display:none}
@@ -131,7 +133,7 @@ table#vatableExpensesTable tfoot td:last-child{border-right:none}
 table#vatableExpensesTable tfoot .sum-label{text-align:right;font-weight:700;font-size:11px;letter-spacing:.5px;color:var(--blue-300);text-transform:uppercase}
 table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-weight:700;font-size:13px;color:white;text-align:right}
 
-/* NATURE OF EXPENSE DROPDOWN */
+/* Nature dropdown */
 .nature-suggestions{position:fixed;background:white;border:1px solid var(--gray-200);border-radius:10px;box-shadow:var(--shadow-lg);max-height:320px;overflow-y:auto;z-index:10000;min-width:300px;font-size:12px}
 .sug-group-header{padding:8px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue-700);background:var(--blue-50);display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--gray-100)}
 .sug-item{padding:8px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--gray-50);transition:background .1s}
@@ -147,7 +149,6 @@ table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .nature-badge.goods{background:#FEF3C7;color:#92400E}
 .nature-badge.rental{background:#FEE2E2;color:#991B1B}
 
-/* PAGINATION */
 .pagination-bar{background:white;border-top:1px solid var(--gray-200);padding:9px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;flex-wrap:wrap}
 .pagination-info{font-size:12px;color:var(--gray-500);display:flex;align-items:center;gap:12px}
 .rows-select{border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:12px;background:white;color:var(--gray-700);cursor:pointer;font-family:var(--font)}
@@ -156,8 +157,6 @@ table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .page-btn:hover:not(:disabled){background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
 .page-btn:disabled{opacity:.4;cursor:not-allowed}
 .page-indicator{font-size:12px;font-weight:600;color:var(--gray-700);padding:0 8px;display:flex;align-items:center}
-
-/* TALLY */
 .tally-section{background:var(--gray-50);border-top:1px solid var(--gray-200);padding:16px 20px;flex-shrink:0}
 .section-header{font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .section-header i{color:var(--blue-500)}
@@ -170,8 +169,6 @@ table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .tally-card-label{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .tally-card-amount{font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:3px;font-variant-numeric:tabular-nums}
 .tally-card-sub{font-size:11px;color:var(--gray-400)}
-
-/* SUPPLIERS */
 .suppliers-section{background:white;border-top:1px solid var(--gray-200);flex-shrink:0}
 .suppliers-header{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-100);background:var(--blue-50)}
 .suppliers-header-left{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--blue-800);text-transform:uppercase;letter-spacing:.8px}
@@ -189,11 +186,7 @@ table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .sup-addr i{font-size:10px;color:var(--blue-400);margin-top:1px}
 .del-sup-btn{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:12px;padding:4px 8px;border-radius:4px;transition:var(--transition);margin-left:8px;font-family:var(--font)}
 .del-sup-btn:hover{background:var(--red-50);color:var(--red-500)}
-
-/* FOOTER */
 .footer{background:var(--blue-900);color:var(--blue-300);text-align:center;padding:10px 20px;font-size:11px;flex-shrink:0}
-
-/* RIGHT PANEL */
 .right-panel{width:var(--rightpanel-w);background:white;border-left:1px solid var(--gray-200);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;transition:width var(--transition),transform var(--transition);z-index:50}
 .right-panel.collapsed{width:0;overflow:hidden}
 .right-panel-header{padding:14px 16px;border-bottom:1px solid var(--gray-100);background:var(--blue-50);font-size:12px;font-weight:700;color:var(--blue-800);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;flex-shrink:0}
@@ -205,8 +198,6 @@ table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .field-group input,.field-group select{width:100%;border:1px solid var(--gray-200);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--gray-800);background:white;font-family:var(--font);transition:var(--transition)}
 .field-group input:focus,.field-group select:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
 .right-panel-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400)}
-
-/* COL VIS */
 .col-vis-container{position:relative;display:inline-block}
 .col-vis-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:white;border:1px solid var(--gray-200);border-radius:10px;min-width:230px;z-index:1000;box-shadow:var(--shadow-lg);overflow:hidden;display:none}
 .col-vis-dropdown.open{display:block}
@@ -219,8 +210,6 @@ table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .col-item:hover{background:var(--gray-50)}
 .col-item input[type="checkbox"]{accent-color:var(--blue-600);cursor:pointer}
 .col-item label{font-size:13px;color:var(--gray-700);cursor:pointer;flex:1}
-
-/* TIN SUGGESTION */
 .tin-sug-box{position:fixed;z-index:9999;background:white;border:1px solid var(--gray-200);border-radius:8px;box-shadow:var(--shadow-lg);max-height:260px;overflow-y:auto;min-width:260px;font-size:12px}
 .tin-sug-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--gray-50);transition:background .1s}
 .tin-sug-item:hover{background:var(--blue-50)}
@@ -228,20 +217,30 @@ table#vatableExpensesTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .tin-sug-name{font-size:11px;color:var(--gray-500);margin-top:2px}
 .tin-sug-addr{font-size:11px;color:var(--gray-400);margin-top:2px;display:flex;align-items:flex-start;gap:4px}
 
-/* SELECTION MODE */
+/* CHANGE 3: Selection mode + right-click context menu */
 .select-mode td{cursor:crosshair!important;user-select:none!important}
 .select-mode input,.select-mode select,.select-mode button{pointer-events:none!important;opacity:.7}
 td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid var(--blue-500);outline-offset:-1.5px}
-.selection-toolbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;border:1px solid var(--gray-200);border-radius:40px;padding:7px 16px;display:flex;gap:8px;align-items:center;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease}
+.selection-info-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--blue-900);color:white;border-radius:20px;padding:7px 18px;font-size:12px;display:flex;align-items:center;gap:8px;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;pointer-events:none}
 @keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-.sel-tb-info{font-size:12px;color:var(--gray-500);padding:0 8px;border-right:1px solid var(--gray-200);margin-right:4px}
-.sel-tb-btn{background:var(--gray-50);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--font);transition:var(--transition)}
-.sel-tb-btn:hover{background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
-.sel-tb-btn.danger:hover{background:var(--red-50);border-color:var(--red-200);color:var(--red-700)}
-.sel-tb-btn.exit{background:var(--blue-600);color:white;border-color:var(--blue-600)}
-.sel-tb-btn.exit:hover{background:var(--blue-700)}
+.sel-info-dot{width:7px;height:7px;border-radius:50%;background:#60A5FA;animation:bpulse 1.5s infinite}
+.sel-info-hint{font-size:10px;color:var(--blue-300);margin-left:4px}
+.ctx-menu{position:fixed;z-index:10100;background:white;border:1px solid var(--gray-200);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);min-width:190px;overflow:hidden;animation:ctxIn .12s ease}
+@keyframes ctxIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.ctx-menu-header{padding:8px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue-700);background:var(--blue-50);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:6px}
+.ctx-item{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:13px;color:var(--gray-700);cursor:pointer;transition:background .1s;border:none;background:none;width:100%;font-family:var(--font);text-align:left}
+.ctx-item i{width:16px;text-align:center;font-size:12px;color:var(--gray-400)}
+.ctx-item:hover{background:var(--blue-50);color:var(--blue-700)}
+.ctx-item:hover i{color:var(--blue-500)}
+.ctx-item.danger{color:var(--red-700)}
+.ctx-item.danger i{color:var(--red-400)}
+.ctx-item.danger:hover{background:var(--red-50)}
+.ctx-item.exit-item{color:var(--blue-700);font-weight:600}
+.ctx-item.exit-item i{color:var(--blue-500)}
+.ctx-item.exit-item:hover{background:var(--blue-100)}
+.ctx-divider{height:1px;background:var(--gray-100);margin:3px 0}
+.ctx-count-badge{margin-left:auto;background:var(--blue-100);color:var(--blue-700);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
 
-/* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;background:white;border:1px solid var(--gray-200);border-left:4px solid var(--blue-500);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--gray-700);box-shadow:var(--shadow-lg);z-index:9999;max-width:360px;animation:toastIn .2s ease}
 @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 .toast.success{border-left-color:var(--green-500)}
@@ -249,21 +248,28 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 .toast.error{border-left-color:var(--red-500)}
 .toast.fade-out{opacity:0;transform:translateY(10px);transition:.25s}
 .long-press-toast{position:fixed;bottom:60px;right:20px;background:var(--blue-900);color:var(--blue-100);border-radius:8px;padding:8px 16px;font-size:12px;z-index:9999;box-shadow:var(--shadow-lg)}
-
-/* MONTHLY BANNER */
 .monthly-banner{background:linear-gradient(135deg,#1E3A8A,#1D4ED8);border-bottom:2px solid #60A5FA;padding:8px 20px;font-size:12px;color:#BFDBFE;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .monthly-banner i{color:#60A5FA}
 .monthly-banner strong{color:white;font-size:13px}
 .monthly-banner .back-link{margin-left:auto;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:4px 10px;cursor:pointer;color:#BFDBFE;text-decoration:none;font-size:11px;transition:.2s}
 .monthly-banner .back-link:hover{background:rgba(255,255,255,.22)}
 
-/* SAVING OVERLAY */
+/* CHANGE 2: Simplified submit modal */
+.submit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10002}
+.submit-modal{background:white;border-radius:14px;padding:28px;max-width:440px;width:92%;box-shadow:0 20px 40px rgba(0,0,0,.15)}
+.submit-modal-title{font-size:16px;font-weight:700;color:var(--blue-900);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.submit-modal-title i{color:var(--blue-600)}
+.submit-modal-sub{font-size:12px;color:var(--gray-500);margin-bottom:20px}
+.submit-modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel-submit{background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--font);transition:var(--transition)}
+.btn-cancel-submit:hover{background:var(--gray-50)}
+.btn-confirm-submit{background:var(--blue-600);color:white;border:none;border-radius:7px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:var(--transition);display:flex;align-items:center;gap:6px}
+.btn-confirm-submit:hover{background:var(--blue-700)}
+
 .saving-overlay{position:fixed;top:70px;right:20px;background:var(--blue-900);color:white;border-radius:8px;padding:8px 16px;font-size:12px;z-index:9998;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);transition:opacity .3s}
 .saving-overlay.hidden{opacity:0;pointer-events:none}
 .saving-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* DATE PICKER */
 .date-picker-overlay{position:fixed;inset:0;z-index:9000;background:transparent}
 .date-picker-popup{position:fixed;z-index:9001;background:white;border:1px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden;width:268px;animation:popIn .15s ease}
 @keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -284,8 +290,6 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 .dp-footer button:hover{background:var(--gray-50)}
 .dp-footer button.dp-today-btn{background:var(--blue-600);color:white;border-color:var(--blue-600)}
 .dp-footer button.dp-today-btn:hover{background:var(--blue-700)}
-
-/* NOTIFICATION BOX */
 .notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:11000;animation:notifFadeIn .2s ease}
 @keyframes notifFadeIn{from{opacity:0}to{opacity:1}}
 .notif-box{background:white;border-radius:16px;padding:0;max-width:480px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,.22);overflow:hidden;animation:notifSlideIn .25s cubic-bezier(.34,1.56,.64,1)}
@@ -318,8 +322,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 .notif-footer{padding:0 24px 20px;display:flex;justify-content:flex-end}
 .notif-close-btn{background:var(--blue-600);color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:var(--transition);display:flex;align-items:center;gap:8px}
 .notif-close-btn:hover{background:var(--blue-700);transform:translateY(-1px);box-shadow:var(--shadow-md)}
-
-/* DATE ANIMATION */
+.portal-banner{background:#FEF3C7;border-bottom:2px solid #F59E0B;padding:8px 20px;font-size:12px;color:#92400E;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.portal-banner i{color:#D97706}
+.portal-banner strong{font-weight:700}
+.portal-banner-close{margin-left:auto;background:none;border:none;cursor:pointer;color:#92400E;font-size:13px;padding:2px 6px;border-radius:4px}
+.portal-banner-close:hover{background:rgba(0,0,0,.08)}
 .date-updated{animation:datePulse 0.5s ease}
 @keyframes datePulse{0%{background-color:transparent}50%{background-color:rgba(59,130,246,.2)}100%{background-color:transparent}}
 .report-date-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-100);color:var(--blue-800);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;margin-left:10px;cursor:pointer;transition:var(--transition)}
@@ -328,12 +335,20 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 #reportDate,#companyTIN{font-family:var(--font-mono);letter-spacing:0.5px}
 .date-input{font-family:var(--font-mono)}
 
-/* MISC */
+/* Row legend */
+.row-legend{display:flex;align-items:center;gap:12px;padding:6px 20px;background:white;border-bottom:1px solid var(--gray-100);flex-shrink:0;font-size:11px;color:var(--gray-500)}
+.row-legend-item{display:flex;align-items:center;gap:5px}
+.row-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.legend-cash{background:#22C55E}
+.legend-charge{background:#3B82F6}
+.legend-services{background:#8B5CF6}
+.legend-goods{background:#F59E0B}
+.legend-rental{background:#EF4444}
+
 .hidden{display:none!important}
 .stats-bar.hidden,.tally-section.hidden,.suppliers-section.hidden,.footer.hidden{display:none!important}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 .pulse{animation:pulse .25s ease}
-
 @media(max-width:900px){
   :root{--sidebar-w:0px;--rightpanel-w:0px}
   .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;width:240px;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
@@ -397,11 +412,12 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <div class="nav-divider"></div>
     <button class="nav-btn danger" id="clearBtn"><i class="fas fa-trash-alt"></i>Clear Table Data</button>
     <button class="nav-btn danger" id="clearInfoBtn"><i class="fas fa-eraser"></i>Clear Company Info</button>
+    <!-- CHANGE 4: "Show X" labels, all hidden by default -->
     <div class="nav-section">Visibility</div>
-    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Hide Stats Bar</button>
-    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Hide Tally</button>
-    <button class="nav-btn toggle-btn" id="toggleSuppliersBtn"><i class="fas fa-receipt"></i>Hide Suppliers</button>
-    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Hide Footer</button>
+    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Show Stats Bar</button>
+    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Show Tally</button>
+    <button class="nav-btn toggle-btn" id="toggleSuppliersBtn"><i class="fas fa-receipt"></i>Show Suppliers</button>
+    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Show Footer</button>
     <div class="nav-divider"></div>
     <button class="nav-btn" id="hideAllBtn"><i class="fas fa-eye-slash"></i>Hide All Sections</button>
     <button class="nav-btn" id="showAllBtn"><i class="fas fa-eye"></i>Show All Sections</button>
@@ -416,12 +432,17 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 </div>
 
 <div class="main" id="mainArea">
-
   <div class="monthly-banner hidden" id="monthlyBanner">
     <i class="fas fa-calendar-check"></i>
     <span>Editing monthly record: <strong id="monthlyBannerLabel">—</strong></span>
     <span style="font-size:11px;color:rgba(191,219,254,.7)" id="monthlyBannerKey"></span>
     <a class="back-link" href="monthly_expenses.html"><i class="fas fa-arrow-left"></i> Back to Records</a>
+  </div>
+
+  <div class="portal-banner hidden" id="portalBanner">
+    <i class="fas fa-file-import"></i>
+    <span>File loaded from portal: <strong id="portalBannerFilename"></strong></span>
+    <button class="portal-banner-close" onclick="document.getElementById('portalBanner').classList.add('hidden')" title="Dismiss"><i class="fas fa-times"></i></button>
   </div>
 
   <div class="content-header">
@@ -430,17 +451,31 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>Automated VAT · Net = Gross ÷ 1.12 · Input Tax = Net × 12% · W/T auto-set by expense category</p>
     </div>
     <div class="header-actions">
+      <!-- CHANGE 2: "Go to Portal" — no file download -->
+      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-arrow-right"></i>Go to Portal</button>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
   </div>
 
-  <div class="stats-bar" id="statsSection">
+  <!-- CHANGE 4: Stats bar hidden by default -->
+  <div class="stats-bar hidden" id="statsSection">
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-receipt" style="margin-right:4px;color:var(--blue-400)"></i>Gross Amount</div><div class="stat-card-value">₱ <span id="totalGrossAmount">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-coins" style="margin-right:4px;color:var(--blue-400)"></i>Net Expenses</div><div class="stat-card-value">₱ <span id="totalNetExpenses">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-percent" style="margin-right:4px;color:var(--blue-400)"></i>Input Tax</div><div class="stat-card-value">₱ <span id="totalInputTax">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-hand-holding-usd" style="margin-right:4px;color:var(--blue-400)"></i>Withholding Tax</div><div class="stat-card-value">₱ <span id="totalWithholdingTax">0.00</span></div></div>
     <div class="stat-card"><div class="stat-card-label"><i class="fas fa-file-invoice-dollar" style="margin-right:4px;color:var(--blue-400)"></i>Net Payable</div><div class="stat-card-value">₱ <span id="netPayable">0.00</span></div></div>
+  </div>
+
+  <!-- Row legend -->
+  <div class="row-legend">
+    <span style="font-weight:600;color:var(--gray-600)">Row Colors:</span>
+    <div class="row-legend-item"><div class="row-legend-dot legend-cash"></div>Cash</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-charge"></div>Charge</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-services"></div>Services (2%)</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-goods"></div>Goods (1%)</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-rental"></div>Rental (5%)</div>
+    <span style="margin-left:4px;font-style:italic;font-size:10px">(Right-click in selection mode for options)</span>
   </div>
 
   <div class="table-area">
@@ -491,7 +526,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="tally-section" id="tallySection">
+  <!-- CHANGE 4: Tally hidden by default -->
+  <div class="tally-section hidden" id="tallySection">
     <div class="section-header"><i class="fas fa-chart-pie"></i>Expense Category Tally</div>
     <div class="tally-grid" id="expenseTallyGrid">
       <div class="tally-card total-card">
@@ -501,7 +537,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="suppliers-section" id="suppliersSection">
+  <!-- CHANGE 4: Suppliers hidden by default -->
+  <div class="suppliers-section hidden" id="suppliersSection">
     <div class="suppliers-header">
       <div class="suppliers-header-left"><i class="fas fa-receipt"></i>Registered Suppliers<span class="suppliers-count" id="suppliersCount">0</span></div>
       <button class="btn-secondary" id="clearAllSuppliersBtn" style="font-size:11px;padding:5px 10px"><i class="fas fa-trash-alt"></i> Clear All</button>
@@ -511,7 +548,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <div class="footer" id="footerEl">© 2025 Vatable Expenses Data Tracker &nbsp;·&nbsp; Professional VAT-Compliant Expenses Tracking System</div>
+  <!-- CHANGE 4: Footer hidden by default -->
+  <div class="footer hidden" id="footerEl">© 2025 Vatable Expenses Data Tracker &nbsp;·&nbsp; Professional VAT-Compliant Expenses Tracking System</div>
 </div>
 
 <div class="right-panel" id="rightPanel">
@@ -524,11 +562,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <div class="field-group"><label>Telephone</label><input type="tel" id="telephone" placeholder="Telephone number"></div>
     <div class="field-group">
       <label>Report Date</label>
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex:1;" autocomplete="off">
-        <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding:7px 12px;width:auto;flex-shrink:0;"><i class="fas fa-calendar-alt"></i></button>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex:1" autocomplete="off">
+        <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding:7px 12px;width:auto;flex-shrink:0"><i class="fas fa-calendar-alt"></i></button>
       </div>
-      <small style="font-size:9px;color:var(--gray-400);margin-top:2px;display:block;">Format: MM/DD/YYYY</small>
+      <small style="font-size:9px;color:var(--gray-400);margin-top:2px;display:block">Format: MM/DD/YYYY</small>
     </div>
     <div class="field-group"><label>Authorized Employee <span class="req">*</span></label><input type="text" id="authorizedEmployee" placeholder="Employee name"></div>
     <div class="field-group"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
@@ -539,13 +577,23 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 
 </div>
 
-<!-- Saving overlay -->
 <div class="saving-overlay hidden" id="savingOverlay">
   <div class="saving-spinner"></div>
   <span id="savingOverlayText">Saving…</span>
 </div>
 
-<!-- Notification Box -->
+<!-- CHANGE 2: Simplified Go to Portal modal -->
+<div class="submit-modal-overlay hidden" id="submitModalOverlay">
+  <div class="submit-modal">
+    <div class="submit-modal-title"><i class="fas fa-arrow-right"></i>Go to Portal</div>
+    <div class="submit-modal-sub">Your current session is autosaved. Click below to navigate to the portal.</div>
+    <div class="submit-modal-actions">
+      <button class="btn-cancel-submit" id="submitModalCancelBtn">Cancel</button>
+      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-arrow-right"></i> Go to Portal</button>
+    </div>
+  </div>
+</div>
+
 <div class="notif-overlay hidden" id="notifOverlay">
   <div class="notif-box">
     <div class="notif-box-header" id="notifHeader">
@@ -577,287 +625,89 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 /* ============================================================
    BACKEND CONFIG
 ============================================================ */
-const API_BASE = (() => {
-  if (window.VAT_API_BASE) return window.VAT_API_BASE;
-  if (window.__TAURI__) return 'http://localhost:9999/api';
-  return (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? `${window.location.protocol}//${window.location.hostname}:9999/api`
-    : '/api';
-})();
-let USE_API = false, authToken = null;
-
-async function checkBackend() {
-  const pill = document.getElementById('backendPill');
-  const text = document.getElementById('backendPillText');
-  try {
-    const r = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
-    if (r.ok) {
-      USE_API = true; pill.className = 'backend-pill online'; text.textContent = 'API Online';
-      const s = sessionStorage.getItem('VAT_SESSION');
-      if (s) { try { authToken = JSON.parse(s).token || null; } catch(e){} }
-      return;
-    }
-  } catch(_) {}
-  USE_API = false; pill.className = 'backend-pill offline'; text.textContent = 'Local Mode';
-}
-function apiHeaders() {
-  const h = { 'Content-Type': 'application/json' };
-  if (authToken) h['Authorization'] = `Bearer ${authToken}`;
-  return h;
-}
+const API_BASE=((()=>{if(window.VAT_API_BASE)return window.VAT_API_BASE;if(window.__TAURI__)return'http://localhost:9999/api';return(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')?`${window.location.protocol}//${window.location.hostname}:9999/api`:'/api';})());
+let USE_API=false,authToken=null;
+async function checkBackend(){const pill=document.getElementById('backendPill'),text=document.getElementById('backendPillText');try{const r=await fetch(`${API_BASE}/health`,{signal:AbortSignal.timeout(3000)});if(r.ok){USE_API=true;pill.className='backend-pill online';text.textContent='API Online';const s=sessionStorage.getItem('VAT_SESSION');if(s){try{authToken=JSON.parse(s).token||null;}catch(e){}}return;}}catch(_){}USE_API=false;pill.className='backend-pill offline';text.textContent='Local Mode';}
+function apiHeaders(){const h={'Content-Type':'application/json'};if(authToken)h['Authorization']=`Bearer ${authToken}`;return h;}
 
 /* ============================================================
    ROLE & MONTHLY CONTEXT
 ============================================================ */
-const APP_ROLE = (function(){
-  const p = window.location.pathname;
-  if (p.includes('/Client/')) return 'Client';
-  if (p.includes('/Sub-Admin/')) return 'SubAdmin';
-  return 'Main';
-})();
-
-const MONTHLY_CTX = {
-  key:   sessionStorage.getItem('EXP_MONTHLY_CONTEXT_KEY')   || null,
-  year:  sessionStorage.getItem('EXP_MONTHLY_CONTEXT_YEAR')  || null,
-  month: sessionStorage.getItem('EXP_MONTHLY_CONTEXT_MONTH') || null,
-  label: sessionStorage.getItem('EXP_MONTHLY_CONTEXT_LABEL') || null,
-  role:  sessionStorage.getItem('EXP_MONTHLY_CONTEXT_ROLE')  || null,
-};
-const IS_MONTHLY = !!(MONTHLY_CTX.key && MONTHLY_CTX.year && MONTHLY_CTX.month);
-
-const STORAGE_NS = {
-  Client:   { SUPPLIER_TIN_MAP:'EXP_SUPPLIER_TIN_MAP_Client',   COMPANY_INFO:'expCompanyInfo_Client',   COL_VISIBILITY:'expColVis_Client',   VIS_STATES:'expVisStates_Client' },
-  SubAdmin: { SUPPLIER_TIN_MAP:'EXP_SUPPLIER_TIN_MAP_SubAdmin', COMPANY_INFO:'expCompanyInfo_SubAdmin', COL_VISIBILITY:'expColVis_SubAdmin', VIS_STATES:'expVisStates_SubAdmin' },
-  Main:     { SUPPLIER_TIN_MAP:'EXP_SUPPLIER_TIN_MAP_Main',     COMPANY_INFO:'expCompanyInfo_Main',     COL_VISIBILITY:'expColVis_Main',     VIS_STATES:'expVisStates_Main' },
-};
-const NS = STORAGE_NS[APP_ROLE];
-
-function getActiveSessionKey() {
-  if (IS_MONTHLY) return MONTHLY_CTX.key;
-  return `EXP_SESSION_TABLE_${APP_ROLE}`;
-}
-function getActiveCompanyKey() {
-  if (IS_MONTHLY) return `${MONTHLY_CTX.key}_COMPANY`;
-  return NS.COMPANY_INFO;
-}
-function getApiRecordId() {
-  if (IS_MONTHLY) return `EXP_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`;
-  return `EXP_${APP_ROLE}_general`;
-}
+const APP_ROLE=(function(){const p=window.location.pathname;if(p.includes('/Client/'))return'Client';if(p.includes('/Sub-Admin/'))return'SubAdmin';return'Main';})();
+const MONTHLY_CTX={key:sessionStorage.getItem('EXP_MONTHLY_CONTEXT_KEY')||null,year:sessionStorage.getItem('EXP_MONTHLY_CONTEXT_YEAR')||null,month:sessionStorage.getItem('EXP_MONTHLY_CONTEXT_MONTH')||null,label:sessionStorage.getItem('EXP_MONTHLY_CONTEXT_LABEL')||null,role:sessionStorage.getItem('EXP_MONTHLY_CONTEXT_ROLE')||null};
+const IS_MONTHLY=!!(MONTHLY_CTX.key&&MONTHLY_CTX.year&&MONTHLY_CTX.month);
+const STORAGE_NS={Client:{SUPPLIER_TIN_MAP:'EXP_SUPPLIER_TIN_MAP_Client',COMPANY_INFO:'expCompanyInfo_Client',COL_VISIBILITY:'expColVis_Client',VIS_STATES:'expVisStates_Client'},SubAdmin:{SUPPLIER_TIN_MAP:'EXP_SUPPLIER_TIN_MAP_SubAdmin',COMPANY_INFO:'expCompanyInfo_SubAdmin',COL_VISIBILITY:'expColVis_SubAdmin',VIS_STATES:'expVisStates_SubAdmin'},Main:{SUPPLIER_TIN_MAP:'EXP_SUPPLIER_TIN_MAP_Main',COMPANY_INFO:'expCompanyInfo_Main',COL_VISIBILITY:'expColVis_Main',VIS_STATES:'expVisStates_Main'}};
+const NS=STORAGE_NS[APP_ROLE];
+function getActiveSessionKey(){return IS_MONTHLY?MONTHLY_CTX.key:`EXP_SESSION_TABLE_${APP_ROLE}`;}
+function getActiveCompanyKey(){return IS_MONTHLY?`${MONTHLY_CTX.key}_COMPANY`:NS.COMPANY_INFO;}
+function getApiRecordId(){return IS_MONTHLY?`EXP_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`:`EXP_${APP_ROLE}_general`;}
 
 /* ============================================================
    FASTAPI DATA LAYER
 ============================================================ */
-async function apiSaveSession(tableData, companyInfo) {
-  const payload = {
-    record_id: getApiRecordId(), role: APP_ROLE,
-    year: MONTHLY_CTX.year ? parseInt(MONTHLY_CTX.year) : null,
-    month: MONTHLY_CTX.month ? parseInt(MONTHLY_CTX.month) : null,
-    label: MONTHLY_CTX.label || 'General',
-    table_data: tableData, company_info: companyInfo,
-    saved_at: new Date().toISOString(), type: 'expenses',
-  };
-  const localData = { version:'1.0', timestamp: payload.saved_at, tableData, companyInfo };
-  localStorage.setItem(getActiveSessionKey(), JSON.stringify(localData));
-  localStorage.setItem(getActiveCompanyKey(), JSON.stringify(companyInfo));
-  if (USE_API) {
-    try {
-      await fetch(`${API_BASE}/exp-records`, { method:'POST', headers:apiHeaders(), body:JSON.stringify(payload) });
-    } catch(_) {}
-  }
-}
+async function apiSaveSession(tableData,companyInfo){const payload={record_id:getApiRecordId(),role:APP_ROLE,year:MONTHLY_CTX.year?parseInt(MONTHLY_CTX.year):null,month:MONTHLY_CTX.month?parseInt(MONTHLY_CTX.month):null,label:MONTHLY_CTX.label||'General',table_data:tableData,company_info:companyInfo,saved_at:new Date().toISOString(),type:'expenses'};const localData={version:'1.0',timestamp:payload.saved_at,tableData,companyInfo};localStorage.setItem(getActiveSessionKey(),JSON.stringify(localData));localStorage.setItem(getActiveCompanyKey(),JSON.stringify(companyInfo));if(USE_API){try{await fetch(`${API_BASE}/exp-records`,{method:'POST',headers:apiHeaders(),body:JSON.stringify(payload)});}catch(_){}}}
+async function apiLoadSession(){if(USE_API){try{const r=await fetch(`${API_BASE}/exp-records/${getApiRecordId()}`,{headers:apiHeaders()});if(r.ok){const d=await r.json();if(d.table_data){localStorage.setItem(getActiveSessionKey(),JSON.stringify({version:'1.0',timestamp:d.saved_at,tableData:d.table_data,companyInfo:d.company_info||{}}));if(d.company_info)localStorage.setItem(getActiveCompanyKey(),JSON.stringify(d.company_info));}return{tableData:d.table_data||[],companyInfo:d.company_info||{}};}}catch(_){}}const raw=localStorage.getItem(getActiveSessionKey());if(!raw)return null;try{const d=JSON.parse(raw);return{tableData:d.tableData||[],companyInfo:d.companyInfo||{}};}catch(e){return null;}}
+async function apiSaveSuppliers(dbObj){localStorage.setItem(NS.SUPPLIER_TIN_MAP,JSON.stringify(Object.fromEntries(dbObj)));if(USE_API){try{await fetch(`${API_BASE}/exp-suppliers`,{method:'POST',headers:apiHeaders(),body:JSON.stringify({role:APP_ROLE,data:Object.fromEntries(dbObj)})});}catch(_){}}}
+async function apiLoadSuppliers(){if(USE_API){try{const r=await fetch(`${API_BASE}/exp-suppliers?role=${APP_ROLE}`,{headers:apiHeaders()});if(r.ok){const d=await r.json();localStorage.setItem(NS.SUPPLIER_TIN_MAP,JSON.stringify(d.data||{}));return new Map(Object.entries(d.data||{}));}}catch(_){}}const s=localStorage.getItem(NS.SUPPLIER_TIN_MAP);if(s){try{return new Map(Object.entries(JSON.parse(s)));}catch(e){}}return new Map();}
 
-async function apiLoadSession() {
-  if (USE_API) {
-    try {
-      const r = await fetch(`${API_BASE}/exp-records/${getApiRecordId()}`, { headers:apiHeaders() });
-      if (r.ok) {
-        const d = await r.json();
-        if (d.table_data) {
-          localStorage.setItem(getActiveSessionKey(), JSON.stringify({ version:'1.0', timestamp:d.saved_at, tableData:d.table_data, companyInfo:d.company_info||{} }));
-          if (d.company_info) localStorage.setItem(getActiveCompanyKey(), JSON.stringify(d.company_info));
-        }
-        return { tableData: d.table_data||[], companyInfo: d.company_info||{} };
-      }
-    } catch(_) {}
-  }
-  const raw = localStorage.getItem(getActiveSessionKey());
-  if (!raw) return null;
-  try { const d = JSON.parse(raw); return { tableData: d.tableData||[], companyInfo: d.companyInfo||{} }; }
-  catch(e) { return null; }
-}
-
-async function apiSaveSuppliers(dbObj) {
-  localStorage.setItem(NS.SUPPLIER_TIN_MAP, JSON.stringify(Object.fromEntries(dbObj)));
-  if (USE_API) {
-    try {
-      await fetch(`${API_BASE}/exp-suppliers`, { method:'POST', headers:apiHeaders(), body:JSON.stringify({ role:APP_ROLE, data:Object.fromEntries(dbObj) }) });
-    } catch(_) {}
-  }
-}
-
-async function apiLoadSuppliers() {
-  if (USE_API) {
-    try {
-      const r = await fetch(`${API_BASE}/exp-suppliers?role=${APP_ROLE}`, { headers:apiHeaders() });
-      if (r.ok) {
-        const d = await r.json();
-        localStorage.setItem(NS.SUPPLIER_TIN_MAP, JSON.stringify(d.data||{}));
-        return new Map(Object.entries(d.data||{}));
-      }
-    } catch(_) {}
-  }
-  const s = localStorage.getItem(NS.SUPPLIER_TIN_MAP);
-  if (s) { try { return new Map(Object.entries(JSON.parse(s))); } catch(e){} }
-  return new Map();
-}
-
-/* ============================================================
-   SAVING OVERLAY
-============================================================ */
-function showSaving(msg='Saving…') { const o=document.getElementById('savingOverlay'); document.getElementById('savingOverlayText').textContent=msg; o.classList.remove('hidden'); }
-function hideSaving() { document.getElementById('savingOverlay').classList.add('hidden'); }
+function showSaving(msg='Saving…'){document.getElementById('savingOverlayText').textContent=msg;document.getElementById('savingOverlay').classList.remove('hidden');}
+function hideSaving(){document.getElementById('savingOverlay').classList.add('hidden');}
 
 /* ============================================================
    NOTIFICATION BOX
 ============================================================ */
-function showNotification(type, title, subtitle, details, message) {
-  const overlay=document.getElementById('notifOverlay'),header=document.getElementById('notifHeader'),
-    iconWrap=document.getElementById('notifIconWrap'),icon=document.getElementById('notifIcon'),
-    titleEl=document.getElementById('notifTitle'),subtitleEl=document.getElementById('notifSubtitle'),
-    msgEl=document.getElementById('notifMessage'),row1=document.getElementById('notifDetailRow1'),
-    row2=document.getElementById('notifDetailRow2'),d1val=document.getElementById('notifD1Value'),
-    d2val=document.getElementById('notifD2Value'),d1lbl=document.getElementById('notifD1Label'),d2lbl=document.getElementById('notifD2Label');
-  header.className='notif-box-header '+type;
-  const icons={success:'fa-check-circle',warning:'fa-exclamation-triangle',error:'fa-times-circle'};
-  icon.className='fas '+(icons[type]||'fa-info-circle');
-  titleEl.textContent=title; subtitleEl.textContent=subtitle||''; msgEl.textContent=message||'';
-  const rc=type+'-row'; row1.className='notif-detail-row '+rc; row2.className='notif-detail-row '+rc;
-  if(details&&details.name!==undefined){d1lbl.textContent='Supplier Name';d1val.textContent=details.name||'—';row1.style.display='flex';}
-  else row1.style.display='none';
-  if(details&&details.tin!==undefined){d2lbl.textContent='TIN Number';d2val.textContent=details.tin||'—';row2.style.display='flex';}
-  else row2.style.display='none';
-  overlay.classList.remove('hidden');
-}
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('notifCloseBtn').addEventListener('click',()=>document.getElementById('notifOverlay').classList.add('hidden'));
-  document.getElementById('notifOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
-});
+function showNotification(type,title,subtitle,details,message){const overlay=document.getElementById('notifOverlay'),header=document.getElementById('notifHeader'),iconWrap=document.getElementById('notifIconWrap'),icon=document.getElementById('notifIcon'),titleEl=document.getElementById('notifTitle'),subtitleEl=document.getElementById('notifSubtitle'),msgEl=document.getElementById('notifMessage'),row1=document.getElementById('notifDetailRow1'),row2=document.getElementById('notifDetailRow2'),d1val=document.getElementById('notifD1Value'),d2val=document.getElementById('notifD2Value'),d1lbl=document.getElementById('notifD1Label'),d2lbl=document.getElementById('notifD2Label');header.className='notif-box-header '+type;const icons={success:'fa-check-circle',warning:'fa-exclamation-triangle',error:'fa-times-circle'};icon.className='fas '+(icons[type]||'fa-info-circle');titleEl.textContent=title;subtitleEl.textContent=subtitle||'';msgEl.textContent=message||'';const rc=type+'-row';row1.className='notif-detail-row '+rc;row2.className='notif-detail-row '+rc;if(details&&details.name!==undefined){d1lbl.textContent='Supplier Name';d1val.textContent=details.name||'—';row1.style.display='flex';}else row1.style.display='none';if(details&&details.tin!==undefined){d2lbl.textContent='TIN Number';d2val.textContent=details.tin||'—';row2.style.display='flex';}else row2.style.display='none';overlay.classList.remove('hidden');}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('notifCloseBtn').addEventListener('click',()=>document.getElementById('notifOverlay').classList.add('hidden'));document.getElementById('notifOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});});
 
 /* ============================================================
-   EXPENSE CATEGORIES & RATES
+   EXPENSE CATEGORIES
 ============================================================ */
-const EXPENSE_CATEGORIES = {
-  "REPAIRS AND MAINTENANCE - LABOR":0.02,"MEALS AND ACCOMMODATION - SERVICES":0.02,
-  "REPRESENTATION - SERVICES":0.02,"ELECTRICITY AND WATER":0.02,"COMMUNICATION EXPENSE":0.02,
-  "FREIGHT AND COURIER":0.02,"TRAVEL AND TRANSPORTATION":0.02,"ADVERTISING AND MARKETING":0.02,
-  "SECURITY SERVICES":0.02,"INSURANCE":0.02,"SEMINAR AND TRAINING":0.02,
-  "MEDICAL EXPENSE - SERVICES":0.02,"PROFESSIONAL FEES":0.02,"CLEANING SERVICES":0.02,"OTHERS - SERVICES":0.02,
-  "REPAIRS AND MAINTENANCE - MATERIALS":0.01,"MEALS AND ACCOMMODATION - GOODS":0.01,
-  "REPRESENTATION - GOODS":0.01,"FUEL AND OIL":0.01,"OFFICE SUPPLIES":0.01,
-  "UNIFORMS":0.01,"MEDICAL EXPENSE - GOODS":0.01,"CLEANING SUPPLIES":0.01,"OTHERS - GOODS":0.01,
-  "RENTAL":0.05
-};
-const CATEGORY_GROUPS = [
-  { name:"SERVICES (2% Withholding Tax)", icon:"fa-cogs", rateClass:"r2",
-    cats:["REPAIRS AND MAINTENANCE - LABOR","MEALS AND ACCOMMODATION - SERVICES","REPRESENTATION - SERVICES","ELECTRICITY AND WATER","COMMUNICATION EXPENSE","FREIGHT AND COURIER","TRAVEL AND TRANSPORTATION","ADVERTISING AND MARKETING","SECURITY SERVICES","INSURANCE","SEMINAR AND TRAINING","MEDICAL EXPENSE - SERVICES","PROFESSIONAL FEES","CLEANING SERVICES","OTHERS - SERVICES"] },
-  { name:"GOODS (1% Withholding Tax)", icon:"fa-boxes", rateClass:"r1",
-    cats:["REPAIRS AND MAINTENANCE - MATERIALS","MEALS AND ACCOMMODATION - GOODS","REPRESENTATION - GOODS","FUEL AND OIL","OFFICE SUPPLIES","UNIFORMS","MEDICAL EXPENSE - GOODS","CLEANING SUPPLIES","OTHERS - GOODS"] },
-  { name:"RENTAL (5% Withholding Tax)", icon:"fa-building", rateClass:"r5", cats:["RENTAL"] }
-];
-
-function getRateFromExpense(val){
-  if(!val) return 0; const v=val.trim();
-  if(EXPENSE_CATEGORIES[v]!==undefined) return EXPENSE_CATEGORIES[v];
-  const u=v.toUpperCase();
-  if(u.includes('RENTAL')||u.includes('RENT')) return 0.05;
-  if(u.includes('GOODS')||u.includes('MATERIALS')||u.includes('SUPPLIES')||u.includes('FUEL')||u.includes('OIL')||u.includes('UNIFORM')) return 0.01;
-  if(u.includes('SERVICE')||u.includes('LABOR')||u.includes('ELECTRICITY')||u.includes('WATER')||u.includes('COMMUNICATION')||u.includes('FREIGHT')||u.includes('TRAVEL')||u.includes('ADVERTISING')||u.includes('SECURITY')||u.includes('INSURANCE')||u.includes('SEMINAR')||u.includes('TRAINING')||u.includes('MEDICAL')||u.includes('PROFESSIONAL')||u.includes('CLEANING')||u.includes('REPRESENTATION')) return 0.02;
-  return 0;
-}
-function getCatType(val){ const r=getRateFromExpense(val); if(r===0.05)return'rental'; if(r===0.02)return'services'; if(r===0.01)return'goods'; return''; }
-
+const EXPENSE_CATEGORIES={"REPAIRS AND MAINTENANCE - LABOR":0.02,"MEALS AND ACCOMMODATION - SERVICES":0.02,"REPRESENTATION - SERVICES":0.02,"ELECTRICITY AND WATER":0.02,"COMMUNICATION EXPENSE":0.02,"FREIGHT AND COURIER":0.02,"TRAVEL AND TRANSPORTATION":0.02,"ADVERTISING AND MARKETING":0.02,"SECURITY SERVICES":0.02,"INSURANCE":0.02,"SEMINAR AND TRAINING":0.02,"MEDICAL EXPENSE - SERVICES":0.02,"PROFESSIONAL FEES":0.02,"CLEANING SERVICES":0.02,"OTHERS - SERVICES":0.02,"REPAIRS AND MAINTENANCE - MATERIALS":0.01,"MEALS AND ACCOMMODATION - GOODS":0.01,"REPRESENTATION - GOODS":0.01,"FUEL AND OIL":0.01,"OFFICE SUPPLIES":0.01,"UNIFORMS":0.01,"MEDICAL EXPENSE - GOODS":0.01,"CLEANING SUPPLIES":0.01,"OTHERS - GOODS":0.01,"RENTAL":0.05};
+const CATEGORY_GROUPS=[{name:"SERVICES (2% Withholding Tax)",icon:"fa-cogs",rateClass:"r2",cats:["REPAIRS AND MAINTENANCE - LABOR","MEALS AND ACCOMMODATION - SERVICES","REPRESENTATION - SERVICES","ELECTRICITY AND WATER","COMMUNICATION EXPENSE","FREIGHT AND COURIER","TRAVEL AND TRANSPORTATION","ADVERTISING AND MARKETING","SECURITY SERVICES","INSURANCE","SEMINAR AND TRAINING","MEDICAL EXPENSE - SERVICES","PROFESSIONAL FEES","CLEANING SERVICES","OTHERS - SERVICES"]},{name:"GOODS (1% Withholding Tax)",icon:"fa-boxes",rateClass:"r1",cats:["REPAIRS AND MAINTENANCE - MATERIALS","MEALS AND ACCOMMODATION - GOODS","REPRESENTATION - GOODS","FUEL AND OIL","OFFICE SUPPLIES","UNIFORMS","MEDICAL EXPENSE - GOODS","CLEANING SUPPLIES","OTHERS - GOODS"]},{name:"RENTAL (5% Withholding Tax)",icon:"fa-building",rateClass:"r5",cats:["RENTAL"]}];
+function getRateFromExpense(val){if(!val)return 0;const v=val.trim();if(EXPENSE_CATEGORIES[v]!==undefined)return EXPENSE_CATEGORIES[v];const u=v.toUpperCase();if(u.includes('RENTAL')||u.includes('RENT'))return 0.05;if(u.includes('GOODS')||u.includes('MATERIALS')||u.includes('SUPPLIES')||u.includes('FUEL')||u.includes('OIL')||u.includes('UNIFORM'))return 0.01;if(u.includes('SERVICE')||u.includes('LABOR')||u.includes('ELECTRICITY')||u.includes('WATER')||u.includes('COMMUNICATION')||u.includes('FREIGHT')||u.includes('TRAVEL')||u.includes('ADVERTISING')||u.includes('SECURITY')||u.includes('INSURANCE')||u.includes('SEMINAR')||u.includes('TRAINING')||u.includes('MEDICAL')||u.includes('PROFESSIONAL')||u.includes('CLEANING')||u.includes('REPRESENTATION'))return 0.02;return 0;}
+function getCatType(val){const r=getRateFromExpense(val);if(r===0.05)return'rental';if(r===0.02)return'services';if(r===0.01)return'goods';return'';}
 let recentExpenses=[];
-function loadRecentExpenses(){ try{ const s=localStorage.getItem('exp_recent_'+APP_ROLE); if(s) recentExpenses=JSON.parse(s); }catch(e){} }
-function saveRecentExpenses(){ localStorage.setItem('exp_recent_'+APP_ROLE,JSON.stringify(recentExpenses.slice(0,5))); }
-function addToRecent(cat){ if(!cat) return; const i=recentExpenses.indexOf(cat); if(i>-1) recentExpenses.splice(i,1); recentExpenses.unshift(cat); if(recentExpenses.length>5) recentExpenses.pop(); saveRecentExpenses(); }
+function loadRecentExpenses(){try{const s=localStorage.getItem('exp_recent_'+APP_ROLE);if(s)recentExpenses=JSON.parse(s);}catch(e){}}
+function saveRecentExpenses(){localStorage.setItem('exp_recent_'+APP_ROLE,JSON.stringify(recentExpenses.slice(0,5)));}
+function addToRecent(cat){if(!cat)return;const i=recentExpenses.indexOf(cat);if(i>-1)recentExpenses.splice(i,1);recentExpenses.unshift(cat);if(recentExpenses.length>5)recentExpenses.pop();saveRecentExpenses();}
 
 /* ============================================================
    SUPPLIER AUTO-FILL DB
 ============================================================ */
 (function(){
-  let db = new Map();
-
-  async function loadDB() { db = await apiLoadSuppliers(); renderSuppliers(); }
-  async function saveDB() { await apiSaveSuppliers(db); renderSuppliers(); }
-
-  window.addExpSupplierPair = async function(name, tin, address, silent) {
-    if(!name) return false;
-    const n=name.trim(); if(!n) return false;
-    const t=tin?tin.trim():'';
-    if(!t){
-      let changed=false;
-      if(address&&db.get('addr:name:'+n)!==address){db.set('addr:name:'+n,address);changed=true;}
-      const isNew=!db.has('notin:'+n);
-      if(isNew){db.set('notin:'+n,'1');changed=true;}
-      if(changed) await saveDB();
-      if(isNew&&!silent) showNotification('success','New Supplier Registered!','Supplier added to the registry',{name:n,tin:'(No TIN provided)'},'This supplier has been saved to your registered suppliers list.');
-      return true;
+  let db=new Map();
+  async function loadDB(){db=await apiLoadSuppliers();renderSuppliers();}
+  async function saveDB(){await apiSaveSuppliers(db);renderSuppliers();}
+  window.addExpSupplierPair=async function(name,tin,address,silent){if(!name)return false;const n=name.trim();if(!n)return false;const t=tin?tin.trim():'';if(!t){let changed=false;if(address&&db.get('addr:name:'+n)!==address){db.set('addr:name:'+n,address);changed=true;}const isNew=!db.has('notin:'+n);if(isNew){db.set('notin:'+n,'1');changed=true;}if(changed)await saveDB();if(isNew&&!silent)showNotification('success','New Supplier Registered!','Supplier added to the registry',{name:n,tin:'(No TIN provided)'},'This supplier has been saved to your registered suppliers list.');return true;}const et=db.get('name:'+n),en=db.get('tin:'+t);if(et&&et!==t){showNotification('error','TIN Conflict Detected','This name is already linked to a different TIN',{name:n,tin:et},'The supplier "'+n+'" is already registered with TIN '+et+'. Please verify the information.');return false;}if(en&&en!==n){showNotification('error','TIN Already Registered','This TIN is already linked to another supplier',{name:en,tin:t},'TIN '+t+' is already registered under "'+en+'". Each TIN must be unique.');return false;}let changed=false;const isNew=!et;if(isNew){db.set('name:'+n,t);db.set('tin:'+t,n);db.delete('notin:'+n);changed=true;}if(address&&db.get('addr:'+n)!==address){db.set('addr:'+n,address);db.set('addr:'+t,address);changed=true;}if(changed)await saveDB();if(isNew&&!silent)showNotification('success','New Supplier Registered!','Supplier successfully added to the registry',{name:n,tin:t},'This supplier has been saved to your registered suppliers list.');return true;};
+  window.lookupTinByExpSupplier=n=>n?(db.get('name:'+n.trim())||null):null;
+  window.lookupExpSupplierByTin=t=>t?(db.get('tin:'+t.trim())||null):null;
+  window.lookupExpSupplierAddr=k=>k?(db.get('addr:'+k.trim())||''):'';
+  window.getAllExpSuppliers = function() {
+  const p = [];
+  for (let [k, v] of db) {
+    if (k.startsWith('name:')) {
+      const nm = k.slice(5);
+      p.push({
+        name: nm,
+        tin: v,
+        address: db.get('addr:' + nm) || ''
+      });
     }
-    const et=db.get('name:'+n), en=db.get('tin:'+t);
-    if(et&&et!==t){showNotification('error','TIN Conflict Detected','This name is already linked to a different TIN',{name:n,tin:et},'The supplier "'+n+'" is already registered with TIN '+et+'. Please verify the information.');return false;}
-    if(en&&en!==n){showNotification('error','TIN Already Registered','This TIN is already linked to another supplier',{name:en,tin:t},'TIN '+t+' is already registered under "'+en+'". Each TIN must be unique.');return false;}
-    let changed=false; const isNew=!et;
-    if(isNew){db.set('name:'+n,t);db.set('tin:'+t,n);db.delete('notin:'+n);changed=true;}
-    if(address&&db.get('addr:'+n)!==address){db.set('addr:'+n,address);db.set('addr:'+t,address);changed=true;}
-    if(changed) await saveDB();
-    if(isNew&&!silent) showNotification('success','New Supplier Registered!','Supplier successfully added to the registry',{name:n,tin:t},'This supplier has been saved to your registered suppliers list.');
-    return true;
-  };
-
-  window.lookupTinByExpSupplier = n => n?(db.get('name:'+n.trim())||null):null;
-  window.lookupExpSupplierByTin = t => t?(db.get('tin:'+t.trim())||null):null;
-  window.lookupExpSupplierAddr  = k => k?(db.get('addr:'+k.trim())||''):'';
-  window.getAllExpSuppliers = function(){
-    const p=[];
-    for(let[k,v]of db){if(k.startsWith('name:')){const nm=k.slice(5);p.push({name:nm,tin:v,address:db.get('addr:'+nm)||''}); }}
-    return p.sort((a,b)=>a.name.localeCompare(b.name));
-  };
-  window.deleteExpSupplier = async function(name,tin){
-    if(!confirm('Delete "'+name+'" (TIN: '+tin+'")?')) return;
-    db.delete('name:'+name);db.delete('tin:'+tin);db.delete('addr:'+name);db.delete('addr:'+tin);
-    db.delete('notin:'+name);db.delete('addr:name:'+name);
-    await saveDB(); showToast('Deleted: "'+name+'"','success');
-  };
-  window.clearAllExpSuppliers = async function(){
-    if(!confirm('Delete ALL registered suppliers?')) return;
-    db.clear(); await saveDB(); showToast('All suppliers cleared','success');
-  };
-
+  }
+  return p.sort((a, b) => a.name.localeCompare(b.name));
+};
+  window.deleteExpSupplier=async function(name,tin){if(!confirm('Delete "'+name+'" (TIN: '+tin+'")?'))return;db.delete('name:'+name);db.delete('tin:'+tin);db.delete('addr:'+name);db.delete('addr:'+tin);db.delete('notin:'+name);db.delete('addr:name:'+name);await saveDB();showToast('Deleted: "'+name+'"','success');};
+  window.clearAllExpSuppliers=async function(){if(!confirm('Delete ALL registered suppliers?'))return;db.clear();await saveDB();showToast('All suppliers cleared','success');};
   function escH(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
-  window.renderSuppliers = function(){
-    const pairs=getAllExpSuppliers();
-    const cnt=document.getElementById('suppliersCount'); if(cnt) cnt.textContent=pairs.length;
-    const container=document.getElementById('suppliersListContainer'); if(!container) return;
-    if(!pairs.length){container.innerHTML='<div style="text-align:center;padding:24px;color:var(--gray-400)"><i class="fas fa-inbox" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>No registered suppliers yet.</div>';return;}
-    container.innerHTML=pairs.map(p=>{
-      const addr=p.address?`<div class="sup-addr"><i class="fas fa-map-marker-alt"></i>${escH(p.address)}</div>`:'';
-      return`<div class="supplier-item"><div class="supplier-info"><div class="supplier-name-tin"><span class="sup-name">${escH(p.name)}</span><span class="sup-arrow">→</span><span class="sup-tin">${escH(p.tin||'No TIN')}</span></div>${addr}</div><button class="del-sup-btn" onclick="deleteExpSupplier('${escH(p.name)}','${escH(p.tin)}')"><i class="fas fa-trash"></i></button></div>`;
-    }).join('');
-  };
-
-  document.addEventListener('DOMContentLoaded', () => loadDB());
+  window.renderSuppliers=function(){const pairs=getAllExpSuppliers();const cnt=document.getElementById('suppliersCount');if(cnt)cnt.textContent=pairs.length;const container=document.getElementById('suppliersListContainer');if(!container)return;if(!pairs.length){container.innerHTML='<div style="text-align:center;padding:24px;color:var(--gray-400)"><i class="fas fa-inbox" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>No registered suppliers yet.</div>';return;}container.innerHTML=pairs.map(p=>{const addr=p.address?`<div class="sup-addr"><i class="fas fa-map-marker-alt"></i>${escH(p.address)}</div>`:'';return`<div class="supplier-item"><div class="supplier-info"><div class="supplier-name-tin"><span class="sup-name">${escH(p.name)}</span><span class="sup-arrow">→</span><span class="sup-tin">${escH(p.tin||'No TIN')}</span></div>${addr}</div><button class="del-sup-btn" onclick="deleteExpSupplier('${escH(p.name)}','${escH(p.tin)}')"><i class="fas fa-trash"></i></button></div>`;}).join('');};
+  document.addEventListener('DOMContentLoaded',()=>loadDB());
 })();
 
 /* ============================================================
    UTILITY
 ============================================================ */
 function escH(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
-function showToast(msg,type='info'){
-  document.querySelectorAll('.toast').forEach(t=>t.remove());
-  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);
-  setTimeout(()=>{t.classList.add('fade-out');setTimeout(()=>t.remove(),300);},2800);
-}
+function showToast(msg,type='info'){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.classList.add('fade-out');setTimeout(()=>t.remove(),300);},2800);}
 function showLPToast(msg){let t=document.querySelector('.long-press-toast');if(!t){t=document.createElement('div');t.className='long-press-toast';document.body.appendChild(t);}t.textContent=msg;}
 function hideLPToast(){const t=document.querySelector('.long-press-toast');if(t)t.remove();}
 function formatTIN(input){let v=input.value.replace(/\D/g,'');if(v.length>12)v=v.slice(0,12);const parts=[v.slice(0,3),v.slice(3,6),v.slice(6,9),v.slice(9,12)].filter(p=>p!=='');input.value=parts.join('-');}
@@ -865,7 +715,18 @@ function validateTIN(input){const d=input.value.replace(/\D/g,'');input.style.bo
 function formatCompanyTIN(input){let v=input.value.replace(/\D/g,'');if(v.length>12)v=v.slice(0,12);let f='';for(let i=0;i<v.length;i++){if(i>0&&i%3===0&&i<12)f+='-';f+=v[i];}input.value=f;}
 
 /* ============================================================
-   DATE HELPERS (MM/DD/YYYY with auto-slash)
+   CHANGE 1: Currency formatting with commas
+============================================================ */
+function formatCurrency(value){if(value===null||value===undefined||value==='')return'0.00';const num=parseFloat(value);if(isNaN(num))return'0.00';return num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function getInputNumber(input){if(!input)return 0;const v=(input.dataset.raw!==undefined?input.dataset.raw:input.value).replace(/,/g,'');return parseFloat(v)||0;}
+function initCurrencyInput(input){
+  input.addEventListener('focus',function(){const raw=this.dataset.raw||this.value.replace(/,/g,'');this.value=raw;this.select();});
+  input.addEventListener('blur',function(){const raw=this.value.replace(/,/g,'');const num=parseFloat(raw);if(!isNaN(num)&&num!==0){this.dataset.raw=raw;this.value=formatCurrency(raw);}else if(raw===''||raw==='0'){this.dataset.raw='';this.value='';}});
+  input.addEventListener('input',function(){this.dataset.raw=this.value.replace(/,/g,'');});
+}
+
+/* ============================================================
+   DATE HELPERS
 ============================================================ */
 function displayToStorageDate(d){if(!d)return'';const p=d.split('/');if(p.length===3)return`${p[2]}-${p[0]}-${p[1]}`;return d;}
 function storageToDisplayDate(d){if(!d)return'';const p=d.split('-');if(p.length===3)return`${p[1]}/${p[2]}/${p[0]}`;return d;}
@@ -887,128 +748,45 @@ function selectCalDate(year,month,day){const input=dpState.targetInput;if(!input
 /* ============================================================
    COMPANY INFO
 ============================================================ */
-async function saveCompanyInfo() {
-  const data={};
-  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){if(id==='reportDate'&&el.value)data[id]=displayToStorageDate(el.value);else data[id]=el.value;}
-  });
-  localStorage.setItem(getActiveCompanyKey(), JSON.stringify(data));
-  if (USE_API) {
-    try {
-      await fetch(`${API_BASE}/exp-records/${getApiRecordId()}/company`, { method:'PATCH', headers:apiHeaders(), body:JSON.stringify(data) });
-    } catch(_) {}
-  }
-}
-
-function applyCompanyInfo(data) {
-  if (!data) return;
-  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el&&data[id]!==undefined){
-      if(id==='reportDate'&&data[id]) el.value=storageToDisplayDate(data[id]);
-      else el.value=data[id];
-    }
-  });
-}
-
-function clearCompanyInfo(){
-  if(!confirm('Clear all company information?')) return;
-  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  localStorage.removeItem(getActiveCompanyKey());
-  if (USE_API) { fetch(`${API_BASE}/exp-records/${getApiRecordId()}/company`,{method:'DELETE',headers:apiHeaders()}).catch(()=>{}); }
-  showToast('Company info cleared','success');
-}
+async function saveCompanyInfo(){const data={};['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el){if(id==='reportDate'&&el.value)data[id]=displayToStorageDate(el.value);else data[id]=el.value;}});localStorage.setItem(getActiveCompanyKey(),JSON.stringify(data));if(USE_API){try{await fetch(`${API_BASE}/exp-records/${getApiRecordId()}/company`,{method:'PATCH',headers:apiHeaders(),body:JSON.stringify(data)});}catch(_){}}}
+function applyCompanyInfo(data){if(!data)return;['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el&&data[id]!==undefined){if(id==='reportDate'&&data[id])el.value=storageToDisplayDate(data[id]);else el.value=data[id];}});}
+function clearCompanyInfo(){if(!confirm('Clear all company information?'))return;['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});localStorage.removeItem(getActiveCompanyKey());if(USE_API){fetch(`${API_BASE}/exp-records/${getApiRecordId()}/company`,{method:'DELETE',headers:apiHeaders()}).catch(()=>{});}showToast('Company info cleared','success');}
 
 /* ============================================================
    AUTOSAVE
 ============================================================ */
-let autoSaveTimer = null;
+let autoSaveTimer=null;
+function getTableData(){return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({date:r.querySelector('.date-input')?.value||'',invoiceNumber:r.querySelector('.invoice-number')?.value||'',invoiceType:r.querySelector('.invoice-type')?.value||'',paymentMode:r.querySelector('.payment-mode')?.value||'',transactionType:r.querySelector('.transaction-type')?.value||'',tinNumber:r.querySelector('.tin-number')?.value||'',supplierName:r.querySelector('.supplier-name')?.value||'',address:r.querySelector('.address')?.value||'',grossAmount:getInputNumber(r.querySelector('.gross-amount'))+'',natureExpense:r.querySelector('.nature-input')?.value||'',remarks:r.querySelector('.remarks')?.value||''}));}
+function getCompanyData(){const f=id=>document.getElementById(id)?.value||'';return{name:f('companyName'),tin:f('companyTIN'),address:f('companyAddress'),business:f('lineOfBusiness'),telephone:f('telephone'),date:f('reportDate'),employee:f('authorizedEmployee'),email:f('email')};}
+async function saveSession(){showSaving(IS_MONTHLY?`Saving ${MONTHLY_CTX.label}…`:'Saving…');await apiSaveSession(getTableData(),getCompanyData());hideSaving();}
+function scheduleAutoSave(){clearTimeout(autoSaveTimer);const ind=document.getElementById('autosaveIndicator');if(ind)ind.classList.add('visible');autoSaveTimer=setTimeout(async()=>{await saveSession();if(ind)ind.classList.remove('visible');},1500);}
+async function restoreSession(){showSaving('Loading…');const data=await apiLoadSession();hideSaving();if(!data||!Array.isArray(data.tableData))return false;if(data.companyInfo)applyCompanyInfo(data.companyInfo);document.getElementById('tableBody').innerHTML='';data.tableData.forEach(rd=>addRow(rd));if(data.tableData.length===0)addRow();currentPage=1;renderCurrentPage();updateAllStats();return data.tableData.length;}
 
-function getTableData(){
-  return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({
-    date:r.querySelector('.date-input')?.value||'',
-    invoiceNumber:r.querySelector('.invoice-number')?.value||'',
-    invoiceType:r.querySelector('.invoice-type')?.value||'',
-    paymentMode:r.querySelector('.payment-mode')?.value||'',
-    transactionType:r.querySelector('.transaction-type')?.value||'',
-    tinNumber:r.querySelector('.tin-number')?.value||'',
-    supplierName:r.querySelector('.supplier-name')?.value||'',
-    address:r.querySelector('.address')?.value||'',
-    grossAmount:r.querySelector('.gross-amount')?.value||'',
-    natureExpense:r.querySelector('.nature-input')?.value||'',
-    remarks:r.querySelector('.remarks')?.value||''
-  }));
-}
-function getCompanyData(){
-  const f=id=>document.getElementById(id)?.value||'';
-  return{name:f('companyName'),tin:f('companyTIN'),address:f('companyAddress'),business:f('lineOfBusiness'),telephone:f('telephone'),date:f('reportDate'),employee:f('authorizedEmployee'),email:f('email')};
-}
+/* ============================================================
+   PORTAL FILE LOAD (SubAdmin)
+============================================================ */
+function checkPortalFileOnLoad(){if(APP_ROLE!=='SubAdmin')return false;try{const content=sessionStorage.getItem('VAT_PORTAL_OPEN_FILE'),filename=sessionStorage.getItem('VAT_PORTAL_OPEN_FILENAME')||'portal_file.exp';if(!content)return false;sessionStorage.removeItem('VAT_PORTAL_OPEN_FILE');sessionStorage.removeItem('VAT_PORTAL_OPEN_FILENAME');const d=JSON.parse(content);if(!d.tableData)throw new Error('Invalid EXP file format');document.getElementById('tableBody').innerHTML='';if(d.companyInfo)applyCompanyInfo(d.companyInfo);d.tableData.forEach(rd=>addRow(rd));if(d.tableData.length===0)addRow();currentPage=1;renderCurrentPage();updateAllStats();const banner=document.getElementById('portalBanner'),bannerName=document.getElementById('portalBannerFilename');if(banner&&bannerName){bannerName.textContent=filename;banner.classList.remove('hidden');}showToast('Loaded "'+filename+'" from portal ('+d.tableData.length+' rows)','success');scheduleAutoSave();return true;}catch(e){sessionStorage.removeItem('VAT_PORTAL_OPEN_FILE');sessionStorage.removeItem('VAT_PORTAL_OPEN_FILENAME');showToast('Could not load portal file: '+e.message,'error');return false;}}
 
-async function saveSession() {
-  showSaving(IS_MONTHLY ? `Saving ${MONTHLY_CTX.label}…` : 'Saving…');
-  await apiSaveSession(getTableData(), getCompanyData());
-  hideSaving();
-}
-
-function scheduleAutoSave() {
-  clearTimeout(autoSaveTimer);
-  const ind=document.getElementById('autosaveIndicator');if(ind)ind.classList.add('visible');
-  autoSaveTimer=setTimeout(async()=>{
+/* ============================================================
+   CHANGE 2: Go to Portal — no file download
+============================================================ */
+function openPortalModal(){
+  document.getElementById('submitModalOverlay').classList.remove('hidden');
+  document.getElementById('submitModalConfirmBtn').onclick=async function(){
     await saveSession();
-    if(ind)ind.classList.remove('visible');
-  }, 1500);
-}
-
-async function restoreSession() {
-  showSaving('Loading…');
-  const data = await apiLoadSession();
-  hideSaving();
-  if (!data || !Array.isArray(data.tableData)) return false;
-  if (data.companyInfo) applyCompanyInfo(data.companyInfo);
-  document.getElementById('tableBody').innerHTML='';
-  data.tableData.forEach(rd=>addRow(rd));
-  if(data.tableData.length===0) addRow();
-  currentPage=1; renderCurrentPage(); updateAllStats();
-  return data.tableData.length;
+    showToast('Navigating to portal…','success');
+    document.getElementById('submitModalOverlay').classList.add('hidden');
+    setTimeout(()=>{location.href='../index.html';},400);
+  };
 }
 
 /* ============================================================
    COLUMN VISIBILITY
 ============================================================ */
-const COLS=[
-  {key:'date',name:'Date'},{key:'invoiceNumber',name:'Invoice No.'},{key:'invoiceType',name:'Invoice Type'},
-  {key:'paymentMode',name:'Payment Mode'},{key:'transactionType',name:'Transaction Type'},
-  {key:'tinNumber',name:'TIN Number'},{key:'supplierName',name:'Supplier Name'},{key:'address',name:'Address'},
-  {key:'grossAmount',name:'Gross Amount'},{key:'natureExpense',name:'Nature of Expense'},
-  {key:'netExpenses',name:'Net Expenses'},{key:'inputTax',name:'Input Tax'},
-  {key:'withholdingRate',name:'W/T Rate'},{key:'withholdingTax',name:'Withholding Tax'},
-  {key:'grossMinusWT',name:'Gross − W/T'},{key:'remarks',name:'Remarks'},{key:'action',name:'Del'}
-];
+const COLS=[{key:'date',name:'Date'},{key:'invoiceNumber',name:'Invoice No.'},{key:'invoiceType',name:'Invoice Type'},{key:'paymentMode',name:'Payment Mode'},{key:'transactionType',name:'Transaction Type'},{key:'tinNumber',name:'TIN Number'},{key:'supplierName',name:'Supplier Name'},{key:'address',name:'Address'},{key:'grossAmount',name:'Gross Amount'},{key:'natureExpense',name:'Nature of Expense'},{key:'netExpenses',name:'Net Expenses'},{key:'inputTax',name:'Input Tax'},{key:'withholdingRate',name:'W/T Rate'},{key:'withholdingTax',name:'Withholding Tax'},{key:'grossMinusWT',name:'Gross − W/T'},{key:'remarks',name:'Remarks'},{key:'action',name:'Del'}];
 let colVis={};
-
-function initColVisibility(){
-  colVis=JSON.parse(localStorage.getItem(NS.COL_VISIBILITY)||'{}');
-  const list=document.getElementById('colList');
-  COLS.forEach(c=>{
-    const item=document.createElement('div');item.className='col-item';
-    const cb=document.createElement('input');cb.type='checkbox';cb.id='cv_'+c.key;cb.checked=!colVis[c.key];
-    const lbl=document.createElement('label');lbl.htmlFor='cv_'+c.key;lbl.textContent=c.name;
-    cb.addEventListener('change',()=>{colVis[c.key]=!cb.checked;applyColVis();localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis));});
-    item.appendChild(cb);item.appendChild(lbl);list.appendChild(item);
-  });
-  applyColVis();
-  document.getElementById('showAllColsBtn').addEventListener('click',()=>{COLS.forEach(c=>{colVis[c.key]=false;const cb=document.getElementById('cv_'+c.key);if(cb)cb.checked=true;});applyColVis();localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis));showToast('All columns visible','success');});
-  document.getElementById('hideAllColsBtn').addEventListener('click',()=>{COLS.forEach(c=>{colVis[c.key]=true;const cb=document.getElementById('cv_'+c.key);if(cb)cb.checked=false;});applyColVis();localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis));showToast('All columns hidden','info');});
-  const btn=document.getElementById('colVisBtn'),dd=document.getElementById('colVisDropdown');
-  btn.addEventListener('click',e=>{e.stopPropagation();dd.classList.toggle('open');});
-  document.addEventListener('click',e=>{if(!dd.contains(e.target)&&e.target!==btn)dd.classList.remove('open');});
-}
-function applyColVis(){
-  const table=document.getElementById('vatableExpensesTable'),ths=table.querySelectorAll('thead th');
-  COLS.forEach((c,i)=>{const hide=!!colVis[c.key];ths[i].classList.toggle('hidden-column',hide);table.querySelectorAll('tbody tr,tfoot tr').forEach(row=>{const td=row.children[i];if(td)td.classList.toggle('hidden-column',hide);});});
-  rebuildSummaryRow();
-}
+function initColVisibility(){colVis=JSON.parse(localStorage.getItem(NS.COL_VISIBILITY)||'{}');const list=document.getElementById('colList');COLS.forEach(c=>{const item=document.createElement('div');item.className='col-item';const cb=document.createElement('input');cb.type='checkbox';cb.id='cv_'+c.key;cb.checked=!colVis[c.key];const lbl=document.createElement('label');lbl.htmlFor='cv_'+c.key;lbl.textContent=c.name;cb.addEventListener('change',()=>{colVis[c.key]=!cb.checked;applyColVis();localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis));});item.appendChild(cb);item.appendChild(lbl);list.appendChild(item);});applyColVis();document.getElementById('showAllColsBtn').addEventListener('click',()=>{COLS.forEach(c=>{colVis[c.key]=false;const cb=document.getElementById('cv_'+c.key);if(cb)cb.checked=true;});applyColVis();localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis));showToast('All columns visible','success');});document.getElementById('hideAllColsBtn').addEventListener('click',()=>{COLS.forEach(c=>{colVis[c.key]=true;const cb=document.getElementById('cv_'+c.key);if(cb)cb.checked=false;});applyColVis();localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis));showToast('All columns hidden','info');});const btn=document.getElementById('colVisBtn'),dd=document.getElementById('colVisDropdown');btn.addEventListener('click',e=>{e.stopPropagation();dd.classList.toggle('open');});document.addEventListener('click',e=>{if(!dd.contains(e.target)&&e.target!==btn)dd.classList.remove('open');});}
+function applyColVis(){const table=document.getElementById('vatableExpensesTable'),ths=table.querySelectorAll('thead th');COLS.forEach((c,i)=>{const hide=!!colVis[c.key];ths[i].classList.toggle('hidden-column',hide);table.querySelectorAll('tbody tr,tfoot tr').forEach(row=>{const td=row.children[i];if(td)td.classList.toggle('hidden-column',hide);});});rebuildSummaryRow();}
 
 /* ============================================================
    PAGINATION
@@ -1017,67 +795,36 @@ let currentPage=1,rowsPerPage=25;
 function getTotalPages(){return Math.max(1,Math.ceil(document.querySelectorAll('#tableBody tr').length/rowsPerPage));}
 function updatePagination(){const total=document.querySelectorAll('#tableBody tr').length,totalP=getTotalPages();const start=total===0?0:(currentPage-1)*rowsPerPage+1,end=Math.min(currentPage*rowsPerPage,total);document.getElementById('startEntry').textContent=start;document.getElementById('endEntry').textContent=end;document.getElementById('totalEntries').textContent=total;document.getElementById('totalPages').textContent=totalP;document.getElementById('currentPageDisplay').textContent=currentPage;document.getElementById('entryCount').textContent=total;document.getElementById('firstPageBtn').disabled=currentPage===1;document.getElementById('prevPageBtn').disabled=currentPage===1;document.getElementById('nextPageBtn').disabled=currentPage>=totalP;document.getElementById('lastPageBtn').disabled=currentPage>=totalP;}
 function renderCurrentPage(){const rows=Array.from(document.querySelectorAll('#tableBody tr'));const start=(currentPage-1)*rowsPerPage,end=Math.min(start+rowsPerPage,rows.length);rows.forEach((r,i)=>{r.style.display=(i>=start&&i<end)?'':'none';});updatePagination();}
-function initPagination(){
-  document.getElementById('rowsPerPage').addEventListener('change',function(){rowsPerPage=+this.value;currentPage=1;renderCurrentPage();});
-  document.getElementById('firstPageBtn').addEventListener('click',()=>{currentPage=1;renderCurrentPage();});
-  document.getElementById('prevPageBtn').addEventListener('click',()=>{if(currentPage>1){currentPage--;renderCurrentPage();}});
-  document.getElementById('nextPageBtn').addEventListener('click',()=>{if(currentPage<getTotalPages()){currentPage++;renderCurrentPage();}});
-  document.getElementById('lastPageBtn').addEventListener('click',()=>{currentPage=getTotalPages();renderCurrentPage();});
-}
+function initPagination(){document.getElementById('rowsPerPage').addEventListener('change',function(){rowsPerPage=+this.value;currentPage=1;renderCurrentPage();});document.getElementById('firstPageBtn').addEventListener('click',()=>{currentPage=1;renderCurrentPage();});document.getElementById('prevPageBtn').addEventListener('click',()=>{if(currentPage>1){currentPage--;renderCurrentPage();}});document.getElementById('nextPageBtn').addEventListener('click',()=>{if(currentPage<getTotalPages()){currentPage++;renderCurrentPage();}});document.getElementById('lastPageBtn').addEventListener('click',()=>{currentPage=getTotalPages();renderCurrentPage();});}
 
 /* ============================================================
    NATURE DROPDOWN
 ============================================================ */
 let activeSugBox=null;
-function showNatureSuggestions(input,row){
-  if(activeSugBox){activeSugBox.remove();activeSugBox=null;}
-  const q=(input.value||'').toLowerCase().trim();
-  const box=document.createElement('div');box.className='nature-suggestions';
-  const filtered=[];
-  const recFiltered=recentExpenses.filter(c=>!q||c.toLowerCase().includes(q));
-  if(recFiltered.length&&!q){
-    const hdr=document.createElement('div');hdr.className='sug-group-header';hdr.innerHTML='<i class="fas fa-history"></i> Recently Used';box.appendChild(hdr);
-    recFiltered.forEach(cat=>{const item=makeSugItem(cat,row,input,box);box.appendChild(item);filtered.push(item);});
-  }
-  CATEGORY_GROUPS.forEach(grp=>{
-    const cats=grp.cats.filter(c=>!q||c.toLowerCase().includes(q));if(!cats.length)return;
-    const hdr=document.createElement('div');hdr.className='sug-group-header';hdr.innerHTML=`<i class="fas ${grp.icon}"></i> ${grp.name}`;box.appendChild(hdr);
-    cats.forEach(cat=>{const item=makeSugItem(cat,row,input,box);box.appendChild(item);filtered.push(item);});
-  });
-  if(!filtered.length){box.innerHTML='<div class="sug-empty"><i class="fas fa-search"></i> No matches</div>';}
-  const rect=input.getBoundingClientRect();
-  box.style.top=(rect.bottom+window.scrollY+4)+'px';
-  box.style.left=(rect.left+window.scrollX)+'px';
-  box.style.width=Math.max(rect.width,300)+'px';
-  document.body.appendChild(box);activeSugBox=box;
-  let hi=-1;
-  input.onkeydown=function(e){
-    if(!activeSugBox)return;
-    if(e.key==='ArrowDown'){e.preventDefault();if(hi<filtered.length-1){if(hi>=0)filtered[hi].classList.remove('highlighted');hi++;filtered[hi].classList.add('highlighted');filtered[hi].scrollIntoView({block:'nearest'});}}
-    else if(e.key==='ArrowUp'){e.preventDefault();if(hi>0){filtered[hi].classList.remove('highlighted');hi--;filtered[hi].classList.add('highlighted');filtered[hi].scrollIntoView({block:'nearest'});}}
-    else if(e.key==='Enter'){e.preventDefault();if(hi>=0&&filtered[hi])filtered[hi].click();else{hideSug();if(input.value){addToRecent(input.value);updateBadge(input);calcRow(row);scheduleStats();}}}
-    else if(e.key==='Escape'){e.preventDefault();hideSug();}
-  };
-  const close=e=>{if(!box.contains(e.target)&&e.target!==input){hideSug();document.removeEventListener('mousedown',close);}};
-  setTimeout(()=>document.addEventListener('mousedown',close),0);
-}
-function makeSugItem(cat,row,input,box){
-  const rate=EXPENSE_CATEGORIES[cat]||getRateFromExpense(cat),rateLabel=(rate*100).toFixed(0)+'%';
-  const rClass=rate===0.05?'r5':rate===0.02?'r2':'r1';
-  const item=document.createElement('div');item.className='sug-item';
-  item.innerHTML=`<span class="sug-item-name">${escH(cat)}</span><span class="sug-item-rate ${rClass}">${rateLabel}</span>`;
-  item.addEventListener('mousedown',e=>{e.preventDefault();selectNature(input,row,cat);});
-  return item;
-}
+function showNatureSuggestions(input,row){if(activeSugBox){activeSugBox.remove();activeSugBox=null;}const q=(input.value||'').toLowerCase().trim();const box=document.createElement('div');box.className='nature-suggestions';const filtered=[];const recFiltered=recentExpenses.filter(c=>!q||c.toLowerCase().includes(q));if(recFiltered.length&&!q){const hdr=document.createElement('div');hdr.className='sug-group-header';hdr.innerHTML='<i class="fas fa-history"></i> Recently Used';box.appendChild(hdr);recFiltered.forEach(cat=>{const item=makeSugItem(cat,row,input,box);box.appendChild(item);filtered.push(item);});}CATEGORY_GROUPS.forEach(grp=>{const cats=grp.cats.filter(c=>!q||c.toLowerCase().includes(q));if(!cats.length)return;const hdr=document.createElement('div');hdr.className='sug-group-header';hdr.innerHTML=`<i class="fas ${grp.icon}"></i> ${grp.name}`;box.appendChild(hdr);cats.forEach(cat=>{const item=makeSugItem(cat,row,input,box);box.appendChild(item);filtered.push(item);});});if(!filtered.length){box.innerHTML='<div class="sug-empty"><i class="fas fa-search"></i> No matches</div>';}const rect=input.getBoundingClientRect();box.style.top=(rect.bottom+window.scrollY+4)+'px';box.style.left=(rect.left+window.scrollX)+'px';box.style.width=Math.max(rect.width,300)+'px';document.body.appendChild(box);activeSugBox=box;let hi=-1;input.onkeydown=function(e){if(!activeSugBox)return;if(e.key==='ArrowDown'){e.preventDefault();if(hi<filtered.length-1){if(hi>=0)filtered[hi].classList.remove('highlighted');hi++;filtered[hi].classList.add('highlighted');filtered[hi].scrollIntoView({block:'nearest'});}}else if(e.key==='ArrowUp'){e.preventDefault();if(hi>0){filtered[hi].classList.remove('highlighted');hi--;filtered[hi].classList.add('highlighted');filtered[hi].scrollIntoView({block:'nearest'});}}else if(e.key==='Enter'){e.preventDefault();if(hi>=0&&filtered[hi])filtered[hi].click();else{hideSug();if(input.value){addToRecent(input.value);updateBadge(input);calcRow(row);scheduleStats();}}}else if(e.key==='Escape'){e.preventDefault();hideSug();}};const close=e=>{if(!box.contains(e.target)&&e.target!==input){hideSug();document.removeEventListener('mousedown',close);}};setTimeout(()=>document.addEventListener('mousedown',close),0);}
+function makeSugItem(cat,row,input,box){const rate=EXPENSE_CATEGORIES[cat]||getRateFromExpense(cat),rateLabel=(rate*100).toFixed(0)+'%';const rClass=rate===0.05?'r5':rate===0.02?'r2':'r1';const item=document.createElement('div');item.className='sug-item';item.innerHTML=`<span class="sug-item-name">${escH(cat)}</span><span class="sug-item-rate ${rClass}">${rateLabel}</span>`;item.addEventListener('mousedown',e=>{e.preventDefault();selectNature(input,row,cat);});return item;}
 function hideSug(){if(activeSugBox){activeSugBox.remove();activeSugBox=null;}}
-function selectNature(input,row,cat){input.value=cat;addToRecent(cat);updateBadge(input);hideSug();calcRow(row);scheduleStats();storeSupplierFromRow(row);input.dispatchEvent(new Event('input',{bubbles:true}));scheduleAutoSave();}
-function updateBadge(input){
-  const cell=input.closest('td');if(!cell)return;
-  let badge=cell.querySelector('.nature-badge');
-  if(!badge){badge=document.createElement('div');badge.className='nature-badge';cell.querySelector('.nature-cell-wrap')?.appendChild(badge);}
-  const val=input.value,type=getCatType(val),rate=getRateFromExpense(val);
-  if(type){badge.className='nature-badge '+type;badge.textContent=(rate*100).toFixed(0)+'%';badge.style.display='block';}
-  else{badge.style.display='none';}
+function selectNature(input,row,cat){input.value=cat;addToRecent(cat);updateBadge(input);hideSug();calcRow(row);updateRowColor(row);scheduleStats();storeSupplierFromRow(row);input.dispatchEvent(new Event('input',{bubbles:true}));scheduleAutoSave();}
+function updateBadge(input){const cell=input.closest('td');if(!cell)return;let badge=cell.querySelector('.nature-badge');if(!badge){badge=document.createElement('div');badge.className='nature-badge';cell.querySelector('.nature-cell-wrap')?.appendChild(badge);}const val=input.value,type=getCatType(val),rate=getRateFromExpense(val);if(type){badge.className='nature-badge '+type;badge.textContent=(rate*100).toFixed(0)+'%';badge.style.display='block';}else{badge.style.display='none';}}
+
+/* ============================================================
+   CHANGE 5: Row color based on payment mode and expense type
+============================================================ */
+function updateRowColor(row){
+  const pm=row.querySelector('.payment-mode')?.value||'';
+  const nature=row.querySelector('.nature-input')?.value||'';
+  const gross=getInputNumber(row.querySelector('.gross-amount'));
+  row.classList.remove('row-has-data','row-cash','row-charge','row-services','row-goods','row-rental');
+  if(!gross&&!pm&&!nature)return;
+  row.classList.add('row-has-data');
+  // Payment mode priority for green/blue
+  if(pm==='Cash'){row.classList.add('row-cash');return;}
+  if(pm==='Charge'){row.classList.add('row-charge');return;}
+  // Fallback: expense category type
+  const type=getCatType(nature);
+  if(type==='services')row.classList.add('row-services');
+  else if(type==='goods')row.classList.add('row-goods');
+  else if(type==='rental')row.classList.add('row-rental');
 }
 
 /* ============================================================
@@ -1087,6 +834,7 @@ function createRow(data={}){
   const today=getTodayDisplayDate(),rid='r'+(Date.now()+'').slice(-8)+'_'+Math.floor(Math.random()*9999);
   const tr=document.createElement('tr');tr.id=rid;
   const invTypes=['OR','SI','DR','AR','TR','CR','OTHERS'];
+  const grossDisplay=data.grossAmount?formatCurrency(data.grossAmount):'';
   tr.innerHTML=`
     <td><input type="text" value="${data.date||today}" class="date-input" placeholder="MM/DD/YYYY"></td>
     <td><input type="text" value="${escH(data.invoiceNumber||'')}" class="invoice-number" placeholder="INV-001"></td>
@@ -1096,7 +844,7 @@ function createRow(data={}){
     <td><input type="text" value="${escH(data.tinNumber||'')}" class="tin-number" maxlength="15" placeholder="000-000-000-000" autocomplete="off"></td>
     <td><input type="text" value="${escH(data.supplierName||'')}" class="supplier-name" placeholder="Supplier name"></td>
     <td><input type="text" value="${escH(data.address||'')}" class="address" placeholder="Supplier address"></td>
-    <td><input type="number" value="${data.grossAmount||''}" step="0.01" min="0" class="gross-amount" placeholder="0.00"></td>
+    <td><input type="text" value="${escH(grossDisplay)}" class="gross-amount" placeholder="0.00" data-raw="${escH(data.grossAmount||'')}"></td>
     <td><div class="nature-cell-wrap" style="position:relative;height:100%;display:flex;align-items:center"><input type="text" value="${escH(data.natureExpense||'')}" class="nature-input" placeholder="Click to select…" autocomplete="off"><div class="nature-badge" style="display:none"></div></div></td>
     <td><div class="cell-computed net-expenses">0.00</div></td>
     <td><div class="cell-computed input-tax">0.00</div></td>
@@ -1106,47 +854,40 @@ function createRow(data={}){
     <td><input type="text" value="${escH(data.remarks||'')}" class="remarks" placeholder="Remarks"></td>
     <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>`;
   COLS.forEach((c,i)=>{const td=tr.children[i];if(td)td.classList.toggle('hidden-column',!!colVis[c.key]);});
+  const grossInput=tr.querySelector('.gross-amount');
+  initCurrencyInput(grossInput);
   attachRowListeners(tr);
   if(data.natureExpense)updateBadge(tr.querySelector('.nature-input'));
-  calcRow(tr);
+  calcRow(tr);updateRowColor(tr);
   return tr;
 }
 
 function attachRowListeners(row){
   if(row.dataset.listenersAttached)return;row.dataset.listenersAttached='1';
   const gross=row.querySelector('.gross-amount');
-  if(gross){gross.addEventListener('input',()=>{calcRow(row);scheduleStats();scheduleAutoSave();});}
-  row.querySelectorAll('select').forEach(el=>{el.addEventListener('change',()=>{calcRow(row);scheduleStats();scheduleAutoSave();});});
+  if(gross){gross.addEventListener('input',()=>{calcRow(row);scheduleStats();scheduleAutoSave();updateRowColor(row);});}
+  row.querySelectorAll('select').forEach(el=>{el.addEventListener('change',()=>{calcRow(row);scheduleStats();scheduleAutoSave();updateRowColor(row);});});
   const tin=row.querySelector('.tin-number');
   if(tin){tin.addEventListener('input',()=>formatTIN(tin));tin.addEventListener('blur',()=>{validateTIN(tin);tryFillFromTin(row);storeSupplierFromRow(row);});tin.addEventListener('focus',()=>{tin.select();setTimeout(()=>showTinSuggestions(tin,row),80);});tin.addEventListener('input',()=>setTimeout(()=>showTinSuggestions(tin,row),60));}
-  const sn=row.querySelector('.supplier-name');
-  if(sn){sn.addEventListener('blur',()=>{tryFillFromName(row);storeSupplierFromRow(row);});}
-  const addr=row.querySelector('.address');
-  if(addr){addr.addEventListener('blur',()=>storeSupplierFromRow(row));}
+  const sn=row.querySelector('.supplier-name');if(sn){sn.addEventListener('blur',()=>{tryFillFromName(row);storeSupplierFromRow(row);});}
+  const addr=row.querySelector('.address');if(addr){addr.addEventListener('blur',()=>storeSupplierFromRow(row));}
   const ni=row.querySelector('.nature-input');
-  if(ni){
-    ni.addEventListener('focus',()=>showNatureSuggestions(ni,row));
-    ni.addEventListener('input',()=>{updateBadge(ni);showNatureSuggestions(ni,row);calcRow(row);scheduleStats();scheduleAutoSave();});
-    ni.addEventListener('blur',()=>{setTimeout(()=>{if(ni.value){addToRecent(ni.value);updateBadge(ni);calcRow(row);scheduleStats();}},200);});
-  }
+  if(ni){ni.addEventListener('focus',()=>showNatureSuggestions(ni,row));ni.addEventListener('input',()=>{updateBadge(ni);showNatureSuggestions(ni,row);calcRow(row);scheduleStats();scheduleAutoSave();updateRowColor(row);});ni.addEventListener('blur',()=>{setTimeout(()=>{if(ni.value){addToRecent(ni.value);updateBadge(ni);calcRow(row);scheduleStats();}},200);});}
   row.querySelector('.remarks').addEventListener('input',()=>scheduleAutoSave());
-  // Date input with auto-slash
   const dateInput=row.querySelector('.date-input');
-  if(dateInput){
-    dateInput.addEventListener('input',function(){autoFormatDate(this);scheduleAutoSave();});
-    dateInput.addEventListener('blur',function(){validateDateInput(this);if(this.value&&!validateDisplayDate(this.value))showToast('Invalid date format. Use MM/DD/YYYY','warning');});
-  }
+  if(dateInput){dateInput.addEventListener('input',function(){autoFormatDate(this);scheduleAutoSave();});dateInput.addEventListener('blur',function(){validateDateInput(this);if(this.value&&!validateDisplayDate(this.value))showToast('Invalid date format. Use MM/DD/YYYY','warning');});}
+  row.querySelector('.payment-mode').addEventListener('change',()=>updateRowColor(row));
 }
 
 function calcRow(row){
-  const gross=parseFloat(row.querySelector('.gross-amount')?.value)||0;
+  const gross=getInputNumber(row.querySelector('.gross-amount'));
   const nature=row.querySelector('.nature-input')?.value||'';
   const net=gross/1.12,it=net*0.12,rate=getRateFromExpense(nature),wt=net*rate,gmw=gross-wt;
-  row.querySelector('.net-expenses').textContent=net.toFixed(2);
-  row.querySelector('.input-tax').textContent=it.toFixed(2);
+  row.querySelector('.net-expenses').textContent=formatCurrency(net);
+  row.querySelector('.input-tax').textContent=formatCurrency(it);
   row.querySelector('.withholding-rate').textContent=(rate*100).toFixed(0)+'%';
-  row.querySelector('.withholding-tax').textContent=wt.toFixed(2);
-  row.querySelector('.gross-minus-wt').textContent=gmw.toFixed(2);
+  row.querySelector('.withholding-tax').textContent=formatCurrency(wt);
+  row.querySelector('.gross-minus-wt').textContent=formatCurrency(gmw);
 }
 
 function tryFillFromTin(row){const t=row.querySelector('.tin-number')?.value.trim();if(!t)return;const n=lookupExpSupplierByTin(t);if(n){const sn=row.querySelector('.supplier-name');if(sn&&!sn.value.trim())sn.value=n;}const addr=lookupExpSupplierAddr(t);if(addr){const ae=row.querySelector('.address');if(ae&&!ae.value.trim())ae.value=addr;}}
@@ -1154,7 +895,7 @@ function tryFillFromName(row){const n=row.querySelector('.supplier-name')?.value
 function storeSupplierFromRow(row){const n=row.querySelector('.supplier-name')?.value.trim(),t=row.querySelector('.tin-number')?.value.trim(),addr=row.querySelector('.address')?.value.trim();if(n)addExpSupplierPair(n,t,addr);}
 
 /* ============================================================
-   TIN SUGGESTION DROPDOWN
+   TIN SUGGESTION
 ============================================================ */
 let activeTinSug=null;
 function showTinSuggestions(input,row){if(activeTinSug){activeTinSug.remove();activeTinSug=null;}const q=input.value.trim().toLowerCase();if(!q)return;const pairs=getAllExpSuppliers().filter(p=>p.tin.toLowerCase().startsWith(q)||p.name.toLowerCase().includes(q)).slice(0,8);if(!pairs.length)return;const rect=input.getBoundingClientRect();const box=document.createElement('div');box.className='tin-sug-box';box.style.top=(rect.bottom+window.scrollY+2)+'px';box.style.left=(rect.left+window.scrollX)+'px';box.style.width=Math.max(rect.width,240)+'px';box.innerHTML=pairs.map(p=>{const addr=p.address?`<div class="tin-sug-addr"><i class="fas fa-map-marker-alt" style="color:var(--blue-400);font-size:10px;margin-top:1px"></i>${escH(p.address.substring(0,50)+(p.address.length>50?'…':''))}</div>`:'';return`<div class="tin-sug-item" data-tin="${escH(p.tin)}" data-name="${escH(p.name)}" data-addr="${escH(p.address)}"><div class="tin-sug-tin">${escH(p.tin||'No TIN')}</div><div class="tin-sug-name"><i class="fas fa-receipt" style="font-size:10px;margin-right:3px;color:var(--blue-400)"></i>${escH(p.name)}</div>${addr}</div>`;}).join('');box.querySelectorAll('.tin-sug-item').forEach(item=>{item.addEventListener('mousedown',e=>{e.preventDefault();if(item.dataset.tin){input.value=item.dataset.tin;formatTIN(input);}const sn=row.querySelector('.supplier-name');if(sn&&!sn.value.trim())sn.value=item.dataset.name;const ae=row.querySelector('.address');if(ae&&!ae.value.trim())ae.value=item.dataset.addr;calcRow(row);scheduleStats();scheduleAutoSave();box.remove();activeTinSug=null;});});document.body.appendChild(box);activeTinSug=box;const close=e=>{if(!box.contains(e.target)&&e.target!==input){box.remove();activeTinSug=null;document.removeEventListener('mousedown',close);}};setTimeout(()=>document.addEventListener('mousedown',close),0);}
@@ -1167,7 +908,7 @@ function addBatchRows(count){const tb=document.getElementById('tableBody');const
 function deleteRow(rid){const row=document.getElementById(rid);if(!row||!confirm('Delete this row?'))return;row.style.transition='opacity .2s,transform .2s';row.style.opacity='0';row.style.transform='translateX(-10px)';setTimeout(()=>{row.remove();if(currentPage>getTotalPages())currentPage=Math.max(1,getTotalPages());renderCurrentPage();scheduleStats();scheduleAutoSave();},200);}
 
 /* ============================================================
-   STATS UPDATE
+   STATS UPDATE — uses formatCurrency
 ============================================================ */
 let statsTimer=null,statsRunning=false;
 function scheduleStats(){clearTimeout(statsTimer);statsTimer=setTimeout(updateAllStats,80);}
@@ -1178,53 +919,28 @@ function updateAllStats(){
       const rows=document.querySelectorAll('#tableBody tr');
       let gA=0,nE=0,iT=0,wT=0,gmw=0;const tallyMap=new Map();
       rows.forEach(r=>{
-        const g=parseFloat(r.querySelector('.gross-amount')?.value)||0;
-        const n=parseFloat(r.querySelector('.net-expenses')?.textContent)||0;
-        const it=parseFloat(r.querySelector('.input-tax')?.textContent)||0;
-        const wt=parseFloat(r.querySelector('.withholding-tax')?.textContent)||0;
-        const gm=parseFloat(r.querySelector('.gross-minus-wt')?.textContent)||0;
+        const g=getInputNumber(r.querySelector('.gross-amount'));
+        const n=parseFloat((r.querySelector('.net-expenses')?.textContent||'0').replace(/,/g,''))||0;
+        const it=parseFloat((r.querySelector('.input-tax')?.textContent||'0').replace(/,/g,''))||0;
+        const wt=parseFloat((r.querySelector('.withholding-tax')?.textContent||'0').replace(/,/g,''))||0;
+        const gm=parseFloat((r.querySelector('.gross-minus-wt')?.textContent||'0').replace(/,/g,''))||0;
         gA+=g;nE+=n;iT+=it;wT+=wt;gmw+=gm;
         const nat=r.querySelector('.nature-input')?.value||'';
-        if(nat&&g>0){
-          let cat=nat.trim();
-          if(!EXPENSE_CATEGORIES[cat]){for(const grp of CATEGORY_GROUPS){const m=grp.cats.find(c=>cat.toUpperCase().includes(c)||c.includes(cat.toUpperCase()));if(m){cat=m;break;}}}
-          if(!EXPENSE_CATEGORIES[cat]){const type=getCatType(nat);cat=type==='rental'?'RENTAL':type==='goods'?'OTHERS - GOODS':'OTHERS - SERVICES';}
-          const rate=EXPENSE_CATEGORIES[cat]||getRateFromExpense(nat)||0;
-          if(!tallyMap.has(cat))tallyMap.set(cat,{gross:0,net:0,wt:0,count:0,rate,type:getCatType(nat)});
-          const d=tallyMap.get(cat);d.gross+=g;d.net+=n;d.wt+=wt;d.count++;
-        }
+        if(nat&&g>0){let cat=nat.trim();if(!EXPENSE_CATEGORIES[cat]){for(const grp of CATEGORY_GROUPS){const m=grp.cats.find(c=>cat.toUpperCase().includes(c)||c.includes(cat.toUpperCase()));if(m){cat=m;break;}}}if(!EXPENSE_CATEGORIES[cat]){const type=getCatType(nat);cat=type==='rental'?'RENTAL':type==='goods'?'OTHERS - GOODS':'OTHERS - SERVICES';}const rate=EXPENSE_CATEGORIES[cat]||getRateFromExpense(nat)||0;if(!tallyMap.has(cat))tallyMap.set(cat,{gross:0,net:0,wt:0,count:0,rate,type:getCatType(nat)});const d=tallyMap.get(cat);d.gross+=g;d.net+=n;d.wt+=wt;d.count++;}
       });
       const cnt=rows.length;
       const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-      set('totalGrossAmount',gA.toFixed(2));set('totalNetExpenses',nE.toFixed(2));set('totalInputTax',iT.toFixed(2));set('totalWithholdingTax',wT.toFixed(2));set('netPayable',gmw.toFixed(2));
+      set('totalGrossAmount',formatCurrency(gA));set('totalNetExpenses',formatCurrency(nE));set('totalInputTax',formatCurrency(iT));set('totalWithholdingTax',formatCurrency(wT));set('netPayable',formatCurrency(gmw));
       const ec=document.getElementById('entryCount');if(ec){ec.textContent=cnt;ec.classList.add('pulse');setTimeout(()=>ec.classList.remove('pulse'),300);}
       rebuildSummaryRow(gA,nE,iT,wT,gmw);updateTallyGrid(tallyMap,gA);
     }finally{statsRunning=false;}
   });
 }
-
-function rebuildSummaryRow(gA,nE,iT,wT,gmw){
-  const foot=document.getElementById('summaryRow');if(!foot)return;
-  if(gA===undefined){gA=0;nE=0;iT=0;wT=0;gmw=0;document.querySelectorAll('#tableBody tr').forEach(r=>{gA+=parseFloat(r.querySelector('.gross-amount')?.value)||0;nE+=parseFloat(r.querySelector('.net-expenses')?.textContent)||0;iT+=parseFloat(r.querySelector('.input-tax')?.textContent)||0;wT+=parseFloat(r.querySelector('.withholding-tax')?.textContent)||0;gmw+=parseFloat(r.querySelector('.gross-minus-wt')?.textContent)||0;});}
-  const ths=document.querySelectorAll('#vatableExpensesTable thead th');let cells='';let first=true;
-  ths.forEach((th,i)=>{if(th.classList.contains('hidden-column'))return;let c='';if(first){c='<span class="sum-label">TOTALS</span>';first=false;}else if(i===8)c='<span class="sum-value">'+gA.toFixed(2)+'</span>';else if(i===10)c='<span class="sum-value">'+nE.toFixed(2)+'</span>';else if(i===11)c='<span class="sum-value">'+iT.toFixed(2)+'</span>';else if(i===13)c='<span class="sum-value">'+wT.toFixed(2)+'</span>';else if(i===14)c='<span class="sum-value">'+gmw.toFixed(2)+'</span>';cells+=`<td>${c}</td>`;});
-  foot.innerHTML='<tr>'+cells+'</tr>';
-}
-
-function updateTallyGrid(tallyMap,totalGross){
-  const grid=document.getElementById('expenseTallyGrid');if(!grid)return;
-  if(!tallyMap.size){grid.innerHTML='<div class="tally-card total-card"><div class="tally-card-label"><i class="fas fa-pen-alt" style="color:var(--blue-500)"></i>No expense data yet</div><div class="tally-card-sub">Enter a Nature of Expense and Gross Amount to see category totals here</div></div>';return;}
-  const sorted=[...tallyMap.entries()].sort((a,b)=>b[1].gross-a[1].gross);
-  let html=sorted.map(([cat,d])=>{
-    const r=(d.rate*100).toFixed(0)+'%';
-    return`<div class="tally-card ${d.type}"><div class="tally-card-label"><i class="fas ${d.type==='rental'?'fa-building':d.type==='goods'?'fa-box':'fa-cogs'}" style="color:${d.type==='rental'?'var(--red-500)':d.type==='goods'?'var(--amber-500)':'var(--purple-500)'}"></i>${escH(cat)}</div><div class="tally-card-amount">₱ ${d.gross.toFixed(2)}</div><div class="tally-card-sub">${d.count} item${d.count!==1?'s':''} · W/T ${r} · Net ₱ ${d.net.toFixed(2)}</div></div>`;
-  }).join('');
-  html+=`<div class="tally-card total-card"><div class="tally-card-label" style="color:var(--blue-700)"><i class="fas fa-sigma" style="color:var(--blue-600)"></i>Total All Categories</div><div class="tally-card-amount">₱ ${totalGross.toFixed(2)}</div><div class="tally-card-sub">${sorted.length} categories</div></div>`;
-  grid.innerHTML=html;
-}
+function rebuildSummaryRow(gA,nE,iT,wT,gmw){const foot=document.getElementById('summaryRow');if(!foot)return;if(gA===undefined){gA=0;nE=0;iT=0;wT=0;gmw=0;document.querySelectorAll('#tableBody tr').forEach(r=>{gA+=getInputNumber(r.querySelector('.gross-amount'));nE+=parseFloat((r.querySelector('.net-expenses')?.textContent||'0').replace(/,/g,''))||0;iT+=parseFloat((r.querySelector('.input-tax')?.textContent||'0').replace(/,/g,''))||0;wT+=parseFloat((r.querySelector('.withholding-tax')?.textContent||'0').replace(/,/g,''))||0;gmw+=parseFloat((r.querySelector('.gross-minus-wt')?.textContent||'0').replace(/,/g,''))||0;});}const ths=document.querySelectorAll('#vatableExpensesTable thead th');let cells='';let first=true;ths.forEach((th,i)=>{if(th.classList.contains('hidden-column'))return;let c='';if(first){c='<span class="sum-label">TOTALS</span>';first=false;}else if(i===8)c='<span class="sum-value">'+formatCurrency(gA)+'</span>';else if(i===10)c='<span class="sum-value">'+formatCurrency(nE)+'</span>';else if(i===11)c='<span class="sum-value">'+formatCurrency(iT)+'</span>';else if(i===13)c='<span class="sum-value">'+formatCurrency(wT)+'</span>';else if(i===14)c='<span class="sum-value">'+formatCurrency(gmw)+'</span>';cells+=`<td>${c}</td>`;});foot.innerHTML='<tr>'+cells+'</tr>';}
+function updateTallyGrid(tallyMap,totalGross){const grid=document.getElementById('expenseTallyGrid');if(!grid)return;if(!tallyMap.size){grid.innerHTML='<div class="tally-card total-card"><div class="tally-card-label"><i class="fas fa-pen-alt" style="color:var(--blue-500)"></i>No expense data yet</div><div class="tally-card-sub">Enter a Nature of Expense and Gross Amount to see category totals here</div></div>';return;}const sorted=[...tallyMap.entries()].sort((a,b)=>b[1].gross-a[1].gross);let html=sorted.map(([cat,d])=>{const r=(d.rate*100).toFixed(0)+'%';return`<div class="tally-card ${d.type}"><div class="tally-card-label"><i class="fas ${d.type==='rental'?'fa-building':d.type==='goods'?'fa-box':'fa-cogs'}" style="color:${d.type==='rental'?'var(--red-500)':d.type==='goods'?'var(--amber-500)':'var(--purple-500)'}"></i>${escH(cat)}</div><div class="tally-card-amount">₱ ${formatCurrency(d.gross)}</div><div class="tally-card-sub">${d.count} item${d.count!==1?'s':''} · W/T ${r} · Net ₱ ${formatCurrency(d.net)}</div></div>`;}).join('');html+=`<div class="tally-card total-card"><div class="tally-card-label" style="color:var(--blue-700)"><i class="fas fa-sigma" style="color:var(--blue-600)"></i>Total All Categories</div><div class="tally-card-amount">₱ ${formatCurrency(totalGross)}</div><div class="tally-card-sub">${sorted.length} categories</div></div>`;grid.innerHTML=html;}
 
 /* ============================================================
-   REPORT DATE — APPLY TO ALL ROWS
+   REPORT DATE
 ============================================================ */
 function updateAllDatesFromReportDate(){const rd=document.getElementById('reportDate').value;if(!rd){showToast('No report date set.','warning');return;}if(!validateDisplayDate(rd)){showToast('Invalid report date format.','warning');return;}const inputs=document.querySelectorAll('#tableBody .date-input');if(!inputs.length){showToast('No rows to update.','info');return;}let cnt=0;inputs.forEach(inp=>{if(inp.value!==rd){inp.value=rd;inp.dispatchEvent(new Event('change',{bubbles:true}));cnt++;const cell=inp.closest('td');cell.classList.add('date-updated');setTimeout(()=>cell.classList.remove('date-updated'),500);}});if(cnt>0){showToast(`Updated ${cnt} row(s) to ${rd}`,'success');scheduleStats();scheduleAutoSave();}else showToast('All rows already have the current report date.','info');}
 function setupAutoDateUpdate(){const rdInput=document.getElementById('reportDate');if(!rdInput)return;const rdGroup=rdInput.closest('.field-group');if(rdGroup&&!document.querySelector('.report-date-badge')){const badge=document.createElement('span');badge.className='report-date-badge';badge.innerHTML='<i class="fas fa-calendar-alt"></i> Apply to all rows';badge.title='Update all date rows to this report date';badge.onclick=()=>updateAllDatesFromReportDate();rdGroup.querySelector('label')?.appendChild(badge);}let prev=rdInput.value;rdInput.addEventListener('change',function(){const newDate=this.value;if(prev&&newDate&&newDate!==prev){const cnt=document.querySelectorAll('#tableBody .date-input').length;if(cnt>0&&confirm(`Update all ${cnt} rows to new report date (${newDate})?`))updateAllDatesFromReportDate();}prev=newDate;saveCompanyInfo();});}
@@ -1240,68 +956,98 @@ async function mergeIntoTable(rows,companyInfo,errs,total){const curr=document.q
 /* ============================================================
    EXPORT TO EXCEL
 ============================================================ */
-function exportToExcel(){
-  const co=getCompanyData();
-  if(!co.name||!co.tin||!co.address||!co.business||!co.employee){alert('Please fill all required company fields (*) before exporting.');return;}
-  const rows=document.querySelectorAll('#tableBody tr');
-  const gA=parseFloat(document.getElementById('totalGrossAmount').textContent)||0;
-  const nE=parseFloat(document.getElementById('totalNetExpenses').textContent)||0;
-  const iT=parseFloat(document.getElementById('totalInputTax').textContent)||0;
-  const wT=parseFloat(document.getElementById('totalWithholdingTax').textContent)||0;
-  const netPay=parseFloat(document.getElementById('netPayable').textContent)||0;
-  const now=new Date(),dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-  const monthlyNote=IS_MONTHLY?` — ${MONTHLY_CTX.label}`:'';
-  const tallyMap=new Map(),suppMap=new Map();
-  rows.forEach(r=>{const g=parseFloat(r.querySelector('.gross-amount')?.value)||0,n=parseFloat(r.querySelector('.net-expenses')?.textContent)||0,wt=parseFloat(r.querySelector('.withholding-tax')?.textContent)||0,nat=r.querySelector('.nature-input')?.value||'',sn=r.querySelector('.supplier-name')?.value||'',tin=r.querySelector('.tin-number')?.value||'';if(nat&&g>0){let cat=nat.trim();if(!EXPENSE_CATEGORIES[cat]){for(const grp of CATEGORY_GROUPS){const m=grp.cats.find(c=>cat.toUpperCase().includes(c)||c.includes(cat.toUpperCase()));if(m){cat=m;break;}}}if(!EXPENSE_CATEGORIES[cat]){const tp=getCatType(nat);cat=tp==='rental'?'RENTAL':tp==='goods'?'OTHERS - GOODS':'OTHERS - SERVICES';}const rate=EXPENSE_CATEGORIES[cat]||getRateFromExpense(nat)||0;if(!tallyMap.has(cat))tallyMap.set(cat,{gross:0,net:0,wt:0,count:0,rate});const d=tallyMap.get(cat);d.gross+=g;d.net+=n;d.wt+=wt;d.count++;}if(sn&&tin&&n>0){const k=sn+'|'+tin;suppMap.set(k,(suppMap.get(k)||0)+n);}});
-  const suppArr=[...suppMap.entries()].map(([k,v])=>{const[nm,t]=k.split('|');return{name:nm,tin:t,net:v};}).sort((a,b)=>b.net-a.net);
-  const tallyArr=[...tallyMap.entries()].sort((a,b)=>b[1].gross-a[1].gross);
-  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>*{font-family:Calibri,Arial,sans-serif}.title{font-size:20pt;font-weight:bold;color:#1E3A8A;text-align:center;border-bottom:2px solid #2563EB;padding-bottom:8px;margin-bottom:12px}.co-table{width:100%;border-collapse:collapse;margin-bottom:16px;background:#EFF6FF}.co-table td{padding:5px 10px;border:1px solid #BFDBFE}.co-lbl{font-weight:bold;color:#1D4ED8;width:180px}.dt{width:100%;border-collapse:collapse;margin-top:12px;font-size:9.5pt}.dt th{background:#1E3A8A;color:#DBEAFE;font-weight:bold;text-align:center;padding:8px 6px;border:1px solid #1E40AF}.dt td{padding:6px;border:1px solid #D1D5DB}.dt tr:nth-child(even){background:#EFF6FF}.num{text-align:right;font-family:Consolas,monospace}.sum-row{background:#FEF3C7;font-weight:bold;border-top:2px solid #F59E0B}.sec-ttl{font-size:13pt;font-weight:bold;color:#1E3A8A;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #93C5FD;padding-bottom:4px}.cs-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:9.5pt}.cs-table th{background:#2563EB;color:white;font-weight:bold;padding:8px;border:1px solid #1D4ED8;text-align:center}.cs-table td{padding:7px 10px;border:1px solid #D1D5DB}.fin-table{width:60%;margin-left:auto;border-collapse:collapse}.fin-table td{padding:7px 14px;border-bottom:1px dotted #D1D5DB;font-size:10.5pt}.fin-lbl{text-align:right;color:#1D4ED8;font-weight:bold}.fin-val{text-align:right;font-family:Consolas,monospace;color:#111827}.footer{margin-top:24px;padding-top:12px;border-top:1px solid #D1D5DB;color:#6B7280;font-size:9pt;text-align:center}</style></head><body>
-  <div class="title">VATABLE EXPENSES DATA REPORT${monthlyNote}</div>
-  <table class="co-table"><tr><td class="co-lbl">Company Name:</td><td>${escH(co.name)}</td><td class="co-lbl">TIN Number:</td><td>${escH(co.tin)}</td></tr><tr><td class="co-lbl">Address:</td><td>${escH(co.address)}</td><td class="co-lbl">Line of Business:</td><td>${escH(co.business)}</td></tr><tr><td class="co-lbl">Telephone:</td><td>${escH(co.telephone||'N/A')}</td><td class="co-lbl">Report Date:</td><td>${escH(co.date||'')}</td></tr><tr><td class="co-lbl">Authorized Employee:</td><td>${escH(co.employee)}</td><td class="co-lbl">Email:</td><td>${escH(co.email||'N/A')}</td></tr></table>
-  <div class="sec-ttl">Expenses Transactions</div>
-  <table class="dt"><thead><tr><th>Date</th><th>Invoice No.</th><th>Invoice Type</th><th>Payment Mode</th><th>Transaction Type</th><th>TIN Number</th><th>Supplier Name</th><th>Address</th><th>Gross Amount</th><th>Nature of Expense</th><th>Net Expenses</th><th>Input Tax</th><th>W/T Rate</th><th>Withholding Tax</th><th>Gross − W/T</th><th>Remarks</th></tr></thead><tbody>`;
-  rows.forEach((r,idx)=>{const v=cls=>r.querySelector(cls);const wr=v('.withholding-rate')?.textContent||'0%';html+=`<tr${idx%2===0?'':' style="background:#EFF6FF"'}><td style="text-align:center">${escH(v('.date-input')?.value||'')}</td><td>${escH(v('.invoice-number')?.value||'')}</td><td style="text-align:center">${escH(v('.invoice-type')?.value||'')}</td><td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td><td style="text-align:center">${escH(v('.transaction-type')?.value||'')}</td><td style="text-align:center;font-family:monospace">${escH(v('.tin-number')?.value||'')}</td><td>${escH(v('.supplier-name')?.value||'')}</td><td>${escH(v('.address')?.value||'')}</td><td class="num">${(parseFloat(v('.gross-amount')?.value)||0).toFixed(2)}</td><td>${escH(v('.nature-input')?.value||'')}</td><td class="num">${(parseFloat(v('.net-expenses')?.textContent)||0).toFixed(2)}</td><td class="num">${(parseFloat(v('.input-tax')?.textContent)||0).toFixed(2)}</td><td style="text-align:center">${wr}</td><td class="num">${(parseFloat(v('.withholding-tax')?.textContent)||0).toFixed(2)}</td><td class="num">${(parseFloat(v('.gross-minus-wt')?.textContent)||0).toFixed(2)}</td><td>${escH(v('.remarks')?.value||'')}</td></tr>`;});
-  html+=`</tbody><tfoot><tr class="sum-row"><td colspan="8" style="text-align:right;font-weight:bold">TOTALS:</td><td class="num">${gA.toFixed(2)}</td><td>-</td><td class="num">${nE.toFixed(2)}</td><td class="num">${iT.toFixed(2)}</td><td>-</td><td class="num">${wT.toFixed(2)}</td><td class="num">${netPay.toFixed(2)}</td><td>-</td></tr></tfoot></table>
-  <div class="sec-ttl">Expense Category Tally</div><table class="cs-table"><thead><tr><th>Nature of Expense</th><th>W/T Rate</th><th>Count</th><th>Total Gross</th><th>Total Net</th><th>Total W/T</th></tr></thead><tbody>`;
-  let tg=0,tn=0,tw=0,tc=0;tallyArr.forEach(([cat,d])=>{html+=`<tr><td>${escH(cat)}</td><td style="text-align:center">${(d.rate*100).toFixed(0)}%</td><td style="text-align:center">${d.count}</td><td class="num">${d.gross.toFixed(2)}</td><td class="num">${d.net.toFixed(2)}</td><td class="num">${d.wt.toFixed(2)}</td></tr>`;tg+=d.gross;tn+=d.net;tw+=d.wt;tc+=d.count;});
-  html+=`<tr class="sum-row"><td colspan="2" style="text-align:right">TOTAL:</td><td style="text-align:center">${tc}</td><td class="num">${tg.toFixed(2)}</td><td class="num">${tn.toFixed(2)}</td><td class="num">${tw.toFixed(2)}</td></tr></tbody></table>
-  <div class="sec-ttl">Supplier Summary</div><table class="cs-table"><thead><tr><th>Supplier Name</th><th>TIN Number</th><th>Total Net Expenses (₱)</th></tr></thead><tbody>`;
-  let stot=0;suppArr.forEach(s=>{html+=`<tr><td>${escH(s.name)}</td><td style="text-align:center;font-family:monospace">${escH(s.tin)}</td><td class="num">${s.net.toFixed(2)}</td></tr>`;stot+=s.net;});
-  html+=`<tr class="sum-row"><td colspan="2" style="text-align:right">TOTAL:</td><td class="num">${stot.toFixed(2)}</td></tr></tbody></table>
-  <div class="sec-ttl">Financial Summary</div><table class="fin-table"><tr><td class="fin-lbl">Total Gross Amount:</td><td class="fin-val">₱ ${gA.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Net Expenses:</td><td class="fin-val">₱ ${nE.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Input Tax (12%):</td><td class="fin-val">₱ ${iT.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Withholding Tax:</td><td class="fin-val">₱ ${wT.toFixed(2)}</td></tr><tr style="border-top:2px solid #2563EB"><td class="fin-lbl" style="color:#1E3A8A">Net Amount Payable:</td><td class="fin-val" style="color:#1E3A8A;font-weight:bold">₱ ${netPay.toFixed(2)}</td></tr></table>
-  <div class="footer"><p>Report generated on ${dateStr} at ${timeStr}</p><p>Authorized by: ${escH(co.employee)} · Vatable Expenses Data Tracker${monthlyNote}</p><p>© ${now.getFullYear()} Vatable Expenses Data Tracker – Professional VAT-Compliant System</p></div></body></html>`;
-  const blob=new Blob([html],{type:'application/vnd.ms-excel'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='Vatable_Expenses_'+co.name.replace(/[^a-zA-Z0-9]/g,'_')+(IS_MONTHLY?'_'+MONTHLY_CTX.label.replace(/\s/g,'_'):'')+'.xls';
-  a.click();URL.revokeObjectURL(a.href);showToast('Excel report exported','success');
-}
+function exportToExcel(){const co=getCompanyData();if(!co.name||!co.tin||!co.address||!co.business||!co.employee){alert('Please fill all required company fields (*) before exporting.');return;}const rows=document.querySelectorAll('#tableBody tr');const gA=parseFloat((document.getElementById('totalGrossAmount').textContent||'0').replace(/,/g,''))||0,nE=parseFloat((document.getElementById('totalNetExpenses').textContent||'0').replace(/,/g,''))||0,iT=parseFloat((document.getElementById('totalInputTax').textContent||'0').replace(/,/g,''))||0,wT=parseFloat((document.getElementById('totalWithholdingTax').textContent||'0').replace(/,/g,''))||0,netPay=parseFloat((document.getElementById('netPayable').textContent||'0').replace(/,/g,''))||0;const now=new Date(),dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});const monthlyNote=IS_MONTHLY?` — ${MONTHLY_CTX.label}`:'';const tallyMap=new Map(),suppMap=new Map();rows.forEach(r=>{const g=getInputNumber(r.querySelector('.gross-amount')),n=parseFloat((r.querySelector('.net-expenses')?.textContent||'0').replace(/,/g,''))||0,wt=parseFloat((r.querySelector('.withholding-tax')?.textContent||'0').replace(/,/g,''))||0,nat=r.querySelector('.nature-input')?.value||'',sn=r.querySelector('.supplier-name')?.value||'',tin=r.querySelector('.tin-number')?.value||'';if(nat&&g>0){let cat=nat.trim();if(!EXPENSE_CATEGORIES[cat]){for(const grp of CATEGORY_GROUPS){const m=grp.cats.find(c=>cat.toUpperCase().includes(c)||c.includes(cat.toUpperCase()));if(m){cat=m;break;}}}if(!EXPENSE_CATEGORIES[cat]){const tp=getCatType(nat);cat=tp==='rental'?'RENTAL':tp==='goods'?'OTHERS - GOODS':'OTHERS - SERVICES';}const rate=EXPENSE_CATEGORIES[cat]||getRateFromExpense(nat)||0;if(!tallyMap.has(cat))tallyMap.set(cat,{gross:0,net:0,wt:0,count:0,rate});const d=tallyMap.get(cat);d.gross+=g;d.net+=n;d.wt+=wt;d.count++;}if(sn&&tin&&n>0){const k=sn+'|'+tin;suppMap.set(k,(suppMap.get(k)||0)+n);}});const suppArr=[...suppMap.entries()].map(([k,v])=>{const[nm,t]=k.split('|');return{name:nm,tin:t,net:v};}).sort((a,b)=>b.net-a.net);const tallyArr=[...tallyMap.entries()].sort((a,b)=>b[1].gross-a[1].gross);let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>*{font-family:Calibri,Arial,sans-serif}.title{font-size:20pt;font-weight:bold;color:#1E3A8A;text-align:center;border-bottom:2px solid #2563EB;padding-bottom:8px;margin-bottom:12px}.co-table{width:100%;border-collapse:collapse;margin-bottom:16px;background:#EFF6FF}.co-table td{padding:5px 10px;border:1px solid #BFDBFE}.co-lbl{font-weight:bold;color:#1D4ED8;width:180px}.dt{width:100%;border-collapse:collapse;margin-top:12px;font-size:9.5pt}.dt th{background:#1E3A8A;color:#DBEAFE;font-weight:bold;text-align:center;padding:8px 6px;border:1px solid #1E40AF}.dt td{padding:6px;border:1px solid #D1D5DB}.dt tr:nth-child(even){background:#EFF6FF}.num{text-align:right;font-family:Consolas,monospace}.sum-row{background:#FEF3C7;font-weight:bold;border-top:2px solid #F59E0B}.sec-ttl{font-size:13pt;font-weight:bold;color:#1E3A8A;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #93C5FD;padding-bottom:4px}.cs-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:9.5pt}.cs-table th{background:#2563EB;color:white;font-weight:bold;padding:8px;border:1px solid #1D4ED8;text-align:center}.cs-table td{padding:7px 10px;border:1px solid #D1D5DB}.fin-table{width:60%;margin-left:auto;border-collapse:collapse}.fin-table td{padding:7px 14px;border-bottom:1px dotted #D1D5DB;font-size:10.5pt}.fin-lbl{text-align:right;color:#1D4ED8;font-weight:bold}.fin-val{text-align:right;font-family:Consolas,monospace;color:#111827}.footer{margin-top:24px;padding-top:12px;border-top:1px solid #D1D5DB;color:#6B7280;font-size:9pt;text-align:center}</style></head><body>
+<div class="title">VATABLE EXPENSES DATA REPORT${monthlyNote}</div>
+<table class="co-table"><tr><td class="co-lbl">Company Name:</td><td>${escH(co.name)}</td><td class="co-lbl">TIN Number:</td><td>${escH(co.tin)}</td></tr><tr><td class="co-lbl">Address:</td><td>${escH(co.address)}</td><td class="co-lbl">Line of Business:</td><td>${escH(co.business)}</td></tr><tr><td class="co-lbl">Telephone:</td><td>${escH(co.telephone||'N/A')}</td><td class="co-lbl">Report Date:</td><td>${escH(co.date||'')}</td></tr><tr><td class="co-lbl">Authorized Employee:</td><td>${escH(co.employee)}</td><td class="co-lbl">Email:</td><td>${escH(co.email||'N/A')}</td></tr></table>
+<div class="sec-ttl">Expenses Transactions</div>
+<table class="dt"><thead><tr><th>Date</th><th>Invoice No.</th><th>Invoice Type</th><th>Payment Mode</th><th>Transaction Type</th><th>TIN Number</th><th>Supplier Name</th><th>Address</th><th>Gross Amount</th><th>Nature of Expense</th><th>Net Expenses</th><th>Input Tax</th><th>W/T Rate</th><th>Withholding Tax</th><th>Gross − W/T</th><th>Remarks</th></tr></thead><tbody>`;
+rows.forEach((r,idx)=>{const v=cls=>r.querySelector(cls);const wr=v('.withholding-rate')?.textContent||'0%';const g=getInputNumber(v('.gross-amount'));const n=parseFloat((v('.net-expenses')?.textContent||'0').replace(/,/g,''))||0,it2=parseFloat((v('.input-tax')?.textContent||'0').replace(/,/g,''))||0,wt2=parseFloat((v('.withholding-tax')?.textContent||'0').replace(/,/g,''))||0,gmw2=parseFloat((v('.gross-minus-wt')?.textContent||'0').replace(/,/g,''))||0;html+=`<tr${idx%2===0?'':' style="background:#EFF6FF"'}><td style="text-align:center">${escH(v('.date-input')?.value||'')}</td><td>${escH(v('.invoice-number')?.value||'')}</td><td style="text-align:center">${escH(v('.invoice-type')?.value||'')}</td><td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td><td style="text-align:center">${escH(v('.transaction-type')?.value||'')}</td><td style="text-align:center;font-family:monospace">${escH(v('.tin-number')?.value||'')}</td><td>${escH(v('.supplier-name')?.value||'')}</td><td>${escH(v('.address')?.value||'')}</td><td class="num">${g.toFixed(2)}</td><td>${escH(v('.nature-input')?.value||'')}</td><td class="num">${n.toFixed(2)}</td><td class="num">${it2.toFixed(2)}</td><td style="text-align:center">${wr}</td><td class="num">${wt2.toFixed(2)}</td><td class="num">${gmw2.toFixed(2)}</td><td>${escH(v('.remarks')?.value||'')}</td></tr>`;});
+html+=`</tbody><tfoot><tr class="sum-row"><td colspan="8" style="text-align:right;font-weight:bold">TOTALS:</td><td class="num">${gA.toFixed(2)}</td><td>-</td><td class="num">${nE.toFixed(2)}</td><td class="num">${iT.toFixed(2)}</td><td>-</td><td class="num">${wT.toFixed(2)}</td><td class="num">${netPay.toFixed(2)}</td><td>-</td></tr></tfoot></table>
+<div class="sec-ttl">Expense Category Tally</div><table class="cs-table"><thead><tr><th>Nature of Expense</th><th>W/T Rate</th><th>Count</th><th>Total Gross</th><th>Total Net</th><th>Total W/T</th></tr></thead><tbody>`;
+let tg=0,tn=0,tw=0,tc=0;tallyArr.forEach(([cat,d])=>{html+=`<tr><td>${escH(cat)}</td><td style="text-align:center">${(d.rate*100).toFixed(0)}%</td><td style="text-align:center">${d.count}</td><td class="num">${d.gross.toFixed(2)}</td><td class="num">${d.net.toFixed(2)}</td><td class="num">${d.wt.toFixed(2)}</td></tr>`;tg+=d.gross;tn+=d.net;tw+=d.wt;tc+=d.count;});
+html+=`<tr class="sum-row"><td colspan="2" style="text-align:right">TOTAL:</td><td style="text-align:center">${tc}</td><td class="num">${tg.toFixed(2)}</td><td class="num">${tn.toFixed(2)}</td><td class="num">${tw.toFixed(2)}</td></tr></tbody></table>
+<div class="sec-ttl">Supplier Summary</div><table class="cs-table"><thead><tr><th>Supplier Name</th><th>TIN Number</th><th>Total Net Expenses (₱)</th></tr></thead><tbody>`;
+let stot=0;suppArr.forEach(s=>{html+=`<tr><td>${escH(s.name)}</td><td style="text-align:center;font-family:monospace">${escH(s.tin)}</td><td class="num">${s.net.toFixed(2)}</td></tr>`;stot+=s.net;});
+html+=`<tr class="sum-row"><td colspan="2" style="text-align:right">TOTAL:</td><td class="num">${stot.toFixed(2)}</td></tr></tbody></table>
+<div class="sec-ttl">Financial Summary</div><table class="fin-table"><tr><td class="fin-lbl">Total Gross Amount:</td><td class="fin-val">₱ ${gA.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Net Expenses:</td><td class="fin-val">₱ ${nE.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Input Tax (12%):</td><td class="fin-val">₱ ${iT.toFixed(2)}</td></tr><tr><td class="fin-lbl">Total Withholding Tax:</td><td class="fin-val">₱ ${wT.toFixed(2)}</td></tr><tr style="border-top:2px solid #2563EB"><td class="fin-lbl" style="color:#1E3A8A">Net Amount Payable:</td><td class="fin-val" style="color:#1E3A8A;font-weight:bold">₱ ${netPay.toFixed(2)}</td></tr></table>
+<div class="footer"><p>Report generated on ${dateStr} at ${timeStr}</p><p>Authorized by: ${escH(co.employee)} · Vatable Expenses Data Tracker${monthlyNote}</p><p>© ${now.getFullYear()} Vatable Expenses Data Tracker – Professional VAT-Compliant System</p></div></body></html>`;
+const blob=new Blob([html],{type:'application/vnd.ms-excel'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Vatable_Expenses_'+co.name.replace(/[^a-zA-Z0-9]/g,'_')+(IS_MONTHLY?'_'+MONTHLY_CTX.label.replace(/\s/g,'_'):'')+'.xls';a.click();URL.revokeObjectURL(a.href);showToast('Excel report exported','success');}
 
 /* ============================================================
-   SELECT MULTIPLE
+   CHANGE 3: SELECT MULTIPLE + RIGHT-CLICK CONTEXT MENU
 ============================================================ */
 let selectMode=false,isDragging=false,dragStart=null,selectedCells=new Set();
-function toggleSelectMode(){selectMode=!selectMode;const tb=document.getElementById('tableBody'),btn=document.getElementById('selectMultipleBtn');if(selectMode){tb.classList.add('select-mode');btn.classList.add('active');btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection';createSelToolbar();showToast('Selection mode on','info');document.body.style.userSelect='none';}else{tb.classList.remove('select-mode');btn.classList.remove('active');btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple';clearCellSel();document.querySelector('.selection-toolbar')?.remove();document.body.style.userSelect='';}}
-function createSelToolbar(){if(document.querySelector('.selection-toolbar'))return;const tb=document.createElement('div');tb.className='selection-toolbar';tb.innerHTML=`<span class="sel-tb-info"><span id="selCount">0</span> cells</span><button class="sel-tb-btn" id="selCopyBtn"><i class="fas fa-copy"></i> Copy</button><button class="sel-tb-btn" id="selPasteBtn"><i class="fas fa-paste"></i> Paste</button><button class="sel-tb-btn danger" id="selDelBtn"><i class="fas fa-trash"></i> Clear</button><button class="sel-tb-btn exit" id="selExitBtn"><i class="fas fa-times"></i> Exit</button>`;document.body.appendChild(tb);document.getElementById('selCopyBtn').addEventListener('click',copySelCells);document.getElementById('selPasteBtn').addEventListener('click',pasteSelCells);document.getElementById('selDelBtn').addEventListener('click',delSelCells);document.getElementById('selExitBtn').addEventListener('click',toggleSelectMode);}
+
+function removeSelectionInfoBar(){document.querySelector('.selection-info-bar')?.remove();}
+function createSelectionInfoBar(){removeSelectionInfoBar();const bar=document.createElement('div');bar.className='selection-info-bar';bar.innerHTML=`<div class="sel-info-dot"></div><span id="selCount">0</span> cells selected<span class="sel-info-hint">· Right-click for options</span>`;document.body.appendChild(bar);}
+function updateSelectionInfoBar(){const el=document.getElementById('selCount');if(el)el.textContent=selectedCells.size;}
+
+function toggleSelectMode(){
+  selectMode=!selectMode;const tb=document.getElementById('tableBody'),btn=document.getElementById('selectMultipleBtn');
+  if(selectMode){tb.classList.add('select-mode');btn.classList.add('active');btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection';createSelectionInfoBar();showToast('Selection mode — drag to select, right-click for options','info');document.body.style.userSelect='none';}
+  else{tb.classList.remove('select-mode');btn.classList.remove('active');btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple';clearCellSel();removeSelectionInfoBar();closeCtxMenu();document.body.style.userSelect='';}
+}
+
+let activeCtxMenu=null;
+function closeCtxMenu(){if(activeCtxMenu){activeCtxMenu.remove();activeCtxMenu=null;}}
+
+function showCtxMenu(x,y){
+  closeCtxMenu();
+  const count=selectedCells.size;
+  const selectedRows=getSelectedFullRows();
+  const hasFullRows=selectedRows.length>0;
+  const menu=document.createElement('div');menu.className='ctx-menu';
+  menu.innerHTML=`<div class="ctx-menu-header"><i class="fas fa-mouse-pointer"></i> Selection Actions <span class="ctx-count-badge">${count} cell${count!==1?'s':''}</span></div>
+    <button class="ctx-item" id="ctxCopy"><i class="fas fa-copy"></i> Copy Cells</button>
+    <button class="ctx-item" id="ctxPaste"><i class="fas fa-paste"></i> Paste Here</button>
+    <button class="ctx-item" id="ctxClear"><i class="fas fa-eraser"></i> Clear Cell Values</button>
+    <div class="ctx-divider"></div>
+    ${hasFullRows?`<button class="ctx-item danger" id="ctxDeleteRows"><i class="fas fa-trash-alt"></i> Delete Selected Rows <span class="ctx-count-badge" style="background:#FECACA;color:#B91C1C">${selectedRows.length} row${selectedRows.length!==1?'s':''}</span></button><div class="ctx-divider"></div>`:''}
+    <button class="ctx-item exit-item" id="ctxExit"><i class="fas fa-times-circle"></i> Exit Selection Mode</button>`;
+  document.body.appendChild(menu);activeCtxMenu=menu;
+  const mw=menu.offsetWidth,mh=menu.offsetHeight,vw=window.innerWidth,vh=window.innerHeight;
+  let left=x,top=y;if(left+mw>vw-8)left=vw-mw-8;if(top+mh>vh-8)top=vh-mh-8;if(left<8)left=8;if(top<8)top=8;
+  menu.style.left=left+'px';menu.style.top=top+'px';
+  menu.querySelector('#ctxCopy').addEventListener('click',()=>{closeCtxMenu();copySelCells();});
+  menu.querySelector('#ctxPaste').addEventListener('click',()=>{closeCtxMenu();pasteSelCells();});
+  menu.querySelector('#ctxClear').addEventListener('click',()=>{closeCtxMenu();delSelCells();});
+  if(hasFullRows)menu.querySelector('#ctxDeleteRows').addEventListener('click',()=>{closeCtxMenu();deleteSelectedRows(selectedRows);});
+  menu.querySelector('#ctxExit').addEventListener('click',()=>{closeCtxMenu();toggleSelectMode();});
+  setTimeout(()=>{const close=e=>{if(!menu.contains(e.target)){closeCtxMenu();document.removeEventListener('mousedown',close);}};document.addEventListener('mousedown',close);},0);
+}
+
+function getSelectedFullRows(){if(!selectedCells.size)return[];const rowMap=new Map();for(const cell of selectedCells){const row=cell.parentElement;if(!rowMap.has(row))rowMap.set(row,new Set());rowMap.get(row).add(cell);}const fullRows=[];for(const[row,cells]of rowMap){const allTds=Array.from(row.children).filter(td=>!td.classList.contains('hidden-column')&&!td.querySelector('.delete-btn'));if(allTds.every(td=>cells.has(td)))fullRows.push(row);}return fullRows;}
+function deleteSelectedRows(rows){if(!rows||!rows.length)return;if(!confirm(`Delete ${rows.length} selected row${rows.length!==1?'s':''}?`))return;clearCellSel();rows.forEach(row=>{row.style.transition='opacity .15s,transform .15s';row.style.opacity='0';row.style.transform='translateX(-10px)';setTimeout(()=>row.remove(),180);});setTimeout(()=>{if(currentPage>getTotalPages())currentPage=Math.max(1,getTotalPages());renderCurrentPage();scheduleStats();scheduleAutoSave();showToast(`Deleted ${rows.length} row${rows.length!==1?'s':''}`, 'success');},220);}
+
 function getCellCoords(c){const r=c.parentElement;return{row:Array.from(r.parentElement.children).indexOf(r),col:Array.from(r.children).indexOf(c)};}
-function selectRange(s,e){clearCellSel();const allRows=Array.from(document.querySelectorAll('#tableBody tr')),r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);for(let r=r1;r<=r2;r++){const row=allRows[r];if(!row)continue;for(let c=c1;c<=c2;c++){const cell=row.children[c];if(!cell)continue;cell.classList.add('cell-selected');selectedCells.add(cell);}}const sc=document.getElementById('selCount');if(sc)sc.textContent=selectedCells.size;}
-function clearCellSel(){document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected'));selectedCells.clear();const sc=document.getElementById('selCount');if(sc)sc.textContent=0;}
+function selectRange(s,e){clearCellSel();const allRows=Array.from(document.querySelectorAll('#tableBody tr')),r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);for(let r=r1;r<=r2;r++){const row=allRows[r];if(!row)continue;for(let c=c1;c<=c2;c++){const cell=row.children[c];if(!cell)continue;cell.classList.add('cell-selected');selectedCells.add(cell);}}updateSelectionInfoBar();}
+function clearCellSel(){document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected'));selectedCells.clear();updateSelectionInfoBar();}
 function getCellValue(c){const inp=c.querySelector('input,select');if(inp)return inp.value;const comp=c.querySelector('.cell-computed');if(comp)return comp.textContent;return c.textContent.trim();}
-function setCellValue(c,v){const inp=c.querySelector('input');if(inp){inp.value=v;inp.dispatchEvent(new Event('input',{bubbles:true}));return true;}const sel=c.querySelector('select');if(sel){const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v);if(opt)sel.value=opt.value;sel.dispatchEvent(new Event('change',{bubbles:true}));return true;}return false;}
+function setCellValue(c,v){const inp=c.querySelector('input');if(inp){inp.value=v;inp.dataset.raw=v.replace(/,/g,'');inp.dispatchEvent(new Event('input',{bubbles:true}));return true;}const sel=c.querySelector('select');if(sel){const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v);if(opt)sel.value=opt.value;sel.dispatchEvent(new Event('change',{bubbles:true}));return true;}return false;}
 function copySelCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}const coords=[...selectedCells].map(c=>({cell:c,...getCellCoords(c)}));const minR=Math.min(...coords.map(c=>c.row)),minC=Math.min(...coords.map(c=>c.col)),maxR=Math.max(...coords.map(c=>c.row)),maxC=Math.max(...coords.map(c=>c.col));const grid=[];for(let r=minR;r<=maxR;r++){const row=[];for(let c=minC;c<=maxC;c++){const f=coords.find(x=>x.row===r&&x.col===c);row.push(f?getCellValue(f.cell):'');}grid.push(row);}navigator.clipboard.writeText(grid.map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+selectedCells.size+' cells','success')).catch(()=>showToast('Clipboard error','error'));}
 function pasteSelCells(){navigator.clipboard.readText().then(text=>{const rows=text.split('\n').map(r=>r.split('\t'));const sorted=[...selectedCells].sort((a,b)=>{const ca=getCellCoords(a),cb=getCellCoords(b);return ca.row!==cb.row?ca.row-cb.row:ca.col-cb.col;});let cnt=0;sorted.forEach((cell,i)=>{const r=Math.floor(i/rows[0].length),c2=i%rows[0].length;if(rows[r]&&rows[r][c2]!==undefined&&setCellValue(cell,rows[r][c2]))cnt++;});clearCellSel();showToast('Pasted to '+cnt+' cells','success');updateAllStats();}).catch(()=>showToast('Clipboard read failed','error'));}
 function delSelCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}let cnt=0;selectedCells.forEach(c=>{if(setCellValue(c,''))cnt++;});clearCellSel();showToast('Cleared '+cnt+' cells','success');updateAllStats();}
 
 /* ============================================================
-   VISIBILITY TOGGLES
+   CHANGE 4: VISIBILITY TOGGLES — default hidden, "Show X" labels
 ============================================================ */
-const TOGGLE_SECTIONS={toggleStatsBtn:{el:'statsSection',show:'Hide Stats Bar',hide:'Show Stats Bar'},toggleTallyBtn:{el:'tallySection',show:'Hide Tally',hide:'Show Tally'},toggleSuppliersBtn:{el:'suppliersSection',show:'Hide Suppliers',hide:'Show Suppliers'},toggleFooterBtn:{el:'footerEl',show:'Hide Footer',hide:'Show Footer'}};
+const TOGGLE_SECTIONS={
+  toggleStatsBtn:{el:'statsSection',showLabel:'Show Stats Bar',hideLabel:'Hide Stats Bar'},
+  toggleTallyBtn:{el:'tallySection',showLabel:'Show Tally',hideLabel:'Hide Tally'},
+  toggleSuppliersBtn:{el:'suppliersSection',showLabel:'Show Suppliers',hideLabel:'Hide Suppliers'},
+  toggleFooterBtn:{el:'footerEl',showLabel:'Show Footer',hideLabel:'Hide Footer'},
+};
 function initVisibilityToggles(){
-  const saved=JSON.parse(localStorage.getItem(NS.VIS_STATES)||'{}');
-  Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const btn=document.getElementById(btnId),el=document.getElementById(cfg.el);if(!btn||!el)return;if(saved[cfg.el]===true){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}btn.addEventListener('click',()=>{const hidden=el.classList.toggle('hidden');updateToggleBtn(btn,cfg,hidden);const s=JSON.parse(localStorage.getItem(NS.VIS_STATES)||'{}');s[cfg.el]=hidden;localStorage.setItem(NS.VIS_STATES,JSON.stringify(s));});});
-  document.getElementById('hideAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el&&!el.classList.contains('hidden')){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}});const s={};Object.values(TOGGLE_SECTIONS).forEach(c=>s[c.el]=true);localStorage.setItem(NS.VIS_STATES,JSON.stringify(s));});
-  document.getElementById('showAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el){el.classList.remove('hidden');updateToggleBtn(btn,cfg,false);}});localStorage.setItem(NS.VIS_STATES,'{}');});
+  Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
+    const btn=document.getElementById(btnId),el=document.getElementById(cfg.el);if(!btn||!el)return;
+    el.classList.add('hidden');
+    updateToggleBtn(btn,cfg,true);
+    btn.addEventListener('click',()=>{const nowHidden=el.classList.toggle('hidden');updateToggleBtn(btn,cfg,nowHidden);});
+  });
+  document.getElementById('hideAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}});});
+  document.getElementById('showAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el){el.classList.remove('hidden');updateToggleBtn(btn,cfg,false);}});});
 }
-function updateToggleBtn(btn,cfg,isHidden){if(!btn)return;const spans=btn.querySelectorAll('span'),last=spans[spans.length-1];if(last)last.textContent=isHidden?cfg.hide:cfg.show;btn.classList.toggle('toggled',!isHidden);}
+function updateToggleBtn(btn,cfg,isHidden){if(!btn)return;const icon=btn.querySelector('i');const iconHTML=icon?icon.outerHTML:'';btn.innerHTML=iconHTML+(isHidden?cfg.showLabel:cfg.hideLabel);btn.classList.toggle('toggled',!isHidden);}
 
 /* ============================================================
    SIDEBAR TOGGLES
@@ -1324,64 +1070,44 @@ function initEnterNav(){document.getElementById('tableBody').addEventListener('k
 function initTableFocusMode(){document.getElementById('tableFocusBtn').addEventListener('click',function(){const inFocus=document.body.classList.toggle('table-focus');if(inFocus){document.querySelectorAll('.stats-bar,.tally-section,.suppliers-section,.footer').forEach(el=>el.classList.add('hidden'));this.innerHTML='<i class="fas fa-compress"></i>Exit Focus Mode';}else{document.querySelectorAll('.stats-bar,.tally-section,.suppliers-section,.footer').forEach(el=>el.classList.remove('hidden'));this.innerHTML='<i class="fas fa-expand"></i>Table Focus Mode';}});}
 
 /* ============================================================
-   SELECTION MOUSE EVENTS
+   SELECTION MOUSE EVENTS — with right-click context menu
 ============================================================ */
-function initSelectionMouseEvents(){const tb=document.getElementById('tableBody');tb.addEventListener('mousedown',e=>{if(!selectMode)return;const td=e.target.closest('td');if(!td)return;e.preventDefault();isDragging=true;dragStart=getCellCoords(td);clearCellSel();td.classList.add('cell-selected');selectedCells.add(td);const sc=document.getElementById('selCount');if(sc)sc.textContent=1;});tb.addEventListener('mousemove',e=>{if(!selectMode||!isDragging)return;const td=e.target.closest('td');if(!td)return;selectRange(dragStart,getCellCoords(td));});document.addEventListener('mouseup',()=>{if(isDragging)isDragging=false;});document.addEventListener('keydown',e=>{if(!selectMode)return;if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelCells();}if(e.ctrlKey&&e.key==='v'){e.preventDefault();pasteSelCells();}if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();delSelCells();}if(e.key==='Escape'){if(selectedCells.size>0)clearCellSel();else toggleSelectMode();}});}
+function initSelectionMouseEvents(){
+  const tb=document.getElementById('tableBody');
+  tb.addEventListener('mousedown',e=>{if(!selectMode)return;if(e.button===2)return;const td=e.target.closest('td');if(!td)return;e.preventDefault();isDragging=true;dragStart=getCellCoords(td);clearCellSel();td.classList.add('cell-selected');selectedCells.add(td);updateSelectionInfoBar();});
+  tb.addEventListener('mousemove',e=>{if(!selectMode||!isDragging)return;const td=e.target.closest('td');if(!td)return;selectRange(dragStart,getCellCoords(td));});
+  tb.addEventListener('contextmenu',e=>{if(!selectMode)return;e.preventDefault();const td=e.target.closest('td');if(td&&!selectedCells.has(td)){clearCellSel();td.classList.add('cell-selected');selectedCells.add(td);updateSelectionInfoBar();}showCtxMenu(e.clientX,e.clientY);});
+  document.addEventListener('mouseup',()=>{if(isDragging)isDragging=false;});
+  document.addEventListener('keydown',e=>{if(!selectMode)return;if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelCells();}if(e.ctrlKey&&e.key==='v'){e.preventDefault();pasteSelCells();}if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();delSelCells();}if(e.key==='Escape'){if(activeCtxMenu){closeCtxMenu();}else if(selectedCells.size>0){clearCellSel();}else{toggleSelectMode();}}});
+}
 
 /* ============================================================
    BEFOREUNLOAD
 ============================================================ */
-window.addEventListener('beforeunload',()=>{
-  const localData={version:'1.0',timestamp:new Date().toISOString(),tableData:getTableData(),companyInfo:getCompanyData()};
-  localStorage.setItem(getActiveSessionKey(),JSON.stringify(localData));
-  localStorage.setItem(getActiveCompanyKey(),JSON.stringify(localData.companyInfo));
-});
+window.addEventListener('beforeunload',()=>{const localData={version:'1.0',timestamp:new Date().toISOString(),tableData:getTableData(),companyInfo:getCompanyData()};localStorage.setItem(getActiveSessionKey(),JSON.stringify(localData));localStorage.setItem(getActiveCompanyKey(),JSON.stringify(localData.companyInfo));});
 
 /* ============================================================
    INIT
 ============================================================ */
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded',async()=>{
   await checkBackend();
   loadRecentExpenses();
-
-  // Monthly context UI
-  if (IS_MONTHLY) {
-    const banner=document.getElementById('monthlyBanner'),bannerLabel=document.getElementById('monthlyBannerLabel'),bannerKey=document.getElementById('monthlyBannerKey');
-    if(banner){banner.classList.remove('hidden');bannerLabel.textContent=MONTHLY_CTX.label;bannerKey.textContent=`[${MONTHLY_CTX.key}]`;}
-    const ctxBadge=document.getElementById('monthlyContextBadge'),ctxLabel=document.getElementById('monthlyContextLabel');
-    if(ctxBadge){ctxBadge.classList.remove('hidden');ctxLabel.textContent=MONTHLY_CTX.label;}
-    document.getElementById('topbarSub').textContent=`Monthly Record — ${MONTHLY_CTX.label}`;
-    document.getElementById('sidebarBrandSub').textContent=MONTHLY_CTX.label;
-  }
-
-  // Report date default
-  const rdEl=document.getElementById('reportDate');
-  if(rdEl&&!rdEl.value){
-    if(IS_MONTHLY){const m=String(MONTHLY_CTX.month).padStart(2,'0');rdEl.value=`${m}/01/${MONTHLY_CTX.year}`;}
-    else{rdEl.value=getTodayDisplayDate();}
-  }
-
+  if(IS_MONTHLY){const banner=document.getElementById('monthlyBanner'),bannerLabel=document.getElementById('monthlyBannerLabel'),bannerKey=document.getElementById('monthlyBannerKey');if(banner){banner.classList.remove('hidden');bannerLabel.textContent=MONTHLY_CTX.label;bannerKey.textContent=`[${MONTHLY_CTX.key}]`;}const ctxBadge=document.getElementById('monthlyContextBadge'),ctxLabel=document.getElementById('monthlyContextLabel');if(ctxBadge){ctxBadge.classList.remove('hidden');ctxLabel.textContent=MONTHLY_CTX.label;}document.getElementById('topbarSub').textContent=`Monthly Record — ${MONTHLY_CTX.label}`;document.getElementById('sidebarBrandSub').textContent=MONTHLY_CTX.label;}
+  const rdEl=document.getElementById('reportDate');if(rdEl&&!rdEl.value){if(IS_MONTHLY){const m=String(MONTHLY_CTX.month).padStart(2,'0');rdEl.value=`${m}/01/${MONTHLY_CTX.year}`;}else{rdEl.value=getTodayDisplayDate();}}
   const sub=APP_ROLE==='Client'?'Client':APP_ROLE==='SubAdmin'?'Sub-Admin':'';
   if(!IS_MONTHLY)document.getElementById('topbarSub').textContent='Professional VAT-Compliant Expenses Tracking'+(sub?' · '+sub:'');
 
   initColVisibility();initPagination();initSidebarToggles();initVisibilityToggles();initEnterNav();initTableFocusMode();initSelectionMouseEvents();
 
-  const restored=await restoreSession();
-  if(restored===false||restored===null){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();}
-  else{const label=IS_MONTHLY?MONTHLY_CTX.label:'session';showToast(`Loaded ${restored} row(s) from ${label}`,'success');}
+  let startupDone=false;
+  if(APP_ROLE==='SubAdmin')startupDone=checkPortalFileOnLoad();
+  if(!startupDone){const restored=await restoreSession();if(restored===false||restored===null){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();}else{const label=IS_MONTHLY?MONTHLY_CTX.label:'session';showToast(`Loaded ${restored} row(s) from ${label}`,'success');}}
 
-  // Company listeners
-  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){el.addEventListener('change',()=>{saveCompanyInfo();scheduleAutoSave();});el.addEventListener('input',()=>scheduleAutoSave());}
-  });
-  const companyTIN=document.getElementById('companyTIN');
-  if(companyTIN){companyTIN.addEventListener('input',function(){formatCompanyTIN(this);});companyTIN.addEventListener('blur',function(){formatCompanyTIN(this);});}
+  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('change',()=>{saveCompanyInfo();scheduleAutoSave();});el.addEventListener('input',()=>scheduleAutoSave());}});
+  const companyTIN=document.getElementById('companyTIN');if(companyTIN){companyTIN.addEventListener('input',function(){formatCompanyTIN(this);});companyTIN.addEventListener('blur',function(){formatCompanyTIN(this);});}
   if(rdEl){rdEl.addEventListener('input',function(){autoFormatDate(this);});rdEl.addEventListener('blur',function(){validateDateInput(this);if(this.value&&!validateDisplayDate(this.value))showToast('Invalid date format. Use MM/DD/YYYY','warning');});}
   setupAutoDateUpdate();
-
-  const datePickerBtn=document.getElementById('reportDatePickerBtn');
-  if(datePickerBtn){datePickerBtn.addEventListener('click',function(e){e.stopPropagation();if(document.getElementById('dpPopup')){closeDatePicker();return;}showDatePicker(this);});}
+  const datePickerBtn=document.getElementById('reportDatePickerBtn');if(datePickerBtn){datePickerBtn.addEventListener('click',function(e){e.stopPropagation();if(document.getElementById('dpPopup')){closeDatePicker();return;}showDatePicker(this);});}
 
   document.getElementById('addRowBtn').addEventListener('click',()=>addRow());
   document.getElementById('addRowBtnHead').addEventListener('click',()=>addRow());
@@ -1398,36 +1124,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('selectMultipleBtn').addEventListener('click',toggleSelectMode);
   document.getElementById('clearAllSuppliersBtn').addEventListener('click',clearAllExpSuppliers);
   document.getElementById('entryCounterBtn').addEventListener('click',()=>addRow());
+
+  // CHANGE 2: Go to Portal
+  if(APP_ROLE==='Client'){
+    const submitBtn=document.getElementById('submitPortalHeadBtn');
+    if(submitBtn){submitBtn.classList.remove('hidden');submitBtn.addEventListener('click',function(e){e.preventDefault();openPortalModal();});}
+    document.getElementById('submitModalCancelBtn').addEventListener('click',()=>document.getElementById('submitModalOverlay').classList.add('hidden'));
+    document.getElementById('submitModalOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
+  }
 });
 </script>
 
-<!--
-=================================================================
-  FASTAPI / SQLITE BACKEND CONTRACT (Expenses)
-=================================================================
-  POST   /api/exp-records
-  GET    /api/exp-records/{record_id}
-  PATCH  /api/exp-records/{record_id}/company
-  DELETE /api/exp-records/{record_id}/company
-  POST   /api/exp-suppliers   Body: { role, data }
-  GET    /api/exp-suppliers?role=Main
-
-  SQLite schema:
-    CREATE TABLE IF NOT EXISTS exp_records (
-      record_id    TEXT PRIMARY KEY,
-      role         TEXT,
-      year         INTEGER,
-      month        INTEGER,
-      label        TEXT,
-      table_data   TEXT,
-      company_info TEXT,
-      saved_at     TEXT
-    );
-    CREATE TABLE IF NOT EXISTS exp_supplier_maps (
-      role   TEXT PRIMARY KEY,
-      data   TEXT
-    );
-=================================================================
--->
+<!-- ============================================================
+   UNDO / REDO
+============================================================ -->
+<script>
+(function(){
+  let undoStack=[],redoStack=[],isUndoingOrRedoing=false;
+  function captureSnapshot(){const rows=document.querySelectorAll('#tableBody tr');const tableData=Array.from(rows).map(row=>({date:row.querySelector('.date-input')?.value||'',invoiceNumber:row.querySelector('.invoice-number')?.value||'',invoiceType:row.querySelector('.invoice-type')?.value||'',paymentMode:row.querySelector('.payment-mode')?.value||'',transactionType:row.querySelector('.transaction-type')?.value||'',tinNumber:row.querySelector('.tin-number')?.value||'',supplierName:row.querySelector('.supplier-name')?.value||'',address:row.querySelector('.address')?.value||'',grossAmount:(row.querySelector('.gross-amount')?.dataset.raw||row.querySelector('.gross-amount')?.value||'').replace(/,/g,''),natureExpense:row.querySelector('.nature-input')?.value||'',remarks:row.querySelector('.remarks')?.value||''}));const companyInfo={companyName:document.getElementById('companyName')?.value||'',companyTIN:document.getElementById('companyTIN')?.value||'',companyAddress:document.getElementById('companyAddress')?.value||'',lineOfBusiness:document.getElementById('lineOfBusiness')?.value||'',telephone:document.getElementById('telephone')?.value||'',reportDate:document.getElementById('reportDate')?.value||'',authorizedEmployee:document.getElementById('authorizedEmployee')?.value||'',email:document.getElementById('email')?.value||''};return{tableData,companyInfo};}
+  function restoreSnapshot(snapshot){if(!snapshot)return;isUndoingOrRedoing=true;const tbody=document.getElementById('tableBody');if(tbody&&snapshot.tableData){tbody.innerHTML='';snapshot.tableData.forEach(rd=>tbody.appendChild(createRow(rd)));if(!snapshot.tableData.length)addRow();if(typeof currentPage!=='undefined')currentPage=1;if(typeof renderCurrentPage==='function')renderCurrentPage();if(typeof updateAllStats==='function')updateAllStats();}if(snapshot.companyInfo){const map={companyName:'companyName',companyTIN:'companyTIN',companyAddress:'companyAddress',lineOfBusiness:'lineOfBusiness',telephone:'telephone',reportDate:'reportDate',authorizedEmployee:'authorizedEmployee',email:'email'};for(const[prop,id]of Object.entries(map)){const el=document.getElementById(id);if(el&&snapshot.companyInfo[prop]!==undefined)el.value=snapshot.companyInfo[prop];}if(typeof saveCompanyInfo==='function')saveCompanyInfo();}if(typeof renderSuppliers==='function')renderSuppliers();if(typeof updateAllStats==='function')updateAllStats();if(typeof scheduleAutoSave==='function')scheduleAutoSave();setTimeout(()=>{isUndoingOrRedoing=false;},10);}
+  function pushToUndoStack(){if(isUndoingOrRedoing)return;redoStack=[];while(undoStack.length>50)undoStack.shift();undoStack.push(captureSnapshot());updateUndoRedoButtons();}
+  function performUndo(){if(!undoStack.length){showToast('Nothing to undo','info');return;}const current=captureSnapshot();const previous=undoStack.pop();if(previous){redoStack.push(current);while(redoStack.length>50)redoStack.shift();restoreSnapshot(previous);showToast('Undo successful','success');updateUndoRedoButtons();}}
+  function performRedo(){if(!redoStack.length){showToast('Nothing to redo','info');return;}const current=captureSnapshot();const next=redoStack.pop();if(next){undoStack.push(current);while(undoStack.length>50)undoStack.shift();restoreSnapshot(next);showToast('Redo successful','success');updateUndoRedoButtons();}}
+  function updateUndoRedoButtons(){const u=document.getElementById('globalUndoBtn'),r=document.getElementById('globalRedoBtn');if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;}
+  let changeTimer=null;
+  function recordChange(){if(isUndoingOrRedoing)return;if(changeTimer)clearTimeout(changeTimer);changeTimer=setTimeout(()=>{pushToUndoStack();changeTimer=null;},150);}
+  function addUndoRedoButtonsToUI(){const actions=document.querySelector('.topbar-actions');if(!actions||document.getElementById('globalUndoBtn'))return;const undoBtn=document.createElement('button');undoBtn.id='globalUndoBtn';undoBtn.className='topbar-btn';undoBtn.innerHTML='<i class="fas fa-undo-alt"></i> Undo';undoBtn.title='Undo (Ctrl+Z)';undoBtn.addEventListener('click',performUndo);const redoBtn=document.createElement('button');redoBtn.id='globalRedoBtn';redoBtn.className='topbar-btn';redoBtn.innerHTML='<i class="fas fa-redo-alt"></i> Redo';redoBtn.title='Redo (Ctrl+Y)';redoBtn.addEventListener('click',performRedo);actions.insertBefore(undoBtn,actions.firstChild);actions.insertBefore(redoBtn,actions.firstChild);updateUndoRedoButtons();}
+  function setupListeners(){const tb=document.getElementById('tableBody');if(tb){tb.addEventListener('input',recordChange);tb.addEventListener('change',recordChange);}['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',recordChange);el.addEventListener('change',recordChange);}});document.body.addEventListener('click',e=>{if(e.target.closest('.delete-btn')&&!isUndoingOrRedoing)pushToUndoStack();});['clearBtn','loadDataBtn','loadMultipleFilesBtn','clearInfoBtn','clearAllSuppliersBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{if(!isUndoingOrRedoing)pushToUndoStack();});});const origAdd=window.addRow,origBatch=window.addBatchRows;if(origAdd)window.addRow=function(data){if(!isUndoingOrRedoing)pushToUndoStack();return origAdd(data);};if(origBatch)window.addBatchRows=function(count){if(!isUndoingOrRedoing)pushToUndoStack();return origBatch(count);};}
+  function init(){addUndoRedoButtonsToUI();setupListeners();window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();performUndo();}if((e.ctrlKey||e.metaKey)&&e.key==='y'){e.preventDefault();performRedo();}});if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',()=>setTimeout(pushToUndoStack,600));}else setTimeout(pushToUndoStack,600);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </body>
 </html>

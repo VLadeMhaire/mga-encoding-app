@@ -308,6 +308,15 @@ body { font-family: var(--font); background: var(--gray-100); color: var(--gray-
 .open-go-btn { background: var(--blue-600); color: white; border: none; border-radius: 9px; padding: 10px 28px; font-family: var(--font-display); font-size: 14px; font-weight: 800; cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 8px; }
 .open-go-btn:hover { background: var(--blue-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
+/* ─── PURCH FILE BADGE ─── */
+.vat-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--blue-50); border: 1px solid var(--blue-200);
+  color: var(--blue-700); padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.vat-badge i { font-size: 10px; }
+
 /* ─── FOOTER ─── */
 .footer { background: var(--blue-900); color: var(--blue-300); text-align: center; padding: 10px 20px; font-size: 11px; flex-shrink: 0; }
 
@@ -334,7 +343,7 @@ body { font-family: var(--font); background: var(--gray-100); color: var(--gray-
     <div class="backend-pill checking" id="backendPill"><div class="bp-dot"></div><span id="backendPillText">Connecting…</span></div>
     <a href="../index.html" class="topbar-btn"><i class="fas fa-home"></i> Portal</a>
     <a href="vatable_sales.html" class="topbar-btn"><i class="fas fa-table-list"></i> Current Tracker</a>
-    <a href="index2.html" class="topbar-btn"><i class="fas fa-home"></i>Back to Dashboard</a>
+    <a href="index2.html" class="topbar-btn"><i class="fas fa-home"></i>Dashboard</a>
   </div>
 </div>
 
@@ -391,6 +400,7 @@ body { font-family: var(--font); background: var(--gray-100); color: var(--gray-
       <p id="contentSub">Select a month to view or open its VAT Sales Tracker</p>
     </div>
     <div class="header-actions">
+      <span class="vat-badge"><i class="fas fa-file-code"></i> .vat files</span>
       <button class="btn btn-secondary" id="exportYearBtn"><i class="fas fa-download"></i> Export Year</button>
       <button class="btn btn-primary" id="openSelectedBtn" disabled><i class="fas fa-external-link-alt"></i> Open Selected</button>
     </div>
