@@ -30,11 +30,11 @@
             --gray-900: #1a2433;
             --accent:   #c8392b;
             --accent-light: #fde8e6;
-            --gold:     #b8920a;
-            --gold-light: #fdf3d0;
             --green:    #1a7340;
             --green-light: #e6f5ee;
-            --shadow-sm: 0 1px 3px rgba(10,31,61,0.08), 0 1px 2px rgba(10,31,61,0.06);
+            --amber:    #b8920a;
+            --amber-light: #fdf3d0;
+            --shadow-sm: 0 1px 3px rgba(10,31,61,0.08);
             --shadow-md: 0 4px 12px rgba(10,31,61,0.10), 0 2px 6px rgba(10,31,61,0.06);
             --shadow-lg: 0 12px 32px rgba(10,31,61,0.12), 0 4px 12px rgba(10,31,61,0.08);
             --radius-sm: 4px;
@@ -51,523 +51,414 @@
 
         /* ─── TOP NAV ─────────────────────────────────────────── */
         .top-nav {
-            position: sticky;
-            top: 0;
-            z-index: 200;
+            position: sticky; top: 0; z-index: 200;
             background: var(--blue-900);
             border-bottom: 2px solid var(--blue-700);
             padding: 0 24px;
-            display: flex;
-            align-items: center;
-            height: 56px;
-            gap: 16px;
+            display: flex; align-items: center;
+            height: 56px; gap: 12px;
             box-shadow: 0 2px 8px rgba(10,31,61,0.3);
         }
-
         .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
             color: var(--white);
             font-family: 'Playfair Display', serif;
-            font-size: 1.05rem;
-            letter-spacing: 0.3px;
-            margin-right: auto;
-            text-decoration: none;
+            font-size: 1.05rem; letter-spacing: 0.3px;
+            margin-right: auto; text-decoration: none;
         }
         .nav-brand .brand-icon {
             width: 30px; height: 30px;
-            background: var(--blue-600);
-            border-radius: var(--radius-sm);
+            background: var(--blue-600); border-radius: var(--radius-sm);
             display: flex; align-items: center; justify-content: center;
             font-size: 0.85rem;
         }
         .nav-brand .brand-sub {
             font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.65rem;
-            color: var(--blue-300);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            display: block;
-            line-height: 1;
-            margin-top: 1px;
+            font-size: 0.65rem; color: var(--blue-300);
+            letter-spacing: 1px; text-transform: uppercase;
+            display: block; line-height: 1; margin-top: 1px;
         }
+        .nav-divider { width: 1px; height: 24px; background: var(--blue-700); flex-shrink: 0; }
 
-        .nav-divider { width: 1px; height: 24px; background: var(--blue-700); }
+        /* Backend status pill */
+        .backend-pill {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 10px; padding: 4px 10px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,.15); white-space: nowrap;
+        }
+        .backend-pill.online   { background: rgba(34,197,94,.15);  color: #86efac; }
+        .backend-pill.offline  { background: rgba(239,68,68,.15);   color: #fca5a5; }
+        .backend-pill.checking { background: rgba(251,191,36,.15);  color: #fde68a; }
+        .bp-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+        .online  .bp-dot { background: #22c55e; animation: bpulse 2s infinite; }
+        .offline .bp-dot { background: #ef4444; }
+        .checking .bp-dot { background: #fbbf24; animation: bpulse 1s infinite; }
+        @keyframes bpulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+        /* Monthly context badge */
+        .monthly-context-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(251,191,36,.2);
+            border: 1px solid rgba(251,191,36,.4);
+            border-radius: 20px; padding: 5px 14px;
+            font-size: 12px; color: #fde68a; font-weight: 600;
+        }
+        .monthly-context-badge i { font-size: 11px; }
+
+        /* Shared button base */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.78rem; font-weight: 500;
+            cursor: pointer; transition: all 0.15s ease;
+            white-space: nowrap; text-decoration: none;
+        }
+        .btn i { font-size: 0.75rem; }
+        .btn-ghost     { background: transparent; color: var(--blue-300); border-color: var(--blue-700); }
+        .btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+        .btn-primary   { background: var(--blue-600); color: var(--white); border-color: var(--blue-700); }
+        .btn-primary:hover { background: var(--blue-700); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .btn-secondary { background: var(--white); color: var(--gray-700); border-color: var(--gray-200); }
+        .btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-300); }
+        .btn-amber     { background: #92400e; color: #fef3c7; border-color: #78350f; }
+        .btn-amber:hover { background: #78350f; }
+        .btn-danger    { background: var(--accent); color: white; border-color: #a02e22; }
+        .btn-danger:hover  { background: #a02e22; }
+        .btn-green     { background: var(--green); color: white; border-color: #155e33; }
+        .btn-green:hover   { background: #155e33; }
+        .btn-teal      { background: #0e6b5e; color: white; border-color: #0a5449; }
+        .btn-teal:hover    { background: #0a5449; }
+
+        /* ─── MONTHLY BANNER ──────────────────────────────────── */
+        .monthly-banner {
+            background: linear-gradient(135deg,#0f2d57,#1a3f73);
+            border-bottom: 2px solid #4a90d9;
+            padding: 8px 24px; font-size: 12px; color: #7eb6f0;
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+        }
+        .monthly-banner i { color: #4a90d9; }
+        .monthly-banner strong { color: white; font-size: 13px; }
+        .monthly-banner .back-link {
+            margin-left: auto; display: flex; align-items: center; gap: 5px;
+            background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+            border-radius: 5px; padding: 4px 10px;
+            color: #7eb6f0; text-decoration: none; font-size: 11px; transition: .2s;
+        }
+        .monthly-banner .back-link:hover { background: rgba(255,255,255,.22); }
+
+        /* ─── AUTO-FETCH BANNER ───────────────────────────────── */
+        .autofetch-banner {
+            background: linear-gradient(135deg,#78350f,#92400e);
+            border-bottom: 2px solid #fbbf24;
+            padding: 9px 24px; font-size: 12px; color: #fef3c7;
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .autofetch-banner i { color: #fbbf24; flex-shrink: 0; }
+        .autofetch-banner strong { color: white; }
+        .fetch-actions { margin-left: auto; display: flex; gap: 6px; }
 
         /* ─── TOOLBAR ─────────────────────────────────────────── */
         .toolbar {
-    position: sticky;
-    top: 56px; /* Match the height of the top-nav */
-    z-index: 199; /* Slightly below the top-nav's z-index (200) */
-    background: var(--white);
-    border-bottom: 1px solid var(--gray-200);
-    padding: 10px 24px;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
+            position: sticky; top: 56px; z-index: 199;
+            background: var(--white); border-bottom: 1px solid var(--gray-200);
+            padding: 10px 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+        }
         .toolbar-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding-right: 12px;
-            border-right: 1px solid var(--gray-200);
+            display: flex; align-items: center; gap: 6px;
+            padding-right: 12px; border-right: 1px solid var(--gray-200);
         }
         .toolbar-group:last-child { border-right: none; padding-right: 0; }
-
         .toolbar-label {
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--gray-500);
-            margin-right: 2px;
+            font-size: 0.65rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray-500);
         }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid transparent;
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            white-space: nowrap;
-        }
-        .btn i { font-size: 0.75rem; }
-
-        .btn-primary {
-            background: var(--blue-600);
-            color: var(--white);
-            border-color: var(--blue-700);
-        }
-        .btn-primary:hover { background: var(--blue-700); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-
-        .btn-secondary {
-            background: var(--white);
-            color: var(--gray-700);
-            border-color: var(--gray-200);
-        }
-        .btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-300); }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--blue-300);
-            border-color: var(--blue-700);
-        }
-        .btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--white); }
-
-        .btn-danger { background: var(--accent); color: white; border-color: #a02e22; }
-        .btn-danger:hover { background: #a02e22; }
-
-        .btn-green { background: var(--green); color: white; border-color: #155e33; }
-        .btn-green:hover { background: #155e33; }
 
         /* Dropdown */
         .dropdown-wrap { position: relative; }
         .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-md);
-            min-width: 210px;
-            z-index: 300;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            display: none;
-            animation: dropIn 0.15s ease;
+            position: absolute; top: calc(100% + 6px); left: 0;
+            background: var(--white); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md); min-width: 210px;
+            z-index: 300; box-shadow: var(--shadow-lg); overflow: hidden;
+            display: none; animation: dropIn 0.15s ease;
         }
-        @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+        @keyframes dropIn { from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;} }
         .dropdown-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 9px 14px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            cursor: pointer;
-            border-bottom: 1px solid var(--gray-100);
-            transition: all 0.12s;
+            padding: 9px 14px; font-size: 0.8rem; font-weight: 500;
+            color: var(--gray-700); cursor: pointer;
+            border-bottom: 1px solid var(--gray-100); transition: all 0.12s;
         }
         .dropdown-item:last-child { border-bottom: none; }
         .dropdown-item:hover { background: var(--blue-50); color: var(--blue-700); }
         .dropdown-item i { width: 16px; text-align: center; color: var(--blue-500); }
         .dropdown-sep { border-top: 1px solid var(--gray-200); margin: 4px 0; }
 
+        /* Saving overlay */
+        .saving-overlay {
+            position: fixed; top: 70px; right: 20px;
+            background: var(--blue-900); color: white;
+            border-radius: var(--radius-md); padding: 8px 16px;
+            font-size: 12px; z-index: 9998;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: var(--shadow-lg); transition: opacity .3s;
+        }
+        .saving-overlay.hidden { opacity: 0; pointer-events: none; }
+        .saving-spinner {
+            width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: white; border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* ─── MAIN CONTENT ────────────────────────────────────── */
         .main { max-width: 1300px; margin: 0 auto; padding: 24px 24px 60px; }
 
         .doc-header {
-            display: flex;
-            align-items: flex-start;
+            display: flex; align-items: flex-start;
             justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
+            margin-bottom: 16px; padding-bottom: 16px;
             border-bottom: 2px solid var(--blue-100);
         }
         .doc-title-block h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.6rem;
-            color: var(--blue-900);
-            margin-bottom: 3px;
+            font-size: 1.6rem; color: var(--blue-900); margin-bottom: 3px;
         }
-        .doc-title-block p {
-            font-size: 0.78rem;
-            color: var(--gray-500);
-            letter-spacing: 0.3px;
-        }
-
-        .doc-meta {
-            text-align: right;
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
+        .doc-title-block p { font-size: 0.78rem; color: var(--gray-500); letter-spacing: 0.3px; }
+        .doc-meta { text-align: right; font-size: 0.75rem; color: var(--gray-500); }
         .doc-meta strong { color: var(--gray-700); }
+
+        /* ─── DATA-SOURCE INDICATOR STRIP ────────────────────── */
+        .datasource-strip {
+            display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+            margin-bottom: 16px; padding: 9px 14px;
+            background: var(--white); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+        }
+        .datasource-label {
+            font-size: 11px; color: var(--gray-500);
+            display: flex; align-items: center; gap: 5px; margin-right: 4px;
+        }
+        .datasource-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10.5px; font-weight: 600; padding: 3px 10px;
+            border-radius: 20px; font-family: 'IBM Plex Mono', monospace;
+        }
+        .chip-api    { background: var(--green-light); color: var(--green); border: 1px solid #a8d5bb; }
+        .chip-local  { background: var(--blue-50); color: var(--blue-600); border: 1px solid var(--blue-200); }
+        .chip-manual { background: var(--amber-light); color: var(--amber); border: 1px solid #d4aa30; }
+        .chip-empty  { background: var(--gray-100); color: var(--gray-500); border: 1px solid var(--gray-200); }
 
         /* ─── TABLE ───────────────────────────────────────────── */
         .table-card {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
+            background: var(--white); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden;
         }
-
         .table-wrap { overflow-x: auto; }
-
         .journal-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.84rem;
-            min-width: 680px;
+            width: 100%; border-collapse: collapse;
+            font-size: 0.84rem; min-width: 680px;
         }
-
-        /* Header */
         .journal-table thead tr th {
-            background: var(--blue-900);
-            color: var(--white);
+            background: var(--blue-900); color: var(--white);
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            padding: 12px 16px;
-            text-align: left;
+            font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.8px; text-transform: uppercase;
+            padding: 12px 16px; text-align: left;
             border-bottom: 2px solid var(--blue-600);
         }
         .journal-table thead tr th:last-child,
-        .journal-table thead tr th:nth-child(2) {
-            text-align: right;
-        }
+        .journal-table thead tr th:nth-child(2) { text-align: right; }
         .col-title { width: auto; }
-        .col-debit { width: 200px; }
-        .col-credit { width: 200px; }
+        .col-debit, .col-credit { width: 200px; }
 
-        /* Rows */
         .journal-table tbody tr td {
-            padding: 10px 16px;
-            border-bottom: 1px solid var(--gray-100);
-            vertical-align: middle;
+            padding: 10px 16px; border-bottom: 1px solid var(--gray-100); vertical-align: middle;
         }
         .journal-table tbody tr:hover td { background: var(--blue-50); }
 
-        /* Section header */
+        /* Section header row */
         .row-section td {
-            background: var(--blue-800) !important;
-            color: var(--white) !important;
-            font-weight: 700;
-            font-size: 0.78rem;
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            padding: 9px 16px !important;
-            border-bottom: none !important;
+            background: var(--blue-800) !important; color: var(--white) !important;
+            font-weight: 700; font-size: 0.78rem; letter-spacing: 0.6px;
+            text-transform: uppercase; padding: 9px 16px !important; border-bottom: none !important;
         }
         .row-section .section-icon { color: var(--blue-300); margin-right: 8px; }
         .row-section .section-number {
-            display: inline-block;
-            background: var(--blue-600);
-            color: white;
-            font-size: 0.65rem;
-            font-family: 'IBM Plex Mono', monospace;
-            padding: 1px 6px;
-            border-radius: 2px;
-            margin-right: 8px;
-            font-weight: 600;
+            display: inline-block; background: var(--blue-600); color: white;
+            font-size: 0.65rem; font-family: 'IBM Plex Mono', monospace;
+            padding: 1px 6px; border-radius: 2px; margin-right: 8px; font-weight: 600;
         }
+        /* Source badge inside section row */
+        .source-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            border-radius: 20px; padding: 1px 8px;
+            font-size: 0.6rem; font-family: 'IBM Plex Mono', monospace;
+            margin-left: 8px; vertical-align: middle;
+            text-transform: none; letter-spacing: 0; font-weight: 600;
+            border: 1px solid rgba(255,255,255,.2);
+        }
+        .src-api    { background: rgba(26,115,64,.35);   color: #86efac; }
+        .src-local  { background: rgba(33,104,192,.35);  color: #93c5fd; }
+        .src-manual { background: rgba(184,146,10,.35);  color: #fde68a; }
 
-        /* Subtotal */
+        /* Subtotal, grandtotal */
         .row-subtotal td {
-            background: var(--blue-50) !important;
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--blue-800);
+            background: var(--blue-50) !important; font-weight: 700;
+            font-size: 0.8rem; color: var(--blue-800);
             border-top: 2px solid var(--blue-200) !important;
             border-bottom: 2px solid var(--blue-200) !important;
         }
-
-        /* Grand total */
         .row-grandtotal td {
-            background: var(--blue-900) !important;
-            color: var(--white) !important;
-            font-weight: 700;
-            font-size: 0.88rem;
+            background: var(--blue-900) !important; color: var(--white) !important;
+            font-weight: 700; font-size: 0.88rem;
             border-top: 3px solid var(--blue-400) !important;
         }
         .row-grandtotal .amount-display { color: #a8d4ff !important; }
-
-        /* Placeholder */
         .row-placeholder td {
-            color: var(--gray-300);
-            font-style: italic;
-            font-size: 0.8rem;
-            padding: 8px 16px;
+            color: var(--gray-300); font-style: italic;
+            font-size: 0.8rem; padding: 8px 16px;
         }
 
-        /* Account row title cell */
-        .cell-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray-700);
-        }
-        .cell-title .acct-icon {
-            color: var(--blue-300);
-            font-size: 0.65rem;
-            width: 14px;
-            text-align: center;
-        }
+        /* Account cell */
+        .cell-title { display: flex; align-items: center; gap: 8px; color: var(--gray-700); }
+        .cell-title .acct-icon { color: var(--blue-300); font-size: 0.65rem; width: 14px; text-align: center; }
         .cell-title .acct-name { font-weight: 500; }
 
         /* Amount display (read-only) */
         .amount-display {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            display: block;
-            text-align: right;
+            font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem;
+            font-weight: 500; color: var(--gray-700); display: block; text-align: right;
         }
         .amount-display.has-value { color: var(--blue-700); font-weight: 600; }
 
-        /* ─── EDITABLE INPUT ─────────────────────────────────── */
-        .amount-input-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 0;
-        }
+        /* Editable input */
+        .amount-input-wrap { display: flex; align-items: center; justify-content: flex-end; }
         .currency-prefix {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--gray-400);
-            padding: 0 5px 0 8px;
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
-            border-right: none;
-            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-            height: 34px;
-            display: flex;
-            align-items: center;
+            font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem;
+            color: var(--gray-400); padding: 0 5px 0 8px;
+            background: var(--gray-50); border: 1px solid var(--gray-200);
+            border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+            height: 34px; display: flex; align-items: center;
         }
         .amount-input {
-            width: 130px;
-            height: 34px;
-            padding: 0 10px;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--gray-900);
-            background: var(--white);
+            width: 130px; height: 34px; padding: 0 10px;
+            font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem;
+            font-weight: 500; color: var(--gray-900); background: var(--white);
             border: 1px solid var(--gray-200);
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-            text-align: right;
-            outline: none;
-            transition: all 0.15s ease;
+            text-align: right; outline: none; transition: all 0.15s ease;
         }
         .amount-input:focus {
             border-color: var(--blue-400);
             box-shadow: 0 0 0 3px rgba(33,104,192,0.12);
-            background: #fff;
             color: var(--blue-800);
         }
-        .amount-input:hover:not(:focus) { border-color: var(--gray-300); }
         .amount-input.has-value {
-            color: var(--blue-700);
-            font-weight: 600;
-            border-color: var(--blue-200);
-            background: var(--blue-50);
+            color: var(--blue-700); font-weight: 600;
+            border-color: var(--blue-200); background: var(--blue-50);
         }
 
-        /* ─── FOOTER BAR ─────────────────────────────────────── */
+        /* ─── TABLE FOOTER BAR ────────────────────────────────── */
         .table-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 20px;
-            background: var(--gray-50);
-            border-top: 1px solid var(--gray-200);
-            flex-wrap: wrap;
-            gap: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px; background: var(--gray-50);
+            border-top: 1px solid var(--gray-200); flex-wrap: wrap; gap: 12px;
         }
-
         .footer-actions { display: flex; gap: 8px; }
 
         /* ─── SUMMARY STRIP ──────────────────────────────────── */
-        .summary-strip {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 16px;
-        }
+        .summary-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 16px; }
         .summary-tile {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            box-shadow: var(--shadow-sm);
+            background: var(--white); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm);
         }
         .summary-tile .tile-label {
-            font-size: 0.68rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--gray-500);
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.8px; color: var(--gray-500); margin-bottom: 4px;
+            display: flex; align-items: center; gap: 6px;
         }
         .summary-tile .tile-value {
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--blue-800);
+            font-size: 1.3rem; font-weight: 600; color: var(--blue-800);
         }
-        .summary-tile.balanced { border-left: 4px solid var(--green); }
-        .summary-tile.balanced .tile-value { color: var(--green); }
+        .summary-tile.balanced   { border-left: 4px solid var(--green); }
+        .summary-tile.balanced   .tile-value { color: var(--green); }
         .summary-tile.unbalanced { border-left: 4px solid var(--accent); }
         .summary-tile.unbalanced .tile-value { color: var(--accent); }
-        .summary-tile .tile-icon { color: var(--blue-400); }
+        .tile-icon { color: var(--blue-400); }
 
         /* ─── STATUS BAR ─────────────────────────────────────── */
         .status-bar {
-            margin-top: 12px;
-            padding: 10px 16px;
-            background: var(--white);
-            border: 1px solid var(--gray-200);
+            margin-top: 12px; padding: 10px 16px;
+            background: var(--white); border: 1px solid var(--gray-200);
             border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            color: var(--gray-500);
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.75rem; color: var(--gray-500);
         }
         .status-bar .status-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--green);
-            flex-shrink: 0;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--green); flex-shrink: 0;
         }
         .status-bar.status-warn .status-dot { background: var(--accent); }
 
         /* ─── TOAST ──────────────────────────────────────────── */
         .toast {
-            position: fixed;
-            bottom: 24px; right: 24px;
-            background: var(--blue-900);
-            color: white;
-            padding: 10px 18px;
-            border-radius: var(--radius-md);
-            font-size: 0.8rem;
-            font-weight: 500;
-            z-index: 9999;
-            box-shadow: var(--shadow-lg);
-            border-left: 3px solid var(--blue-400);
-            animation: toastIn 0.25s ease;
-            max-width: 320px;
+            position: fixed; bottom: 24px; right: 24px;
+            background: var(--blue-900); color: white;
+            padding: 10px 18px; border-radius: var(--radius-md);
+            font-size: 0.8rem; font-weight: 500; z-index: 9999;
+            box-shadow: var(--shadow-lg); border-left: 3px solid var(--blue-400);
+            animation: toastIn 0.25s ease; max-width: 340px;
         }
-        @keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+        .toast.t-success { border-left-color: #22c55e; }
+        .toast.t-warning { border-left-color: #fbbf24; }
+        .toast.t-error   { border-left-color: var(--accent); }
+        @keyframes toastIn { from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;} }
 
-        /* ─── PAGE ANIMATIONS ─────────────────────────────────── */
-        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
-        .table-card { animation: fadeUp 0.4s ease both; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;} }
+        .table-card    { animation: fadeUp 0.4s ease both; }
         .summary-strip { animation: fadeUp 0.4s ease 0.1s both; }
 
-        /* ─── PRINT STYLES ───────────────────────────────────── */
+        .hidden { display: none !important; }
+
+        /* ─── PRINT ──────────────────────────────────────────── */
         @media print {
-            @page {
-                size: A4 landscape;
-                margin: 18mm 20mm;
-            }
-            body {
-                background: white !important;
-                color: black !important;
-                font-family: 'IBM Plex Sans', Arial, sans-serif;
-                font-size: 9pt;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            .top-nav, .toolbar, .table-footer, .summary-strip, .status-bar { display: none !important; }
+            @page { size: A4 landscape; margin: 18mm 20mm; }
+            body { background: white !important; font-family: 'IBM Plex Sans', Arial, sans-serif;
+                   font-size: 9pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .top-nav, .toolbar, .table-footer, .summary-strip, .status-bar,
+            .monthly-banner, .autofetch-banner, .saving-overlay, .datasource-strip { display: none !important; }
             .main { padding: 0; max-width: 100%; margin: 0; }
             .doc-header { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #ccc; }
             .doc-title-block h1 { font-size: 14pt; color: #0a1f3d; }
-            .doc-title-block p, .doc-meta { font-size: 7pt; color: #666; }
             .table-card { box-shadow: none; border: 1px solid #ccc; border-radius: 0; }
             .journal-table { font-size: 8pt; }
-            .journal-table thead tr th {
-                background: #0a1f3d !important;
-                color: white !important;
-                padding: 7px 10px;
-                font-size: 7pt;
-            }
+            .journal-table thead tr th { background: #0a1f3d !important; color: white !important; padding: 7px 10px; font-size: 7pt; }
             .journal-table tbody tr td { padding: 5px 10px; border-bottom: 1px solid #e0e0e0; }
-            .journal-table tbody tr:hover td { background: none !important; }
-            .row-section td { background: #1a3f73 !important; color: white !important; padding: 6px 10px !important; }
-            .row-subtotal td { background: #ddeeff !important; color: #0a1f3d !important; font-weight: bold; }
-            .row-grandtotal td { background: #0a1f3d !important; color: white !important; font-weight: bold; }
-            .amount-display { color: black !important; font-weight: 500; }
-            .row-grandtotal .amount-display { color: white !important; }
-            .amount-input {
-                border: none !important;
-                background: transparent !important;
-                box-shadow: none !important;
-                color: black !important;
-                font-size: 8pt;
-                text-align: right;
-                padding: 0;
-                width: auto;
-            }
+            .row-section td { background: #1a3f73 !important; color: white !important; }
+            .row-subtotal td { background: #ddeeff !important; color: #0a1f3d !important; }
+            .row-grandtotal td { background: #0a1f3d !important; color: white !important; }
+            .amount-input { border: none !important; background: transparent !important;
+                            color: black !important; font-size: 8pt; text-align: right; padding: 0; width: auto; }
             .currency-prefix { display: none !important; }
-            .amount-input-wrap { justify-content: flex-end; }
-            .cell-title .acct-icon { display: none; }
-            .section-number { background: #1a3f73 !important; }
-            /* Print watermark / footer */
-            .print-footer {
-                display: block !important;
-                margin-top: 16px;
-                text-align: center;
-                font-size: 7pt;
-                color: #999;
-                border-top: 1px solid #ddd;
-                padding-top: 6px;
-            }
+            .source-badge { display: none; }
+            .print-footer { display: block !important; margin-top: 16px; text-align: center;
+                            font-size: 7pt; color: #999; border-top: 1px solid #ddd; padding-top: 6px; }
         }
         .print-footer { display: none; }
 
         @media (max-width: 768px) {
-            .toolbar { padding: 8px 12px; }
+            .toolbar, .monthly-banner, .autofetch-banner { padding-left: 12px; padding-right: 12px; }
             .main { padding: 12px; }
             .summary-strip { grid-template-columns: 1fr; }
-            .top-nav { padding: 0 12px; }
             .doc-header { flex-direction: column; gap: 6px; }
+            .datasource-strip { gap: 5px; }
+            .top-nav { padding: 0 12px; gap: 8px; }
         }
     </style>
 </head>
@@ -577,76 +468,151 @@
 <nav class="top-nav">
     <a href="index2.html" class="nav-brand">
         <div class="brand-icon"><i class="fas fa-book-open"></i></div>
-        <div>
-            General Journal
-            <span class="brand-sub">VAT Tally Ledger System</span>
-        </div>
+        <div>General Journal<span class="brand-sub">VAT Tally Ledger System</span></div>
     </a>
     <div class="nav-divider"></div>
-    <a href="index2.html" class="btn btn-ghost" style="text-decoration: none;">
-        <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </a>
+    <div class="backend-pill checking" id="backendPill">
+        <div class="bp-dot"></div><span id="backendPillText">Connecting…</span>
+    </div>
+    <div class="monthly-context-badge hidden" id="monthlyContextBadge">
+        <i class="fas fa-calendar-alt"></i><span id="monthlyContextLabel">—</span>
+    </div>
     <div class="nav-divider"></div>
-    <button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Print / Export</button>
+    <a href="index2.html"          class="btn btn-ghost" style="text-decoration:none;"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    <a href="monthly_journal.html" class="btn btn-ghost" style="text-decoration:none;"><i class="fas fa-calendar-alt"></i> Monthly Records</a>
+    <div class="nav-divider"></div>
+    <button class="btn btn-ghost" id="printBtn"><i class="fas fa-print"></i> Print</button>
 </nav>
+
+<!-- ─── MONTHLY BANNER (shown when editing a specific month) ─── -->
+<div class="monthly-banner hidden" id="monthlyBanner">
+    <i class="fas fa-calendar-check"></i>
+    <span>Editing monthly journal: <strong id="monthlyBannerLabel">—</strong></span>
+    <span style="font-size:11px;color:rgba(126,182,240,.6)" id="monthlyBannerKey"></span>
+    <a class="back-link" href="monthly_journal.html"><i class="fas fa-arrow-left"></i> Back to Records</a>
+</div>
+
+<!-- ─── AUTO-FETCH BANNER (shown when VAT sales data found) ─── -->
+<div class="autofetch-banner hidden" id="autofetchBanner">
+    <i class="fas fa-bolt"></i>
+    <div>
+        <strong>VAT data available</strong> for <span id="fetchPeriodLabel">—</span> —
+        <span id="fetchSummaryText">found in database</span>
+    </div>
+    <div class="fetch-actions">
+        <button class="btn btn-amber" id="autoFetchBtn"><i class="fas fa-download"></i> Auto-Fill Sales</button>
+        <button class="btn btn-ghost" id="dismissFetchBtn" style="border-color:rgba(255,255,255,.25);font-size:.7rem;padding:4px 8px;">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<!-- ─── AUTO-FETCH BANNER for Purchases (shown when purch data found) ─ -->
+<div class="autofetch-banner hidden" id="autofetchPurchBanner" style="background:linear-gradient(135deg,#1a4057,#1e6080);border-bottom-color:#60bffa;">
+    <i class="fas fa-cart-shopping" style="color:#60bffa;"></i>
+    <div>
+        <strong>Purchases data available</strong> for <span id="fetchPurchPeriodLabel">—</span> —
+        <span id="fetchPurchSummaryText">found in database</span>
+    </div>
+    <div class="fetch-actions">
+        <button class="btn btn-primary" id="autoFetchPurchBtn" style="background:#1e6080;border-color:#155070;"><i class="fas fa-download"></i> Auto-Fill Purchases</button>
+        <button class="btn btn-ghost" id="dismissFetchPurchBtn" style="border-color:rgba(255,255,255,.25);font-size:.7rem;padding:4px 8px;">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<!-- ─── AUTO-FETCH BANNER for Expenses (shown when exp data found) ─── -->
+<div class="autofetch-banner hidden" id="autofetchExpBanner" style="background:linear-gradient(135deg,#1a4a2e,#1d6b40);border-bottom-color:#4ade80;">
+    <i class="fas fa-receipt" style="color:#4ade80;"></i>
+    <div>
+        <strong>Expenses data available</strong> for <span id="fetchExpPeriodLabel">—</span> —
+        <span id="fetchExpSummaryText">found in database</span>
+    </div>
+    <div class="fetch-actions">
+        <button class="btn btn-teal" id="autoFetchExpBtn" style="background:#1d6b40;border-color:#155e33;"><i class="fas fa-download"></i> Auto-Fill Expenses</button>
+        <button class="btn btn-ghost" id="dismissFetchExpBtn" style="border-color:rgba(255,255,255,.25);font-size:.7rem;padding:4px 8px;">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
 
 <!-- ─── TOOLBAR ──────────────────────────────────────────────── -->
 <div class="toolbar">
-
     <div class="toolbar-group">
         <span class="toolbar-label">Sales</span>
         <button class="btn btn-primary" id="loadSalesBtn"><i class="fas fa-file-arrow-up"></i> Load Sales (.vat)</button>
     </div>
-
     <div class="toolbar-group">
         <span class="toolbar-label">Purchases</span>
         <div class="dropdown-wrap">
-            <button class="btn btn-secondary" id="loadPurchasesBtn"><i class="fas fa-cart-shopping"></i> Purchases <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></button>
+            <button class="btn btn-secondary" id="loadPurchasesBtn">
+                <i class="fas fa-cart-shopping"></i> Purchases <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
+            </button>
             <div class="dropdown-menu" id="purchasesDropdown">
                 <div class="dropdown-item" data-type="vat"><i class="fas fa-file-invoice"></i> VAT Purchases (.purch)</div>
                 <div class="dropdown-item" data-type="nonvat"><i class="fas fa-file-invoice-dollar"></i> Non-VAT Purchases (.npurch)</div>
                 <div class="dropdown-item" data-type="returns"><i class="fas fa-rotate-left"></i> Purchase Returns (.rpurch)</div>
                 <div class="dropdown-sep"></div>
                 <div class="dropdown-item" data-type="all"><i class="fas fa-layer-group"></i> Load All Three</div>
+                <div class="dropdown-sep"></div>
+                <div class="dropdown-item" data-type="autofetch" id="purchAutoFetchItem"><i class="fas fa-bolt"></i> Auto-fill from VAT Purchases DB</div>
             </div>
         </div>
     </div>
-
     <div class="toolbar-group">
         <span class="toolbar-label">Expenses</span>
         <div class="dropdown-wrap">
-            <button class="btn btn-secondary" id="loadExpensesBtn"><i class="fas fa-receipt"></i> Expenses <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></button>
+            <button class="btn btn-secondary" id="loadExpensesBtn">
+                <i class="fas fa-receipt"></i> Expenses <i class="fas fa-chevron-down" style="font-size:.6rem;"></i>
+            </button>
             <div class="dropdown-menu" id="expensesDropdown">
                 <div class="dropdown-item" data-type="vatable"><i class="fas fa-file-invoice"></i> Vatable Expenses (.exp)</div>
                 <div class="dropdown-item" data-type="nonvat"><i class="fas fa-file-invoice-dollar"></i> Non-VAT Expenses (.nexp)</div>
+                <div class="dropdown-sep"></div>
+                <div class="dropdown-item" data-type="autofetch" id="expAutoFetchItem"><i class="fas fa-bolt"></i> Auto-fill from Expenses DB</div>
             </div>
         </div>
     </div>
-
     <div class="toolbar-group">
         <span class="toolbar-label">Other</span>
-        <button class="btn btn-secondary" id="loadTaxesBtn"><i class="fas fa-landmark"></i> Taxes & Licenses</button>
+        <button class="btn btn-secondary" id="loadTaxesBtn"><i class="fas fa-landmark"></i> Taxes &amp; Licenses</button>
         <button class="btn btn-secondary" id="loadCapexBtn"><i class="fas fa-building"></i> CAPEX</button>
     </div>
-
     <div class="toolbar-group" style="margin-left:auto;">
+        <button class="btn btn-secondary" id="saveJournalBtn"><i class="fas fa-save"></i> Save</button>
         <button class="btn btn-secondary" id="refreshTotalsBtn"><i class="fas fa-calculator"></i> Recalculate</button>
-        <button class="btn btn-danger" id="resetAllBtn"><i class="fas fa-trash-can"></i> Clear All</button>
+        <button class="btn btn-danger"    id="resetAllBtn"><i class="fas fa-trash-can"></i> Clear All</button>
     </div>
+</div>
+
+<!-- Saving overlay (top-right spinner) -->
+<div class="saving-overlay hidden" id="savingOverlay">
+    <div class="saving-spinner"></div>
+    <span id="savingOverlayText">Saving…</span>
 </div>
 
 <!-- ─── MAIN ─────────────────────────────────────────────────── -->
 <div class="main">
 
-    <div class="doc-header" id="printArea">
+    <div class="doc-header">
         <div class="doc-title-block">
             <h1><i class="fas fa-book-open" style="color:var(--blue-400);font-size:1.2rem;margin-right:8px;"></i>General Journal · VAT Tally Ledger</h1>
-            <p>Debit & Credit entries · Balanced Taxes & Licenses · All sections auto-calculated</p>
+            <p>Debit &amp; Credit entries · Balanced Taxes &amp; Licenses · All sections auto-calculated</p>
         </div>
         <div class="doc-meta">
-            <strong id="dateDisplay"></strong><br>
-            Journal Entry Report
+            <strong id="dateDisplay"></strong><br>Journal Entry Report
         </div>
+    </div>
+
+    <!-- Data-source indicator strip -->
+    <div class="datasource-strip" id="datasourceStrip">
+        <span class="datasource-label"><i class="fas fa-database" style="color:var(--blue-400)"></i> Sources:</span>
+        <span class="datasource-chip chip-empty" id="srcSales"  ><i class="fas fa-circle-dot"></i> Sales: —</span>
+        <span class="datasource-chip chip-empty" id="srcPurch"  ><i class="fas fa-circle-dot"></i> Purchases: —</span>
+        <span class="datasource-chip chip-empty" id="srcExp"    ><i class="fas fa-circle-dot"></i> Expenses: —</span>
+        <span class="datasource-chip chip-empty" id="srcTax"    ><i class="fas fa-circle-dot"></i> Tax/Lic: —</span>
+        <span class="datasource-chip chip-empty" id="srcCapex"  ><i class="fas fa-circle-dot"></i> CAPEX: —</span>
     </div>
 
     <div class="table-card">
@@ -655,24 +621,24 @@
                 <thead>
                     <tr>
                         <th class="col-title">Account Title</th>
-                        <th class="col-debit" style="text-align:right;">Debit (₱)</th>
+                        <th class="col-debit"  style="text-align:right;">Debit (₱)</th>
                         <th class="col-credit" style="text-align:right;">Credit (₱)</th>
                     </tr>
                 </thead>
                 <tbody id="journalTbody"></tbody>
             </table>
         </div>
-
         <div class="table-footer">
-            <span style="font-size:0.75rem;color:var(--gray-400);"><i class="fas fa-info-circle"></i> Click any amount field to edit. Tab between fields.</span>
+            <span style="font-size:.75rem;color:var(--gray-400);">
+                <i class="fas fa-info-circle"></i> Click any amount field to edit · Tab between fields
+            </span>
             <div class="footer-actions">
                 <button class="btn btn-secondary" id="refreshTotalsBtn2"><i class="fas fa-calculator"></i> Recalculate</button>
-                <button class="btn btn-green" id="printBtn2"><i class="fas fa-print"></i> Print Journal</button>
+                <button class="btn btn-green"     id="printBtn2"><i class="fas fa-print"></i> Print Journal</button>
             </div>
         </div>
     </div>
 
-    <!-- Summary -->
     <div class="summary-strip">
         <div class="summary-tile">
             <div class="tile-label"><i class="fas fa-arrow-down tile-icon"></i> Total Debits</div>
@@ -693,469 +659,1019 @@
         <span id="statusText">Ledger balanced — Debits equal Credits across all sections.</span>
     </div>
 
-    <!-- Print footer (visible only in print) -->
     <div class="print-footer">
-        Generated by VAT Tally Ledger System · <span id="printDateFooter"></span> · All entries are subject to review and audit.
+        Generated by VAT Tally Ledger System · <span id="printDateFooter"></span> · All entries subject to review and audit.
     </div>
 </div>
 
 <script>
+/* ================================================================
+   GENERAL JOURNAL — Full Backend Integration
+   ─────────────────────────────────────────────────────────────────
+   Architecture:
+     1. Tauri  → FastAPI at localhost:9999
+     2. FastAPI → SQLite (journal_records table)
+     3. localStorage → always written first as offline safety net
+     4. Monthly context from sessionStorage (set by monthly_journal.html)
+     5. Auto-Fetch: on load, reads the VAT Sales record for the same
+        period from /api/vat-records/{id} (written by vatable_sales.html),
+        VAT Purchases from /api/purch-records/{id} (vatable_purchases.html),
+        and Expenses from /api/exp-records/{id} (vatable_expenses.html).
+     6. Autosave: 1.5 s debounce after every user edit → API + localStorage
+   ================================================================ */
 (function () {
-    // ── Date display
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
-    document.getElementById('dateDisplay').textContent = dateStr;
-    document.getElementById('printDateFooter').textContent = dateStr;
+'use strict';
 
-    // ── Sections definition
-    const sections = [
-        { name: "Sales", icon: "fa-chart-line", accounts: ["Cash","Accounts Receivable","Creditable Withholding Tax","Sales - Vatable","Sales - Exempted","Sales - Return","Output Tax"] },
-        { name: "Purchases", icon: "fa-cart-shopping", accounts: ["Purchases - Vatable","Purchases - Non Vatable","Input Tax","Cash","Purchase Return","Accounts Payable","Withholding Tax Payable"] },
-        { name: "Expenses", icon: "fa-receipt", accounts: [] },
-        { name: "Taxes and Licenses", icon: "fa-landmark", accounts: ["Cash","Accounts Payable","Taxes & Licenses Expense (Debit Balancing)"] },
-        { name: "CAPEX", icon: "fa-building", accounts: ["CAPEX - Vatable","CAPEX - Non Vatable","Input Tax","Cash","Accounts Payable","Withholding Tax Payable"] }
-    ];
+/* ── 1. BACKEND CONFIG ───────────────────────────────────────── */
+const API_BASE = (() => {
+    if (window.VAT_API_BASE) return window.VAT_API_BASE;
+    if (window.__TAURI__)    return 'http://localhost:9999/api';
+    const h = window.location.hostname;
+    return (h === 'localhost' || h === '127.0.0.1')
+        ? `${window.location.protocol}//${h}:9999/api`
+        : '/api';
+})();
 
-    let rows = [];
-    let currentVatData = null, currentNonVatData = null, currentReturnsTotal = 0;
-    let currentVatableExpenses = null, currentNonVatExpenses = null;
+let USE_API   = false;
+let authToken = null;
 
-    const getExpenseRate = (nature) => {
-        if (!nature) return 0;
-        const n = nature.toUpperCase().trim();
-        const zero = ["SALARIES AND WAGES","SSS/PHILHEALTH/PAG-IBIG","SERVICES CHARGE","PRINTING AND REPRODUCTION","COMMISSION FEE","INTERMENT FEE"];
-        if (zero.includes(n)) return 0;
-        const one = ["REPAIRS AND MAINTENANCE- MATERIALS","REPAIRS AND MAINTENANCE-MATERIALS","MEALS AND ACCOMMODATION - GOODS","REPRESENTATION- GOODS","REPRESENTATIONS - GOODS","OTHERS - GOODS","FUEL AND OIL","OFFICE SUPPLIES","UNIFORMS","MEDICAL EXPENSE - GOODS","MEDICAL EXPENSES - GOODS","CLEANING SUPPLIES"];
-        if (one.includes(n)) return 0.01;
-        if (n === "RENTAL") return 0.05;
-        const two = ["REPAIRS AND MAINTENANCE- LABOR","REPAIRS AND MAINTENANCE-LABOR","MEALS AND ACCOMMODATION - SERVICES","REPRESENTATION - SERVICES","REPRESENTATIONS - SERVICES","OTHERS - SERVICES","ELECTRICITY AND WATER","COMMUNICATION EXPENSE","FREIGHT AND COURIER","TRAVEL AND TRANSPORTATION","ADVERTISING AND MARKETING","SECURITY SERVICES","INSURANCE","SEMINAR AND TRAINING","MEDICAL EXPENSE - SERVICES","MEDICAL EXPENSES - SERVICES","PROFESSIONAL FEES","CLEANING SERVICES"];
-        if (two.includes(n)) return 0.02;
-        if (n.includes("SERVICE")||n.includes("LABOR")||n.includes("PROFESSIONAL")) return 0.02;
-        if (n.includes("GOODS")||n.includes("MATERIALS")||n.includes("SUPPLIES")) return 0.01;
-        if (n.includes("RENT")) return 0.05;
-        return 0;
-    };
+async function checkBackend() {
+    const pill = document.getElementById('backendPill');
+    const text = document.getElementById('backendPillText');
+    try {
+        const r = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
+        if (r.ok) {
+            USE_API = true;
+            pill.className  = 'backend-pill online';
+            text.textContent = 'API Online';
+            try {
+                const s = sessionStorage.getItem('VAT_SESSION');
+                if (s) authToken = JSON.parse(s).token || null;
+            } catch(_) {}
+            return;
+        }
+    } catch(_) {}
+    USE_API = false;
+    pill.className  = 'backend-pill offline';
+    text.textContent = 'Local Mode';
+}
 
-    function buildRows() {
-        const r = []; let id = 0;
-        sections.forEach((sec, si) => {
-            r.push({ id: id++, type:'subheader', sectionName:sec.name, icon:sec.icon, sectionIndex:si+1, accountTitle:sec.name, debitVal:0, creditVal:0 });
-            if (sec.accounts.length === 0) {
-                r.push({ id:id++, type:'placeholder', sectionName:sec.name, accountTitle:'— No entries loaded —', debitVal:0, creditVal:0 });
-            } else {
-                sec.accounts.forEach(acc => r.push({ id:id++, type:'account', sectionName:sec.name, accountTitle:acc, debitEditable:true, creditEditable:true, debitVal:0, creditVal:0 }));
-            }
-            r.push({ id:id++, type:'subtotal', sectionName:sec.name, accountTitle:`Total ${sec.name}`, debitVal:0, creditVal:0 });
-        });
-        r.push({ id:id++, type:'grandtotal', accountTitle:'GRAND TOTAL', debitVal:0, creditVal:0 });
-        return r;
-    }
+function apiHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (authToken) h['Authorization'] = `Bearer ${authToken}`;
+    return h;
+}
 
-    function recalc() {
-        const secD = new Map(), secC = new Map();
-        sections.forEach(s => { secD.set(s.name,0); secC.set(s.name,0); });
-        rows.forEach(row => {
-            if (row.type==='account') {
-                let d = Math.max(0,parseFloat(row.debitVal)||0);
-                let c = Math.max(0,parseFloat(row.creditVal)||0);
-                row.debitVal = d; row.creditVal = c;
-                secD.set(row.sectionName, (secD.get(row.sectionName)||0)+d);
-                secC.set(row.sectionName, (secC.get(row.sectionName)||0)+c);
-            }
-        });
-        rows.forEach(row => {
-            if (row.type==='subtotal') { row.debitVal = secD.get(row.sectionName)||0; row.creditVal = secC.get(row.sectionName)||0; }
-        });
-        let gd=0,gc=0;
-        rows.forEach(row => { if(row.type==='subtotal'){ gd+=row.debitVal; gc+=row.creditVal; } });
-        const gr = rows.find(r=>r.type==='grandtotal');
-        if (gr) { gr.debitVal=gd; gr.creditVal=gc; }
-        updateSummary();
-    }
+/* ── 2. ROLE & MONTHLY CONTEXT ───────────────────────────────── */
+const APP_ROLE = (() => {
+    const p = window.location.pathname;
+    if (p.includes('/Client/'))    return 'Client';
+    if (p.includes('/Sub-Admin/')) return 'SubAdmin';
+    return 'Main';
+})();
 
-    function fmt(n) { return (parseFloat(n)||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+const MONTHLY_CTX = {
+    key:   sessionStorage.getItem('JOURNAL_MONTHLY_CONTEXT_KEY')   || null,
+    year:  sessionStorage.getItem('JOURNAL_MONTHLY_CONTEXT_YEAR')  || null,
+    month: sessionStorage.getItem('JOURNAL_MONTHLY_CONTEXT_MONTH') || null,
+    label: sessionStorage.getItem('JOURNAL_MONTHLY_CONTEXT_LABEL') || null,
+};
+const IS_MONTHLY = !!(MONTHLY_CTX.key && MONTHLY_CTX.year && MONTHLY_CTX.month);
 
-    function updateSummary() {
-        const gr = rows.find(r=>r.type==='grandtotal');
-        const d = gr ? gr.debitVal : 0, c = gr ? gr.creditVal : 0;
-        const diff = d - c;
-        document.getElementById('totalDebitSpan').textContent = '₱ '+fmt(d);
-        document.getElementById('totalCreditSpan').textContent = '₱ '+fmt(c);
-        document.getElementById('balanceDiffSpan').textContent = '₱ '+fmt(Math.abs(diff));
-        const tile = document.getElementById('balanceTile');
-        const bar = document.getElementById('statusBar');
-        const statusText = document.getElementById('statusText');
-        if (Math.abs(diff) < 0.01) {
-            tile.className='summary-tile balanced';
-            bar.className='status-bar';
-            statusText.textContent='Ledger balanced — Debits equal Credits across all sections.';
+/* localStorage keys */
+function getJournalLocalKey() {
+    return IS_MONTHLY
+        ? MONTHLY_CTX.key
+        : `JOURNAL_SESSION_${APP_ROLE}`;
+}
+
+/* API record id for journal */
+function getJournalApiId() {
+    if (IS_MONTHLY)
+        return `JOURNAL_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`;
+    return `JOURNAL_${APP_ROLE}_general`;
+}
+
+/* API record id for VAT Sales (written by vatable_sales.html) */
+function getVatApiId() {
+    if (IS_MONTHLY)
+        return `${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`;
+    return `${APP_ROLE}_general`;
+}
+
+/* API record id for VAT Purchases (written by vatable_purchases.html) */
+function getVatPurchApiId() {
+    if (IS_MONTHLY)
+        return `PURCH_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`;
+    return `PURCH_${APP_ROLE}_general`;
+}
+
+/* API record id for Expenses (written by vatable_expenses.html)
+   Mirrors: getApiRecordId() in vatable_expenses.html
+   IS_MONTHLY → EXP_{Role}_{year}_{MM}
+   general    → EXP_{Role}_general                                  */
+function getExpApiId() {
+    if (IS_MONTHLY)
+        return `EXP_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`;
+    return `EXP_${APP_ROLE}_general`;
+}
+
+/* ── 3. SAVING OVERLAY ───────────────────────────────────────── */
+function showSaving(msg) {
+    document.getElementById('savingOverlayText').textContent = msg || 'Saving…';
+    document.getElementById('savingOverlay').classList.remove('hidden');
+}
+function hideSaving() { document.getElementById('savingOverlay').classList.add('hidden'); }
+
+/* ── Date display ─────────────────────────────────────────────  */
+const NOW = new Date();
+const dateStr = NOW.toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+document.getElementById('dateDisplay').textContent     = dateStr;
+document.getElementById('printDateFooter').textContent = dateStr;
+
+/* ── Monthly context UI ──────────────────────────────────────── */
+if (IS_MONTHLY) {
+    document.getElementById('monthlyBanner').classList.remove('hidden');
+    document.getElementById('monthlyBannerLabel').textContent = MONTHLY_CTX.label;
+    document.getElementById('monthlyBannerKey').textContent   = `[${MONTHLY_CTX.key}]`;
+    document.getElementById('monthlyContextBadge').classList.remove('hidden');
+    document.getElementById('monthlyContextLabel').textContent = MONTHLY_CTX.label;
+}
+
+/* ── 4. SECTION DEFINITIONS ──────────────────────────────────── */
+const SECTIONS = [
+    { name:'Sales',              icon:'fa-chart-line',    accounts:['Cash','Accounts Receivable','Creditable Withholding Tax','Sales - Vatable','Sales - Exempted','Sales - Return','Output Tax'] },
+    { name:'Purchases',          icon:'fa-cart-shopping', accounts:['Purchases - Vatable','Purchases - Non Vatable','Input Tax','Cash','Purchase Return','Accounts Payable','Withholding Tax Payable'] },
+    { name:'Expenses',           icon:'fa-receipt',       accounts:[] },
+    { name:'Taxes and Licenses', icon:'fa-landmark',      accounts:['Cash','Accounts Payable','Taxes & Licenses Expense (Debit Balancing)'] },
+    { name:'CAPEX',              icon:'fa-building',      accounts:['CAPEX - Vatable','CAPEX - Non Vatable','Input Tax','Cash','Accounts Payable','Withholding Tax Payable'] },
+];
+
+/* Per-section data provenance: 'api' | 'local' | 'manual' | 'none' */
+const srcOf = { Sales:'none', Purchases:'none', Expenses:'none', 'Taxes and Licenses':'none', CAPEX:'none' };
+
+let rows = [];
+let currentVatData=null, currentNonVatData=null, currentReturnsTotal=0;
+let currentVatableExpenses=null, currentNonVatExpenses=null;
+let autoSaveTimer=null, saveInProgress=false;
+
+/* ── 5. EXPENSE RATE TABLE ───────────────────────────────────── */
+function getExpenseRate(nature) {
+    if (!nature) return 0;
+    const n = nature.toUpperCase().trim();
+    if (['SALARIES AND WAGES','SSS/PHILHEALTH/PAG-IBIG','SERVICES CHARGE','PRINTING AND REPRODUCTION','COMMISSION FEE','INTERMENT FEE'].includes(n)) return 0;
+    if (['REPAIRS AND MAINTENANCE- MATERIALS','REPAIRS AND MAINTENANCE-MATERIALS','MEALS AND ACCOMMODATION - GOODS','REPRESENTATION- GOODS','REPRESENTATIONS - GOODS','OTHERS - GOODS','FUEL AND OIL','OFFICE SUPPLIES','UNIFORMS','MEDICAL EXPENSE - GOODS','MEDICAL EXPENSES - GOODS','CLEANING SUPPLIES'].includes(n)) return 0.01;
+    if (n === 'RENTAL') return 0.05;
+    if (['REPAIRS AND MAINTENANCE- LABOR','REPAIRS AND MAINTENANCE-LABOR','MEALS AND ACCOMMODATION - SERVICES','REPRESENTATION - SERVICES','REPRESENTATIONS - SERVICES','OTHERS - SERVICES','ELECTRICITY AND WATER','COMMUNICATION EXPENSE','FREIGHT AND COURIER','TRAVEL AND TRANSPORTATION','ADVERTISING AND MARKETING','SECURITY SERVICES','INSURANCE','SEMINAR AND TRAINING','MEDICAL EXPENSE - SERVICES','MEDICAL EXPENSES - SERVICES','PROFESSIONAL FEES','CLEANING SERVICES'].includes(n)) return 0.02;
+    if (n.includes('SERVICE')||n.includes('LABOR')||n.includes('PROFESSIONAL')) return 0.02;
+    if (n.includes('GOODS')||n.includes('MATERIALS')||n.includes('SUPPLIES'))   return 0.01;
+    if (n.includes('RENT')) return 0.05;
+    return 0;
+}
+
+/* ── 6. BUILD ROWS ───────────────────────────────────────────── */
+function buildRows() {
+    const r = []; let id=0;
+    SECTIONS.forEach((sec, si) => {
+        r.push({ id:id++, type:'subheader', sectionName:sec.name, icon:sec.icon, sectionIndex:si+1, accountTitle:sec.name, debitVal:0, creditVal:0 });
+        if (sec.accounts.length === 0) {
+            r.push({ id:id++, type:'placeholder', sectionName:sec.name, accountTitle:'— No entries loaded —', debitVal:0, creditVal:0 });
         } else {
-            tile.className='summary-tile unbalanced';
-            bar.className='status-bar status-warn';
-            statusText.textContent=`Ledger unbalanced — Difference of ₱${fmt(Math.abs(diff))}. Review entries.`;
+            sec.accounts.forEach(acc =>
+                r.push({ id:id++, type:'account', sectionName:sec.name, accountTitle:acc, debitEditable:true, creditEditable:true, debitVal:0, creditVal:0 })
+            );
         }
+        r.push({ id:id++, type:'subtotal', sectionName:sec.name, accountTitle:`Total ${sec.name}`, debitVal:0, creditVal:0 });
+    });
+    r.push({ id:id++, type:'grandtotal', accountTitle:'GRAND TOTAL', debitVal:0, creditVal:0 });
+    return r;
+}
+
+/* ── 7. SERIALIZE / DESERIALIZE ──────────────────────────────── */
+function serializeJournal() {
+    return {
+        version:'2.0',
+        timestamp:  new Date().toISOString(),
+        record_id:  getJournalApiId(),
+        role:       APP_ROLE,
+        year:       MONTHLY_CTX.year  ? parseInt(MONTHLY_CTX.year)  : null,
+        month:      MONTHLY_CTX.month ? parseInt(MONTHLY_CTX.month) : null,
+        label:      MONTHLY_CTX.label || 'General',
+        section_source: { ...srcOf },
+        rows: rows.map(r => ({
+            type:r.type, sectionName:r.sectionName, accountTitle:r.accountTitle,
+            debitVal:r.debitVal||0, creditVal:r.creditVal||0,
+            debitEditable:r.debitEditable, creditEditable:r.creditEditable,
+            icon:r.icon, sectionIndex:r.sectionIndex
+        }))
+    };
+}
+
+function deserializeJournal(data) {
+    if (!data || !Array.isArray(data.rows) || !data.rows.length) return false;
+    rows = data.rows.map((r,i) => ({ ...r, id:i }));
+    if (data.section_source) Object.assign(srcOf, data.section_source);
+    recalc(); renderTable(); updateSourceUI();
+    return true;
+}
+
+/* ── 8. API: SAVE JOURNAL ────────────────────────────────────── */
+async function apiSaveJournal(payload) {
+    localStorage.setItem(getJournalLocalKey(), JSON.stringify(payload));
+    if (USE_API) {
+        try {
+            await fetch(`${API_BASE}/journal-records`, {
+                method: 'POST',
+                headers: apiHeaders(),
+                body: JSON.stringify(payload)
+            });
+        } catch(_) {}
+    }
+}
+
+/* ── 9. API: LOAD JOURNAL ────────────────────────────────────── */
+async function apiLoadJournal() {
+    if (USE_API) {
+        try {
+            const r = await fetch(`${API_BASE}/journal-records/${getJournalApiId()}`, { headers: apiHeaders() });
+            if (r.ok) {
+                const d = await r.json();
+                if (d && d.rows) {
+                    localStorage.setItem(getJournalLocalKey(), JSON.stringify(d));
+                    return d;
+                }
+            }
+        } catch(_) {}
+    }
+    const raw = localStorage.getItem(getJournalLocalKey());
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch(_) { return null; }
+}
+
+/* ── 10a. API: LOAD VAT SALES for this period ────────────────── */
+async function apiLoadVatSales() {
+    if (USE_API) {
+        try {
+            const r = await fetch(`${API_BASE}/vat-records/${getVatApiId()}`, { headers: apiHeaders() });
+            if (r.ok) {
+                const d = await r.json();
+                const td = d.table_data || d.tableData;
+                if (Array.isArray(td) && td.length > 0) return { tableData:td, source:'api' };
+            }
+        } catch(_) {}
     }
 
-    function renderTable() {
-        const tbody = document.getElementById('journalTbody');
-        tbody.innerHTML = '';
-        rows.forEach(row => {
-            const tr = document.createElement('tr');
-            if (row.type==='subheader') {
-                tr.className='row-section';
-                const td = document.createElement('td'); td.colSpan=3;
-                td.innerHTML=`<span class="section-number">${row.sectionIndex||'·'}</span><i class="fas ${row.icon||'fa-folder'} section-icon"></i>${esc(row.accountTitle)}`;
-                tr.appendChild(td);
-            } else if (row.type==='placeholder') {
-                tr.className='row-placeholder';
-                const td=document.createElement('td'); td.colSpan=3;
-                td.textContent=row.accountTitle;
-                tr.appendChild(td);
-            } else if (row.type==='subtotal' || row.type==='grandtotal') {
-                tr.className=row.type==='grandtotal'?'row-grandtotal':'row-subtotal';
-                const tdT=document.createElement('td');
-                tdT.innerHTML=`<div class="cell-title"><span class="acct-name"><strong>${esc(row.accountTitle)}</strong></span></div>`;
-                tr.appendChild(tdT);
-                ['debitVal','creditVal'].forEach(f=>{
-                    const td=document.createElement('td');
+    const candidates = [
+        IS_MONTHLY && `VAT_MONTHLY_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`,
+        IS_MONTHLY && `VAT_MONTHLY_Main_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`,
+        `VAT_SESSION_TABLE_${APP_ROLE}`,
+        `VAT_SESSION_TABLE_Main`,
+    ].filter(Boolean);
+
+    for (const key of candidates) {
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        try {
+            const d = JSON.parse(raw);
+            const td = d.tableData || d.table_data;
+            if (Array.isArray(td) && td.length > 0) return { tableData:td, source:'local' };
+        } catch(_) {}
+    }
+    return null;
+}
+
+/* ── 10b. API: LOAD VAT PURCHASES for this period ────────────── */
+async function apiLoadVatPurchases() {
+    if (USE_API) {
+        try {
+            const r = await fetch(`${API_BASE}/purch-records/${getVatPurchApiId()}`, { headers: apiHeaders() });
+            if (r.ok) {
+                const d = await r.json();
+                const td = d.table_data || d.tableData;
+                if (Array.isArray(td) && td.length > 0) return { tableData:td, source:'api' };
+            }
+        } catch(_) {}
+    }
+
+    const purchCandidates = [
+        IS_MONTHLY && `PURCH_MONTHLY_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`,
+        IS_MONTHLY && `PURCH_MONTHLY_Main_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`,
+        `PURCH_SESSION_TABLE_${APP_ROLE}`,
+        `PURCH_SESSION_TABLE_Main`,
+    ].filter(Boolean);
+
+    for (const key of purchCandidates) {
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        try {
+            const d = JSON.parse(raw);
+            const td = d.tableData || d.table_data;
+            if (Array.isArray(td) && td.length > 0) return { tableData:td, source:'local' };
+        } catch(_) {}
+    }
+    return null;
+}
+
+/* ── 10c. API: LOAD EXPENSES for this period ─────────────────── */
+/* Mirrors vatable_expenses.html storage patterns exactly:
+   API  →  /api/exp-records/{EXP_{Role}_{year}_{MM}}
+   localStorage → EXP_SESSION_TABLE_{Role} (general session key used by
+                  vatable_expenses.html) or the monthly key
+                  which vatable_expenses.html sets as MONTHLY_CTX.key
+                  (format: EXP_MONTHLY_{Role}_{year}_{MM} when IS_MONTHLY).
+   Data field: table_data (API) | tableData (localStorage)
+   Row fields expected: grossAmount, natureExpense, paymentMode            */
+async function apiLoadExpenses() {
+    /* 10c-i. FastAPI / SQLite (written by vatable_expenses.html) */
+    if (USE_API) {
+        try {
+            const r = await fetch(`${API_BASE}/exp-records/${getExpApiId()}`, { headers: apiHeaders() });
+            if (r.ok) {
+                const d = await r.json();
+                const td = d.table_data || d.tableData;
+                if (Array.isArray(td) && td.length > 0) return { tableData:td, source:'api' };
+            }
+        } catch(_) {}
+    }
+
+    /* 10c-ii. localStorage — all plausible keys written by vatable_expenses.html
+       vatable_expenses.html getActiveSessionKey() returns:
+         IS_MONTHLY → MONTHLY_CTX.key  (set by monthly_expenses.html, e.g. EXP_MONTHLY_Main_2026_05)
+         general    → EXP_SESSION_TABLE_{Role}
+       We also try the Main role variants as fallback.                     */
+    const expCandidates = [
+        IS_MONTHLY && `EXP_MONTHLY_${APP_ROLE}_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`,
+        IS_MONTHLY && `EXP_MONTHLY_Main_${MONTHLY_CTX.year}_${String(MONTHLY_CTX.month).padStart(2,'0')}`,
+        `EXP_SESSION_TABLE_${APP_ROLE}`,
+        `EXP_SESSION_TABLE_Main`,
+    ].filter(Boolean);
+
+    for (const key of expCandidates) {
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        try {
+            const d = JSON.parse(raw);
+            const td = d.tableData || d.table_data;
+            if (Array.isArray(td) && td.length > 0) return { tableData:td, source:'local' };
+        } catch(_) {}
+    }
+    return null;
+}
+
+/* ── 11. SESSION SAVE / RESTORE ──────────────────────────────── */
+async function saveSession(silent) {
+    if (saveInProgress) return;
+    saveInProgress = true;
+    if (!silent) showSaving(IS_MONTHLY ? `Saving ${MONTHLY_CTX.label}…` : 'Saving…');
+    await apiSaveJournal(serializeJournal());
+    if (!silent) setTimeout(hideSaving, 800);
+    saveInProgress = false;
+}
+
+async function restoreSession() {
+    showSaving('Loading journal…');
+    const data = await apiLoadJournal();
+    hideSaving();
+    if (!data) return false;
+    return deserializeJournal(data);
+}
+
+function scheduleAutoSave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => saveSession(false), 1500);
+}
+
+/* ── 12. RECALC & FORMAT ─────────────────────────────────────── */
+function recalc() {
+    const secD=new Map(), secC=new Map();
+    SECTIONS.forEach(s => { secD.set(s.name,0); secC.set(s.name,0); });
+    rows.forEach(row => {
+        if (row.type==='account') {
+            const d=Math.max(0,parseFloat(row.debitVal)||0);
+            const c=Math.max(0,parseFloat(row.creditVal)||0);
+            row.debitVal=d; row.creditVal=c;
+            secD.set(row.sectionName,(secD.get(row.sectionName)||0)+d);
+            secC.set(row.sectionName,(secC.get(row.sectionName)||0)+c);
+        }
+    });
+    rows.forEach(row => {
+        if (row.type==='subtotal') { row.debitVal=secD.get(row.sectionName)||0; row.creditVal=secC.get(row.sectionName)||0; }
+    });
+    let gd=0,gc=0;
+    rows.forEach(row => { if(row.type==='subtotal'){gd+=row.debitVal;gc+=row.creditVal;} });
+    const gr=rows.find(r=>r.type==='grandtotal');
+    if(gr){gr.debitVal=gd;gr.creditVal=gc;}
+    updateSummary();
+}
+
+function fmt(n) { return (parseFloat(n)||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+
+function updateSummary() {
+    const gr=rows.find(r=>r.type==='grandtotal');
+    const d=gr?gr.debitVal:0, c=gr?gr.creditVal:0, diff=d-c;
+    document.getElementById('totalDebitSpan').textContent  = '₱ '+fmt(d);
+    document.getElementById('totalCreditSpan').textContent = '₱ '+fmt(c);
+    document.getElementById('balanceDiffSpan').textContent = '₱ '+fmt(Math.abs(diff));
+    const tile=document.getElementById('balanceTile'),
+          bar =document.getElementById('statusBar'),
+          txt =document.getElementById('statusText');
+    if(Math.abs(diff)<0.01){
+        tile.className='summary-tile balanced'; bar.className='status-bar';
+        txt.textContent='Ledger balanced — Debits equal Credits across all sections.';
+    } else {
+        tile.className='summary-tile unbalanced'; bar.className='status-bar status-warn';
+        txt.textContent=`Ledger unbalanced — Difference of ₱${fmt(Math.abs(diff))}. Review entries.`;
+    }
+}
+
+/* ── 13. SOURCE INDICATOR UI ─────────────────────────────────── */
+function updateSourceUI() {
+    const map={Sales:'srcSales',Purchases:'srcPurch',Expenses:'srcExp','Taxes and Licenses':'srcTax',CAPEX:'srcCapex'};
+    const labels={api:'API/SQLite ✓',local:'localStorage ✓',manual:'Manual',none:'—'};
+    const classes={api:'chip-api',local:'chip-local',manual:'chip-manual',none:'chip-empty'};
+    Object.entries(map).forEach(([sec,id])=>{
+        const el=document.getElementById(id), src=srcOf[sec]||'none';
+        const short = sec==='Taxes and Licenses'?'Tax/Lic':sec;
+        el.className=`datasource-chip ${classes[src]||'chip-empty'}`;
+        el.innerHTML=`<i class="fas fa-circle-dot"></i> ${short}: ${labels[src]||'—'}`;
+    });
+}
+
+/* ── 14. RENDER TABLE ────────────────────────────────────────── */
+function renderTable() {
+    const tbody=document.getElementById('journalTbody');
+    tbody.innerHTML='';
+    rows.forEach(row=>{
+        const tr=document.createElement('tr');
+        if(row.type==='subheader'){
+            tr.className='row-section';
+            const td=document.createElement('td'); td.colSpan=3;
+            const src=srcOf[row.sectionName]||'none';
+            const srcBadge=src!=='none'
+                ?`<span class="source-badge src-${src}"><i class="fas fa-database"></i> ${src==='api'?'API/SQLite':src==='local'?'localStorage':'manual'}</span>`
+                :'';
+            td.innerHTML=`<span class="section-number">${row.sectionIndex||'·'}</span><i class="fas ${row.icon||'fa-folder'} section-icon"></i>${esc(row.accountTitle)}${srcBadge}`;
+            tr.appendChild(td);
+        } else if(row.type==='placeholder'){
+            tr.className='row-placeholder';
+            const td=document.createElement('td'); td.colSpan=3;
+            td.textContent=row.accountTitle; tr.appendChild(td);
+        } else if(row.type==='subtotal'||row.type==='grandtotal'){
+            tr.className=row.type==='grandtotal'?'row-grandtotal':'row-subtotal';
+            const tdT=document.createElement('td');
+            tdT.innerHTML=`<div class="cell-title"><span class="acct-name"><strong>${esc(row.accountTitle)}</strong></span></div>`;
+            tr.appendChild(tdT);
+            ['debitVal','creditVal'].forEach(f=>{
+                const td=document.createElement('td');
+                const sp=document.createElement('span');
+                sp.className='amount-display'+(row[f]>0?' has-value':'');
+                sp.textContent=fmt(row[f]);
+                td.appendChild(sp); tr.appendChild(td);
+            });
+        } else {
+            const tdT=document.createElement('td');
+            tdT.innerHTML=`<div class="cell-title"><i class="fas fa-minus acct-icon"></i><span class="acct-name">${esc(row.accountTitle)}</span></div>`;
+            tr.appendChild(tdT);
+            ['debitVal','creditVal'].forEach((field,fi)=>{
+                const td=document.createElement('td');
+                const editable=fi===0?row.debitEditable:row.creditEditable;
+                if(editable===false){
                     const sp=document.createElement('span');
-                    sp.className='amount-display'+(row[f]>0?' has-value':'');
-                    sp.textContent=fmt(row[f]);
-                    td.appendChild(sp); tr.appendChild(td);
-                });
-            } else {
-                // account row
-                const tdT=document.createElement('td');
-                tdT.innerHTML=`<div class="cell-title"><i class="fas fa-minus acct-icon"></i><span class="acct-name">${esc(row.accountTitle)}</span></div>`;
-                tr.appendChild(tdT);
-
-                ['debitVal','creditVal'].forEach((field,fi)=>{
-                    const td=document.createElement('td');
-                    const editable = fi===0 ? row.debitEditable : row.creditEditable;
-                    if (editable === false || editable === undefined) {
-                        // might be auto-populated (read-only in computed rows), but we allow input for user-editable rows
-                        // check if explicitly false
-                        if (editable === false) {
-                            const sp=document.createElement('span');
-                            sp.className='amount-display'+(row[field]>0?' has-value':'');
-                            sp.textContent=fmt(row[field]);
-                            td.appendChild(sp);
-                        } else {
-                            td.appendChild(makeInput(row, field));
-                        }
-                    } else {
-                        td.appendChild(makeInput(row, field));
-                    }
-                    tr.appendChild(td);
-                });
-            }
-            tbody.appendChild(tr);
-        });
-    }
-
-    function makeInput(row, field) {
-        const wrap=document.createElement('div');
-        wrap.className='amount-input-wrap';
-        const pfx=document.createElement('span');
-        pfx.className='currency-prefix';
-        pfx.textContent='₱';
-        const inp=document.createElement('input');
-        inp.type='number'; inp.min='0'; inp.step='0.01';
-        inp.className='amount-input'+(row[field]>0?' has-value':'');
-        inp.value=row[field]>0?row[field]:'';
-        inp.placeholder='0.00';
-        inp.addEventListener('input', e=>{
-            let v=parseFloat(e.target.value)||0;
-            if(v<0) v=0;
-            row[field]=v;
-            inp.className='amount-input'+(v>0?' has-value':'');
-            recalc(); updateSummary();
-        });
-        inp.addEventListener('focus',()=>{ if(!inp.value||inp.value==='0') inp.value=''; });
-        inp.addEventListener('blur',()=>{ if(!inp.value) { inp.value=''; row[field]=0; } recalc(); });
-        wrap.appendChild(pfx); wrap.appendChild(inp);
-        return wrap;
-    }
-
-    function esc(str) { if(!str) return ''; return str.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]||m)); }
-
-    // ── Reset
-    function resetAll() {
-        rows.forEach(row=>{ if(row.type==='account'){ row.debitVal=0; row.creditVal=0; } });
-        currentVatData=null; currentNonVatData=null; currentReturnsTotal=0;
-        currentVatableExpenses=null; currentNonVatExpenses=null;
-        // restore expense placeholder
-        const newRows=rows.filter(r=>!(r.sectionName==="Expenses"&&(r.type==='account')));
-        const hasPlaceholder=newRows.some(r=>r.sectionName==="Expenses"&&r.type==='placeholder');
-        if(!hasPlaceholder){
-            const si=newRows.findIndex(r=>r.sectionName==="Expenses"&&r.type==='subtotal');
-            if(si!==-1) newRows.splice(si,0,{id:Date.now(),type:'placeholder',sectionName:"Expenses",accountTitle:'— No entries loaded —',debitVal:0,creditVal:0});
+                    sp.className='amount-display'+(row[field]>0?' has-value':'');
+                    sp.textContent=fmt(row[field]);
+                    td.appendChild(sp);
+                } else {
+                    td.appendChild(makeInput(row,field));
+                }
+                tr.appendChild(td);
+            });
         }
-        rows=newRows;
-        recalc(); renderTable();
-        showToast('All journal entries cleared.');
+        tbody.appendChild(tr);
+    });
+}
+
+function makeInput(row,field){
+    const wrap=document.createElement('div'); wrap.className='amount-input-wrap';
+    const pfx=document.createElement('span'); pfx.className='currency-prefix'; pfx.textContent='₱';
+    const inp=document.createElement('input');
+    inp.type='number'; inp.min='0'; inp.step='0.01';
+    inp.className='amount-input'+(row[field]>0?' has-value':'');
+    inp.value=row[field]>0?row[field]:''; inp.placeholder='0.00';
+    inp.addEventListener('input',e=>{
+        let v=parseFloat(e.target.value)||0; if(v<0)v=0;
+        row[field]=v; inp.className='amount-input'+(v>0?' has-value':'');
+        srcOf[row.sectionName]='manual';
+        recalc(); updateSummary(); updateSourceUI(); scheduleAutoSave();
+    });
+    inp.addEventListener('focus',()=>{ if(!inp.value||inp.value==='0')inp.value=''; });
+    inp.addEventListener('blur', ()=>{ if(!inp.value){inp.value='';row[field]=0;} recalc(); });
+    wrap.appendChild(pfx); wrap.appendChild(inp);
+    return wrap;
+}
+
+function esc(s){ if(!s)return''; return s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]||m)); }
+
+/* ── 15. ACCOUNT SETTER ──────────────────────────────────────── */
+function setAccount(section,title,debitVal,creditVal,isDebit){
+    const row=rows.find(r=>r.sectionName===section&&r.accountTitle===title&&r.type==='account');
+    if(row){ if(isDebit){row.debitVal=debitVal;row.creditVal=0;}else{row.creditVal=creditVal;row.debitVal=0;} }
+}
+
+/* ── 16. RESET ALL ───────────────────────────────────────────── */
+function resetAll(){
+    rows.forEach(row=>{ if(row.type==='account'){row.debitVal=0;row.creditVal=0;} });
+    currentVatData=null;currentNonVatData=null;currentReturnsTotal=0;
+    currentVatableExpenses=null;currentNonVatExpenses=null;
+    Object.keys(srcOf).forEach(k=>srcOf[k]='none');
+    /* Restore expense placeholder */
+    const nr=rows.filter(r=>!(r.sectionName==='Expenses'&&r.type==='account'));
+    if(!nr.some(r=>r.sectionName==='Expenses'&&r.type==='placeholder')){
+        const si=nr.findIndex(r=>r.sectionName==='Expenses'&&r.type==='subtotal');
+        if(si!==-1)nr.splice(si,0,{id:Date.now(),type:'placeholder',sectionName:'Expenses',accountTitle:'— No entries loaded —',debitVal:0,creditVal:0});
     }
+    rows=nr;
+    recalc(); renderTable(); updateSourceUI(); scheduleAutoSave();
+    showToast('All journal entries cleared.','t-warning');
+}
 
-    // ── Print
-    function printJournal() {
-        window.print();
+/* ── 17. FILE PICKER ─────────────────────────────────────────── */
+function pickFile(accept,cb){
+    const inp=document.createElement('input');
+    inp.type='file';inp.accept=accept;inp.style.display='none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change',e=>{if(e.target.files?.[0])cb(e.target.files[0]);inp.remove();});
+    inp.click();
+}
+
+/* ── 18. SALES ───────────────────────────────────────────────── */
+function applySalesData(txns,source){
+    if(!Array.isArray(txns)||!txns.length)return;
+    let tCash=0,tCharge=0,tWH=0,tNet=0,tExempt=0,tOut=0;
+    for(const row of txns){
+        const gross=parseFloat(row.grossSales)||0,exempt=parseFloat(row.exemptSales)||0,rate=parseFloat(row.withholdingRate)||0;
+        const net=gross/1.12,output=net*0.12,wh=net*rate,receipt=gross-wh+exempt;
+        if((row.paymentMode||'').toLowerCase()==='cash')tCash+=receipt;else tCharge+=receipt;
+        tWH+=wh;tNet+=net;tExempt+=exempt;tOut+=output;
     }
+    setAccount('Sales','Cash',tCash,0,true);
+    setAccount('Sales','Accounts Receivable',tCharge,0,true);
+    setAccount('Sales','Creditable Withholding Tax',tWH,0,true);
+    setAccount('Sales','Sales - Vatable',0,tNet,false);
+    setAccount('Sales','Sales - Exempted',0,tExempt,false);
+    setAccount('Sales','Output Tax',0,tOut,false);
+    srcOf['Sales']=source;
+    recalc();renderTable();updateSourceUI();scheduleAutoSave();
+}
 
-    // ── File picker helper
-    function pickFile(accept, cb) {
-        const inp=document.createElement('input'); inp.type='file'; inp.accept=accept; inp.style.display='none';
-        document.body.appendChild(inp);
-        inp.addEventListener('change',e=>{ if(e.target.files&&e.target.files[0]) cb(e.target.files[0]); inp.remove(); });
-        inp.click();
+function loadSales(){
+    pickFile('.vat,.json',file=>{
+        const r=new FileReader();
+        r.onload=e=>{
+            try{
+                const fd=JSON.parse(e.target.result);
+                const txns=fd.tableData||fd.data||fd;
+                if(!Array.isArray(txns))throw new Error();
+                applySalesData(txns,'manual');
+                showToast(`✔ Sales loaded — ${txns.length} transactions`,'t-success');
+            }catch(_){showToast('✖ Failed to parse sales file','t-error');}
+        };
+        r.readAsText(file);
+    });
+}
+
+/* ── 19. PURCHASES ───────────────────────────────────────────── */
+function parsePurchFile(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.tableData)throw 0;res(d);}catch(e){rej(e);}};r.onerror=()=>rej(new Error());r.readAsText(file);});}
+function parseReturnsFile(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.tableData)throw 0;let t=0;for(const row of d.tableData)t+=(parseFloat(row.grossReturns)||0)/1.12;res(t);}catch(e){rej(e);}};r.onerror=()=>rej(new Error());r.readAsText(file);});}
+
+function applyPurchasesData(vatD,nonVatD,retTotal,source){
+    let tVatNet=0,tNonVat=0,tIT=0,tCash=0,tCharge=0,tWHP=0;
+    if(vatD?.tableData)for(const row of vatD.tableData){
+        const gross=parseFloat(row.grossPurchases)||0,net=gross/1.12,it=net*0.12,wr=parseFloat(row.withholdingRate)||0,wa=net*wr,nr=gross-wa;
+        tVatNet+=net;tIT+=it;tWHP+=wa;
+        if((row.paymentMode||'').toLowerCase()==='cash')tCash+=nr;else tCharge+=nr;
     }
-
-    // ── SALES
-    function loadSales() {
-        pickFile('.vat,.json', file=>{
-            const r=new FileReader();
-            r.onload=e=>{
-                try {
-                    const fd=JSON.parse(e.target.result);
-                    const txns=fd.tableData||fd.data||fd;
-                    if(!Array.isArray(txns)) throw new Error();
-                    let tCash=0,tCharge=0,tWH=0,tNet=0,tExempt=0,tOut=0;
-                    for(const row of txns){
-                        const gross=parseFloat(row.grossSales)||0, exempt=parseFloat(row.exemptSales)||0, rate=parseFloat(row.withholdingRate)||0;
-                        const net=gross/1.12, output=net*0.12, wh=net*rate, receipt=gross-wh+exempt;
-                        if((row.paymentMode||'').toLowerCase()==='cash') tCash+=receipt; else tCharge+=receipt;
-                        tWH+=wh; tNet+=net; tExempt+=exempt; tOut+=output;
-                    }
-                    setAccount('Sales','Cash',tCash,0,true);
-                    setAccount('Sales','Accounts Receivable',tCharge,0,true);
-                    setAccount('Sales','Creditable Withholding Tax',tWH,0,true);
-                    setAccount('Sales','Sales - Vatable',0,tNet,false);
-                    setAccount('Sales','Sales - Exempted',0,tExempt,false);
-                    setAccount('Sales','Output Tax',0,tOut,false);
-                    recalc(); renderTable();
-                    showToast('✔ Sales loaded — '+txns.length+' transactions');
-                } catch(err){ showToast('✖ Failed to parse sales file'); }
-            };
-            r.readAsText(file);
-        });
+    if(nonVatD?.tableData)for(const row of nonVatD.tableData){
+        const gross=parseFloat(row.grossPurchases)||0,wr=parseFloat(row.withholdingRate)||0,wa=gross*wr,nr=gross-wa;
+        tNonVat+=gross;tWHP+=wa;
+        if((row.paymentMode||'').toLowerCase()==='cash')tCash+=nr;else tCharge+=nr;
     }
+    setAccount('Purchases','Purchases - Vatable',tVatNet,0,true);
+    setAccount('Purchases','Purchases - Non Vatable',tNonVat,0,true);
+    setAccount('Purchases','Input Tax',tIT,0,true);
+    setAccount('Purchases','Cash',0,tCash,false);
+    setAccount('Purchases','Purchase Return',0,retTotal,false);
+    setAccount('Purchases','Accounts Payable',0,tCharge,false);
+    setAccount('Purchases','Withholding Tax Payable',0,tWHP,false);
+    srcOf['Purchases']=source;
+    recalc();renderTable();updateSourceUI();scheduleAutoSave();
+}
 
-    function setAccount(section,title,debitVal,creditVal,isDebit){
-        const row=rows.find(r=>r.sectionName===section&&r.accountTitle===title&&r.type==='account');
-        if(row){ if(isDebit){row.debitVal=debitVal;row.creditVal=0;}else{row.creditVal=creditVal;row.debitVal=0;} }
+function handleVatPurch()   {pickFile('.purch,.json', f=>parsePurchFile(f).then(d=>{currentVatData=d;   applyPurchasesData(currentVatData,currentNonVatData,currentReturnsTotal,'manual');showToast('✔ VAT Purchases loaded','t-success');}).catch(()=>showToast('✖ Invalid VAT Purchases file','t-error')));}
+function handleNonVatPurch(){pickFile('.npurch,.json',f=>parsePurchFile(f).then(d=>{currentNonVatData=d;applyPurchasesData(currentVatData,currentNonVatData,currentReturnsTotal,'manual');showToast('✔ Non-VAT Purchases loaded','t-success');}).catch(()=>showToast('✖ Invalid Non-VAT file','t-error')));}
+function handleReturns()    {pickFile('.rpurch,.json',f=>parseReturnsFile(f).then(t=>{currentReturnsTotal=t;applyPurchasesData(currentVatData,currentNonVatData,currentReturnsTotal,'manual');showToast('✔ Purchase Returns loaded','t-success');}).catch(()=>showToast('✖ Invalid Returns file','t-error')));}
+function handleLoadAll()    {handleVatPurch();setTimeout(()=>{handleNonVatPurch();setTimeout(handleReturns,600);},600);}
+
+/* ── 20. EXPENSES ────────────────────────────────────────────── */
+function processExpenses(file,type){
+    const r=new FileReader();
+    r.onload=e=>{
+        try{
+            const data=JSON.parse(e.target.result);
+            if(!data.tableData||!Array.isArray(data.tableData))throw 0;
+            if(type==='vatable')currentVatableExpenses=data;else currentNonVatExpenses=data;
+            applyExpensesData('manual');
+            showToast(`✔ ${type==='vatable'?'Vatable':'Non-VAT'} Expenses loaded — ${data.tableData.length} records`,'t-success');
+        }catch(_){showToast(`✖ Error loading ${type} expenses file`,'t-error');}
+    };
+    r.readAsText(file);
+}
+
+function applyExpensesData(source){
+    const allExp=[];
+    if(currentVatableExpenses?.tableData)for(const row of currentVatableExpenses.tableData){
+        const gross=parseFloat(row.grossAmount)||0,net=gross/1.12,it=net*0.12;
+        const nature=row.natureExpense||'Uncategorized',rate=getExpenseRate(nature),wh=net*rate;
+        allExp.push({nature,netAmount:net,grossAmount:gross,inputTax:it,withholdingTax:wh,paymentMode:(row.paymentMode||'').toLowerCase()==='cash'?'cash':'charge',rate});
     }
-
-    // ── PURCHASES
-    function loadVatPurch(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>{ try{ const d=JSON.parse(e.target.result); if(!d.tableData) throw new Error(); res(d); }catch(err){rej(err);} }; r.onerror=()=>rej(new Error()); r.readAsText(file); }); }
-    function loadNonVatPurch(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>{ try{ const d=JSON.parse(e.target.result); if(!d.tableData) throw new Error(); res(d); }catch(err){rej(err);} }; r.onerror=()=>rej(new Error()); r.readAsText(file); }); }
-    function loadReturns(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>{ try{ const d=JSON.parse(e.target.result); if(!d.tableData) throw new Error(); let t=0; for(const row of d.tableData) t+=(parseFloat(row.grossReturns)||0)/1.12; res(t); }catch(err){rej(err);} }; r.onerror=()=>rej(new Error()); r.readAsText(file); }); }
-
-    function updatePurchases(){
-        let tVatNet=0,tNonVat=0,tInputTax=0,tCash=0,tCharge=0,tWHP=0;
-        if(currentVatData&&currentVatData.tableData){
-            for(const row of currentVatData.tableData){
-                const gross=parseFloat(row.grossPurchases)||0, net=gross/1.12, it=net*0.12, wr=parseFloat(row.withholdingRate)||0, wa=net*wr, nr=gross-wa;
-                tVatNet+=net; tInputTax+=it; tWHP+=wa;
-                if((row.paymentMode||'').toLowerCase()==='cash') tCash+=nr; else tCharge+=nr;
-            }
-        }
-        if(currentNonVatData&&currentNonVatData.tableData){
-            for(const row of currentNonVatData.tableData){
-                const gross=parseFloat(row.grossPurchases)||0, wr=parseFloat(row.withholdingRate)||0, wa=gross*wr, nr=gross-wa;
-                tNonVat+=gross; tWHP+=wa;
-                if((row.paymentMode||'').toLowerCase()==='cash') tCash+=nr; else tCharge+=nr;
-            }
-        }
-        setAccount('Purchases','Purchases - Vatable',tVatNet,0,true);
-        setAccount('Purchases','Purchases - Non Vatable',tNonVat,0,true);
-        setAccount('Purchases','Input Tax',tInputTax,0,true);
-        setAccount('Purchases','Cash',0,tCash,false);
-        setAccount('Purchases','Purchase Return',0,currentReturnsTotal,false);
-        setAccount('Purchases','Accounts Payable',0,tCharge,false);
-        setAccount('Purchases','Withholding Tax Payable',0,tWHP,false);
-        recalc(); renderTable();
+    if(currentNonVatExpenses?.tableData)for(const row of currentNonVatExpenses.tableData){
+        const gross=parseFloat(row.grossAmount)||0;
+        const nature=row.natureExpense||'Uncategorized',rate=getExpenseRate(nature),wh=gross*rate;
+        allExp.push({nature,netAmount:gross,grossAmount:gross,inputTax:0,withholdingTax:wh,paymentMode:(row.paymentMode||'').toLowerCase()==='cash'?'cash':'charge',rate});
     }
+    const map=new Map();
+    for(const exp of allExp){
+        if(!map.has(exp.nature))map.set(exp.nature,{nature:exp.nature,totalNet:0,totalInputTax:0,totalWH:0,cashNR:0,chargeNR:0,rate:exp.rate});
+        const en=map.get(exp.nature);
+        en.totalNet+=exp.netAmount;en.totalInputTax+=exp.inputTax;en.totalWH+=exp.withholdingTax;
+        const nr=exp.grossAmount-exp.withholdingTax;
+        if(exp.paymentMode==='cash')en.cashNR+=nr;else en.chargeNR+=nr;
+    }
+    let tIT=0,tCash=0,tAP=0,tWHP=0;
+    const natRows=[];
+    for(const en of map.values()){
+        const rLbl=en.rate===0?'0%':en.rate===0.01?'1%':en.rate===0.02?'2%':'5%';
+        natRows.push({title:`${en.nature} (${rLbl})`,totalNet:en.totalNet,rate:en.rate});
+        tIT+=en.totalInputTax;tCash+=en.cashNR;tAP+=en.chargeNR;tWHP+=en.totalWH;
+    }
+    natRows.sort((a,b)=>a.rate-b.rate);
+    const newRows=rows.filter(r=>!(r.sectionName==='Expenses'&&(r.type==='account'||r.type==='placeholder')));
+    const si=newRows.findIndex(r=>r.sectionName==='Expenses'&&r.type==='subtotal');
+    if(si!==-1){
+        const ins=[];
+        for(const item of natRows)if(item.totalNet>0)ins.push({id:Date.now()+Math.random(),type:'account',sectionName:'Expenses',accountTitle:item.title,debitEditable:false,creditEditable:false,debitVal:item.totalNet,creditVal:0});
+        if(tIT>0)   ins.push({id:Date.now()+Math.random(),type:'account',sectionName:'Expenses',accountTitle:'Input Tax',debitEditable:false,creditEditable:false,debitVal:tIT,creditVal:0});
+        if(tCash>0) ins.push({id:Date.now()+Math.random(),type:'account',sectionName:'Expenses',accountTitle:'Cash',debitEditable:false,creditEditable:false,debitVal:0,creditVal:tCash});
+        if(tAP>0)   ins.push({id:Date.now()+Math.random(),type:'account',sectionName:'Expenses',accountTitle:'Accounts Payable',debitEditable:false,creditEditable:false,debitVal:0,creditVal:tAP});
+        if(tWHP>0)  ins.push({id:Date.now()+Math.random(),type:'account',sectionName:'Expenses',accountTitle:'Withholding Tax Payable',debitEditable:false,creditEditable:false,debitVal:0,creditVal:tWHP});
+        if(!ins.length)ins.push({id:Date.now(),type:'placeholder',sectionName:'Expenses',accountTitle:'— No expense entries —',debitVal:0,creditVal:0});
+        newRows.splice(si,0,...ins);
+    }
+    rows=newRows; srcOf['Expenses']=source;
+    recalc();renderTable();updateSourceUI();scheduleAutoSave();
+}
 
-    function handleVatPurch(){ pickFile('.purch,.json',file=>{ loadVatPurch(file).then(d=>{ currentVatData=d; updatePurchases(); showToast('✔ VAT Purchases loaded'); }).catch(()=>showToast('✖ Invalid VAT Purchases file')); }); }
-    function handleNonVatPurch(){ pickFile('.npurch,.json',file=>{ loadNonVatPurch(file).then(d=>{ currentNonVatData=d; updatePurchases(); showToast('✔ Non-VAT Purchases loaded'); }).catch(()=>showToast('✖ Invalid Non-VAT Purchases file')); }); }
-    function handleReturns(){ pickFile('.rpurch,.json',file=>{ loadReturns(file).then(t=>{ currentReturnsTotal=t; updatePurchases(); showToast('✔ Purchase Returns loaded'); }).catch(()=>showToast('✖ Invalid Returns file')); }); }
-    function handleLoadAll(){ handleVatPurch(); setTimeout(()=>{ handleNonVatPurch(); setTimeout(()=>handleReturns(),600); },600); }
-
-    // ── EXPENSES
-    function processExpenses(file, type){
+/* ── 21. TAXES & LICENSES ────────────────────────────────────── */
+function loadTaxes(){
+    pickFile('.taxes,.json',file=>{
         const r=new FileReader();
         r.onload=e=>{
             try{
                 const data=JSON.parse(e.target.result);
-                if(!data.tableData||!Array.isArray(data.tableData)) throw new Error();
-                if(type==='vatable') currentVatableExpenses=data; else currentNonVatExpenses=data;
-                updateExpenses();
-                showToast(`✔ ${type==='vatable'?'Vatable':'Non-VAT'} Expenses loaded — ${data.tableData.length} records`);
-            }catch(err){ showToast(`✖ Error loading ${type} expenses file`); }
+                if(!data.tableData||!Array.isArray(data.tableData))throw 0;
+                let tCash=0,tAP=0;
+                for(const row of data.tableData){const amt=parseFloat(row.amount)||0;if((row.paymentMode||'').toLowerCase()==='cash')tCash+=amt;else tAP+=amt;}
+                const total=tCash+tAP;
+                const cashRow=rows.find(r=>r.sectionName==='Taxes and Licenses'&&r.accountTitle==='Cash');
+                const apRow  =rows.find(r=>r.sectionName==='Taxes and Licenses'&&r.accountTitle==='Accounts Payable');
+                const balRow =rows.find(r=>r.sectionName==='Taxes and Licenses'&&r.accountTitle==='Taxes & Licenses Expense (Debit Balancing)');
+                if(cashRow){cashRow.debitVal=0;cashRow.creditVal=tCash;}
+                if(apRow)  {apRow.debitVal=0;  apRow.creditVal=tAP;}
+                if(balRow) {balRow.debitVal=total;balRow.creditVal=0;}
+                srcOf['Taxes and Licenses']='manual';
+                recalc();renderTable();updateSourceUI();scheduleAutoSave();
+                showToast(`✔ Taxes & Licenses loaded — ₱${fmt(total)} balanced`,'t-success');
+            }catch(_){showToast('✖ Invalid Taxes & Licenses file','t-error');}
         };
         r.readAsText(file);
-    }
+    });
+}
 
-    function updateExpenses(){
-        const allExp=[];
-        if(currentVatableExpenses&&currentVatableExpenses.tableData){
-            for(const row of currentVatableExpenses.tableData){
-                const gross=parseFloat(row.grossAmount)||0, net=gross/1.12, it=net*0.12;
-                const nature=row.natureExpense||"Uncategorized", rate=getExpenseRate(nature), wh=net*rate;
-                const pm=(row.paymentMode||'').toLowerCase();
-                allExp.push({nature,netAmount:net,grossAmount:gross,inputTax:it,withholdingTax:wh,paymentMode:pm==='cash'?'cash':'charge',rate});
+/* ── 22. CAPEX ───────────────────────────────────────────────── */
+function loadCapex(){
+    pickFile('.capex,.json',file=>{
+        const r=new FileReader();
+        r.onload=e=>{
+            try{
+                const data=JSON.parse(e.target.result);
+                if(!data.tableData||!Array.isArray(data.tableData))throw 0;
+                let tVatNet=0,tNonVat=0,tIT=0,tCash=0,tAP=0,tWHP=0;
+                for(const row of data.tableData){
+                    const vg=parseFloat(row.vatableGross)||0,nvg=parseFloat(row.nonVatGross)||0,wt=parseFloat(row.withholdingTax)||0;
+                    const net=vg/1.12,it=net*0.12,nr=(vg+nvg)-wt;
+                    tVatNet+=net;tNonVat+=nvg;tIT+=it;tWHP+=wt;
+                    if((row.paymentMode||'').toLowerCase()==='cash')tCash+=nr;else tAP+=nr;
+                }
+                setAccount('CAPEX','CAPEX - Vatable',tVatNet,0,true);
+                setAccount('CAPEX','CAPEX - Non Vatable',tNonVat,0,true);
+                setAccount('CAPEX','Input Tax',tIT,0,true);
+                setAccount('CAPEX','Cash',0,tCash,false);
+                setAccount('CAPEX','Accounts Payable',0,tAP,false);
+                setAccount('CAPEX','Withholding Tax Payable',0,tWHP,false);
+                srcOf['CAPEX']='manual';
+                recalc();renderTable();updateSourceUI();scheduleAutoSave();
+                showToast('✔ CAPEX loaded successfully','t-success');
+            }catch(_){showToast('✖ Invalid CAPEX file','t-error');}
+        };
+        r.readAsText(file);
+    });
+}
+
+/* ── 23a. AUTO-FETCH: Sales ──────────────────────────────────── */
+async function checkAutoFetch(){
+    if(srcOf['Sales']!=='none') return;
+
+    const result=await apiLoadVatSales();
+    if(!result) return;
+
+    const {tableData,source}=result;
+    const grossTotal=tableData.reduce((s,r)=>s+(parseFloat(r.grossSales)||0),0);
+    const period=IS_MONTHLY?MONTHLY_CTX.label:'current session';
+
+    document.getElementById('fetchPeriodLabel').textContent=period;
+    document.getElementById('fetchSummaryText').textContent=
+        `${tableData.length} transaction${tableData.length!==1?'s':''} · gross ₱${fmt(grossTotal)} · from ${source==='api'?'SQLite/API':'localStorage'}`;
+
+    const banner=document.getElementById('autofetchBanner');
+    banner.classList.remove('hidden');
+
+    document.getElementById('dismissFetchBtn').onclick=()=>banner.classList.add('hidden');
+    document.getElementById('autoFetchBtn').onclick=()=>{
+        banner.classList.add('hidden');
+        applySalesData(tableData,source);
+        showToast(`✔ Sales section auto-filled from ${source==='api'?'API/SQLite':'localStorage'} (${tableData.length} rows)`,'t-success');
+    };
+}
+
+/* ── 23b. AUTO-FETCH: Purchases ──────────────────────────────── */
+async function checkAutoFetchPurchases(){
+    if(srcOf['Purchases']!=='none') return;
+
+    const result=await apiLoadVatPurchases();
+    if(!result) return;
+
+    const {tableData,source}=result;
+    const grossTotal=tableData.reduce((s,r)=>s+(parseFloat(r.grossPurchases)||0),0);
+    const period=IS_MONTHLY?MONTHLY_CTX.label:'current session';
+
+    document.getElementById('fetchPurchPeriodLabel').textContent=period;
+    document.getElementById('fetchPurchSummaryText').textContent=
+        `${tableData.length} transaction${tableData.length!==1?'s':''} · gross ₱${fmt(grossTotal)} · from ${source==='api'?'SQLite/API':'localStorage'}`;
+
+    const banner=document.getElementById('autofetchPurchBanner');
+    banner.classList.remove('hidden');
+
+    document.getElementById('dismissFetchPurchBtn').onclick=()=>banner.classList.add('hidden');
+    document.getElementById('autoFetchPurchBtn').onclick=()=>{
+        banner.classList.add('hidden');
+        applyPurchasesAutoData(tableData, source);
+        showToast(`✔ Purchases section auto-filled from ${source==='api'?'API/SQLite':'localStorage'} (${tableData.length} rows)`,'t-success');
+    };
+}
+
+/* Compute purchase journal entries from raw vatable_purchases tableData rows. */
+function applyPurchasesAutoData(tableData, source){
+    currentVatData={ tableData };
+    applyPurchasesData(currentVatData, currentNonVatData, currentReturnsTotal, source);
+}
+
+/* ── 23c. AUTO-FETCH: Expenses ───────────────────────────────── */
+/* Reads from vatable_expenses.html storage (exp-records API or
+   EXP_MONTHLY / EXP_SESSION_TABLE localStorage keys).
+   Converts raw expense rows into the same {tableData} wrapper that
+   processExpenses() produces, sets currentVatableExpenses, then calls
+   applyExpensesData() which does all the category grouping and journal
+   row injection.
+
+   NOTE: vatable_expenses.html stores ALL expenses (vatable + non-vat) in
+   ONE table with grossAmount and a "VAT ÷ 1.12" calculation already in
+   the file. For journal purposes we treat every row loaded from the
+   Expenses DB as vatable (the grossAmount already reflects the entered
+   gross and the nature/rate determines withholding), matching exactly
+   how the manual .exp file load works via processExpenses(file,'vatable').  */
+async function checkAutoFetchExpenses(){
+    if(srcOf['Expenses']!=='none') return;
+
+    const result=await apiLoadExpenses();
+    if(!result) return;
+
+    const {tableData,source}=result;
+    /* Filter out completely empty rows (no grossAmount) */
+    const validRows=tableData.filter(r=>(parseFloat(r.grossAmount)||0)>0);
+    if(!validRows.length) return;
+
+    const grossTotal=validRows.reduce((s,r)=>s+(parseFloat(r.grossAmount)||0),0);
+    const period=IS_MONTHLY?MONTHLY_CTX.label:'current session';
+
+    document.getElementById('fetchExpPeriodLabel').textContent=period;
+    document.getElementById('fetchExpSummaryText').textContent=
+        `${validRows.length} expense${validRows.length!==1?'s':''} · gross ₱${fmt(grossTotal)} · from ${source==='api'?'SQLite/API':'localStorage'}`;
+
+    const banner=document.getElementById('autofetchExpBanner');
+    banner.classList.remove('hidden');
+
+    document.getElementById('dismissFetchExpBtn').onclick=()=>banner.classList.add('hidden');
+    document.getElementById('autoFetchExpBtn').onclick=()=>{
+        banner.classList.add('hidden');
+        applyExpensesAutoData(validRows, source);
+        showToast(
+            `✔ Expenses section auto-filled from ${source==='api'?'API/SQLite':'localStorage'} (${validRows.length} rows)`,
+            't-success'
+        );
+    };
+}
+
+/* Convert raw vatable_expenses tableData rows into the format expected by
+   applyExpensesData(), then trigger the full journal injection.
+   The vatable_expenses rows already have: grossAmount, natureExpense, paymentMode.
+   We wrap them in a {tableData} object and assign to currentVatableExpenses,
+   clearing currentNonVatExpenses so no double-counting occurs.             */
+function applyExpensesAutoData(tableData, source){
+    /* Build a wrapper object matching what processExpenses() produces */
+    currentVatableExpenses = { tableData };
+    /* Clear non-vat; auto-fetch only covers the vatable expenses DB for now */
+    currentNonVatExpenses  = null;
+    applyExpensesData(source);
+}
+
+/* ── 24. TOAST ───────────────────────────────────────────────── */
+function showToast(msg,cls){
+    const ex=document.querySelector('.toast');if(ex)ex.remove();
+    const t=document.createElement('div');
+    t.className='toast'+(cls?' '+cls:'');
+    t.textContent=msg; document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),350);},3500);
+}
+
+/* ── 25. DROPDOWNS ───────────────────────────────────────────── */
+function initDropdowns(){
+    [['loadPurchasesBtn','purchasesDropdown'],['loadExpensesBtn','expensesDropdown']].forEach(([btnId,dropId])=>{
+        const btn=document.getElementById(btnId),drop=document.getElementById(dropId);
+        if(!btn||!drop)return;
+        btn.addEventListener('click',e=>{e.stopPropagation();drop.style.display=drop.style.display==='block'?'none':'block';});
+        document.addEventListener('click',()=>{drop.style.display='none';});
+        drop.addEventListener('click',e=>e.stopPropagation());
+    });
+    document.querySelectorAll('#purchasesDropdown .dropdown-item').forEach(item=>{
+        item.addEventListener('click',()=>{
+            document.getElementById('purchasesDropdown').style.display='none';
+            const t=item.dataset.type;
+            if(t==='vat')          handleVatPurch();
+            else if(t==='nonvat')  handleNonVatPurch();
+            else if(t==='returns') handleReturns();
+            else if(t==='all')     handleLoadAll();
+            else if(t==='autofetch') {
+                checkAutoFetchPurchases().then(()=>{
+                    if(srcOf['Purchases']==='none')
+                        showToast('No VAT Purchases data found for this period.','t-warning');
+                });
             }
-        }
-        if(currentNonVatExpenses&&currentNonVatExpenses.tableData){
-            for(const row of currentNonVatExpenses.tableData){
-                const gross=parseFloat(row.grossAmount)||0;
-                const nature=row.natureExpense||"Uncategorized", rate=getExpenseRate(nature), wh=gross*rate;
-                const pm=(row.paymentMode||'').toLowerCase();
-                allExp.push({nature,netAmount:gross,grossAmount:gross,inputTax:0,withholdingTax:wh,paymentMode:pm==='cash'?'cash':'charge',rate});
+        });
+    });
+    document.querySelectorAll('#expensesDropdown .dropdown-item').forEach(item=>{
+        item.addEventListener('click',()=>{
+            document.getElementById('expensesDropdown').style.display='none';
+            const t=item.dataset.type;
+            if(t==='vatable')        pickFile('.exp,.json', f=>processExpenses(f,'vatable'));
+            else if(t==='nonvat')    pickFile('.nexp,.json',f=>processExpenses(f,'nonvat'));
+            else if(t==='autofetch') {
+                /* Manually trigger the expenses auto-fetch on demand */
+                checkAutoFetchExpenses().then(()=>{
+                    if(srcOf['Expenses']==='none')
+                        showToast('No Expenses data found for this period.','t-warning');
+                });
             }
-        }
-        const map=new Map();
-        for(const exp of allExp){
-            if(!map.has(exp.nature)) map.set(exp.nature,{nature:exp.nature,totalNet:0,totalInputTax:0,totalWH:0,cashNR:0,chargeNR:0,rate:exp.rate});
-            const en=map.get(exp.nature);
-            en.totalNet+=exp.netAmount; en.totalInputTax+=exp.inputTax; en.totalWH+=exp.withholdingTax;
-            const nr=exp.grossAmount-exp.withholdingTax;
-            if(exp.paymentMode==='cash') en.cashNR+=nr; else en.chargeNR+=nr;
-        }
-        let tInputTax=0,tCash=0,tAP=0,tWHP=0;
-        const natRows=[];
-        for(const en of map.values()){
-            const rLbl=en.rate===0?'0%':en.rate===0.01?'1%':en.rate===0.02?'2%':'5%';
-            natRows.push({title:`${en.nature} (${rLbl})`,totalNet:en.totalNet,rate:en.rate});
-            tInputTax+=en.totalInputTax; tCash+=en.cashNR; tAP+=en.chargeNR; tWHP+=en.totalWH;
-        }
-        natRows.sort((a,b)=>a.rate-b.rate);
-
-        // rebuild expense rows
-        const newRows=rows.filter(r=>!(r.sectionName==="Expenses"&&(r.type==='account'||r.type==='placeholder')));
-        const si=newRows.findIndex(r=>r.sectionName==="Expenses"&&r.type==='subtotal');
-        if(si!==-1){
-            const inserts=[];
-            for(const item of natRows) if(item.totalNet>0) inserts.push({id:Date.now()+Math.random(),type:'account',sectionName:"Expenses",accountTitle:item.title,debitEditable:false,creditEditable:false,debitVal:item.totalNet,creditVal:0});
-            if(tInputTax>0) inserts.push({id:Date.now()+Math.random(),type:'account',sectionName:"Expenses",accountTitle:"Input Tax",debitEditable:false,creditEditable:false,debitVal:tInputTax,creditVal:0});
-            if(tCash>0) inserts.push({id:Date.now()+Math.random(),type:'account',sectionName:"Expenses",accountTitle:"Cash",debitEditable:false,creditEditable:false,debitVal:0,creditVal:tCash});
-            if(tAP>0) inserts.push({id:Date.now()+Math.random(),type:'account',sectionName:"Expenses",accountTitle:"Accounts Payable",debitEditable:false,creditEditable:false,debitVal:0,creditVal:tAP});
-            if(tWHP>0) inserts.push({id:Date.now()+Math.random(),type:'account',sectionName:"Expenses",accountTitle:"Withholding Tax Payable",debitEditable:false,creditEditable:false,debitVal:0,creditVal:tWHP});
-            if(inserts.length===0) inserts.push({id:Date.now(),type:'placeholder',sectionName:"Expenses",accountTitle:'— No expense entries —',debitVal:0,creditVal:0});
-            newRows.splice(si,0,...inserts);
-        }
-        rows=newRows;
-        recalc(); renderTable();
-    }
-
-    // ── TAXES
-    function loadTaxes(){
-        pickFile('.taxes,.json', file=>{
-            const r=new FileReader();
-            r.onload=e=>{
-                try{
-                    const data=JSON.parse(e.target.result);
-                    if(!data.tableData||!Array.isArray(data.tableData)) throw new Error();
-                    let tCash=0,tAP=0;
-                    for(const row of data.tableData){
-                        const amount=parseFloat(row.amount)||0, mode=(row.paymentMode||'').toLowerCase();
-                        if(mode==='cash') tCash+=amount; else tAP+=amount;
-                    }
-                    const total=tCash+tAP;
-                    const cashRow=rows.find(r=>r.sectionName==="Taxes and Licenses"&&r.accountTitle==="Cash");
-                    const apRow=rows.find(r=>r.sectionName==="Taxes and Licenses"&&r.accountTitle==="Accounts Payable");
-                    const balRow=rows.find(r=>r.sectionName==="Taxes and Licenses"&&r.accountTitle==="Taxes & Licenses Expense (Debit Balancing)");
-                    if(cashRow){cashRow.debitVal=0;cashRow.creditVal=tCash;}
-                    if(apRow){apRow.debitVal=0;apRow.creditVal=tAP;}
-                    if(balRow){balRow.debitVal=total;balRow.creditVal=0;}
-                    recalc(); renderTable();
-                    showToast(`✔ Taxes & Licenses loaded — ₱${fmt(total)} balanced`);
-                } catch(err){ showToast('✖ Invalid Taxes & Licenses file'); }
-            };
-            r.readAsText(file);
         });
-    }
+    });
+}
 
-    // ── CAPEX
-    function loadCapex(){
-        pickFile('.capex,.json', file=>{
-            const r=new FileReader();
-            r.onload=e=>{
-                try{
-                    const data=JSON.parse(e.target.result);
-                    if(!data.tableData||!Array.isArray(data.tableData)) throw new Error();
-                    let tVatNet=0,tNonVat=0,tIT=0,tCash=0,tAP=0,tWHP=0;
-                    for(const row of data.tableData){
-                        const vg=parseFloat(row.vatableGross)||0, nvg=parseFloat(row.nonVatGross)||0, wt=parseFloat(row.withholdingTax)||0;
-                        const net=vg/1.12, it=net*0.12, nr=(vg+nvg)-wt;
-                        tVatNet+=net; tNonVat+=nvg; tIT+=it; tWHP+=wt;
-                        if((row.paymentMode||'').toLowerCase()==='cash') tCash+=nr; else tAP+=nr;
-                    }
-                    setAccount('CAPEX','CAPEX - Vatable',tVatNet,0,true);
-                    setAccount('CAPEX','CAPEX - Non Vatable',tNonVat,0,true);
-                    setAccount('CAPEX','Input Tax',tIT,0,true);
-                    setAccount('CAPEX','Cash',0,tCash,false);
-                    setAccount('CAPEX','Accounts Payable',0,tAP,false);
-                    setAccount('CAPEX','Withholding Tax Payable',0,tWHP,false);
-                    recalc(); renderTable();
-                    showToast('✔ CAPEX loaded successfully');
-                } catch(err){ showToast('✖ Invalid CAPEX file'); }
-            };
-            r.readAsText(file);
-        });
-    }
+/* ── 26. BEFOREUNLOAD — synchronous localStorage safety net ───── */
+window.addEventListener('beforeunload',()=>{
+    localStorage.setItem(getJournalLocalKey(), JSON.stringify(serializeJournal()));
+});
 
-    // ── Toast
-    function showToast(msg){
-        const ex=document.querySelector('.toast'); if(ex) ex.remove();
-        const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
-        document.body.appendChild(t);
-        setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),350); },3500);
-    }
+/* ── 27. MAIN INIT ───────────────────────────────────────────── */
+(async()=>{
+    /* Step 1: detect backend */
+    await checkBackend();
 
-    // ── Dropdowns
-    function initDropdowns(){
-        [[('loadPurchasesBtn'),('purchasesDropdown'),'purchases-dropdown-item'],
-         [('loadExpensesBtn'),('expensesDropdown'),'expenses-dropdown-item']].forEach(([btnId,dropId])=>{
-            const btn=document.getElementById(btnId), drop=document.getElementById(dropId);
-            if(!btn||!drop) return;
-            btn.addEventListener('click',e=>{ e.stopPropagation(); drop.style.display=drop.style.display==='block'?'none':'block'; });
-            document.addEventListener('click',()=>{ drop.style.display='none'; });
-            drop.addEventListener('click',e=>e.stopPropagation());
-        });
+    /* Step 2: build empty journal scaffold */
+    rows=buildRows();
 
-        document.querySelectorAll('#purchasesDropdown .dropdown-item').forEach(item=>{
-            item.addEventListener('click',()=>{
-                document.getElementById('purchasesDropdown').style.display='none';
-                const t=item.getAttribute('data-type');
-                if(t==='vat') handleVatPurch();
-                else if(t==='nonvat') handleNonVatPurch();
-                else if(t==='returns') handleReturns();
-                else if(t==='all') handleLoadAll();
-            });
-        });
-        document.querySelectorAll('#expensesDropdown .dropdown-item').forEach(item=>{
-            item.addEventListener('click',()=>{
-                document.getElementById('expensesDropdown').style.display='none';
-                const t=item.getAttribute('data-type');
-                if(t==='vatable') pickFile('.exp,.json',file=>processExpenses(file,'vatable'));
-                else if(t==='nonvat') pickFile('.nexp,.json',file=>processExpenses(file,'nonvat'));
-            });
-        });
-    }
+    /* Step 3: load saved journal (API → localStorage) */
+    const restored=await restoreSession();
+    if(!restored){ recalc(); renderTable(); updateSourceUI(); }
+    else if(IS_MONTHLY) showToast(`Loaded journal for ${MONTHLY_CTX.label}`,'t-success');
 
-    // ── Init
-    rows = buildRows();
-    recalc(); renderTable(); initDropdowns();
+    /* Step 4: check if VAT sales, purchases AND expenses data exist for this period */
+    await checkAutoFetch();
+    await checkAutoFetchPurchases();
+    await checkAutoFetchExpenses();
 
-    document.getElementById('loadSalesBtn')?.addEventListener('click', loadSales);
-    document.getElementById('printBtn')?.addEventListener('click', printJournal);
-    document.getElementById('printBtn2')?.addEventListener('click', printJournal);
-    document.getElementById('loadTaxesBtn')?.addEventListener('click', loadTaxes);
-    document.getElementById('loadCapexBtn')?.addEventListener('click', loadCapex);
-    document.getElementById('resetAllBtn')?.addEventListener('click', resetAll);
-    document.getElementById('refreshTotalsBtn')?.addEventListener('click', ()=>{ recalc(); renderTable(); showToast('Totals recalculated.'); });
-    document.getElementById('refreshTotalsBtn2')?.addEventListener('click', ()=>{ recalc(); renderTable(); showToast('Totals recalculated.'); });
+    /* Step 5: wire up all buttons */
+    initDropdowns();
+    document.getElementById('loadSalesBtn')    ?.addEventListener('click', loadSales);
+    document.getElementById('loadTaxesBtn')    ?.addEventListener('click', loadTaxes);
+    document.getElementById('loadCapexBtn')    ?.addEventListener('click', loadCapex);
+    document.getElementById('resetAllBtn')     ?.addEventListener('click', resetAll);
+    document.getElementById('printBtn')        ?.addEventListener('click', ()=>window.print());
+    document.getElementById('printBtn2')       ?.addEventListener('click', ()=>window.print());
+    document.getElementById('refreshTotalsBtn')?.addEventListener('click', ()=>{recalc();renderTable();showToast('Totals recalculated.');});
+    document.getElementById('refreshTotalsBtn2')?.addEventListener('click',()=>{recalc();renderTable();showToast('Totals recalculated.');});
+    document.getElementById('saveJournalBtn')  ?.addEventListener('click', async()=>{
+        await saveSession(false);
+        showToast(`✔ Saved to ${USE_API?'SQLite/API + localStorage':'localStorage'}`,'t-success');
+    });
 })();
+
+})(); // end IIFE
 </script>
+
+<!--
+=================================================================
+  FASTAPI / SQLITE BACKEND CONTRACT  (add to main.py)
+=================================================================
+
+  ── NEW TABLE ──────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS journal_records (
+    record_id      TEXT PRIMARY KEY,   -- e.g. "JOURNAL_Main_2026_05"
+    role           TEXT,               -- Main | Client | SubAdmin
+    year           INTEGER,
+    month          INTEGER,
+    label          TEXT,               -- "May 2026"
+    rows           TEXT,               -- JSON array (journal row objects)
+    section_source TEXT,               -- JSON {Sales, Purchases, ...}
+    saved_at       TEXT                -- ISO timestamp
+  );
+
+  ── ENDPOINTS ──────────────────────────────────────────────────
+  POST   /api/journal-records
+    Body  → { record_id, role, year, month, label,
+              rows: [...], section_source: {...}, saved_at }
+    Logic → INSERT OR REPLACE INTO journal_records ...
+    Return → 200 OK
+
+  GET    /api/journal-records/{record_id}
+    Return → full row as JSON (rows parsed back to array)
+    404 if not found
+
+  DELETE /api/journal-records/{record_id}
+    Return → 200 OK
+
+  ── AUTO-FETCH uses the EXISTING vat_records endpoint ──────────
+  GET    /api/vat-records/{record_id}
+    record_id format: "{Role}_{year}_{MM}"  e.g. "Main_2026_05"
+    (already written by vatable_sales.html)
+
+  ── AUTO-FETCH PURCHASES uses the EXISTING purch-records endpoint ─
+  GET    /api/purch-records/{record_id}
+    record_id format: "PURCH_{Role}_{year}_{MM}"  e.g. "PURCH_Main_2026_05"
+    (already written by vatable_purchases.html)
+    Response field: table_data (array of purchase rows with grossPurchases,
+    withholdingRate, paymentMode fields)
+
+  ── AUTO-FETCH EXPENSES uses the EXISTING exp-records endpoint ───
+  GET    /api/exp-records/{record_id}
+    record_id format: "EXP_{Role}_{year}_{MM}"  e.g. "EXP_Main_2026_05"
+    general:          "EXP_{Role}_general"
+    (already written by vatable_expenses.html)
+    Response field: table_data (array of expense rows with grossAmount,
+    natureExpense, paymentMode fields)
+
+  ── EXP-RECORDS SCHEMA (already in vatable_expenses.html contract) ──
+  CREATE TABLE IF NOT EXISTS exp_records (
+    record_id    TEXT PRIMARY KEY,
+    role         TEXT,
+    year         INTEGER,
+    month        INTEGER,
+    label        TEXT,
+    table_data   TEXT,   -- JSON array of expense row objects
+    company_info TEXT,
+    saved_at     TEXT
+  );
+
+  ── PURCH-RECORDS SCHEMA ───────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS purch_records (
+    record_id    TEXT PRIMARY KEY,
+    role         TEXT,
+    year         INTEGER,
+    month        INTEGER,
+    label        TEXT,
+    table_data   TEXT,   -- JSON array of purchase row objects
+    company_info TEXT,
+    saved_at     TEXT
+  );
+
+=================================================================
+-->
 </body>
 </html>
