@@ -582,18 +582,30 @@ async function checkBackend() {
  */
 async function saveMonthData(year, month, dataObj) {
   const key = makeStorageKey(year, month);
+  // companyInfo from capex.html uses short keys: name, tin, address, business, telephone, date, employee, email
+  const ci = dataObj.companyInfo || {};
   const meta = {
     year, month,
-    rowCount:     Array.isArray(dataObj.tableData) ? dataObj.tableData.length : 0,
-    totalGross:   calcTotalGross(dataObj.tableData),
-    netPurchases: calcNetPurchases(dataObj.tableData),
-    inputTax:     calcInputTax(dataObj.tableData),
+    rowCount:       Array.isArray(dataObj.tableData) ? dataObj.tableData.length : 0,
+    totalGross:     calcTotalGross(dataObj.tableData),
+    netPurchases:   calcNetPurchases(dataObj.tableData),
+    inputTax:       calcInputTax(dataObj.tableData),
     withholdingTax: calcWithholdingTax(dataObj.tableData),
-    lastModified: new Date().toISOString(),
-    companyName:  dataObj.companyInfo?.name || '',
-    reportDate:   dataObj.companyInfo?.date || '',
+    lastModified:   new Date().toISOString(),
+    // capex.html getCompanyDataRaw() uses short field names
+    companyName:    ci.name || ci.companyName || '',
+    reportDate:     ci.date || ci.reportDate  || '',
   };
-  localStorage.setItem(key, JSON.stringify(dataObj));
+
+  // Store the full session blob under the monthly key
+  // Shape matches what capex.html saveSession() writes, so round-trips work
+  const sessionBlob = {
+    version:     '1.0',
+    timestamp:   meta.lastModified,
+    tableData:   dataObj.tableData || [],
+    companyInfo: ci,
+  };
+  localStorage.setItem(key, JSON.stringify(sessionBlob));
   localStorage.setItem(makeMetaKey(year, month), JSON.stringify(meta));
 
   if (USE_API && authToken) {
@@ -601,20 +613,21 @@ async function saveMonthData(year, month, dataObj) {
       await fetch(`${API_BASE}/capex-monthly-records`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-        body: JSON.stringify({ year, month, data: dataObj, meta }),
+        body: JSON.stringify({ year, month, data: sessionBlob, meta }),
       });
     } catch(_) {}
   }
   return meta;
 }
 
-/** Load month data. Returns null if no data. */
+/** Load month data. Returns { data: sessionBlob, meta } or null. */
 async function loadMonthData(year, month) {
   if (USE_API && authToken) {
     try {
-      const r = await fetch(`${API_BASE}/capex-monthly-records/${year}/${String(month).padStart(2,'0')}`, {
-        headers: { 'Authorization': `Bearer ${authToken}` }
-      });
+      const r = await fetch(
+        `${API_BASE}/capex-monthly-records/${year}/${String(month).padStart(2,'0')}`,
+        { headers: { 'Authorization': `Bearer ${authToken}` } }
+      );
       if (r.ok) {
         const d = await r.json();
         localStorage.setItem(makeStorageKey(year, month), JSON.stringify(d.data));
@@ -623,11 +636,15 @@ async function loadMonthData(year, month) {
       }
     } catch(_) {}
   }
-  const raw = localStorage.getItem(makeStorageKey(year, month));
+  const raw     = localStorage.getItem(makeStorageKey(year, month));
   const metaRaw = localStorage.getItem(makeMetaKey(year, month));
   if (!raw) return null;
   try {
-    return { data: JSON.parse(raw), meta: metaRaw ? JSON.parse(metaRaw) : null };
+    const parsed = JSON.parse(raw);
+    // Normalise: old shape was {tableData, companyInfo} without version wrapper;
+    // new shape is {version, timestamp, tableData, companyInfo}
+    const data = parsed.tableData !== undefined ? parsed : { tableData: [], companyInfo: {} };
+    return { data, meta: metaRaw ? JSON.parse(metaRaw) : null };
   } catch(e) { return null; }
 }
 
@@ -721,12 +738,42 @@ function fmtDate(iso) {
    reads that key and persists the meta.
 ============================================================ */
 function openMonthInTracker(year, month) {
-  const contextKey = makeStorageKey(year, month);
+  const contextKey   = makeStorageKey(year, month);          // CAPEX_MONTHLY_Main_YYYY_MM
+  const sessionKey   = `CAPEX_SESSION_TABLE_${APP_ROLE}`;   // what capex.html reads on startup
+  const label        = `${MONTHS[month-1]} ${year}`;
+  const mm           = String(month).padStart(2, '0');
+
+  // ── Pre-seed capex.html's general session key with this month's saved data
+  // so restoreSession() in capex.html picks it up immediately on open.
+  const existingRaw = localStorage.getItem(contextKey);
+  if (existingRaw) {
+    try {
+      const existing = JSON.parse(existingRaw);
+      // capex.html expects: { version, timestamp, tableData, companyInfo }
+      // monthly_capex stores:  { tableData, companyInfo }  (from saveMonthData)
+      const seeded = {
+        version:     '1.0',
+        timestamp:   new Date().toISOString(),
+        tableData:   existing.tableData   || [],
+        companyInfo: existing.companyInfo || {},
+      };
+      localStorage.setItem(sessionKey, JSON.stringify(seeded));
+    } catch(e) {}
+  } else {
+    // No existing data — seed an empty session so capex.html starts fresh for this month
+    localStorage.setItem(sessionKey, JSON.stringify({
+      version: '1.0', timestamp: new Date().toISOString(),
+      tableData: [], companyInfo: { date: `${mm}/01/${year}` },
+    }));
+  }
+
+  // ── Set all sessionStorage context keys capex.html checks
   sessionStorage.setItem('CAPEX_MONTHLY_CONTEXT_KEY',   contextKey);
   sessionStorage.setItem('CAPEX_MONTHLY_CONTEXT_YEAR',  String(year));
   sessionStorage.setItem('CAPEX_MONTHLY_CONTEXT_MONTH', String(month));
   sessionStorage.setItem('CAPEX_MONTHLY_CONTEXT_ROLE',  APP_ROLE);
-  sessionStorage.setItem('CAPEX_MONTHLY_CONTEXT_LABEL', `${MONTHS[month-1]} ${year}`);
+  sessionStorage.setItem('CAPEX_MONTHLY_CONTEXT_LABEL', label);
+
   window.location.href = 'capex.html';
 }
 
@@ -1007,45 +1054,36 @@ function showToast(msg, type='info') {
 }
 
 /* ============================================================
-   INTEGRATION BRIDGE
-   When returning from capex.html, read session data and save
-   it back to the monthly slot.
+   INTEGRATION BRIDGE — monthly_capex ↔ capex.html
+   
+   CONTRACT (implemented on both sides):
+   
+   OPEN FLOW (monthly_capex → capex.html):
+     1. monthly_capex.openMonthInTracker() seeds the general session key
+        (CAPEX_SESSION_TABLE_${APP_ROLE}) with the month's existing data
+        so capex.html's restoreSession() picks it up on startup.
+     2. sessionStorage context keys are set (CAPEX_MONTHLY_CONTEXT_*).
+     3. Navigate to capex.html.
 
-   capex.html integration contract (sessionStorage handshake):
-     CAPEX_MONTHLY_CONTEXT_KEY   — the localStorage key for this month
-     CAPEX_MONTHLY_CONTEXT_YEAR  — year
-     CAPEX_MONTHLY_CONTEXT_MONTH — month (1-12)
-     CAPEX_MONTHLY_CONTEXT_ROLE  — role string
+   CAPEX.HTML (while open):
+     - The monthly bridge in DOMContentLoaded detects the context keys.
+     - Its beforeunload writes the session blob to BOTH:
+         • CAPEX_MONTHLY_${APP_ROLE}_YYYY_MM  (monthly slot)
+         • CAPEX_SESSION_TABLE_${APP_ROLE}     (general slot)
 
-   capex.html must write its current session (tableData +
-   companyInfo) to CAPEX_MONTHLY_CONTEXT_KEY in localStorage
-   before/on navigation back. This mirrors the VAT handshake.
+   RETURN FLOW (capex.html → monthly_capex):
+     1. checkReturnFromTracker() reads CAPEX_SESSION_TABLE_${APP_ROLE}
+        (the key capex.html always writes to).
+     2. Calls saveMonthData() → writes the versioned blob to the monthly
+        slot and rebuilds meta for display.
+     3. Clears all sessionStorage context keys.
 
-   To wire this into capex.html without modifying it, add the
-   following snippet at the end of capex.html's DOMContentLoaded:
-
-     // ── Monthly CAPEX bridge ──
-     const _capexCtxKey = sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_KEY');
-     if (_capexCtxKey) {
-       // Pre-load data for this month if it exists
-       const _saved = localStorage.getItem(_capexCtxKey);
-       if (_saved) {
-         try {
-           const _d = JSON.parse(_saved);
-           if (_d.tableData) {
-             document.getElementById('tableBody').innerHTML = '';
-             _d.tableData.forEach(rd => addRow(rd));
-             if (_d.companyInfo) setCompanyData(_d.companyInfo);
-             currentPage = 1; renderCurrentPage(); updateAllStats();
-           }
-         } catch(e) {}
-       }
-       // Auto-save back on navigation away
-       window.addEventListener('beforeunload', () => {
-         localStorage.setItem(_capexCtxKey,
-           JSON.stringify({ tableData: getTableData(), companyInfo: getCompanyData() }));
-       });
-     }
+   STORAGE KEY SHAPES:
+     CAPEX_MONTHLY_${APP_ROLE}_YYYY_MM →
+       { version, timestamp, tableData[], companyInfo{name,tin,...} }
+     CAPEX_MONTHLY_META_${APP_ROLE}_YYYY_MM →
+       { year, month, rowCount, totalGross, netPurchases, inputTax,
+         withholdingTax, lastModified, companyName, reportDate }
 ============================================================ */
 function checkReturnFromTracker() {
   const key   = sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_KEY');
@@ -1056,30 +1094,75 @@ function checkReturnFromTracker() {
   if (!key || !yr || !mo) return;
   if (role !== APP_ROLE) return;
 
-  const rawSession = localStorage.getItem(key);
+  // capex.html always saves its working session to CAPEX_SESSION_TABLE_${APP_ROLE}
+  // via saveSession() and the beforeunload handler.
+  // The monthly context key (CAPEX_MONTHLY_Main_YYYY_MM) is what WE own —
+  // capex.html writes to the general session key, so we read from there.
+  const sessionKey = `CAPEX_SESSION_TABLE_${APP_ROLE}`;
+  const rawSession = localStorage.getItem(sessionKey);
+
   if (rawSession) {
     try {
       const session = JSON.parse(rawSession);
-      if (session && session.tableData) {
-        saveMonthData(parseInt(yr), parseInt(mo), {
-          tableData:   session.tableData,
-          companyInfo: session.companyInfo || {}
-        });
-        showToast(`Saved CAPEX data for ${MONTHS[parseInt(mo)-1]} ${yr}`, 'success');
+      // capex.html session shape: { version, timestamp, tableData, companyInfo }
+      // companyInfo shape (from getCompanyDataRaw):
+      //   { name, tin, address, business, telephone, date, employee, email }
+      const tableData   = session.tableData   || [];
+      const companyInfo = session.companyInfo || {};
+
+      // Validate this session belongs to our month — check date field loosely
+      // (companyInfo.date is in MM/DD/YYYY format)
+      const sessionYear  = session.timestamp ? new Date(session.timestamp).getFullYear() : null;
+      const contextYear  = parseInt(yr);
+      // Only reject if session is clearly from a different year and has data
+      // (be permissive — user may not have set a date)
+      if (sessionYear && Math.abs(sessionYear - contextYear) > 1 && tableData.length === 0) {
+        // stale empty session from a different year — skip
+        clearContextKeys();
+        return;
       }
+
+      // Save to the monthly slot
+      await_saveMonthData(parseInt(yr), parseInt(mo), { tableData, companyInfo });
+
     } catch(e) {
       console.error('Failed to parse CAPEX session data:', e);
     }
+  } else {
+    // capex.html session key not found — try the monthly key itself
+    // (in case capex.html was patched to write directly there)
+    const rawMonthly = localStorage.getItem(key);
+    if (rawMonthly) {
+      try {
+        const session = JSON.parse(rawMonthly);
+        if (session && session.tableData) {
+          await_saveMonthData(parseInt(yr), parseInt(mo), {
+            tableData:   session.tableData,
+            companyInfo: session.companyInfo || {},
+          });
+        }
+      } catch(e) {}
+    }
   }
 
-  // Clear context
-  sessionStorage.removeItem('CAPEX_MONTHLY_CONTEXT_KEY');
-  sessionStorage.removeItem('CAPEX_MONTHLY_CONTEXT_YEAR');
-  sessionStorage.removeItem('CAPEX_MONTHLY_CONTEXT_MONTH');
-  sessionStorage.removeItem('CAPEX_MONTHLY_CONTEXT_LABEL');
-
+  clearContextKeys();
   selectedYear  = parseInt(yr);
   selectedMonth = parseInt(mo);
+}
+
+// Synchronous wrapper — saveMonthData is async but we need it in a sync context here.
+// We call it and let it run; the UI update (updateAll) fires after.
+function await_saveMonthData(yr, mo, dataObj) {
+  saveMonthData(yr, mo, dataObj).then(() => {
+    showToast(`Saved CAPEX data for ${MONTHS[mo-1]} ${yr}`, 'success');
+    updateAll();
+  }).catch(e => console.error('saveMonthData failed:', e));
+}
+
+function clearContextKeys() {
+  ['CAPEX_MONTHLY_CONTEXT_KEY','CAPEX_MONTHLY_CONTEXT_YEAR',
+   'CAPEX_MONTHLY_CONTEXT_MONTH','CAPEX_MONTHLY_CONTEXT_LABEL',
+   'CAPEX_MONTHLY_CONTEXT_ROLE'].forEach(k => sessionStorage.removeItem(k));
 }
 
 /* ============================================================
@@ -1087,7 +1170,7 @@ function checkReturnFromTracker() {
 ============================================================ */
 document.addEventListener('DOMContentLoaded', async () => {
   await checkBackend();
-  checkReturnFromTracker();
+  checkReturnFromTracker(); // async internally via await_saveMonthData; updateAll called inside
 
   // ── Year navigation
   document.getElementById('yearPrevBtn').addEventListener('click', () => {
@@ -1149,21 +1232,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-<!-- CAPEX INTEGRATION NOTE:
-  To fully enable the monthly bridge (auto-load/save per month),
-  add the snippet documented in checkReturnFromTracker() above
-  to the end of capex.html's DOMContentLoaded handler.
-
-  Storage key contract:
-    CAPEX_MONTHLY_Main_YYYY_MM  →  { tableData, companyInfo }
-    CAPEX_MONTHLY_META_Main_YYYY_MM  →  meta object
-
-  sessionStorage handshake keys (set by monthly_capex.html):
-    CAPEX_MONTHLY_CONTEXT_KEY
-    CAPEX_MONTHLY_CONTEXT_YEAR
-    CAPEX_MONTHLY_CONTEXT_MONTH
-    CAPEX_MONTHLY_CONTEXT_ROLE
-    CAPEX_MONTHLY_CONTEXT_LABEL
--->
 </body>
 </html>

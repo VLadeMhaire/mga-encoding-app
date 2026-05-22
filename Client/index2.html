@@ -472,6 +472,9 @@
         .theme-returns .card-icon { background: var(--red-light); color: var(--red); }
         .theme-returns { --card-accent-from: rgba(192,53,42,0.04); }
         .theme-returns .badge { background: var(--red-light); color: var(--red); }
+        .theme-company .card-icon { background: #e0e7ff; color: #3730a3; }
+        .theme-company { --card-accent-from: rgba(55,48,163,0.04); }
+        .theme-company .badge { background: #e0e7ff; color: #3730a3; }
 
         /* Footer */
         .footer {
@@ -496,52 +499,6 @@
             transition: color 0.2s;
         }
         .footer-links a:hover { color: var(--blue-vivid); }
-
-        /* TIN MODAL */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(13,17,23,0.55);
-            backdrop-filter: blur(10px);
-            z-index: 1100;
-            align-items: center; justify-content: center;
-        }
-        .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal {
-            background: var(--surface);
-            width: 92%; max-width: 520px;
-            border-radius: 28px;
-            box-shadow: 0 32px 80px rgba(13,17,23,0.25);
-            overflow: hidden;
-            animation: slideUp 0.28s var(--ease-out);
-        }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-head { padding: 22px 24px; border-bottom: 1px solid var(--ink-10); display: flex; align-items: center; justify-content: space-between; }
-        .modal-head h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; }
-        .modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--surface-2); cursor: pointer; color: var(--ink-60); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: background 0.2s, color 0.2s; }
-        .modal-close:hover { background: #fde8e6; color: var(--red); }
-        .modal-search { padding: 16px 24px; background: var(--surface-2); display: flex; gap: 10px; }
-        .modal-search input { flex: 1; padding: 10px 16px; border: 1px solid var(--ink-10); border-radius: 40px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; background: var(--surface); color: var(--ink); }
-        .modal-search input:focus { outline: none; border-color: var(--blue-mid); }
-        .modal-search button { padding: 10px 18px; background: var(--blue-vivid); color: white; border: none; border-radius: 40px; font-size: 0.8rem; cursor: pointer; transition: background 0.2s; }
-        .modal-search button:hover { background: #1240b8; }
-        .modal-form { padding: 20px 24px; border-bottom: 1px solid var(--surface-2); }
-        .field { margin-bottom: 14px; }
-        .field label { display: block; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-60); margin-bottom: 6px; }
-        .field input { width: 100%; padding: 10px 16px; border: 1px solid var(--ink-10); border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; color: var(--ink); transition: border-color 0.2s; }
-        .field input:focus { outline: none; border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(42,93,232,0.1); }
-        .btn-add { width: 100%; padding: 11px; background: var(--ink); color: white; border: none; border-radius: 40px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .btn-add:hover { background: #1e2836; }
-        .modal-list { padding: 16px 24px; max-height: 320px; overflow-y: auto; }
-        .tin-item { background: var(--surface-2); border-radius: 16px; padding: 13px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        .tin-num { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600; color: var(--amber); margin-bottom: 3px; }
-        .tin-name { font-size: 0.8rem; font-weight: 500; color: var(--ink); }
-        .tin-acts { display: flex; gap: 6px; flex-shrink: 0; }
-        .tin-copy, .tin-del { padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 500; border: 1px solid var(--ink-10); background: var(--surface); cursor: pointer; transition: all 0.18s; }
-        .tin-copy:hover { background: var(--blue-vivid); color: white; border-color: var(--blue-vivid); }
-        .tin-del:hover { background: var(--red); color: white; border-color: var(--red); }
-        .toast { position: fixed; bottom: 28px; right: 28px; background: var(--ink); color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.8rem; z-index: 1300; animation: toastAnim 2.4s forwards; box-shadow: 0 8px 24px rgba(13,17,23,0.2); }
-        @keyframes toastAnim { 0% { opacity: 0; transform: translateY(10px); } 12% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
 
         @media (max-width: 900px) {
             .hero { padding: 36px 32px; }
@@ -582,9 +539,9 @@
             <a href="compensation.html" class="nav-link"><i class="fas fa-money-check-alt"></i> Compensation</a>
             <a href="tax_game.html" class="nav-link"><i class="fas fa-gamepad"></i> Tax Game</a>
             <a href="quick_guide.html" class="nav-link"><i class="fas fa-compass"></i> Guide</a>
-            <a href="quick_guide.html" class="nav-link"><i class="fas fa-life-ring"></i> Help</a>
+            <a href="help.html" class="nav-link"><i class="fas fa-life-ring"></i> Help</a>
         </div>
-        <div class="nav-right"><button class="tin-btn" id="openTinBtn"><i class="fas fa-id-card"></i> TIN Library</button></div>
+        <div class="nav-right"><a href="tin_library.html" class="tin-btn"><i class="fas fa-id-card"></i> TIN Library</a></div>
     </div>
 </nav>
 
@@ -598,7 +555,7 @@
             <div class="hero-eyebrow"><span class="pulse"></span> All Modules Live</div>
             <h1>VAT Compliance<br><span>Kiosk Dashboard</span></h1>
             <p>Professional interface for tracking vatable sales, purchases, expenses, journal entries, and government remittances — all in one place.</p>
-            <div class="hero-stats"><div class="hero-stat"><strong>9</strong><span>Modules</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>12%</strong><span>VAT Rate</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>Auto</strong><span>Saved Locally</span></div></div>
+            <div class="hero-stats"><div class="hero-stat"><strong>10</strong><span>Modules</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>12%</strong><span>VAT Rate</span></div><div class="stat-divider"></div><div class="hero-stat"><strong>Auto</strong><span>Saved Locally</span></div></div>
         </div>
     </section>
 
@@ -618,6 +575,7 @@
 
     <div class="grid-wrapper" id="gridWrapper">
         <div class="grid" id="moduleGrid">
+            <a href="company_information.html" class="card theme-company reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-building"></i></div><span class="badge">Company</span></div><div class="card-title">Company Information</div><div class="card-desc">Manage business name, TIN, address, and authorized signatory. Syncs directly to the VAT Sales right panel.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
             <a href="monthly_journal.html" class="card theme-ledger reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-journal-whills"></i></div><span class="badge">Ledger</span></div><div class="card-title">Journal Entry</div><div class="card-desc">Tally table with debits & credits. Subtotals per section: Sales, Purchases, CAPEX, and more.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
             <a href="monthly_record.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Sales</div><div class="card-desc">Track vatable sales with automated 12% output VAT calculations and invoice summaries.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
             <a href="monthly_purchases.html" class="card theme-vat reveal"><div class="card-top"><div class="card-icon"><i class="fas fa-shopping-cart"></i></div><span class="badge">VAT</span></div><div class="card-title">VAT Purchases</div><div class="card-desc">Track vatable purchases with input tax calculations and supplier TIN integration.</div><div class="card-cta"><i class="fas fa-arrow-right"></i> Access module</div></a>
@@ -632,10 +590,10 @@
 </div>
 
 <footer class="footer">
-    <div class="footer-inner"><div class="footer-copy">© 2026 MGAA VAT Tracking System · Professional Kiosk v2.0</div><div class="footer-links"><a href="quick_guide.html"><i class="fas fa-compass"></i> Quick Guide</a><a href="quick_guide.html"><i class="fas fa-headset"></i> Help & Support</a></div><div class="footer-copy"><i class="fas fa-database"></i> Auto-saved locally</div></div>
+    <div class="footer-inner"><div class="footer-copy">© 2026 MGAA VAT Tracking System · Professional Kiosk v2.0</div><div class="footer-links"><a href="quick_guide.html"><i class="fas fa-compass"></i> Quick Guide</a><a href="help.html"><i class="fas fa-headset"></i> Help & Support</a></div><div class="footer-copy"><i class="fas fa-database"></i> Auto-saved locally</div></div>
 </footer>
 
-<div class="modal-overlay" id="tinModal"><div class="modal"><div class="modal-head"><h3><i class="fas fa-id-card" style="margin-right:8px;color:var(--blue-vivid)"></i>TIN Library</h3><button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button></div><div class="modal-search"><input type="text" id="tinSearch" placeholder="Search by name or TIN…"><button id="searchBtn"><i class="fas fa-search"></i></button></div><div class="modal-form"><div class="field"><label>Full Name</label><input type="text" id="tinName" placeholder="e.g., Maria Santos, ABC Corp"></div><div class="field"><label>TIN (12 digits)</label><input type="text" id="tinNum" placeholder="123-456-789-012" maxlength="15"></div><button class="btn-add" id="addTinBtn"><i class="fas fa-plus-circle" style="margin-right:6px"></i>Add to Library</button></div><div class="modal-list" id="tinList"></div></div></div>
+
 
 <script>
 (function(){
@@ -731,40 +689,7 @@
     // Initial call to set correct background position
     updateBackgroundOnScroll();
 
-    // ----- TIN Library -----
-    let tins = [];
-    function save() { localStorage.setItem('vat_tin_pro_library', JSON.stringify(tins)); }
-    function load() {
-        const s = localStorage.getItem('vat_tin_pro_library');
-        if (s) { tins = JSON.parse(s); return; }
-        tins = [{ id: 1, name: 'Maria Dela Cruz', tin: '123-456-789-012' },{ id: 2, name: 'Ramon Enterprises', tin: '987-654-321-001' },{ id: 3, name: 'VAT Solutions Inc', tin: '456-789-123-555' }];
-        save();
-    }
-    function fmt(raw){ const d=raw.replace(/\D/g,'').slice(0,12); let f=d.slice(0,3); if(d.length>=4) f+='-'+d.slice(3,6); if(d.length>=7) f+='-'+d.slice(6,9); if(d.length>=10) f+='-'+d.slice(9,12); return f; }
-    function esc(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-    function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.innerHTML=`<i class="fas fa-check-circle" style="margin-right:6px;color:#4ade80"></i>${msg}`; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
-    function render(filter){
-        const list=document.getElementById('tinList'); if(!list) return;
-        const f=(filter||'').trim().toLowerCase(); const items=f?tins.filter(t=>t.name.toLowerCase().includes(f)||t.tin.includes(f)):tins;
-        if(!items.length){ list.innerHTML='<div style="text-align:center;padding:32px;color:var(--ink-60);font-size:0.85rem"><i class="fas fa-folder-open" style="display:block;font-size:1.5rem;margin-bottom:8px;opacity:0.4"></i>No TINs found</div>'; return; }
-        list.innerHTML=items.map(t=>`<div class="tin-item" data-id="${t.id}"><div><div class="tin-num"><i class="fas fa-hashtag" style="font-size:0.65rem;margin-right:4px;opacity:0.6"></i>${esc(t.tin)}</div><div class="tin-name">${esc(t.name)}</div></div><div class="tin-acts"><button class="tin-copy" data-tin="${esc(t.tin)}"><i class="fas fa-copy"></i> Copy</button><button class="tin-del" data-id="${t.id}"><i class="fas fa-trash"></i> Del</button></div></div>`).join('');
-        list.querySelectorAll('.tin-copy').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation(); navigator.clipboard.writeText(btn.dataset.tin); toast('TIN copied');}));
-        list.querySelectorAll('.tin-del').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation(); if(!confirm('Delete?')) return; tins=tins.filter(t=>t.id!==+btn.dataset.id); save(); render(document.getElementById('tinSearch').value); toast('Deleted');}));
-    }
-    const modal=document.getElementById('tinModal');
-    document.getElementById('openTinBtn').addEventListener('click',()=>{ modal.classList.add('open'); render(document.getElementById('tinSearch').value); });
-    document.getElementById('closeModal').addEventListener('click',()=>modal.classList.remove('open'));
-    modal.addEventListener('click',e=>{ if(e.target===modal) modal.classList.remove('open'); });
-    document.getElementById('addTinBtn').addEventListener('click',()=>{
-        const name=document.getElementById('tinName').value.trim(); const raw=document.getElementById('tinNum').value.replace(/-/g,'');
-        if(!name){ toast('Enter a name'); return; } if(raw.length!==12||!/^\d+$/.test(raw)){ toast('TIN must be 12 digits'); return; }
-        const formatted=fmt(raw); if(tins.some(t=>t.name.toLowerCase()===name.toLowerCase())){ toast('Name exists'); return; }
-        tins.push({id:Date.now(),name,tin:formatted}); save(); document.getElementById('tinName').value=''; document.getElementById('tinNum').value=''; render(document.getElementById('tinSearch').value); toast('TIN added');
-    });
-    document.getElementById('searchBtn').addEventListener('click',()=>render(document.getElementById('tinSearch').value));
-    document.getElementById('tinSearch').addEventListener('keyup',e=>{ if(e.key==='Enter') render(e.target.value); });
-    document.getElementById('tinNum').addEventListener('input',function(){ this.value=fmt(this.value); });
-    load(); render('');
+
 })();
 </script>
 

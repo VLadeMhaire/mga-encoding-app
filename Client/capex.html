@@ -54,8 +54,31 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .offline .bp-dot{background:#ef4444}
 .checking .bp-dot{background:#fbbf24;animation:bpulse 1s infinite}
 @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.3}}
-.monthly-context-badge{display:flex;align-items:center;gap:6px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.4);border-radius:20px;padding:5px 14px;font-size:12px;color:#fde68a;font-weight:600}
-.monthly-context-badge i{font-size:11px}
+/* Monthly context badge - prominent indicator */
+.monthly-context-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(251,191,36,.25), rgba(251,191,36,.15));
+  border: 1px solid rgba(251,191,36,.5);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  color: #fde68a;
+  font-weight: 600;
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+.monthly-context-badge i {
+  font-size: 11px;
+  color: #fbbf24;
+}
+
+.monthly-context-badge:hover {
+  background: rgba(251,191,36,.3);
+  border-color: rgba(251,191,36,.7);
+}
 
 /* LAYOUT */
 .layout{display:flex;flex:1;overflow:hidden}
@@ -112,17 +135,22 @@ table#capexTable thead th.hidden-column{display:none}
 
 /* Row color distinctions */
 table#capexTable tbody tr{border-bottom:1px solid var(--gray-100);background:white;transition:background .12s}
+table#capexTable tbody tr.row-has-data{border-left:3px solid var(--gray-300)}
 table#capexTable tbody tr.row-cash{border-left:3px solid #22C55E;background:#F0FDF4}
 table#capexTable tbody tr.row-cash:nth-child(even){background:#DCFCE7}
 table#capexTable tbody tr.row-cash:hover{background:#BBF7D0 !important}
 table#capexTable tbody tr.row-charge{border-left:3px solid #3B82F6;background:#EFF6FF}
 table#capexTable tbody tr.row-charge:nth-child(even){background:#DBEAFE}
 table#capexTable tbody tr.row-charge:hover{background:#BFDBFE !important}
-table#capexTable tbody tr.row-vatable{border-left:3px solid #8B5CF6}
-table#capexTable tbody tr.row-nonvat{border-left:3px solid #F59E0B}
-table#capexTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge){background:var(--blue-50)}
-table#capexTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge):hover{background:#DBEAFE}
-table#capexTable tbody tr:not(.row-cash):not(.row-charge):hover{background:var(--blue-100)}
+table#capexTable tbody tr.row-vatable{border-left:3px solid #8B5CF6;background:#F5F3FF}
+table#capexTable tbody tr.row-vatable:nth-child(even){background:#EDE9FE}
+table#capexTable tbody tr.row-vatable:hover{background:#DDD6FE !important}
+table#capexTable tbody tr.row-nonvat{border-left:3px solid #F59E0B;background:#FFFBEB}
+table#capexTable tbody tr.row-nonvat:nth-child(even){background:#FEF3C7}
+table#capexTable tbody tr.row-nonvat:hover{background:#FDE68A !important}
+table#capexTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge):not(.row-vatable):not(.row-nonvat){background:var(--blue-50)}
+table#capexTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge):not(.row-vatable):not(.row-nonvat):hover{background:#DBEAFE}
+table#capexTable tbody tr:not(.row-cash):not(.row-charge):not(.row-vatable):not(.row-nonvat):hover{background:var(--blue-100)}
 table#capexTable td{padding:0;height:42px;vertical-align:middle;border-right:1px solid var(--gray-100)}
 table#capexTable td:last-child{border-right:none}
 table#capexTable td.hidden-column{display:none}
@@ -510,25 +538,25 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   <div class="table-area">
     <table id="capexTable">
       <thead>
-        <tr>
-          <th data-col="date">Date</th>
-          <th data-col="invoiceNumber">Invoice No.</th>
-          <th data-col="invoiceType">Invoice Type</th>
-          <th data-col="paymentMode">Payment Mode</th>
-          <th data-col="supplierName">Supplier Name</th>
-          <th data-col="assetDescription">Asset Description</th>
-          <th data-col="address">Address</th>
-          <th data-col="tinNumber">TIN Number</th>
-          <th data-col="nonVatGross">Non-VAT Gross</th>
-          <th data-col="vatableGross">Vatable Gross</th>
-          <th data-col="netPurchases">Net Purchases</th>
-          <th data-col="inputTax">Input Tax</th>
-          <th data-col="withholdingTax">Withholding Tax</th>
-          <th data-col="grossMinusWT">Gross − W/T</th>
-          <th data-col="remarks">Remarks</th>
-          <th data-col="action" style="width:48px;text-align:center">Del</th>
-        </tr>
-      </thead>
+  <tr>
+    <th data-col="date">Date</th>
+    <th data-col="invoiceNumber">Invoice No.</th>
+    <th data-col="invoiceType">Invoice Type</th>
+    <th data-col="paymentMode">Payment Mode</th>
+    <th data-col="tinNumber">TIN Number</th>
+    <th data-col="supplierName">Supplier Name</th>
+    <th data-col="assetDescription">Asset Description</th>
+    <th data-col="address">Address</th>
+    <th data-col="nonVatGross">Non-VAT Gross</th>
+    <th data-col="vatableGross">Vatable Gross</th>
+    <th data-col="netPurchases">Net Purchases</th>
+    <th data-col="inputTax">Input Tax</th>
+    <th data-col="withholdingTax">Withholding Tax</th>
+    <th data-col="grossMinusWT">Gross − W/T</th>
+    <th data-col="remarks">Remarks</th>
+    <th data-col="action" style="width:48px;text-align:center">Del</th>
+  </tr>
+</thead>
       <tbody id="tableBody"></tbody>
       <tfoot id="summaryRow"></tfoot>
     </table>
@@ -689,13 +717,31 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 
 <script>
 /* ============================================================
-   SUPPLIER DB — separate key for CAPEX
+   ROLE DETECTION — Client / SubAdmin / Main
+============================================================ */
+const APP_ROLE=(function(){
+  const p=window.location.pathname;
+  if(p.includes('/Client/')) return 'Client';
+  if(p.includes('/Sub-Admin/')) return 'SubAdmin';
+  return 'Main';
+})();
+
+const STORAGE_NS={
+  Client:  {SUPPLIER_TIN_MAP:'CAPEX_SUPPLIER_TIN_MAP_Client',  COMPANY_INFO:'capexCompanyInfo_Client',  COL_VISIBILITY:'capexColVis_Client',  VIS_STATES:'capexVisStates_Client'},
+  SubAdmin:{SUPPLIER_TIN_MAP:'CAPEX_SUPPLIER_TIN_MAP_SubAdmin',COMPANY_INFO:'capexCompanyInfo_SubAdmin',COL_VISIBILITY:'capexColVis_SubAdmin',VIS_STATES:'capexVisStates_SubAdmin'},
+  Main:    {SUPPLIER_TIN_MAP:'CAPEX_SUPPLIER_TIN_MAP_Main',    COMPANY_INFO:'capexCompanyInfo_Main',    COL_VISIBILITY:'capexColVis_Main',    VIS_STATES:'capexVisStates_Main'},
+};
+const NS=STORAGE_NS[APP_ROLE];
+
+function getActiveSessionKey(){return `CAPEX_SESSION_TABLE_${APP_ROLE}`;}
+
+/* ============================================================
+   SUPPLIER DB — role-scoped for CAPEX
 ============================================================ */
 (function(){
-  const SK='CAPEX_SUPPLIER_TIN_MAP';
   let db=new Map();
-  function loadDB(){ try{ const s=localStorage.getItem(SK); if(s) db=new Map(Object.entries(JSON.parse(s))); }catch(e){} }
-  function saveDB(){ localStorage.setItem(SK,JSON.stringify(Object.fromEntries(db))); renderSuppliers(); }
+  function loadDB(){ try{ const s=localStorage.getItem(NS.SUPPLIER_TIN_MAP); if(s) db=new Map(Object.entries(JSON.parse(s))); }catch(e){} }
+  function saveDB(){ localStorage.setItem(NS.SUPPLIER_TIN_MAP,JSON.stringify(Object.fromEntries(db))); renderSuppliers(); }
   window.addCAPEXSupplierPair=function(name,tin,address){
     if(!name||!tin) return false;
     const n=name.trim(),t=tin.trim(); if(!n||!t) return false;
@@ -752,56 +798,185 @@ window.validateTIN=function(input){ const d=input.value.replace(/\D/g,''); input
 function formatCompanyTIN(input){ let v=input.value.replace(/\D/g,''); if(v.length>12)v=v.slice(0,12); const parts=[v.slice(0,3),v.slice(3,6),v.slice(6,9),v.slice(9,12)].filter(p=>p!==''); input.value=parts.join('-'); }
 
 /* ============================================================
+   BACKEND CONFIG
+============================================================ */
+const API_BASE=(()=>{
+  if(window.CAPEX_API_BASE) return window.CAPEX_API_BASE;
+  if(window.__TAURI__) return 'http://localhost:9999/api';
+  return(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')
+    ?`${window.location.protocol}//${window.location.hostname}:9999/api`:'/api';
+})();
+let USE_API=false,authToken=null;
+async function checkBackend(){
+  const pill=document.getElementById('backendPill'),text=document.getElementById('backendPillText');
+  try{
+    const r=await fetch(`${API_BASE}/health`,{signal:AbortSignal.timeout(3000)});
+    if(r.ok){USE_API=true;pill.className='backend-pill online';text.textContent='API Online';
+      const s=sessionStorage.getItem('CAPEX_SESSION');if(s){try{authToken=JSON.parse(s).token||null;}catch(e){}}return;}
+  }catch(_){}
+  USE_API=false;pill.className='backend-pill offline';text.textContent='Local Mode';
+}
+function apiHeaders(){const h={'Content-Type':'application/json'};if(authToken)h['Authorization']=`Bearer ${authToken}`;return h;}
+
+/* ============================================================
+   DATE HELPERS — MM/DD/YYYY format (matching vatable_sales)
+============================================================ */
+function displayToStorageDate(d){if(!d)return'';const p=d.split('/');if(p.length===3)return`${p[2]}-${p[0]}-${p[1]}`;return d;}
+function storageToDisplayDate(d){if(!d)return'';const p=d.split('-');if(p.length===3)return`${p[1]}/${p[2]}/${p[0]}`;return d;}
+function getTodayDisplayDate(){const t=new Date();return String(t.getMonth()+1).padStart(2,'0')+'/'+String(t.getDate()).padStart(2,'0')+'/'+t.getFullYear();}
+function validateDisplayDate(dateStr){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dateStr);if(!m)return false;const d=new Date(m[3],m[1]-1,m[2]);return d.getFullYear()===+m[3]&&d.getMonth()===+m[1]-1&&d.getDate()===+m[2];}
+function autoFormatReportDate(input){let v=input.value.replace(/[^0-9]/g,'');if(v.length>=2&&v.length<4)v=v.slice(0,2)+'/'+v.slice(2);else if(v.length>=4&&v.length<6)v=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4);else if(v.length>=6)v=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4,8);input.value=v;}
+function validateReportDate(input){if(!input.value)return true;if(!validateDisplayDate(input.value)){input.style.borderColor='var(--red-500)';input.style.backgroundColor='var(--red-50)';return false;}else{input.style.borderColor='var(--gray-200)';input.style.backgroundColor='white';return true;}}
+
+/* ============================================================
+   CALENDAR DATE PICKER
+============================================================ */
+let dpState={year:0,month:0,targetInput:null};
+function showDatePicker(anchorEl){closeDatePicker();const input=document.getElementById('reportDate');let initDate=new Date();if(input.value&&validateDisplayDate(input.value)){const p=input.value.split('/');initDate=new Date(+p[2],+p[0]-1,+p[1]);}dpState.year=initDate.getFullYear();dpState.month=initDate.getMonth();dpState.targetInput=input;const overlay=document.createElement('div');overlay.className='date-picker-overlay';overlay.id='dpOverlay';overlay.addEventListener('click',closeDatePicker);document.body.appendChild(overlay);const popup=document.createElement('div');popup.className='date-picker-popup';popup.id='dpPopup';popup.addEventListener('click',e=>e.stopPropagation());document.body.appendChild(popup);renderCalendar();positionPicker(anchorEl||document.getElementById('reportDatePickerBtn'));}
+function positionPicker(anchor){const popup=document.getElementById('dpPopup');if(!popup||!anchor)return;const rect=anchor.getBoundingClientRect(),vpH=window.innerHeight,vpW=window.innerWidth,pW=268,pH=320;let top=rect.bottom+6,left=rect.right-pW;if(top+pH>vpH-10)top=rect.top-pH-6;if(left<8)left=8;if(left+pW>vpW-8)left=vpW-pW-8;popup.style.top=top+'px';popup.style.left=left+'px';}
+function closeDatePicker(){document.getElementById('dpOverlay')?.remove();document.getElementById('dpPopup')?.remove();}
+function renderCalendar(){const popup=document.getElementById('dpPopup');if(!popup)return;const{year,month,targetInput}=dpState;const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'],DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];const today=new Date();let selDay=null,selMonth=null,selYear=null;if(targetInput&&targetInput.value&&validateDisplayDate(targetInput.value)){const p=targetInput.value.split('/');selMonth=+p[0]-1;selDay=+p[1];selYear=+p[2];}const firstDay=new Date(year,month,1).getDay(),daysInMonth=new Date(year,month+1,0).getDate(),daysInPrev=new Date(year,month,0).getDate();let daysHTML='';for(let i=firstDay-1;i>=0;i--)daysHTML+=`<button class="dp-day other-month" data-y="${year}" data-m="${month-1}" data-d="${daysInPrev-i}" type="button">${daysInPrev-i}</button>`;for(let d=1;d<=daysInMonth;d++){let cls='dp-day';if(d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear())cls+=' today';if(selDay===d&&selMonth===month&&selYear===year)cls+=' selected';daysHTML+=`<button class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}" type="button">${d}</button>`;}const remaining=(firstDay+daysInMonth)%7===0?0:7-(firstDay+daysInMonth)%7;for(let d=1;d<=remaining;d++)daysHTML+=`<button class="dp-day other-month" data-y="${year}" data-m="${month+1}" data-d="${d}" type="button">${d}</button>`;popup.innerHTML=`<div class="dp-header"><button class="dp-nav-btn" id="dpPrev" type="button"><i class="fas fa-chevron-left"></i></button><span class="dp-month-year">${MONTHS[month]} ${year}</span><button class="dp-nav-btn" id="dpNext" type="button"><i class="fas fa-chevron-right"></i></button></div><div class="dp-weekdays">${DAYS.map(d=>`<span>${d}</span>`).join('')}</div><div class="dp-days">${daysHTML}</div><div class="dp-footer"><button class="dp-today-btn" id="dpTodayBtn" type="button"><i class="fas fa-crosshairs"></i> Today</button><button id="dpCancelBtn" type="button">Cancel</button></div>`;popup.querySelector('#dpPrev').addEventListener('click',()=>{dpState.month--;if(dpState.month<0){dpState.month=11;dpState.year--;}renderCalendar();});popup.querySelector('#dpNext').addEventListener('click',()=>{dpState.month++;if(dpState.month>11){dpState.month=0;dpState.year++;}renderCalendar();});popup.querySelector('#dpTodayBtn').addEventListener('click',()=>{const t=new Date();dpState.year=t.getFullYear();dpState.month=t.getMonth();selectDate(t.getFullYear(),t.getMonth(),t.getDate());});popup.querySelector('#dpCancelBtn').addEventListener('click',closeDatePicker);popup.querySelectorAll('.dp-day').forEach(btn=>btn.addEventListener('click',()=>{let y=+btn.dataset.y,m=+btn.dataset.m,d=+btn.dataset.d;if(m<0){m=11;y--;}if(m>11){m=0;y++;}selectDate(y,m,d);}));}
+function selectDate(year,month,day){const input=dpState.targetInput;if(!input){closeDatePicker();return;}const mm=String(month+1).padStart(2,'0'),dd=String(day).padStart(2,'0');input.value=`${mm}/${dd}/${year}`;input.dispatchEvent(new Event('change',{bubbles:true}));closeDatePicker();}
+
+/* ============================================================
+   AUTOSAVE — localStorage session persistence
+============================================================ */
+let autoSaveTimer=null;
+function scheduleAutoSave(){
+  clearTimeout(autoSaveTimer);
+  const ind=document.getElementById('autosaveIndicator');if(ind)ind.classList.add('visible');
+  autoSaveTimer=setTimeout(()=>{saveSession();if(ind)ind.classList.remove('visible');},1500);
+}
+function saveSession(){
+  const data={version:'1.0',timestamp:new Date().toISOString(),tableData:getTableData(),companyInfo:getCompanyDataRaw()};
+  localStorage.setItem(getActiveSessionKey(),JSON.stringify(data));
+}
+function getCompanyDataRaw(){
+  const f=id=>document.getElementById(id)?.value||'';
+  return{name:f('companyName'),tin:f('companyTIN'),address:f('companyAddress'),business:f('lineOfBusiness'),telephone:f('telephone'),date:f('reportDate'),employee:f('authorizedEmployee'),email:f('email')};
+}
+function restoreSession(){
+  const raw=localStorage.getItem(getActiveSessionKey()); if(!raw) return false;
+  try{
+    const d=JSON.parse(raw);
+    if(!d.tableData) return false;
+    if(d.companyInfo) applyCompanyInfoRaw(d.companyInfo);
+    document.getElementById('tableBody').innerHTML='';
+    d.tableData.forEach(rd=>addRow(rd));
+    if(!d.tableData.length) addRow();
+    currentPage=1; renderCurrentPage(); updateAllStats();
+    return d.tableData.length;
+  }catch(e){return false;}
+}
+function applyCompanyInfoRaw(d){
+  const map={name:'companyName',tin:'companyTIN',address:'companyAddress',business:'lineOfBusiness',telephone:'telephone',date:'reportDate',employee:'authorizedEmployee',email:'email'};
+  Object.keys(map).forEach(k=>{const el=document.getElementById(map[k]);if(el&&d[k]!==undefined)el.value=d[k];});
+}
+
+/* save on page close — writes to general key always; bridge adds monthly key separately */
+window.addEventListener('beforeunload',()=>{
+  // Only write the general session key here if NOT in monthly mode
+  // (monthly mode beforeunload is registered in the bridge block above)
+  const _ctxKey=sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_KEY');
+  const _ctxRole=sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_ROLE');
+  if(_ctxKey&&_ctxRole===APP_ROLE) return; // bridge handles it
+  localStorage.setItem(getActiveSessionKey(),JSON.stringify({version:'1.0',timestamp:new Date().toISOString(),tableData:getTableData(),companyInfo:getCompanyDataRaw()}));
+});
+
+/* ============================================================
+   CURRENCY FORMATTING — auto comma for 1,000+
+============================================================ */
+function formatCurrency(value){
+  if(value===null||value===undefined||value==='') return '0.00';
+  const num=parseFloat(String(value).replace(/,/g,''));
+  if(isNaN(num)) return '0.00';
+  return num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function getInputNumber(input){
+  if(!input) return 0;
+  const v=(input.dataset.raw!==undefined?input.dataset.raw:input.value).replace(/,/g,'');
+  return parseFloat(v)||0;
+}
+function initCurrencyInput(input){
+  input.addEventListener('focus',function(){
+    const raw=this.dataset.raw||this.value.replace(/,/g,'');
+    this.value=raw; this.select();
+  });
+  input.addEventListener('blur',function(){
+    const raw=this.value.replace(/,/g,'');
+    const num=parseFloat(raw);
+    if(!isNaN(num)&&num!==0){ this.dataset.raw=raw; this.value=formatCurrency(raw); }
+    else if(raw===''||raw==='0'){ this.dataset.raw=''; this.value=''; }
+  });
+  input.addEventListener('input',function(){ this.dataset.raw=this.value.replace(/,/g,''); });
+}
+
+/* ============================================================
    COMPANY INFO
 ============================================================ */
 function saveCompanyInfo(){
   const fields=['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'];
-  const data={}; fields.forEach(id=>{const el=document.getElementById(id);if(el)data[id]=el.value;});
-  localStorage.setItem('capexCompanyInfo',JSON.stringify(data));
+  const data={};
+  fields.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){if(id==='reportDate'&&el.value)data[id]=el.value;else data[id]=el.value;}
+  });
+  localStorage.setItem(NS.COMPANY_INFO,JSON.stringify(data));
 }
 function loadCompanyInfo(){
-  const raw=localStorage.getItem('capexCompanyInfo'); if(!raw) return;
-  try{ const d=JSON.parse(raw); Object.keys(d).forEach(id=>{const el=document.getElementById(id);if(el)el.value=d[id];}); }catch(e){}
+  const raw=localStorage.getItem(NS.COMPANY_INFO); if(!raw) return;
+  try{
+    const d=JSON.parse(raw);
+    Object.keys(d).forEach(id=>{const el=document.getElementById(id);if(el&&d[id]!==undefined)el.value=d[id];});
+  }catch(e){}
 }
 function clearCompanyInfo(){
   if(!confirm('Clear all company information?')) return;
   ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  localStorage.removeItem('capexCompanyInfo');
+  localStorage.removeItem(NS.COMPANY_INFO);
   showToast('Company info cleared','success');
 }
 
 /* ============================================================
    COLUMN VISIBILITY
 ============================================================ */
-const COLS=[
-  {key:'date',name:'Date'},{key:'invoiceNumber',name:'Invoice No.'},
-  {key:'invoiceType',name:'Invoice Type'},{key:'paymentMode',name:'Payment Mode'},
-  {key:'supplierName',name:'Supplier Name'},{key:'assetDescription',name:'Asset Description'},
-  {key:'address',name:'Address'},{key:'tinNumber',name:'TIN Number'},
-  {key:'nonVatGross',name:'Non-VAT Gross'},{key:'vatableGross',name:'Vatable Gross'},
-  {key:'netPurchases',name:'Net Purchases'},{key:'inputTax',name:'Input Tax'},
-  {key:'withholdingTax',name:'Withholding Tax'},{key:'grossMinusWT',name:'Gross − W/T'},
-  {key:'remarks',name:'Remarks'},{key:'action',name:'Del'}
+const COLS = [
+  {key:'date', name:'Date'},
+  {key:'invoiceNumber', name:'Invoice No.'},
+  {key:'invoiceType', name:'Invoice Type'},
+  {key:'paymentMode', name:'Payment Mode'},
+  {key:'tinNumber', name:'TIN Number'},        // Moved up
+  {key:'supplierName', name:'Supplier Name'},
+  {key:'assetDescription', name:'Asset Description'},
+  {key:'address', name:'Address'},
+  {key:'nonVatGross', name:'Non-VAT Gross'},
+  {key:'vatableGross', name:'Vatable Gross'},
+  {key:'netPurchases', name:'Net Purchases'},
+  {key:'inputTax', name:'Input Tax'},
+  {key:'withholdingTax', name:'Withholding Tax'},
+  {key:'grossMinusWT', name:'Gross − W/T'},
+  {key:'remarks', name:'Remarks'},
+  {key:'action', name:'Del'}
 ];
 let colVis={};
 function initColVisibility(){
-  colVis=JSON.parse(localStorage.getItem('capexColVis')||'{}');
+  colVis=JSON.parse(localStorage.getItem(NS.COL_VISIBILITY)||'{}');
   const list=document.getElementById('colList');
   COLS.forEach((c,i)=>{
     const item=document.createElement('div'); item.className='col-item';
     const cb=document.createElement('input'); cb.type='checkbox'; cb.id='cv_'+c.key; cb.checked=!colVis[c.key];
     const lbl=document.createElement('label'); lbl.htmlFor='cv_'+c.key; lbl.textContent=c.name;
-    cb.addEventListener('change',()=>{ colVis[c.key]=!cb.checked; applyColVis(); localStorage.setItem('capexColVis',JSON.stringify(colVis)); });
+    cb.addEventListener('change',()=>{ colVis[c.key]=!cb.checked; applyColVis(); localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis)); });
     item.appendChild(cb); item.appendChild(lbl); list.appendChild(item);
   });
   applyColVis();
   document.getElementById('showAllColsBtn').addEventListener('click',()=>{
     COLS.forEach(c=>{ colVis[c.key]=false; const cb=document.getElementById('cv_'+c.key); if(cb) cb.checked=true; });
-    applyColVis(); localStorage.setItem('capexColVis',JSON.stringify(colVis)); showToast('All columns visible','success');
+    applyColVis(); localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis)); showToast('All columns visible','success');
   });
   document.getElementById('hideAllColsBtn').addEventListener('click',()=>{
     COLS.forEach(c=>{ colVis[c.key]=true; const cb=document.getElementById('cv_'+c.key); if(cb) cb.checked=false; });
-    applyColVis(); localStorage.setItem('capexColVis',JSON.stringify(colVis)); showToast('All columns hidden','info');
+    applyColVis(); localStorage.setItem(NS.COL_VISIBILITY,JSON.stringify(colVis)); showToast('All columns hidden','info');
   });
   const btn=document.getElementById('colVisBtn'), dd=document.getElementById('colVisDropdown');
   btn.addEventListener('click',e=>{ e.stopPropagation(); dd.classList.toggle('open'); });
@@ -864,34 +1039,62 @@ function initPagination(){
 ============================================================ */
 function getTableDate(){
   const rd=document.getElementById('reportDate')?.value;
-  return rd||new Date().toISOString().split('T')[0];
+  return rd||getTodayDisplayDate();
 }
+
+/* ============================================================
+   ROW COLOR — based on payment mode and VAT type
+============================================================ */
+function updateRowColor(row){
+  row.classList.remove('row-has-data','row-cash','row-charge','row-vatable','row-nonvat');
+  const nv=getInputNumber(row.querySelector('.non-vat-gross'));
+  const vg=getInputNumber(row.querySelector('.vatable-gross'));
+  const pm=row.querySelector('.payment-mode')?.value||'';
+  if(!nv&&!vg&&!pm) return;
+  row.classList.add('row-has-data');
+  if(pm==='Cash'){ row.classList.add('row-cash'); return; }
+  if(pm==='Charge'){ row.classList.add('row-charge'); return; }
+  if(vg>0){ row.classList.add('row-vatable'); return; }
+  if(nv>0){ row.classList.add('row-nonvat'); }
+}
+
 function createRow(data={}){
   const rid='r'+(Date.now()+'').slice(-8)+'_'+Math.floor(Math.random()*1000);
   const tr=document.createElement('tr'); tr.id=rid;
   const today=getTableDate();
   const invTypes=['OR','SI','DR','AR','TR','CR','OTHERS'];
-  tr.innerHTML=`
-    <td><input type="date" value="${data.date||today}" class="date-input"></td>
-    <td><input type="text" value="${escH(data.invoiceNumber||'')}" class="invoice-number" placeholder="INV-001"></td>
-    <td><select class="invoice-type"><option value="">Select</option>${invTypes.map(v=>`<option${data.invoiceType===v?' selected':''}>${v}</option>`).join('')}</select></td>
-    <td><select class="payment-mode"><option value="">Select</option>${['Cash','Charge'].map(v=>`<option${data.paymentMode===v?' selected':''}>${v}</option>`).join('')}</select></td>
-    <td><input type="text" value="${escH(data.supplierName||'')}" class="supplier-name" placeholder="Supplier name"></td>
-    <td><input type="text" value="${escH(data.assetDescription||'')}" class="asset-description" placeholder="Asset description"></td>
-    <td><input type="text" value="${escH(data.address||'')}" class="address" placeholder="Supplier address"></td>
-    <td><input type="text" value="${escH(data.tinNumber||'')}" class="tin-number" maxlength="15" placeholder="000-000-000-000" autocomplete="off"></td>
-    <td><input type="number" value="${data.nonVatGross||''}" step="0.01" min="0" class="non-vat-gross" placeholder="0.00"></td>
-    <td><input type="number" value="${data.vatableGross||''}" step="0.01" min="0" class="vatable-gross" placeholder="0.00"></td>
-    <td><div class="cell-computed net-purchases">0.00</div></td>
-    <td><div class="cell-computed input-tax">0.00</div></td>
-    <td><input type="number" value="${data.withholdingTax||''}" step="0.01" min="0" class="withholding-tax" placeholder="0.00"></td>
-    <td><div class="cell-computed gross-minus-wt">0.00</div></td>
-    <td><input type="text" value="${escH(data.remarks||'')}" class="remarks" placeholder="Remarks"></td>
-    <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>
-  `;
+  const nvRaw=data.nonVatGross||'';
+  const vgRaw=data.vatableGross||'';
+  const wtRaw=data.withholdingTax||'';
+  const nvDisplay=nvRaw?formatCurrency(nvRaw):'';
+  const vgDisplay=vgRaw?formatCurrency(vgRaw):'';
+  const wtDisplay=wtRaw?formatCurrency(wtRaw):'';
+  tr.innerHTML = `
+  <td><input type="text" value="${escH(data.date||today)}" class="date-input" placeholder="MM/DD/YYYY" maxlength="10"></td>
+  <td><input type="text" value="${escH(data.invoiceNumber||'')}" class="invoice-number" placeholder="INV-001"></td>
+  <td><select class="invoice-type"><option value="">Select</option>${invTypes.map(v=>`<option${data.invoiceType===v?' selected':''}>${v}</option>`).join('')}</select></td>
+  <td><select class="payment-mode"><option value="">Select</option>${['Cash','Charge'].map(v=>`<option${data.paymentMode===v?' selected':''}>${v}</option>`).join('')}</select></td>
+  <td><input type="text" value="${escH(data.tinNumber||'')}" class="tin-number" maxlength="15" placeholder="000-000-000-000" autocomplete="off"></td>
+  <td><input type="text" value="${escH(data.supplierName||'')}" class="supplier-name" placeholder="Supplier name"></td>
+  <td><input type="text" value="${escH(data.assetDescription||'')}" class="asset-description" placeholder="Asset description"></td>
+  <td><input type="text" value="${escH(data.address||'')}" class="address" placeholder="Supplier address"></td>
+  <td><input type="text" value="${escH(nvDisplay)}" data-raw="${escH(nvRaw)}" class="non-vat-gross" placeholder="0.00"></td>
+  <td><input type="text" value="${escH(vgDisplay)}" data-raw="${escH(vgRaw)}" class="vatable-gross" placeholder="0.00"></td>
+  <td><div class="cell-computed net-purchases">0.00</div></td>
+  <td><div class="cell-computed input-tax">0.00</div></td>
+  <td><input type="text" value="${escH(wtDisplay)}" data-raw="${escH(wtRaw)}" class="withholding-tax" placeholder="0.00"></td>
+  <td><div class="cell-computed gross-minus-wt">0.00</div></td>
+  <td><input type="text" value="${escH(data.remarks||'')}" class="remarks" placeholder="Remarks"></td>
+  <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>
+`;
   applyColVisToRow(tr);
+  // Init currency inputs
+  initCurrencyInput(tr.querySelector('.non-vat-gross'));
+  initCurrencyInput(tr.querySelector('.vatable-gross'));
+  initCurrencyInput(tr.querySelector('.withholding-tax'));
   attachRowListeners(tr);
   calcRow(tr);
+  updateRowColor(tr);
   return tr;
 }
 
@@ -899,9 +1102,17 @@ function attachRowListeners(row){
   if(row.dataset.listenersAttached) return;
   row.dataset.listenersAttached='1';
   row.querySelectorAll('input,select').forEach(el=>{
-    el.addEventListener('input',()=>{ calcRow(row); scheduleStats(); });
-    el.addEventListener('change',()=>{ calcRow(row); scheduleStats(); });
+    el.addEventListener('input',()=>{ calcRow(row); scheduleStats(); scheduleAutoSave(); updateRowColor(row); });
+    el.addEventListener('change',()=>{ calcRow(row); scheduleStats(); scheduleAutoSave(); updateRowColor(row); });
   });
+  // Date input — auto-format MM/DD/YYYY
+  const dateInput=row.querySelector('.date-input');
+  if(dateInput){
+    dateInput.addEventListener('input',function(){autoFormatReportDate(this);});
+    dateInput.addEventListener('blur',function(){validateReportDate(this);if(this.value&&!validateDisplayDate(this.value))showToast('Invalid date. Use MM/DD/YYYY','warning');});
+  }
+  const pm=row.querySelector('.payment-mode');
+  if(pm) pm.addEventListener('change',()=>updateRowColor(row));
   const tin=row.querySelector('.tin-number');
   if(tin){
     tin.addEventListener('input',()=>{ formatTIN(tin); setTimeout(()=>showTinSuggestions(tin,row),60); });
@@ -915,15 +1126,15 @@ function attachRowListeners(row){
 }
 
 function calcRow(row){
-  const nonVat=parseFloat(row.querySelector('.non-vat-gross')?.value)||0;
-  const vatable=parseFloat(row.querySelector('.vatable-gross')?.value)||0;
-  const wt=parseFloat(row.querySelector('.withholding-tax')?.value)||0;
+  const nonVat=getInputNumber(row.querySelector('.non-vat-gross'));
+  const vatable=getInputNumber(row.querySelector('.vatable-gross'));
+  const wt=getInputNumber(row.querySelector('.withholding-tax'));
   const net=vatable/1.12;
   const it=net*0.12;
   const gmw=(nonVat+vatable)-wt;
-  row.querySelector('.net-purchases').textContent=net.toFixed(2);
-  row.querySelector('.input-tax').textContent=it.toFixed(2);
-  row.querySelector('.gross-minus-wt').textContent=gmw.toFixed(2);
+  row.querySelector('.net-purchases').textContent=formatCurrency(net);
+  row.querySelector('.input-tax').textContent=formatCurrency(it);
+  row.querySelector('.gross-minus-wt').textContent=formatCurrency(gmw);
 }
 
 function tryFillFromTin(row){
@@ -1012,12 +1223,12 @@ window.updateAllStats=function(){
     const rows=document.querySelectorAll('#tableBody tr');
     let nvat=0,vat=0,net=0,it=0,wt=0,gmw=0,cash=0,charge=0,cC=0,chC=0,nC=0,vC=0;
     rows.forEach(r=>{
-      const nv=parseFloat(r.querySelector('.non-vat-gross')?.value)||0;
-      const vg=parseFloat(r.querySelector('.vatable-gross')?.value)||0;
-      const n=parseFloat(r.querySelector('.net-purchases')?.textContent)||0;
-      const i=parseFloat(r.querySelector('.input-tax')?.textContent)||0;
-      const w=parseFloat(r.querySelector('.withholding-tax')?.value)||0;
-      const gm=parseFloat(r.querySelector('.gross-minus-wt')?.textContent)||0;
+      const nv=getInputNumber(r.querySelector('.non-vat-gross'));
+      const vg=getInputNumber(r.querySelector('.vatable-gross'));
+      const n=parseFloat((r.querySelector('.net-purchases')?.textContent||'0').replace(/,/g,''))||0;
+      const i=parseFloat((r.querySelector('.input-tax')?.textContent||'0').replace(/,/g,''))||0;
+      const w=getInputNumber(r.querySelector('.withholding-tax'));
+      const gm=parseFloat((r.querySelector('.gross-minus-wt')?.textContent||'0').replace(/,/g,''))||0;
       nvat+=nv; vat+=vg; net+=n; it+=i; wt+=w; gmw+=gm;
       if(nv>0) nC++;
       if(vg>0) vC++;
@@ -1027,15 +1238,15 @@ window.updateAllStats=function(){
     });
     const cnt=rows.length;
     const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-    set('totalNonVatPurchases',nvat.toFixed(2)); set('totalVatablePurchases',vat.toFixed(2));
-    set('totalNetPurchases',net.toFixed(2)); set('totalInputTax',it.toFixed(2)); set('netPayable',gmw.toFixed(2));
+    set('totalNonVatPurchases',formatCurrency(nvat)); set('totalVatablePurchases',formatCurrency(vat));
+    set('totalNetPurchases',formatCurrency(net)); set('totalInputTax',formatCurrency(it)); set('netPayable',formatCurrency(gmw));
     // Tally
-    set('tallyNonVat',nvat.toFixed(2)); set('tallyNonVatCount',nC+' transaction'+(nC!==1?'s':''));
-    set('tallyVatable',vat.toFixed(2)); set('tallyVatableCount',vC+' transaction'+(vC!==1?'s':''));
-    set('tallyNet',net.toFixed(2)); set('tallyInputTax',it.toFixed(2));
-    set('tallyCash',cash.toFixed(2)); set('tallyCashCount',cC+' transaction'+(cC!==1?'s':''));
-    set('tallyCharge',charge.toFixed(2)); set('tallyChargeCount',chC+' transaction'+(chC!==1?'s':''));
-    set('tallyTotalGross',(nvat+vat).toFixed(2)); set('tallyNetPayable',gmw.toFixed(2)); set('tallyWT',wt.toFixed(2));
+    set('tallyNonVat',formatCurrency(nvat)); set('tallyNonVatCount',nC+' transaction'+(nC!==1?'s':''));
+    set('tallyVatable',formatCurrency(vat)); set('tallyVatableCount',vC+' transaction'+(vC!==1?'s':''));
+    set('tallyNet',formatCurrency(net)); set('tallyInputTax',formatCurrency(it));
+    set('tallyCash',formatCurrency(cash)); set('tallyCashCount',cC+' transaction'+(cC!==1?'s':''));
+    set('tallyCharge',formatCurrency(charge)); set('tallyChargeCount',chC+' transaction'+(chC!==1?'s':''));
+    set('tallyTotalGross',formatCurrency(nvat+vat)); set('tallyNetPayable',formatCurrency(gmw)); set('tallyWT',formatCurrency(wt));
     const ec=document.getElementById('entryCount'); if(ec){ec.textContent=cnt;ec.classList.add('pulse');setTimeout(()=>ec.classList.remove('pulse'),300);}
     rebuildSummaryRow(nvat,vat,net,it,wt,gmw);
   });
@@ -1046,12 +1257,12 @@ function rebuildSummaryRow(nv,vg,net,it,wt,gmw){
   if(nv===undefined){
     nv=0;vg=0;net=0;it=0;wt=0;gmw=0;
     document.querySelectorAll('#tableBody tr').forEach(r=>{
-      nv+=parseFloat(r.querySelector('.non-vat-gross')?.value)||0;
-      vg+=parseFloat(r.querySelector('.vatable-gross')?.value)||0;
-      net+=parseFloat(r.querySelector('.net-purchases')?.textContent)||0;
-      it+=parseFloat(r.querySelector('.input-tax')?.textContent)||0;
-      wt+=parseFloat(r.querySelector('.withholding-tax')?.value)||0;
-      gmw+=parseFloat(r.querySelector('.gross-minus-wt')?.textContent)||0;
+      nv+=getInputNumber(r.querySelector('.non-vat-gross'));
+      vg+=getInputNumber(r.querySelector('.vatable-gross'));
+      net+=parseFloat((r.querySelector('.net-purchases')?.textContent||'0').replace(/,/g,''))||0;
+      it+=parseFloat((r.querySelector('.input-tax')?.textContent||'0').replace(/,/g,''))||0;
+      wt+=getInputNumber(r.querySelector('.withholding-tax'));
+      gmw+=parseFloat((r.querySelector('.gross-minus-wt')?.textContent||'0').replace(/,/g,''))||0;
     });
   }
   const ths=document.querySelectorAll('#capexTable thead th');
@@ -1059,14 +1270,16 @@ function rebuildSummaryRow(nv,vg,net,it,wt,gmw){
   ths.forEach((th,i)=>{
     if(th.classList.contains('hidden-column')) return;
     let c='';
-    if(first){c='<span class="sum-label">TOTALS</span>';first=false;}
-    // col indices: 8=nonvat, 9=vatable, 10=net, 11=it, 12=wt, 13=gmw
-    else if(i===8)  c='<span class="sum-value">'+nv.toFixed(2)+'</span>';
-    else if(i===9)  c='<span class="sum-value">'+vg.toFixed(2)+'</span>';
-    else if(i===10) c='<span class="sum-value">'+net.toFixed(2)+'</span>';
-    else if(i===11) c='<span class="sum-value">'+it.toFixed(2)+'</span>';
-    else if(i===12) c='<span class="sum-value">'+wt.toFixed(2)+'</span>';
-    else if(i===13) c='<span class="sum-value">'+gmw.toFixed(2)+'</span>';
+    if(first){
+  c='<span class="sum-label">TOTALS</span>';
+  first=false;
+}
+else if(i===9)  c='<span class="sum-value">'+formatCurrency(nv)+'</span>';   // Was 8, now 9
+else if(i===10) c='<span class="sum-value">'+formatCurrency(vg)+'</span>';  // Was 9, now 10
+else if(i===11) c='<span class="sum-value">'+formatCurrency(net)+'</span>'; // Was 10, now 11
+else if(i===12) c='<span class="sum-value">'+formatCurrency(it)+'</span>';  // Was 11, now 12
+else if(i===13) c='<span class="sum-value">'+formatCurrency(wt)+'</span>';  // Was 12, now 13
+else if(i===14) c='<span class="sum-value">'+formatCurrency(gmw)+'</span>'; // Was 13, now 14
     cells+=`<td>${c}</td>`;
   });
   foot.innerHTML='<tr>'+cells+'</tr>';
@@ -1084,20 +1297,20 @@ function setCompanyData(d){
   Object.keys(map).forEach(k=>{const el=document.getElementById(map[k]);if(el&&d[k])el.value=d[k];});
   saveCompanyInfo();
 }
-function getTableData(){
-  return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({
-    date:r.querySelector('.date-input')?.value||'',
-    invoiceNumber:r.querySelector('.invoice-number')?.value||'',
-    invoiceType:r.querySelector('.invoice-type')?.value||'',
-    paymentMode:r.querySelector('.payment-mode')?.value||'',
-    supplierName:r.querySelector('.supplier-name')?.value||'',
-    assetDescription:r.querySelector('.asset-description')?.value||'',
-    address:r.querySelector('.address')?.value||'',
-    tinNumber:r.querySelector('.tin-number')?.value||'',
-    nonVatGross:r.querySelector('.non-vat-gross')?.value||'',
-    vatableGross:r.querySelector('.vatable-gross')?.value||'',
-    withholdingTax:r.querySelector('.withholding-tax')?.value||'',
-    remarks:r.querySelector('.remarks')?.value||''
+function getTableData() {
+  return Array.from(document.querySelectorAll('#tableBody tr')).map(r => ({
+    date: r.querySelector('.date-input')?.value || '',
+    invoiceNumber: r.querySelector('.invoice-number')?.value || '',
+    invoiceType: r.querySelector('.invoice-type')?.value || '',
+    paymentMode: r.querySelector('.payment-mode')?.value || '',
+    tinNumber: r.querySelector('.tin-number')?.value || '',           // Moved up
+    supplierName: r.querySelector('.supplier-name')?.value || '',
+    assetDescription: r.querySelector('.asset-description')?.value || '',
+    address: r.querySelector('.address')?.value || '',
+    nonVatGross: (r.querySelector('.non-vat-gross')?.dataset.raw || r.querySelector('.non-vat-gross')?.value || '').replace(/,/g, ''),
+    vatableGross: (r.querySelector('.vatable-gross')?.dataset.raw || r.querySelector('.vatable-gross')?.value || '').replace(/,/g, ''),
+    withholdingTax: (r.querySelector('.withholding-tax')?.dataset.raw || r.querySelector('.withholding-tax')?.value || '').replace(/,/g, ''),
+    remarks: r.querySelector('.remarks')?.value || ''
   }));
 }
 function saveDataToFile(){
@@ -1165,19 +1378,19 @@ function exportToExcel(){
   const co=getCompanyData();
   if(!co.name||!co.tin||!co.address||!co.business||!co.employee){ alert('Please fill all required company fields (*) before exporting.'); return; }
   const rows=document.querySelectorAll('#tableBody tr');
-  const nvT=parseFloat(document.getElementById('totalNonVatPurchases').textContent)||0;
-  const vgT=parseFloat(document.getElementById('totalVatablePurchases').textContent)||0;
-  const netT=parseFloat(document.getElementById('totalNetPurchases').textContent)||0;
-  const itT=parseFloat(document.getElementById('totalInputTax').textContent)||0;
-  const npT=parseFloat(document.getElementById('netPayable').textContent)||0;
+  const nvT=parseFloat(document.getElementById('totalNonVatPurchases').textContent.replace(/,/g,''))||0;
+  const vgT=parseFloat(document.getElementById('totalVatablePurchases').textContent.replace(/,/g,''))||0;
+  const netT=parseFloat(document.getElementById('totalNetPurchases').textContent.replace(/,/g,''))||0;
+  const itT=parseFloat(document.getElementById('totalInputTax').textContent.replace(/,/g,''))||0;
+  const npT=parseFloat(document.getElementById('netPayable').textContent.replace(/,/g,''))||0;
   let wtTotal=0;
-  rows.forEach(r=>{ wtTotal+=parseFloat(r.querySelector('.withholding-tax')?.value)||0; });
+  rows.forEach(r=>{ wtTotal+=getInputNumber(r.querySelector('.withholding-tax')); });
   const now=new Date();
   const dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   const timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
   let suppMap=new Map();
   rows.forEach(r=>{
-    const g=(parseFloat(r.querySelector('.non-vat-gross')?.value)||0)+(parseFloat(r.querySelector('.vatable-gross')?.value)||0);
+    const g=getInputNumber(r.querySelector('.non-vat-gross'))+getInputNumber(r.querySelector('.vatable-gross'));
     const sn=r.querySelector('.supplier-name')?.value||'';
     const tin=r.querySelector('.tin-number')?.value||'';
     if(sn&&tin&&g>0){ const k=sn+'|'+tin; suppMap.set(k,(suppMap.get(k)||0)+g); }
@@ -1213,26 +1426,41 @@ function exportToExcel(){
     <tr><td class="co-lbl">Authorized Employee:</td><td>${escH(co.employee)}</td><td class="co-lbl">Email:</td><td>${escH(co.email||'N/A')}</td></tr>
   </table>
   <div class="sec-ttl">CAPEX Transactions</div>
-  <table class="dt"><thead><tr><th>Date</th><th>Invoice No.</th><th>Invoice Type</th><th>Payment Mode</th><th>Supplier Name</th><th>Asset Description</th><th>Address</th><th>TIN Number</th><th>Non-VAT Gross</th><th>Vatable Gross</th><th>Net Purchases</th><th>Input Tax</th><th>Withholding Tax</th><th>Gross − W/T</th><th>Remarks</th></tr></thead><tbody>`;
+  <table class="dt"><thead><tr><th>Date</th>
+  <th>Invoice No.</th>
+  <th>Invoice Type</th>
+  <th>Payment Mode</th>
+  <th>TIN Number</th>
+  <th>Supplier Name</th>
+  <th>Asset Description</th>
+  <th>Address</th>
+  <th>Non-VAT Gross</th>
+  <th>Vatable Gross</th>
+  <th>Net Purchases</th>
+  <th>Input Tax</th>
+  <th>Withholding Tax</th>
+  <th>Gross − W/T</th>
+  <th>Remarks</th>
+</tr></thead><tbody>`;
   rows.forEach((r,idx)=>{
     const v=cls=>r.querySelector(cls);
-    html+=`<tr${idx%2===0?'':' style="background:#EFF6FF"'}>
-      <td style="text-align:center">${escH(v('.date-input')?.value||'')}</td>
-      <td>${escH(v('.invoice-number')?.value||'')}</td>
-      <td style="text-align:center">${escH(v('.invoice-type')?.value||'')}</td>
-      <td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td>
-      <td>${escH(v('.supplier-name')?.value||'')}</td>
-      <td>${escH(v('.asset-description')?.value||'')}</td>
-      <td>${escH(v('.address')?.value||'')}</td>
-      <td style="text-align:center;font-family:monospace">${escH(v('.tin-number')?.value||'')}</td>
-      <td class="num">${(parseFloat(v('.non-vat-gross')?.value)||0).toFixed(2)}</td>
-      <td class="num">${(parseFloat(v('.vatable-gross')?.value)||0).toFixed(2)}</td>
-      <td class="num">${(parseFloat(v('.net-purchases')?.textContent)||0).toFixed(2)}</td>
-      <td class="num">${(parseFloat(v('.input-tax')?.textContent)||0).toFixed(2)}</td>
-      <td class="num">${(parseFloat(v('.withholding-tax')?.value)||0).toFixed(2)}</td>
-      <td class="num">${(parseFloat(v('.gross-minus-wt')?.textContent)||0).toFixed(2)}</td>
-      <td>${escH(v('.remarks')?.value||'')}</td>
-    </tr>`;
+    html += `<tr${idx%2===0?'':' style="background:#EFF6FF"'}>
+  <td style="text-align:center">${escH(v('.date-input')?.value||'')}</td>
+  <td>${escH(v('.invoice-number')?.value||'')}</td>
+  <td style="text-align:center">${escH(v('.invoice-type')?.value||'')}</td>
+  <td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td>
+  <td style="text-align:center;font-family:monospace">${escH(v('.tin-number')?.value||'')}</td>
+  <td>${escH(v('.supplier-name')?.value||'')}</td>
+  <td>${escH(v('.asset-description')?.value||'')}</td>
+  <td>${escH(v('.address')?.value||'')}</td>
+  <td class="num">${(getInputNumber(v('.non-vat-gross'))).toFixed(2)}</td>
+  <td class="num">${(getInputNumber(v('.vatable-gross'))).toFixed(2)}</td>
+  <td class="num">${(parseFloat((v('.net-purchases')?.textContent||'0').replace(/,/g,''))||0).toFixed(2)}</td>
+  <td class="num">${(parseFloat((v('.input-tax')?.textContent||'0').replace(/,/g,''))||0).toFixed(2)}</td>
+  <td class="num">${(getInputNumber(v('.withholding-tax'))).toFixed(2)}</td>
+  <td class="num">${(parseFloat((v('.gross-minus-wt')?.textContent||'0').replace(/,/g,''))||0).toFixed(2)}</td>
+  <td>${escH(v('.remarks')?.value||'')}</td>
+</tr>`;
   });
   html+=`</tbody><tfoot><tr class="sum-row"><td colspan="8" style="text-align:right;font-weight:bold">TOTALS:</td>
     <td class="num">${nvT.toFixed(2)}</td><td class="num">${vgT.toFixed(2)}</td><td class="num">${netT.toFixed(2)}</td><td class="num">${itT.toFixed(2)}</td>
@@ -1263,65 +1491,155 @@ function exportToExcel(){
 }
 
 /* ============================================================
-   SELECT MULTIPLE
+   SELECT MULTIPLE — with right-click context menu
 ============================================================ */
 let selectMode=false,isDragging=false,dragStart=null,selectedCells=new Set();
+
+function removeSelectionInfoBar(){document.querySelector('.selection-info-bar')?.remove();}
+function createSelectionInfoBar(){
+  removeSelectionInfoBar();
+  const bar=document.createElement('div'); bar.className='selection-info-bar';
+  bar.innerHTML=`<div class="sel-info-dot"></div><span id="selCount">0</span> cells selected<span class="sel-info-hint">· Right-click for options</span>`;
+  document.body.appendChild(bar);
+}
+function updateSelectionInfoBar(){const el=document.getElementById('selCount');if(el)el.textContent=selectedCells.size;}
+
 function toggleSelectMode(){
   selectMode=!selectMode;
-  const tb=document.getElementById('tableBody'), btn=document.getElementById('selectMultipleBtn');
-  if(selectMode){ tb.classList.add('select-mode'); btn.classList.add('active'); btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection'; createSelToolbar(); showToast('Selection mode on','info'); document.body.style.userSelect='none'; }
-  else { tb.classList.remove('select-mode'); btn.classList.remove('active'); btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple'; clearCellSel(); document.querySelector('.selection-toolbar')?.remove(); document.body.style.userSelect=''; }
+  const tb=document.getElementById('tableBody'),btn=document.getElementById('selectMultipleBtn');
+  if(selectMode){
+    tb.classList.add('select-mode'); btn.classList.add('active');
+    btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection';
+    createSelectionInfoBar();
+    showToast('Selection mode — drag to select, right-click for options','info');
+    document.body.style.userSelect='none';
+  } else {
+    tb.classList.remove('select-mode'); btn.classList.remove('active');
+    btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple';
+    clearCellSel(); removeSelectionInfoBar(); closeCtxMenu();
+    document.body.style.userSelect='';
+  }
 }
-function createSelToolbar(){
-  if(document.querySelector('.selection-toolbar')) return;
-  const tb=document.createElement('div'); tb.className='selection-toolbar';
-  tb.innerHTML=`<span class="sel-tb-info"><span id="selCount">0</span> cells</span>
-    <button class="sel-tb-btn" id="selCopyBtn"><i class="fas fa-copy"></i> Copy</button>
-    <button class="sel-tb-btn" id="selPasteBtn"><i class="fas fa-paste"></i> Paste</button>
-    <button class="sel-tb-btn" id="selDelBtn"><i class="fas fa-trash"></i> Clear</button>
-    <button class="sel-tb-btn exit" id="selExitBtn"><i class="fas fa-times"></i> Exit</button>`;
-  document.body.appendChild(tb);
-  document.getElementById('selCopyBtn').addEventListener('click',copySelCells);
-  document.getElementById('selPasteBtn').addEventListener('click',pasteSelCells);
-  document.getElementById('selDelBtn').addEventListener('click',delSelCells);
-  document.getElementById('selExitBtn').addEventListener('click',toggleSelectMode);
+
+/* Right-click context menu */
+let activeCtxMenu=null;
+function closeCtxMenu(){if(activeCtxMenu){activeCtxMenu.remove();activeCtxMenu=null;}}
+
+function showCtxMenu(x,y){
+  closeCtxMenu();
+  const count=selectedCells.size;
+  const selectedRows=getSelectedFullRows();
+  const hasFullRows=selectedRows.length>0;
+  const menu=document.createElement('div');
+  menu.className='ctx-menu';
+  menu.innerHTML=`
+    <div class="ctx-menu-header"><i class="fas fa-mouse-pointer"></i> Selection Actions <span class="ctx-count-badge">${count} cell${count!==1?'s':''}</span></div>
+    <button class="ctx-item" id="ctxCopy"><i class="fas fa-copy"></i> Copy Cells</button>
+    <button class="ctx-item" id="ctxPaste"><i class="fas fa-paste"></i> Paste Here</button>
+    <button class="ctx-item" id="ctxClear"><i class="fas fa-eraser"></i> Clear Cell Values</button>
+    <div class="ctx-divider"></div>
+    ${hasFullRows?`<button class="ctx-item danger" id="ctxDeleteRows"><i class="fas fa-trash-alt"></i> Delete Selected Rows <span class="ctx-count-badge" style="background:#FECACA;color:#B91C1C">${selectedRows.length} row${selectedRows.length!==1?'s':''}</span></button><div class="ctx-divider"></div>`:''}
+    <button class="ctx-item exit-item" id="ctxExit"><i class="fas fa-times-circle"></i> Exit Selection Mode</button>`;
+  document.body.appendChild(menu); activeCtxMenu=menu;
+  const mw=menu.offsetWidth,mh=menu.offsetHeight,vw=window.innerWidth,vh=window.innerHeight;
+  let left=x,top=y;
+  if(left+mw>vw-8) left=vw-mw-8; if(top+mh>vh-8) top=vh-mh-8;
+  if(left<8) left=8; if(top<8) top=8;
+  menu.style.left=left+'px'; menu.style.top=top+'px';
+  menu.querySelector('#ctxCopy').addEventListener('click',()=>{closeCtxMenu();copySelCells();});
+  menu.querySelector('#ctxPaste').addEventListener('click',()=>{closeCtxMenu();pasteSelCells();});
+  menu.querySelector('#ctxClear').addEventListener('click',()=>{closeCtxMenu();delSelCells();});
+  if(hasFullRows) menu.querySelector('#ctxDeleteRows').addEventListener('click',()=>{closeCtxMenu();deleteSelectedRows(selectedRows);});
+  menu.querySelector('#ctxExit').addEventListener('click',()=>{closeCtxMenu();toggleSelectMode();});
+  setTimeout(()=>{
+    const close=e=>{if(!menu.contains(e.target)){closeCtxMenu();document.removeEventListener('mousedown',close);}};
+    document.addEventListener('mousedown',close);
+  },0);
 }
-function getCellCoords(c){ const r=c.parentElement; const rows=Array.from(r.parentElement.children); return{row:rows.indexOf(r),col:Array.from(r.children).indexOf(c)}; }
+
+function getSelectedFullRows(){
+  if(!selectedCells.size) return [];
+  const rowMap=new Map();
+  for(const cell of selectedCells){const row=cell.parentElement;if(!rowMap.has(row))rowMap.set(row,new Set());rowMap.get(row).add(cell);}
+  const fullRows=[];
+  for(const[row,cells] of rowMap){
+    const allTds=Array.from(row.children).filter(td=>!td.classList.contains('hidden-column')&&!td.querySelector('.delete-btn'));
+    if(allTds.every(td=>cells.has(td))) fullRows.push(row);
+  }
+  return fullRows;
+}
+
+function deleteSelectedRows(rows){
+  if(!rows||!rows.length) return;
+  if(!confirm(`Delete ${rows.length} selected row${rows.length!==1?'s':''}?`)) return;
+  clearCellSel();
+  rows.forEach(row=>{
+    row.style.transition='opacity .15s,transform .15s'; row.style.opacity='0'; row.style.transform='translateX(-10px)';
+    setTimeout(()=>row.remove(),180);
+  });
+  setTimeout(()=>{
+    if(currentPage>getTotalPages()) currentPage=Math.max(1,getTotalPages());
+    renderCurrentPage(); scheduleStats();
+    showToast(`Deleted ${rows.length} row${rows.length!==1?'s':''}`, 'success');
+  },220);
+}
+
+function getCellCoords(c){const r=c.parentElement;const rows=Array.from(r.parentElement.children);return{row:rows.indexOf(r),col:Array.from(r.children).indexOf(c)};}
 function selectRange(s,e){
   clearCellSel();
   const allRows=Array.from(document.querySelectorAll('#tableBody tr'));
   const r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);
-  for(let r=r1;r<=r2;r++){ const row=allRows[r]; if(!row) continue; for(let c=c1;c<=c2;c++){ const cell=row.children[c]; if(!cell) continue; cell.classList.add('cell-selected'); selectedCells.add(cell); } }
-  const sc=document.getElementById('selCount'); if(sc) sc.textContent=selectedCells.size;
+  for(let r=r1;r<=r2;r++){const row=allRows[r];if(!row)continue;for(let c=c1;c<=c2;c++){const cell=row.children[c];if(!cell)continue;cell.classList.add('cell-selected');selectedCells.add(cell);}}
+  updateSelectionInfoBar();
 }
-function clearCellSel(){ document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected')); selectedCells.clear(); const sc=document.getElementById('selCount'); if(sc) sc.textContent=0; }
-function getCellValue(c){ const inp=c.querySelector('input,select'); if(inp) return inp.value; const comp=c.querySelector('.cell-computed'); if(comp) return comp.textContent; return c.textContent.trim(); }
-function setCellValue(c,v){ const inp=c.querySelector('input'); if(inp){ inp.value=v; inp.dispatchEvent(new Event('input',{bubbles:true})); return true; } const sel=c.querySelector('select'); if(sel){ const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v); if(opt) sel.value=opt.value; sel.dispatchEvent(new Event('change',{bubbles:true})); return true; } return false; }
-function copySelCells(){ if(!selectedCells.size){showToast('No cells selected','warning');return;} const coords=[...selectedCells].map(c=>({cell:c,...getCellCoords(c)})); const minR=Math.min(...coords.map(c=>c.row)),minC=Math.min(...coords.map(c=>c.col)),maxR=Math.max(...coords.map(c=>c.row)),maxC=Math.max(...coords.map(c=>c.col)); const grid=[]; for(let r=minR;r<=maxR;r++){const row=[];for(let c=minC;c<=maxC;c++){const f=coords.find(x=>x.row===r&&x.col===c);row.push(f?getCellValue(f.cell):'');}grid.push(row);} navigator.clipboard.writeText(grid.map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+selectedCells.size+' cells','success')).catch(()=>showToast('Clipboard error','error')); }
-function pasteSelCells(){ navigator.clipboard.readText().then(text=>{ const rows=text.split('\n').map(r=>r.split('\t')); const sorted=[...selectedCells].sort((a,b)=>{const ca=getCellCoords(a),cb=getCellCoords(b);return ca.row!==cb.row?ca.row-cb.row:ca.col-cb.col;}); let cnt=0; sorted.forEach((cell,i)=>{const r=Math.floor(i/rows[0].length),c2=i%rows[0].length;if(rows[r]&&rows[r][c2]!==undefined&&setCellValue(cell,rows[r][c2]))cnt++;}); clearCellSel(); showToast('Pasted to '+cnt+' cells','success'); scheduleStats(); }).catch(()=>showToast('Clipboard read failed','error')); }
-function delSelCells(){ if(!selectedCells.size){showToast('No cells selected','warning');return;} let cnt=0; selectedCells.forEach(c=>{if(setCellValue(c,''))cnt++;}); clearCellSel(); showToast('Cleared '+cnt+' cells','success'); scheduleStats(); }
+function clearCellSel(){document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected'));selectedCells.clear();updateSelectionInfoBar();}
+function getCellValue(c){const inp=c.querySelector('input,select');if(inp)return inp.value;const comp=c.querySelector('.cell-computed');if(comp)return comp.textContent;return c.textContent.trim();}
+function setCellValue(c,v){const inp=c.querySelector('input');if(inp){inp.value=v;inp.dataset.raw=v.replace(/,/g,'');inp.dispatchEvent(new Event('input',{bubbles:true}));return true;}const sel=c.querySelector('select');if(sel){const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v);if(opt)sel.value=opt.value;sel.dispatchEvent(new Event('change',{bubbles:true}));return true;}return false;}
+function copySelCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}const coords=[...selectedCells].map(c=>({cell:c,...getCellCoords(c)}));const minR=Math.min(...coords.map(c=>c.row)),minC=Math.min(...coords.map(c=>c.col)),maxR=Math.max(...coords.map(c=>c.row)),maxC=Math.max(...coords.map(c=>c.col));const grid=[];for(let r=minR;r<=maxR;r++){const row=[];for(let c=minC;c<=maxC;c++){const f=coords.find(x=>x.row===r&&x.col===c);row.push(f?getCellValue(f.cell):'');}grid.push(row);}navigator.clipboard.writeText(grid.map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+selectedCells.size+' cells','success')).catch(()=>showToast('Clipboard error','error'));}
+function pasteSelCells(){navigator.clipboard.readText().then(text=>{const rows=text.split('\n').map(r=>r.split('\t'));const sorted=[...selectedCells].sort((a,b)=>{const ca=getCellCoords(a),cb=getCellCoords(b);return ca.row!==cb.row?ca.row-cb.row:ca.col-cb.col;});let cnt=0;sorted.forEach((cell,i)=>{const r=Math.floor(i/rows[0].length),c2=i%rows[0].length;if(rows[r]&&rows[r][c2]!==undefined&&setCellValue(cell,rows[r][c2]))cnt++;});clearCellSel();showToast('Pasted to '+cnt+' cells','success');scheduleStats();}).catch(()=>showToast('Clipboard read failed','error'));}
+function delSelCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}let cnt=0;selectedCells.forEach(c=>{if(setCellValue(c,''))cnt++;});clearCellSel();showToast('Cleared '+cnt+' cells','success');scheduleStats();}
 
 /* ============================================================
-   VISIBILITY TOGGLES
+   VISIBILITY TOGGLES — default hidden, labels start as "Show X"
 ============================================================ */
 const TOGGLE_SECTIONS={
-  toggleStatsBtn:{el:'statsSection',show:'Hide Stats Bar',hide:'Show Stats Bar'},
-  toggleTallyBtn:{el:'tallySection',show:'Hide Tally',hide:'Show Tally'},
-  toggleSuppliersBtn:{el:'suppliersSection',show:'Hide Suppliers',hide:'Show Suppliers'},
-  toggleFooterBtn:{el:'footerEl',show:'Hide Footer',hide:'Show Footer'}
+  toggleStatsBtn:    {el:'statsSection',    showLabel:'Show Stats Bar', hideLabel:'Hide Stats Bar'},
+  toggleTallyBtn:    {el:'tallySection',    showLabel:'Show Tally',     hideLabel:'Hide Tally'},
+  toggleSuppliersBtn:{el:'suppliersSection',showLabel:'Show Suppliers', hideLabel:'Hide Suppliers'},
+  toggleFooterBtn:   {el:'footerEl',        showLabel:'Show Footer',    hideLabel:'Hide Footer'}
 };
 function initVisibilityToggles(){
-  const saved=JSON.parse(localStorage.getItem('capexVisStates')||'{}');
   Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
-    const btn=document.getElementById(btnId), el=document.getElementById(cfg.el);
+    const btn=document.getElementById(btnId),el=document.getElementById(cfg.el);
     if(!btn||!el) return;
-    if(saved[cfg.el]===true){ el.classList.add('hidden'); updateToggleBtn(btn,cfg,true); }
-    btn.addEventListener('click',()=>{ const hidden=el.classList.toggle('hidden'); updateToggleBtn(btn,cfg,hidden); const s=JSON.parse(localStorage.getItem('capexVisStates')||'{}'); s[cfg.el]=hidden; localStorage.setItem('capexVisStates',JSON.stringify(s)); });
+    // Always start hidden on page load
+    el.classList.add('hidden');
+    updateToggleBtn(btn,cfg,true);
+    btn.addEventListener('click',()=>{
+      const nowHidden=el.classList.toggle('hidden');
+      updateToggleBtn(btn,cfg,nowHidden);
+    });
   });
-  document.getElementById('hideAllBtn').addEventListener('click',()=>{ Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{ const el=document.getElementById(cfg.el); const btn=document.getElementById(btnId); if(el&&!el.classList.contains('hidden')){ el.classList.add('hidden'); updateToggleBtn(btn,cfg,true); } }); const s={}; Object.values(TOGGLE_SECTIONS).forEach(c=>s[c.el]=true); localStorage.setItem('capexVisStates',JSON.stringify(s)); });
-  document.getElementById('showAllBtn').addEventListener('click',()=>{ Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{ const el=document.getElementById(cfg.el); const btn=document.getElementById(btnId); if(el){ el.classList.remove('hidden'); updateToggleBtn(btn,cfg,false); } }); localStorage.setItem('capexVisStates','{}'); });
+  document.getElementById('hideAllBtn').addEventListener('click',()=>{
+    Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
+      const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);
+      if(el){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}
+    });
+  });
+  document.getElementById('showAllBtn').addEventListener('click',()=>{
+    Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
+      const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);
+      if(el){el.classList.remove('hidden');updateToggleBtn(btn,cfg,false);}
+    });
+  });
 }
-function updateToggleBtn(btn,cfg,isHidden){ if(!btn) return; const spans=btn.querySelectorAll('span'); const last=spans[spans.length-1]; if(last) last.textContent=isHidden?cfg.hide:cfg.show; btn.classList.toggle('toggled',!isHidden); }
+function updateToggleBtn(btn,cfg,isHidden){
+  if(!btn) return;
+  const icon=btn.querySelector('i');
+  const iconHTML=icon?icon.outerHTML:'';
+  btn.innerHTML=iconHTML+(isHidden?cfg.showLabel:cfg.hideLabel);
+  btn.classList.toggle('toggled',!isHidden);
+}
 
 /* ============================================================
    SIDEBAR TOGGLES
@@ -1362,7 +1680,7 @@ function initTableFocusMode(){
 }
 
 /* ============================================================
-   ENTER KEY NAVIGATION
+   ENTER KEY NAVIGATION — move down, never auto-add rows
 ============================================================ */
 function initEnterNav(){
   document.getElementById('tableBody').addEventListener('keydown',e=>{
@@ -1371,9 +1689,8 @@ function initEnterNav(){
     if(!el||!['INPUT','SELECT'].includes(el.tagName)) return;
     const td=el.closest('td'); if(!td) return;
     const tr=td.parentElement;
-    let nextTr=tr.nextElementSibling;
-    if(!nextTr){ e.preventDefault(); addRow(); const rows=document.querySelectorAll('#tableBody tr'); if(rows.length) nextTr=rows[rows.length-1]; }
-    if(!nextTr) return;
+    const nextTr=tr.nextElementSibling;
+    if(!nextTr) return; // at last row — do nothing, no new row added
     const idx=Array.from(tr.children).indexOf(td);
     const nextTd=nextTr.children[idx]; if(!nextTd) return;
     const nextEl=nextTd.querySelector('input,select');
@@ -1382,21 +1699,31 @@ function initEnterNav(){
 }
 
 /* ============================================================
-   SELECTION MOUSE EVENTS
+   SELECTION MOUSE EVENTS — with right-click context menu
 ============================================================ */
 function initSelectionMouseEvents(){
   const tb=document.getElementById('tableBody');
   tb.addEventListener('mousedown',e=>{
     if(!selectMode) return;
+    if(e.button===2) return; // let contextmenu handle right-click
     const td=e.target.closest('td'); if(!td) return;
     e.preventDefault(); isDragging=true; dragStart=getCellCoords(td);
-    clearCellSel(); td.classList.add('cell-selected'); selectedCells.add(td);
-    const sc=document.getElementById('selCount'); if(sc) sc.textContent=1;
+    clearCellSel(); td.classList.add('cell-selected'); selectedCells.add(td); updateSelectionInfoBar();
   });
   tb.addEventListener('mousemove',e=>{
     if(!selectMode||!isDragging) return;
     const td=e.target.closest('td'); if(!td) return;
     selectRange(dragStart,getCellCoords(td));
+  });
+  // Right-click context menu
+  tb.addEventListener('contextmenu',e=>{
+    if(!selectMode) return;
+    e.preventDefault();
+    const td=e.target.closest('td');
+    if(td&&!selectedCells.has(td)){
+      clearCellSel(); td.classList.add('cell-selected'); selectedCells.add(td); updateSelectionInfoBar();
+    }
+    showCtxMenu(e.clientX,e.clientY);
   });
   document.addEventListener('mouseup',()=>{ if(isDragging) isDragging=false; });
   document.addEventListener('keydown',e=>{
@@ -1404,84 +1731,384 @@ function initSelectionMouseEvents(){
     if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelCells();}
     if(e.ctrlKey&&e.key==='v'){e.preventDefault();pasteSelCells();}
     if(e.key==='Delete'){e.preventDefault();delSelCells();}
-    if(e.key==='Escape'){if(selectedCells.size>0)clearCellSel();else toggleSelectMode();}
+    if(e.key==='Escape'){
+      if(activeCtxMenu){closeCtxMenu();}
+      else if(selectedCells.size>0){clearCellSel();}
+      else{toggleSelectMode();}
+    }
   });
 }
 
 /* ============================================================
-   REPORT DATE → TABLE DATE SYNC
+   REPORT DATE → TABLE DATE SYNC  (matching vatable_sales)
 ============================================================ */
-function initReportDateSync(){
-  const rdInput=document.getElementById('reportDate');
-  if(!rdInput) return;
-  rdInput.addEventListener('change',function(){
-    const newDate=this.value; if(!newDate) return;
-    saveCompanyInfo();
-    if(confirm('Update all table dates to match the new report date ('+newDate+')?')){
-      document.querySelectorAll('#tableBody tr .date-input').forEach(di=>{ di.value=newDate; });
-      showToast('All dates updated to '+newDate,'success');
+function updateAllDatesFromReportDate(){
+  const reportDate=document.getElementById('reportDate').value;
+  if(!reportDate){showToast('No report date set.','warning');return;}
+  if(!validateDisplayDate(reportDate)){showToast('Invalid report date format.','warning');return;}
+  const dateInputs=document.querySelectorAll('#tableBody .date-input');
+  if(!dateInputs.length){showToast('No rows to update.','info');return;}
+  let updatedCount=0;
+  dateInputs.forEach(input=>{
+    if(input.value!==reportDate){
+      input.value=reportDate;
+      input.dispatchEvent(new Event('change',{bubbles:true}));
+      updatedCount++;
+      const cell=input.closest('td');
+      cell.classList.add('date-updated');
+      setTimeout(()=>cell.classList.remove('date-updated'),500);
     }
+  });
+  if(updatedCount>0){showToast(`Updated ${updatedCount} row(s) to ${reportDate}`,'success');scheduleStats();scheduleAutoSave();}
+  else showToast('All rows already have the current report date.','info');
+}
+function setupAutoDateUpdate(){
+  const rdInput=document.getElementById('reportDate'); if(!rdInput) return;
+  // Add "Apply to all rows" badge next to label
+  const rdGroup=rdInput.closest('.field-group');
+  if(rdGroup&&!document.querySelector('.report-date-badge')){
+    const badge=document.createElement('span');
+    badge.className='report-date-badge';
+    badge.innerHTML='<i class="fas fa-calendar-alt"></i> Apply to all rows';
+    badge.title='Update all row dates to this report date';
+    badge.onclick=()=>updateAllDatesFromReportDate();
+    rdGroup.querySelector('label')?.appendChild(badge);
+  }
+  let prev=rdInput.value;
+  rdInput.addEventListener('change',function(){
+    const newDate=this.value;
+    if(prev&&newDate&&newDate!==prev){
+      const cnt=document.querySelectorAll('#tableBody .date-input').length;
+      if(cnt>0&&confirm(`Update all ${cnt} rows to new report date (${newDate})?`)) updateAllDatesFromReportDate();
+    }
+    prev=newDate; saveCompanyInfo();
   });
 }
 
 /* ============================================================
    INIT
 ============================================================ */
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('reportDate').value=new Date().toISOString().split('T')[0];
+function initializeCapexTracker() {
+  // 1. Backend check
+  checkBackend();
+
+  // ── MONTHLY BRIDGE ──────────────────────────────────────────
+  const _capexCtxKey   = sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_KEY');
+  const _capexCtxYear  = sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_YEAR');
+  const _capexCtxMonth = sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_MONTH');
+  const _capexCtxRole  = sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_ROLE');
+  const _capexCtxLabel = sessionStorage.getItem('CAPEX_MONTHLY_CONTEXT_LABEL');
+  const MONTHLY_CTX = {
+    key: _capexCtxKey,
+    year: _capexCtxYear,
+    month: _capexCtxMonth,
+    label: _capexCtxLabel
+  };
+  const IS_MONTHLY = !!(_capexCtxKey && _capexCtxRole === APP_ROLE);
+
+  if (_capexCtxKey && _capexCtxRole === APP_ROLE) {
+    const banner = document.getElementById('monthlyBanner');
+    const bannerLabel = document.getElementById('monthlyBannerLabel');
+    const bannerKey   = document.getElementById('monthlyBannerKey');
+    if (banner) banner.classList.remove('hidden');
+    if (bannerLabel && _capexCtxLabel) bannerLabel.textContent = _capexCtxLabel;
+    if (bannerKey) bannerKey.textContent = `[${_capexCtxKey}]`;
+
+    const sub = document.getElementById('topbarSub');
+    if (sub) sub.textContent = `Monthly Record — ${_capexCtxLabel || _capexCtxKey}`;
+
+    const rdEl = document.getElementById('reportDate');
+    if (rdEl && !rdEl.value && _capexCtxYear && _capexCtxMonth) {
+      const mm = String(_capexCtxMonth).padStart(2, '0');
+      rdEl.value = `${mm}/01/${_capexCtxYear}`;
+    }
+
+    window.addEventListener('beforeunload', () => {
+      const blob = {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        tableData: getTableData(),
+        companyInfo: getCompanyDataRaw(),
+      };
+      localStorage.setItem(_capexCtxKey, JSON.stringify(blob));
+      localStorage.setItem(getActiveSessionKey(), JSON.stringify(blob));
+    });
+  }
+
+  // Topbar subtitle
+  const roleLabel = APP_ROLE === 'Client' ? 'Client' : APP_ROLE === 'SubAdmin' ? 'Sub-Admin' : 'Main';
+  const modeLabel = USE_API ? 'API Mode' : 'Local Mode';
+  const now = new Date();
+  const liveDateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  if (!IS_MONTHLY) {
+    const subEl = document.getElementById('topbarSub');
+    if (subEl) subEl.textContent = `CAPEX Tracker · ${roleLabel} · ${modeLabel} · ${liveDateStr}`;
+  }
+  
+  setInterval(() => {
+    if (!IS_MONTHLY) {
+      const n = new Date();
+      const ds = n.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+      const pill = document.getElementById('backendPill');
+      const mode = pill && pill.classList.contains('online') ? 'API Mode' : 'Local Mode';
+      const subEl = document.getElementById('topbarSub');
+      if (subEl) subEl.textContent = `CAPEX Tracker · ${roleLabel} · ${mode} · ${ds}`;
+    }
+  }, 60000);
+
+  // Update monthly context badge
+if (IS_MONTHLY) {
+  const ctxBadge = document.getElementById('monthlyContextBadge');
+  const ctxLabel = document.getElementById('monthlyContextLabel');
+  if (ctxBadge && ctxLabel) {
+    ctxBadge.classList.remove('hidden');
+    ctxLabel.textContent = MONTHLY_CTX.label || `${MONTHS[parseInt(_capexCtxMonth)-1]} ${_capexCtxYear}`;
+  }
+}
+
+  // Set report date default
+  const rdEl = document.getElementById('reportDate');
+  if (rdEl && !rdEl.value) {
+    if (IS_MONTHLY && _capexCtxYear && _capexCtxMonth) {
+      const m = String(_capexCtxMonth).padStart(2, '0');
+      rdEl.value = `${m}/01/${_capexCtxYear}`;
+    } else {
+      rdEl.value = getTodayDisplayDate();
+    }
+  }
+
+  // Core inits
   loadCompanyInfo();
   initColVisibility();
   initPagination();
-  addRow();
-  updateAllStats();
   initSidebarToggles();
   initVisibilityToggles();
   initEnterNav();
   initTableFocusMode();
   initSelectionMouseEvents();
-  initReportDateSync();
 
-  // Company info auto-save
-  ['companyName','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email']
-    .forEach(id=>{const el=document.getElementById(id);if(el) el.addEventListener('change',saveCompanyInfo);});
+  // Restore session or start fresh
+  let restored = false;
+  let loadedFromMonthly = false;
 
-  // Company TIN auto-format
-  const cTIN=document.getElementById('companyTIN');
-  if(cTIN){
-    cTIN.addEventListener('input',()=>formatCompanyTIN(cTIN));
-    cTIN.addEventListener('change',()=>{ formatCompanyTIN(cTIN); saveCompanyInfo(); });
+  if (_capexCtxKey && _capexCtxRole === APP_ROLE) {
+    const monthlyData = localStorage.getItem(_capexCtxKey);
+    if (monthlyData) {
+      try {
+        const data = JSON.parse(monthlyData);
+        if (data.tableData && Array.isArray(data.tableData)) {
+          if (data.companyInfo) {
+            const map = {
+              name: 'companyName', tin: 'companyTIN', address: 'companyAddress',
+              business: 'lineOfBusiness', telephone: 'telephone',
+              date: 'reportDate', employee: 'authorizedEmployee', email: 'email'
+            };
+            Object.keys(map).forEach(k => {
+              const el = document.getElementById(map[k]);
+              if (el && data.companyInfo[k] !== undefined) el.value = data.companyInfo[k];
+            });
+          }
+          
+          document.getElementById('tableBody').innerHTML = '';
+          data.tableData.forEach(rowData => addRow(rowData));
+          if (!data.tableData.length) addRow();
+          
+          currentPage = 1;
+          renderCurrentPage();
+          updateAllStats();
+          restored = data.tableData.length;
+          loadedFromMonthly = true;
+          showToast(`Loaded ${restored} row(s) from monthly record`, 'success');
+        }
+      } catch(e) {
+        console.error('Failed to load monthly data:', e);
+      }
+    }
   }
 
-  // Nav buttons
-  document.getElementById('addRowBtn').addEventListener('click',()=>addRow());
-  document.getElementById('addRowBtnHead').addEventListener('click',()=>addRow());
-  initLongPress(document.getElementById('addRowBtn'));
+  if (!loadedFromMonthly) {
+    restored = restoreSession();
+  }
 
-  document.getElementById('addBatchRowsBtn').addEventListener('click',()=>{
-    const n=parseInt(prompt('How many rows?','10'));
-    if(n>0&&n<=5000) addBatchRows(n);
-    else if(n>5000) showToast('Max 5000 rows at a time','warning');
+  if (restored === false || restored === null || restored === 0) {
+    document.getElementById('tableBody').innerHTML = '';
+    addRow();
+    currentPage = 1;
+    renderCurrentPage();
+    updateAllStats();
+    if (!loadedFromMonthly && restored !== false) {
+      showToast('Started new session', 'info');
+    }
+  } else if (!loadedFromMonthly) {
+    showToast(`Loaded ${restored} row(s) from session`, 'success');
+  }
+
+  // Report date field setup
+  if (rdEl) {
+    rdEl.addEventListener('input', function() { autoFormatReportDate(this); });
+    rdEl.addEventListener('blur', function() {
+      validateReportDate(this);
+      if (this.value && !validateDisplayDate(this.value)) {
+        showToast('Invalid date format. Use MM/DD/YYYY', 'warning');
+      } else {
+        saveCompanyInfo();
+        scheduleAutoSave();
+      }
+    });
+  }
+  
+  const datePickerBtn = document.getElementById('reportDatePickerBtn');
+  if (datePickerBtn) {
+    datePickerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (document.getElementById('dpPopup')) {
+        closeDatePicker();
+        return;
+      }
+      showDatePicker(this);
+    });
+  }
+  
+  setupAutoDateUpdate();
+
+  // Company info auto-save
+  ['companyName', 'companyAddress', 'lineOfBusiness', 'telephone', 'authorizedEmployee', 'email']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => { saveCompanyInfo(); scheduleAutoSave(); });
+        el.addEventListener('input', () => scheduleAutoSave());
+      }
+    });
+  
+  const cTIN = document.getElementById('companyTIN');
+  if (cTIN) {
+    cTIN.addEventListener('input', () => formatCompanyTIN(cTIN));
+    cTIN.addEventListener('change', () => { formatCompanyTIN(cTIN); saveCompanyInfo(); scheduleAutoSave(); });
+  }
+
+  // ATTACH ALL BUTTON LISTENERS (THIS IS THE CRITICAL FIX)
+  attachAllButtonListeners();
+
+  // Submit portal button (Client only)
+  if (APP_ROLE === 'Client') {
+    const submitBtn = document.getElementById('submitPortalHeadBtn');
+    if (submitBtn) submitBtn.classList.remove('hidden');
+  }
+}
+
+function attachAllButtonListeners() {
+  // Helper to safely attach listener
+  const safeAttach = (id, callback) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const newEl = el.cloneNode(true);
+      el.parentNode.replaceChild(newEl, el);
+      newEl.addEventListener('click', callback);
+    }
+  };
+  
+  safeAttach('addRowBtn', () => addRow());
+  safeAttach('addRowBtnHead', () => addRow());
+  safeAttach('addBatchRowsBtn', () => {
+    const n = parseInt(prompt('How many rows?', '10'));
+    if (n > 0 && n <= 5000) addBatchRows(n);
+    else if (n > 5000) showToast('Max 5000 rows at a time', 'warning');
   });
-
-  document.getElementById('exportBtn').addEventListener('click',exportToExcel);
-  document.getElementById('exportBtnHead').addEventListener('click',exportToExcel);
-  document.getElementById('saveDataBtn').addEventListener('click',saveDataToFile);
-  document.getElementById('loadDataBtn').addEventListener('click',loadDataFromFile);
-  document.getElementById('loadMultipleFilesBtn').addEventListener('click',loadMultipleFiles);
-
-  document.getElementById('clearBtn').addEventListener('click',()=>{
-    if(confirm('Clear all table data? Cannot be undone.')){
-      document.getElementById('tableBody').innerHTML='';
-      addRow(); currentPage=1; renderCurrentPage(); updateAllStats();
-      showToast('Table cleared','success');
+  safeAttach('exportBtn', exportToExcel);
+  safeAttach('exportBtnHead', exportToExcel);
+  safeAttach('saveDataBtn', saveDataToFile);
+  safeAttach('loadDataBtn', loadDataFromFile);
+  safeAttach('loadMultipleFilesBtn', loadMultipleFiles);
+  safeAttach('clearBtn', () => {
+    if (confirm('Clear all table data? Cannot be undone.')) {
+      document.getElementById('tableBody').innerHTML = '';
+      addRow();
+      currentPage = 1;
+      renderCurrentPage();
+      updateAllStats();
+      scheduleAutoSave();
+      showToast('Table cleared', 'success');
     }
   });
-  document.getElementById('clearInfoBtn').addEventListener('click',clearCompanyInfo);
-  document.getElementById('clearInfoBtnPanel').addEventListener('click',clearCompanyInfo);
-  document.getElementById('selectMultipleBtn').addEventListener('click',toggleSelectMode);
-  document.getElementById('clearAllSuppliersBtn').addEventListener('click',clearAllCAPEXSuppliers);
-  document.getElementById('entryCounterBtn').addEventListener('click',()=>addRow());
-});
+  safeAttach('clearInfoBtn', clearCompanyInfo);
+  safeAttach('clearInfoBtnPanel', clearCompanyInfo);
+  safeAttach('selectMultipleBtn', toggleSelectMode);
+  safeAttach('clearAllSuppliersBtn', clearAllCAPEXSuppliers);
+  safeAttach('entryCounterBtn', () => addRow());
+  
+  // Long press for add row button
+  const addRowBtn = document.getElementById('addRowBtn');
+  if (addRowBtn && !addRowBtn.dataset.longPressAttached) {
+    initLongPress(addRowBtn);
+    addRowBtn.dataset.longPressAttached = 'true';
+  }
+}
+
+// Run initialization
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeCapexTracker);
+} else {
+  initializeCapexTracker();
+}
 </script>
+<!-- ============================================================
+   UNDO / REDO
+============================================================ -->
+<script>
+(function(){
+  let undoStack=[],redoStack=[],isUndoingOrRedoing=false;
+  function captureSnapshot(){
+    const rows=document.querySelectorAll('#tableBody tr');
+    const tableData=Array.from(rows).map(row=>({
+      date:row.querySelector('.date-input')?.value||'',
+      invoiceNumber:row.querySelector('.invoice-number')?.value||'',
+      invoiceType:row.querySelector('.invoice-type')?.value||'',
+      paymentMode:row.querySelector('.payment-mode')?.value||'',
+      supplierName:row.querySelector('.supplier-name')?.value||'',
+      assetDescription:row.querySelector('.asset-description')?.value||'',
+      address:row.querySelector('.address')?.value||'',
+      tinNumber:row.querySelector('.tin-number')?.value||'',
+      nonVatGross:(row.querySelector('.non-vat-gross')?.dataset.raw||row.querySelector('.non-vat-gross')?.value||'').replace(/,/g,''),
+      vatableGross:(row.querySelector('.vatable-gross')?.dataset.raw||row.querySelector('.vatable-gross')?.value||'').replace(/,/g,''),
+      withholdingTax:(row.querySelector('.withholding-tax')?.dataset.raw||row.querySelector('.withholding-tax')?.value||'').replace(/,/g,''),
+      remarks:row.querySelector('.remarks')?.value||''
+    }));
+    const companyInfo={
+      companyName:document.getElementById('companyName')?.value||'',
+      companyTIN:document.getElementById('companyTIN')?.value||'',
+      companyAddress:document.getElementById('companyAddress')?.value||'',
+      lineOfBusiness:document.getElementById('lineOfBusiness')?.value||'',
+      telephone:document.getElementById('telephone')?.value||'',
+      reportDate:document.getElementById('reportDate')?.value||'',
+      authorizedEmployee:document.getElementById('authorizedEmployee')?.value||'',
+      email:document.getElementById('email')?.value||''
+    };
+    return{tableData,companyInfo};
+  }
+  function restoreSnapshot(snapshot){
+    if(!snapshot)return;
+    isUndoingOrRedoing=true;
+    const tbody=document.getElementById('tableBody');
+    if(tbody&&snapshot.tableData){tbody.innerHTML='';snapshot.tableData.forEach(rd=>tbody.appendChild(createRow(rd)));if(!snapshot.tableData.length)addRow();if(typeof currentPage!=='undefined')currentPage=1;if(typeof renderCurrentPage==='function')renderCurrentPage();if(typeof updateAllStats==='function')updateAllStats();}
+    if(snapshot.companyInfo){const map={companyName:'companyName',companyTIN:'companyTIN',companyAddress:'companyAddress',lineOfBusiness:'lineOfBusiness',telephone:'telephone',reportDate:'reportDate',authorizedEmployee:'authorizedEmployee',email:'email'};for(const[prop,id]of Object.entries(map)){const el=document.getElementById(id);if(el&&snapshot.companyInfo[prop]!==undefined)el.value=snapshot.companyInfo[prop];}if(typeof saveCompanyInfo==='function')saveCompanyInfo();}
+    if(typeof renderSuppliers==='function')renderSuppliers();
+    if(typeof updateAllStats==='function')updateAllStats();
+    if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+    setTimeout(()=>{isUndoingOrRedoing=false;},10);
+  }
+  function pushToUndoStack(){if(isUndoingOrRedoing)return;redoStack=[];while(undoStack.length>50)undoStack.shift();undoStack.push(captureSnapshot());updateUndoRedoButtons();}
+  function performUndo(){if(!undoStack.length){showToast('Nothing to undo','info');return;}const current=captureSnapshot();const previous=undoStack.pop();if(previous){redoStack.push(current);while(redoStack.length>50)redoStack.shift();restoreSnapshot(previous);showToast('Undo successful','success');updateUndoRedoButtons();}}
+  function performRedo(){if(!redoStack.length){showToast('Nothing to redo','info');return;}const current=captureSnapshot();const next=redoStack.pop();if(next){undoStack.push(current);while(undoStack.length>50)undoStack.shift();restoreSnapshot(next);showToast('Redo successful','success');updateUndoRedoButtons();}}
+  function updateUndoRedoButtons(){const u=document.getElementById('globalUndoBtn'),r=document.getElementById('globalRedoBtn');if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;}
+  let changeTimer=null;
+  function recordChange(){if(isUndoingOrRedoing)return;if(changeTimer)clearTimeout(changeTimer);changeTimer=setTimeout(()=>{pushToUndoStack();changeTimer=null;},150);}
+  function addUndoRedoButtonsToUI(){const actions=document.querySelector('.topbar-actions');if(!actions||document.getElementById('globalUndoBtn'))return;const undoBtn=document.createElement('button');undoBtn.id='globalUndoBtn';undoBtn.className='topbar-btn';undoBtn.innerHTML='<i class="fas fa-undo-alt"></i> Undo';undoBtn.title='Undo (Ctrl+Z)';undoBtn.addEventListener('click',performUndo);const redoBtn=document.createElement('button');redoBtn.id='globalRedoBtn';redoBtn.className='topbar-btn';redoBtn.innerHTML='<i class="fas fa-redo-alt"></i> Redo';redoBtn.title='Redo (Ctrl+Y)';redoBtn.addEventListener('click',performRedo);actions.insertBefore(undoBtn,actions.firstChild);actions.insertBefore(redoBtn,actions.firstChild);updateUndoRedoButtons();}
+  function setupListeners(){const tb=document.getElementById('tableBody');if(tb){tb.addEventListener('input',recordChange);tb.addEventListener('change',recordChange);}['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',recordChange);el.addEventListener('change',recordChange);}});document.body.addEventListener('click',e=>{if(e.target.closest('.delete-btn')&&!isUndoingOrRedoing)pushToUndoStack();});['clearBtn','loadDataBtn','loadMultipleFilesBtn','clearInfoBtn','clearAllSuppliersBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{if(!isUndoingOrRedoing)pushToUndoStack();});});const origAdd=window.addRow,origBatch=window.addBatchRows;if(origAdd)window.addRow=function(data){if(!isUndoingOrRedoing)pushToUndoStack();return origAdd(data);};if(origBatch)window.addBatchRows=function(count){if(!isUndoingOrRedoing)pushToUndoStack();return origBatch(count);};}
+  function init(){addUndoRedoButtonsToUI();setupListeners();window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();performUndo();}if((e.ctrlKey||e.metaKey)&&e.key==='y'){e.preventDefault();performRedo();}});if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',()=>setTimeout(pushToUndoStack,600));}else setTimeout(pushToUndoStack,600);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
 </body>
 </html>

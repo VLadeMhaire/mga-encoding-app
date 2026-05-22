@@ -15,8 +15,9 @@
   --gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;--gray-300:#D1D5DB;
   --gray-400:#9CA3AF;--gray-500:#6B7280;--gray-600:#4B5563;--gray-700:#374151;
   --gray-800:#1F2937;--gray-900:#111827;
-  --red-50:#FEF2F2;--red-500:#EF4444;--red-700:#B91C1C;
-  --green-500:#22C55E;--amber-500:#F59E0B;--purple-500:#8B5CF6;--teal-500:#14B8A6;
+  --red-50:#FEF2F2;--red-200:#FECACA;--red-500:#EF4444;--red-700:#B91C1C;
+  --green-50:#F0FDF4;--green-500:#22C55E;--green-700:#15803D;
+  --amber-500:#F59E0B;--purple-500:#8B5CF6;--teal-500:#14B8A6;
   --shadow-sm:0 1px 2px rgba(0,0,0,.06);
   --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
   --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
@@ -32,8 +33,6 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 ::-webkit-scrollbar-track{background:var(--gray-100)}
 ::-webkit-scrollbar-thumb{background:var(--blue-300);border-radius:99px}
 ::-webkit-scrollbar-thumb:hover{background:var(--blue-500)}
-
-/* TOP BAR */
 .topbar{height:var(--topbar-h);background:var(--blue-900);display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;box-shadow:var(--shadow-md);z-index:100}
 .topbar-logo{width:36px;height:36px;background:var(--blue-600);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0}
 .topbar-title{font-size:15px;font-weight:600;color:white;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -41,14 +40,20 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .topbar-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
 .topbar-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--blue-200);font-weight:500;cursor:default}
 .topbar-badge strong{color:white;font-size:14px}
-.topbar-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:6px 13px;font-size:12px;color:white;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
+.topbar-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:6px 13px;font-size:12px;color:white;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none}
 .topbar-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3)}
 .topbar-btn i{font-size:12px;opacity:.85}
-
-/* LAYOUT */
+.topbar-btn:disabled{opacity:.4;cursor:not-allowed}
+.backend-pill{display:flex;align-items:center;gap:5px;font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.15)}
+.backend-pill.online{background:rgba(34,197,94,.15);color:#86efac}
+.backend-pill.offline{background:rgba(239,68,68,.15);color:#fca5a5}
+.backend-pill.checking{background:rgba(251,191,36,.15);color:#fde68a}
+.bp-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.online .bp-dot{background:#22c55e;animation:bpulse 2s infinite}
+.offline .bp-dot{background:#ef4444}
+.checking .bp-dot{background:#fbbf24;animation:bpulse 1s infinite}
+@keyframes bpulse{0%,100%{opacity:1}50%{opacity:.3}}
 .layout{display:flex;flex:1;overflow:hidden}
-
-/* SIDEBAR */
 .sidebar{width:var(--sidebar-w);background:white;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;transition:width var(--transition),transform var(--transition);z-index:50}
 .sidebar.collapsed{width:0;overflow:hidden}
 .sidebar-brand{padding:14px 16px 12px;border-bottom:1px solid var(--gray-100);background:var(--blue-50)}
@@ -64,9 +69,11 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .nav-btn.active{background:var(--blue-50);color:var(--blue-800);font-weight:600}
 .nav-btn.danger:hover{background:var(--red-50);color:var(--red-700)}
 .nav-btn.toggled{color:var(--blue-700);background:var(--blue-50)}
+.autosave-indicator{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--gray-400);padding:4px 10px 0;opacity:0;transition:opacity 0.3s}
+.autosave-indicator.visible{opacity:1}
+.autosave-dot{width:6px;height:6px;border-radius:50%;background:var(--green-500);animation:pulse-dot 1s ease infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .sidebar-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400);line-height:1.7}
-
-/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .content-header{background:white;border-bottom:1px solid var(--gray-200);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow-sm)}
 .content-header h2{font-size:15px;font-weight:600;color:var(--blue-900)}
@@ -74,33 +81,45 @@ body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);di
 .header-actions{display:flex;gap:8px}
 .btn-primary{display:flex;align-items:center;gap:6px;background:var(--blue-600);color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
 .btn-primary:hover{background:var(--blue-700);box-shadow:var(--shadow)}
-.btn-secondary{display:flex;align-items:center;gap:6px;background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
+.btn-secondary{display:flex;align-items:center;gap:6px;background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none}
 .btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-300)}
-
-/* STATS BAR */
+.btn-submit{display:flex;align-items:center;gap:6px;background:var(--green-500);color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap;text-decoration:none}
+.btn-submit:hover{background:var(--green-700);box-shadow:var(--shadow)}
 .stats-bar{display:flex;gap:10px;padding:12px 20px;background:white;border-bottom:1px solid var(--gray-200);flex-shrink:0;overflow-x:auto}
 .stat-card{flex:1;min-width:120px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:8px;padding:10px 14px}
 .stat-card-label{font-size:11px;color:var(--blue-700);font-weight:500;white-space:nowrap;margin-bottom:4px}
 .stat-card-value{font-size:15px;font-weight:700;color:var(--blue-900);font-variant-numeric:tabular-nums}
 
-/* TABLE */
-.table-area{flex:1;overflow:auto;background:var(--gray-100)}
-table#taxesLicensesTable{width:100%;min-width:900px;border-collapse:collapse;font-size:12px;background:white}
+/* TABLE AREA with MGAALogo.jpg background watermark */
+.table-area{flex:1;overflow:auto;background:var(--gray-100);position:relative}
+.table-area::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background-image:url('MGAALogo.jpg');background-size:cover;background-repeat:no-repeat;background-position:center;opacity:0.07;pointer-events:none;z-index:0}
+
+/* ROW COLOR DISTINCTIONS */
+table#taxesLicensesTable{width:100%;min-width:900px;border-collapse:collapse;font-size:12px;background:white;position:relative;z-index:1}
 table#taxesLicensesTable thead{position:sticky;top:0;z-index:20}
 table#taxesLicensesTable thead th{background:var(--blue-900);color:var(--blue-100);font-size:11px;font-weight:600;padding:10px 10px;text-align:left;white-space:nowrap;border-right:1px solid var(--blue-800);letter-spacing:.3px;user-select:none}
 table#taxesLicensesTable thead th:last-child{border-right:none;text-align:center}
 table#taxesLicensesTable thead th.hidden-column{display:none}
 table#taxesLicensesTable tbody tr{border-bottom:1px solid var(--gray-100);background:white;transition:background .12s}
-table#taxesLicensesTable tbody tr:nth-child(even){background:var(--blue-50)}
-table#taxesLicensesTable tbody tr:nth-child(even):hover{background:#DBEAFE}
-table#taxesLicensesTable tbody tr:hover{background:var(--blue-100)}
+table#taxesLicensesTable tbody tr.row-cash{border-left:3px solid #22C55E;background:#F0FDF4}
+table#taxesLicensesTable tbody tr.row-cash:nth-child(even){background:#DCFCE7}
+table#taxesLicensesTable tbody tr.row-cash:hover{background:#BBF7D0!important}
+table#taxesLicensesTable tbody tr.row-charge{border-left:3px solid #3B82F6;background:#EFF6FF}
+table#taxesLicensesTable tbody tr.row-charge:nth-child(even){background:#DBEAFE}
+table#taxesLicensesTable tbody tr.row-charge:hover{background:#BFDBFE!important}
+table#taxesLicensesTable tbody tr.row-vat{border-left:3px solid var(--blue-500)}
+table#taxesLicensesTable tbody tr.row-it{border-left:3px solid var(--purple-500)}
+table#taxesLicensesTable tbody tr.row-dst{border-left:3px solid var(--amber-500)}
+table#taxesLicensesTable tbody tr.row-wt{border-left:3px solid var(--teal-500)}
+table#taxesLicensesTable tbody tr.row-license{border-left:3px solid var(--green-500)}
+table#taxesLicensesTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge){background:var(--blue-50)}
+table#taxesLicensesTable tbody tr:nth-child(even):not(.row-cash):not(.row-charge):hover{background:#DBEAFE}
+table#taxesLicensesTable tbody tr:not(.row-cash):not(.row-charge):hover{background:var(--blue-100)}
 table#taxesLicensesTable td{padding:0;height:42px;vertical-align:middle;border-right:1px solid var(--gray-100)}
 table#taxesLicensesTable td:last-child{border-right:none}
 table#taxesLicensesTable td.hidden-column{display:none}
-table#taxesLicensesTable td input,
-table#taxesLicensesTable td select{width:100%;height:100%;padding:6px 9px;border:none;background:transparent;font-family:var(--font);font-size:12px;color:var(--gray-800);min-height:42px}
-table#taxesLicensesTable td input:focus,
-table#taxesLicensesTable td select:focus{outline:none;background:white;box-shadow:inset 0 0 0 2px var(--blue-400);position:relative;z-index:1}
+table#taxesLicensesTable td input,table#taxesLicensesTable td select{width:100%;height:100%;padding:6px 9px;border:none;background:transparent;font-family:var(--font);font-size:12px;color:var(--gray-800);min-height:42px}
+table#taxesLicensesTable td input:focus,table#taxesLicensesTable td select:focus{outline:none;background:white;box-shadow:inset 0 0 0 2px var(--blue-400);position:relative;z-index:1}
 table#taxesLicensesTable td select{cursor:pointer}
 .delete-btn{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:13px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
 .delete-btn:hover{color:var(--red-500);background:var(--red-50)}
@@ -110,7 +129,15 @@ table#taxesLicensesTable tfoot td:last-child{border-right:none}
 table#taxesLicensesTable tfoot .sum-label{text-align:right;font-weight:700;font-size:11px;letter-spacing:.5px;color:var(--blue-300);text-transform:uppercase}
 table#taxesLicensesTable tfoot .sum-value{font-family:var(--font-mono);font-weight:700;font-size:13px;color:white;text-align:right}
 
-/* PAGINATION */
+/* Row legend */
+.row-legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 20px;background:white;border-bottom:1px solid var(--gray-100);flex-shrink:0;font-size:11px;color:var(--gray-500)}
+.row-legend-item{display:flex;align-items:center;gap:5px}
+.row-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.legend-cash{background:#22C55E}.legend-charge{background:#3B82F6}
+.legend-vat{background:var(--blue-500)}.legend-it{background:var(--purple-500)}
+.legend-dst{background:var(--amber-500)}.legend-wt{background:var(--teal-500)}
+.legend-lic{background:var(--green-500)}
+
 .pagination-bar{background:white;border-top:1px solid var(--gray-200);padding:9px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;flex-wrap:wrap}
 .pagination-info{font-size:12px;color:var(--gray-500);display:flex;align-items:center;gap:12px}
 .rows-select{border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:12px;background:white;color:var(--gray-700);cursor:pointer;font-family:var(--font)}
@@ -119,8 +146,6 @@ table#taxesLicensesTable tfoot .sum-value{font-family:var(--font-mono);font-weig
 .page-btn:hover:not(:disabled){background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
 .page-btn:disabled{opacity:.4;cursor:not-allowed}
 .page-indicator{font-size:12px;font-weight:600;color:var(--gray-700);padding:0 8px;display:flex;align-items:center}
-
-/* TALLY */
 .tally-section{background:var(--gray-50);border-top:1px solid var(--gray-200);padding:16px 20px;flex-shrink:0}
 .section-header{font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .section-header i{color:var(--blue-500)}
@@ -137,12 +162,8 @@ table#taxesLicensesTable tfoot .sum-value{font-family:var(--font-mono);font-weig
 .tally-card-label{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .tally-card-amount{font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:3px;font-variant-numeric:tabular-nums}
 .tally-card-sub{font-size:11px;color:var(--gray-400)}
-
-/* FOOTER */
 .footer{background:var(--blue-900);color:var(--blue-300);text-align:center;padding:10px 20px;font-size:11px;flex-shrink:0}
-
-/* RIGHT PANEL */
-.right-panel{width:var(--rightpanel-w);background:white;border-left:1px solid var(--gray-200);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;transition:width var(--transition);z-index:50}
+.right-panel{width:var(--rightpanel-w);background:white;border-left:1px solid var(--gray-200);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;transition:width var(--transition),transform var(--transition);z-index:50}
 .right-panel.collapsed{width:0;overflow:hidden}
 .right-panel-header{padding:14px 16px;border-bottom:1px solid var(--gray-100);background:var(--blue-50);font-size:12px;font-weight:700;color:var(--blue-800);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;flex-shrink:0}
 .right-panel-body{padding:16px;flex:1}
@@ -154,7 +175,37 @@ table#taxesLicensesTable tfoot .sum-value{font-family:var(--font-mono);font-weig
 #companyTIN{font-family:var(--font-mono);letter-spacing:.5px}
 .right-panel-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400)}
 
-/* COL VIS DROPDOWN */
+/* Report date badge */
+.report-date-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-100);color:var(--blue-800);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:500;margin-left:8px;cursor:pointer;transition:var(--transition)}
+.report-date-badge:hover{background:var(--blue-200)}
+.report-date-badge i{font-size:9px}
+#reportDate{font-family:var(--font-mono);letter-spacing:0.5px}
+.date-updated{animation:datePulse 0.5s ease}
+@keyframes datePulse{0%{background-color:transparent}50%{background-color:rgba(59,130,246,.2)}100%{background-color:transparent}}
+
+/* Date picker */
+.date-picker-overlay{position:fixed;inset:0;z-index:9000;background:transparent}
+.date-picker-popup{position:fixed;z-index:9001;background:white;border:1px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden;width:268px;animation:popIn .15s ease}
+@keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.dp-header{background:var(--blue-900);color:white;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.dp-month-year{font-size:14px;font-weight:700;flex:1;text-align:center;letter-spacing:.3px}
+.dp-nav-btn{background:rgba(255,255,255,.15);border:none;color:white;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.dp-nav-btn:hover{background:rgba(255,255,255,.3)}
+.dp-weekdays{display:grid;grid-template-columns:repeat(7,1fr);background:var(--blue-50);border-bottom:1px solid var(--gray-100)}
+.dp-weekdays span{text-align:center;padding:7px 0;font-size:10px;font-weight:700;color:var(--blue-700);text-transform:uppercase;letter-spacing:.5px}
+.dp-days{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 8px 10px;gap:2px}
+.dp-day{text-align:center;padding:7px 2px;font-size:12px;border-radius:6px;cursor:pointer;border:none;background:none;color:var(--gray-700);font-family:var(--font);transition:background .1s,color .1s;line-height:1}
+.dp-day:hover{background:var(--blue-100);color:var(--blue-800)}
+.dp-day.today{font-weight:700;color:var(--blue-600)}
+.dp-day.selected{background:var(--blue-600);color:white;font-weight:700}
+.dp-day.selected:hover{background:var(--blue-700)}
+.dp-day.other-month{color:var(--gray-300)}
+.dp-footer{border-top:1px solid var(--gray-100);padding:8px 10px;display:flex;gap:6px;justify-content:flex-end}
+.dp-footer button{font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:var(--font);border:1px solid var(--gray-200);background:white;color:var(--gray-600);transition:var(--transition)}
+.dp-footer button.dp-today-btn{background:var(--blue-600);color:white;border-color:var(--blue-600)}
+.dp-footer button.dp-today-btn:hover{background:var(--blue-700)}
+
+/* Column visibility */
 .col-vis-container{position:relative;display:inline-block}
 .col-vis-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:white;border:1px solid var(--gray-200);border-radius:10px;min-width:230px;z-index:1000;box-shadow:var(--shadow-lg);overflow:hidden;display:none}
 .col-vis-dropdown.open{display:block}
@@ -168,19 +219,35 @@ table#taxesLicensesTable tfoot .sum-value{font-family:var(--font-mono);font-weig
 .col-item input[type="checkbox"]{accent-color:var(--blue-600);cursor:pointer}
 .col-item label{font-size:13px;color:var(--gray-700);cursor:pointer;flex:1}
 
-/* SELECTION MODE */
+/* Selection */
 .select-mode td{cursor:crosshair!important;user-select:none!important}
 .select-mode input,.select-mode select,.select-mode button{pointer-events:none!important;opacity:.7}
 td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid var(--blue-500);outline-offset:-1.5px}
-.selection-toolbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;border:1px solid var(--gray-200);border-radius:40px;padding:7px 16px;display:flex;gap:8px;align-items:center;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease}
-@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-.sel-tb-info{font-size:12px;color:var(--gray-500);padding:0 8px;border-right:1px solid var(--gray-200);margin-right:4px}
-.sel-tb-btn{background:var(--gray-50);color:var(--gray-700);border:1px solid var(--gray-200);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--font);transition:var(--transition)}
-.sel-tb-btn:hover{background:var(--blue-50);border-color:var(--blue-300);color:var(--blue-700)}
-.sel-tb-btn.exit{background:var(--blue-600);color:white;border-color:var(--blue-600)}
-.sel-tb-btn.exit:hover{background:var(--blue-700)}
 
-/* TOAST */
+/* Right-click context menu */
+.ctx-menu{position:fixed;z-index:10100;background:white;border:1px solid var(--gray-200);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);min-width:200px;overflow:hidden;animation:ctxIn .12s ease}
+@keyframes ctxIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.ctx-menu-header{padding:8px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue-700);background:var(--blue-50);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:6px}
+.ctx-item{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:13px;color:var(--gray-700);cursor:pointer;transition:background .1s;border:none;background:none;width:100%;font-family:var(--font);text-align:left}
+.ctx-item i{width:16px;text-align:center;font-size:12px;color:var(--gray-400)}
+.ctx-item:hover{background:var(--blue-50);color:var(--blue-700)}
+.ctx-item:hover i{color:var(--blue-500)}
+.ctx-item.danger{color:var(--red-700)}
+.ctx-item.danger i{color:#f87171}
+.ctx-item.danger:hover{background:var(--red-50)}
+.ctx-item.exit-item{color:var(--blue-700);font-weight:600}
+.ctx-item.exit-item i{color:var(--blue-500)}
+.ctx-item.exit-item:hover{background:var(--blue-100)}
+.ctx-divider{height:1px;background:var(--gray-100);margin:3px 0}
+.ctx-count-badge{margin-left:auto;background:var(--blue-100);color:var(--blue-700);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+
+/* Selection info bar */
+.selection-info-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--blue-900);color:white;border-radius:20px;padding:7px 18px;font-size:12px;display:flex;align-items:center;gap:8px;z-index:10000;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;pointer-events:none}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.sel-info-dot{width:7px;height:7px;border-radius:50%;background:#60A5FA;animation:bpulse 1.5s infinite}
+.sel-info-hint{font-size:10px;color:var(--blue-300);margin-left:4px}
+
+/* Toast */
 .toast{position:fixed;bottom:20px;right:20px;background:white;border:1px solid var(--gray-200);border-left:4px solid var(--blue-500);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--gray-700);box-shadow:var(--shadow-lg);z-index:9999;max-width:360px;animation:toastIn .2s ease}
 @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 .toast.success{border-left-color:var(--green-500)}
@@ -189,16 +256,68 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 .toast.fade-out{opacity:0;transform:translateY(10px);transition:.25s}
 .long-press-toast{position:fixed;bottom:60px;right:20px;background:var(--blue-900);color:var(--blue-100);border-radius:8px;padding:8px 16px;font-size:12px;z-index:9999;box-shadow:var(--shadow-lg)}
 
-/* HIDDEN */
+/* Saving overlay */
+.saving-overlay{position:fixed;top:70px;right:20px;background:var(--blue-900);color:white;border-radius:8px;padding:8px 16px;font-size:12px;z-index:9998;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);transition:opacity .3s}
+.saving-overlay.hidden{opacity:0;pointer-events:none}
+.saving-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Big notification box */
+.notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:11000;animation:notifFadeIn .2s ease}
+@keyframes notifFadeIn{from{opacity:0}to{opacity:1}}
+.notif-box{background:white;border-radius:16px;padding:0;max-width:480px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,.22);overflow:hidden;animation:notifSlideIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes notifSlideIn{from{transform:scale(.85) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.notif-box-header{padding:20px 24px 16px;display:flex;align-items:center;gap:14px}
+.notif-box-header.success{background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border-bottom:2px solid #6EE7B7}
+.notif-box-header.warning{background:linear-gradient(135deg,#FFF7ED,#FED7AA);border-bottom:2px solid #FDBA74}
+.notif-box-header.error{background:linear-gradient(135deg,#FEF2F2,#FECACA);border-bottom:2px solid #FCA5A5}
+.notif-icon-wrap{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px}
+.notif-box-header.success .notif-icon-wrap{background:#D1FAE5;color:#059669}
+.notif-box-header.warning .notif-icon-wrap{background:#FED7AA;color:#D97706}
+.notif-box-header.error .notif-icon-wrap{background:#FECACA;color:#DC2626}
+.notif-title{font-size:17px;font-weight:800;color:var(--gray-900);margin-bottom:3px}
+.notif-box-header.success .notif-title{color:#065F46}
+.notif-box-header.warning .notif-title{color:#92400E}
+.notif-box-header.error .notif-title{color:#7F1D1D}
+.notif-subtitle{font-size:12px;font-weight:500;opacity:.75}
+.notif-body{padding:18px 24px 22px}
+.notif-detail-row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px}
+.notif-detail-row.success-row{background:var(--green-50);border:1px solid #BBF7D0}
+.notif-detail-row.warning-row{background:#FFF7ED;border:1px solid #FED7AA}
+.notif-detail-row.error-row{background:var(--red-50);border:1px solid #FECACA}
+.notif-detail-icon{font-size:16px;margin-top:1px;flex-shrink:0}
+.notif-detail-row.success-row .notif-detail-icon{color:#059669}
+.notif-detail-row.warning-row .notif-detail-icon{color:#D97706}
+.notif-detail-row.error-row .notif-detail-icon{color:#DC2626}
+.notif-detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:2px}
+.notif-detail-value{font-size:14px;font-weight:700;color:var(--gray-900);font-family:var(--font-mono)}
+.notif-message{font-size:13px;color:var(--gray-600);line-height:1.6;margin-top:10px}
+.notif-footer{padding:0 24px 20px;display:flex;justify-content:flex-end}
+.notif-close-btn{background:var(--blue-600);color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:var(--transition);display:flex;align-items:center;gap:8px}
+.notif-close-btn:hover{background:var(--blue-700);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+
+/* Submit modal */
+.submit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10002}
+.submit-modal{background:white;border-radius:14px;padding:28px;max-width:440px;width:92%;box-shadow:0 20px 40px rgba(0,0,0,.15)}
+.submit-modal-title{font-size:16px;font-weight:700;color:var(--blue-900);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.submit-modal-title i{color:var(--green-500)}
+.submit-modal-sub{font-size:12px;color:var(--gray-500);margin-bottom:20px}
+.submit-modal-file{background:var(--green-50);border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.submit-modal-file i{color:var(--green-500);font-size:1.4rem}
+.submit-modal-file-name{font-size:13px;font-weight:600;color:var(--gray-800)}
+.submit-modal-file-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
+.submit-modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel-submit{background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--font);transition:var(--transition)}
+.btn-cancel-submit:hover{background:var(--gray-50)}
+.btn-confirm-submit{background:var(--green-500);color:white;border:none;border-radius:7px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:var(--transition);display:flex;align-items:center;gap:6px}
+.btn-confirm-submit:hover{background:var(--green-700)}
+
 .hidden{display:none!important}
 .stats-bar.hidden,.tally-section.hidden,.footer.hidden{display:none!important}
-.page-hidden{display:none!important}
-
-/* PULSE */
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 .pulse{animation:pulse .25s ease}
-
 @media(max-width:900px){
+  :root{--sidebar-w:0px;--rightpanel-w:0px}
   .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;width:240px;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   .sidebar.mobile-open{transform:translateX(0);width:240px}
   .right-panel{position:fixed;right:0;top:var(--topbar-h);bottom:0;width:260px;transform:translateX(100%);box-shadow:var(--shadow-lg)}
@@ -209,14 +328,14 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
   <div class="topbar-logo"><i class="fas fa-file-invoice-dollar"></i></div>
   <div>
     <div class="topbar-title">Taxes &amp; Licenses Data Tracker</div>
-    <span class="topbar-sub">Professional Tax &amp; Government License Payment Tracking System</span>
+    <span class="topbar-sub" id="topbarSub">Professional Tax &amp; Government License Payment Tracking</span>
   </div>
   <div class="topbar-actions">
+    <div class="backend-pill checking" id="backendPill"><div class="bp-dot"></div><span id="backendPillText">Connecting…</span></div>
     <div class="col-vis-container">
       <button class="topbar-btn" id="colVisBtn"><i class="fas fa-columns"></i> Columns</button>
       <div class="col-vis-dropdown" id="colVisDropdown">
@@ -236,10 +355,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   </div>
 </div>
 
-<!-- LAYOUT -->
 <div class="layout">
 
-<!-- LEFT SIDEBAR -->
 <div class="sidebar" id="leftSidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-label">Taxes &amp; Licenses Menu</div>
@@ -247,7 +364,8 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   </div>
   <div class="sidebar-nav">
     <a href="index2.html" class="nav-btn"><i class="fas fa-home"></i>Dashboard</a>
-    <div class="nav-divider"></div>
+    <div class="nav-section">Session</div>
+    <div class="autosave-indicator" id="autosaveIndicator"><span class="autosave-dot"></span> Autosaving…</div>
     <div class="nav-section">Data Management</div>
     <button class="nav-btn" id="selectMultipleBtn"><i class="fas fa-check-double"></i>Select Multiple</button>
     <button class="nav-btn" id="addRowBtn"><i class="fas fa-plus-circle"></i>Add New Row</button>
@@ -260,9 +378,9 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <button class="nav-btn danger" id="clearBtn"><i class="fas fa-trash-alt"></i>Clear Table Data</button>
     <button class="nav-btn danger" id="clearInfoBtn"><i class="fas fa-eraser"></i>Clear Company Info</button>
     <div class="nav-section">Visibility</div>
-    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Hide Stats Bar</button>
-    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Hide Tally</button>
-    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Hide Footer</button>
+    <button class="nav-btn toggle-btn" id="toggleStatsBtn"><i class="fas fa-chart-bar"></i>Show Stats Bar</button>
+    <button class="nav-btn toggle-btn" id="toggleTallyBtn"><i class="fas fa-calculator"></i>Show Tally</button>
+    <button class="nav-btn toggle-btn" id="toggleFooterBtn"><i class="fas fa-copyright"></i>Show Footer</button>
     <div class="nav-divider"></div>
     <button class="nav-btn" id="hideAllBtn"><i class="fas fa-eye-slash"></i>Hide All Sections</button>
     <button class="nav-btn" id="showAllBtn"><i class="fas fa-eye"></i>Show All Sections</button>
@@ -276,8 +394,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   </div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<div class="main" id="mainArea">
 
   <div class="content-header">
     <div>
@@ -285,32 +402,33 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>VAT · Income Tax · Documentary Stamp Tax · Withholding Tax · Government License Fees</p>
     </div>
     <div class="header-actions">
+      <a href="../index.html" class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit to Portal</a>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
   </div>
 
-  <!-- Stats Bar -->
-  <div class="stats-bar" id="statsSection">
-    <div class="stat-card">
-      <div class="stat-card-label"><i class="fas fa-percent" style="margin-right:4px;color:var(--blue-400)"></i>VAT Payments</div>
-      <div class="stat-card-value">₱ <span id="totalVAT">0.00</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-label"><i class="fas fa-landmark" style="margin-right:4px;color:var(--blue-400)"></i>Income Tax</div>
-      <div class="stat-card-value">₱ <span id="totalIT">0.00</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-label"><i class="fas fa-id-card" style="margin-right:4px;color:var(--blue-400)"></i>License Fees</div>
-      <div class="stat-card-value">₱ <span id="totalLicenses">0.00</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-label"><i class="fas fa-coins" style="margin-right:4px;color:var(--blue-400)"></i>Total Amount</div>
-      <div class="stat-card-value">₱ <span id="totalAmount">0.00</span></div>
-    </div>
+  <!-- Stats Bar — hidden by default (req #9) -->
+  <div class="stats-bar hidden" id="statsSection">
+    <div class="stat-card"><div class="stat-card-label"><i class="fas fa-percent" style="margin-right:4px;color:var(--blue-400)"></i>VAT Payments</div><div class="stat-card-value">₱ <span id="totalVAT">0.00</span></div></div>
+    <div class="stat-card"><div class="stat-card-label"><i class="fas fa-landmark" style="margin-right:4px;color:var(--blue-400)"></i>Income Tax</div><div class="stat-card-value">₱ <span id="totalIT">0.00</span></div></div>
+    <div class="stat-card"><div class="stat-card-label"><i class="fas fa-id-card" style="margin-right:4px;color:var(--blue-400)"></i>License Fees</div><div class="stat-card-value">₱ <span id="totalLicenses">0.00</span></div></div>
+    <div class="stat-card"><div class="stat-card-label"><i class="fas fa-coins" style="margin-right:4px;color:var(--blue-400)"></i>Total Amount</div><div class="stat-card-value">₱ <span id="totalAmount">0.00</span></div></div>
   </div>
 
-  <!-- Table -->
+  <!-- Row color legend -->
+  <div class="row-legend">
+    <span style="font-weight:600;color:var(--gray-600)">Row Colors:</span>
+    <div class="row-legend-item"><div class="row-legend-dot legend-cash"></div>Cash</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-charge"></div>Charge</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-vat"></div>VAT</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-it"></div>Income Tax</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-dst"></div>DST</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-wt"></div>W/Tax</div>
+    <div class="row-legend-item"><div class="row-legend-dot legend-lic"></div>License</div>
+    <span style="font-style:italic;font-size:10px">(Right-click in selection mode)</span>
+  </div>
+
   <div class="table-area">
     <table id="taxesLicensesTable">
       <thead>
@@ -330,7 +448,6 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </table>
   </div>
 
-  <!-- Pagination -->
   <div class="pagination-bar">
     <div class="pagination-info">
       <span>Showing <strong><span id="startEntry">0</span>–<span id="endEntry">0</span></strong> of <strong><span id="totalEntries">0</span></strong></span>
@@ -351,60 +468,26 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
   </div>
 
-  <!-- Tally -->
-  <div class="tally-section" id="tallySection">
+  <!-- Tally — hidden by default (req #9) -->
+  <div class="tally-section hidden" id="tallySection">
     <div class="section-header"><i class="fas fa-chart-pie"></i>Tax Category Tally</div>
     <div class="tally-grid">
-      <div class="tally-card vat-card">
-        <div class="tally-card-label"><i class="fas fa-percent" style="color:var(--blue-500)"></i>VAT</div>
-        <div class="tally-card-amount">₱ <span id="tallyVAT">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyVATCount">0 transactions</span></div>
-      </div>
-      <div class="tally-card it-card">
-        <div class="tally-card-label"><i class="fas fa-landmark" style="color:var(--purple-500)"></i>Income Tax</div>
-        <div class="tally-card-amount">₱ <span id="tallyIT">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyITCount">0 transactions</span></div>
-      </div>
-      <div class="tally-card dst-card">
-        <div class="tally-card-label"><i class="fas fa-file-contract" style="color:var(--amber-500)"></i>DST</div>
-        <div class="tally-card-amount">₱ <span id="tallyDST">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyDSTCount">0 transactions</span></div>
-      </div>
-      <div class="tally-card wt-card">
-        <div class="tally-card-label"><i class="fas fa-hand-holding-usd" style="color:var(--teal-500)"></i>W/Tax</div>
-        <div class="tally-card-amount">₱ <span id="tallyWT">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyWTCount">0 transactions</span></div>
-      </div>
-      <div class="tally-card lic-card">
-        <div class="tally-card-label"><i class="fas fa-id-card" style="color:var(--green-500)"></i>Licenses</div>
-        <div class="tally-card-amount">₱ <span id="tallyLic">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyLicCount">0 transactions</span></div>
-      </div>
-      <div class="tally-card cash-card">
-        <div class="tally-card-label"><i class="fas fa-money-bill-wave" style="color:var(--green-500)"></i>Cash</div>
-        <div class="tally-card-amount">₱ <span id="tallyCash">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyCashCount">0 transactions</span></div>
-      </div>
-      <div class="tally-card charge-card">
-        <div class="tally-card-label"><i class="fas fa-credit-card" style="color:var(--blue-600)"></i>Charge</div>
-        <div class="tally-card-amount">₱ <span id="tallyCharge">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyChargeCount">0 transactions</span></div>
-      </div>
-      <div class="tally-card total-card">
-        <div class="tally-card-label" style="color:var(--blue-700)"><i class="fas fa-sigma" style="color:var(--blue-600)"></i>Grand Total</div>
-        <div class="tally-card-amount">₱ <span id="tallyTotal">0.00</span></div>
-        <div class="tally-card-sub"><span id="tallyTotalCount">0 total transactions</span></div>
-      </div>
+      <div class="tally-card vat-card"><div class="tally-card-label"><i class="fas fa-percent" style="color:var(--blue-500)"></i>VAT</div><div class="tally-card-amount">₱ <span id="tallyVAT">0.00</span></div><div class="tally-card-sub"><span id="tallyVATCount">0 transactions</span></div></div>
+      <div class="tally-card it-card"><div class="tally-card-label"><i class="fas fa-landmark" style="color:var(--purple-500)"></i>Income Tax</div><div class="tally-card-amount">₱ <span id="tallyIT">0.00</span></div><div class="tally-card-sub"><span id="tallyITCount">0 transactions</span></div></div>
+      <div class="tally-card dst-card"><div class="tally-card-label"><i class="fas fa-file-contract" style="color:var(--amber-500)"></i>DST</div><div class="tally-card-amount">₱ <span id="tallyDST">0.00</span></div><div class="tally-card-sub"><span id="tallyDSTCount">0 transactions</span></div></div>
+      <div class="tally-card wt-card"><div class="tally-card-label"><i class="fas fa-hand-holding-usd" style="color:var(--teal-500)"></i>W/Tax</div><div class="tally-card-amount">₱ <span id="tallyWT">0.00</span></div><div class="tally-card-sub"><span id="tallyWTCount">0 transactions</span></div></div>
+      <div class="tally-card lic-card"><div class="tally-card-label"><i class="fas fa-id-card" style="color:var(--green-500)"></i>Licenses</div><div class="tally-card-amount">₱ <span id="tallyLic">0.00</span></div><div class="tally-card-sub"><span id="tallyLicCount">0 transactions</span></div></div>
+      <div class="tally-card cash-card"><div class="tally-card-label"><i class="fas fa-money-bill-wave" style="color:var(--green-500)"></i>Cash</div><div class="tally-card-amount">₱ <span id="tallyCash">0.00</span></div><div class="tally-card-sub"><span id="tallyCashCount">0 transactions</span></div></div>
+      <div class="tally-card charge-card"><div class="tally-card-label"><i class="fas fa-credit-card" style="color:var(--blue-600)"></i>Charge</div><div class="tally-card-amount">₱ <span id="tallyCharge">0.00</span></div><div class="tally-card-sub"><span id="tallyChargeCount">0 transactions</span></div></div>
+      <div class="tally-card total-card"><div class="tally-card-label" style="color:var(--blue-700)"><i class="fas fa-sigma" style="color:var(--blue-600)"></i>Grand Total</div><div class="tally-card-amount">₱ <span id="tallyTotal">0.00</span></div><div class="tally-card-sub"><span id="tallyTotalCount">0 total transactions</span></div></div>
     </div>
   </div>
 
-  <div class="footer" id="footerEl">
-    © 2026 Taxes &amp; Licenses Data Tracker &nbsp;·&nbsp; Professional Tax and Government License Payment Tracking System
-  </div>
+  <!-- Footer — hidden by default (req #9) -->
+  <div class="footer hidden" id="footerEl">© 2026 Taxes &amp; Licenses Data Tracker &nbsp;·&nbsp; Professional Tax and Government License Payment Tracking System</div>
 
 </div><!-- /main -->
 
-<!-- RIGHT PANEL -->
 <div class="right-panel" id="rightPanel">
   <div class="right-panel-header"><i class="fas fa-building" style="color:var(--blue-600)"></i>Company Information</div>
   <div class="right-panel-body">
@@ -414,662 +497,697 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <div class="field-group"><label>Line of Business <span class="req">*</span></label><input type="text" id="lineOfBusiness" placeholder="Line of business"></div>
     <div class="field-group"><label>Telephone</label><input type="tel" id="telephone" placeholder="Telephone number"></div>
     <div class="field-group">
-      <label>Report Date</label>
-      <input type="date" id="reportDate">
+      <label>Report Date <span class="report-date-badge" id="applyDateBadge" title="Apply to all table rows"><i class="fas fa-calendar-check"></i> Apply to all rows</span></label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex:1" autocomplete="off">
+        <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding:7px 12px;width:auto;flex-shrink:0"><i class="fas fa-calendar-alt"></i></button>
+      </div>
+      <small style="font-size:9px;color:var(--gray-400);margin-top:2px;display:block">Format: MM/DD/YYYY · slashes auto-inserted</small>
     </div>
     <div class="field-group"><label>Authorized Employee <span class="req">*</span></label><input type="text" id="authorizedEmployee" placeholder="Employee name"></div>
     <div class="field-group"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
-    <button class="btn-secondary" id="clearInfoBtnPanel" style="width:100%;justify-content:center;margin-top:4px">
-      <i class="fas fa-eraser"></i> Clear Company Info
-    </button>
+    <button class="btn-secondary" id="clearInfoBtnPanel" style="width:100%;justify-content:center;margin-top:4px"><i class="fas fa-eraser"></i> Clear Company Info</button>
   </div>
   <div class="right-panel-footer">Required fields marked with <span style="color:var(--blue-500)">*</span></div>
 </div>
 
 </div><!-- /layout -->
 
+<div class="saving-overlay hidden" id="savingOverlay">
+  <div class="saving-spinner"></div>
+  <span id="savingOverlayText">Saving…</span>
+</div>
+
+<!-- Submit modal (Client only) -->
+<div class="submit-modal-overlay hidden" id="submitModalOverlay">
+  <div class="submit-modal">
+    <div class="submit-modal-title"><i class="fas fa-paper-plane"></i>Submit to Portal</div>
+    <div class="submit-modal-sub">This will save your current data as a .taxes file and redirect you to the portal's submit page.</div>
+    <div class="submit-modal-file"><i class="fas fa-file-code"></i><div><div class="submit-modal-file-name" id="submitModalFileName">TAXES_Data.taxes</div><div class="submit-modal-file-meta" id="submitModalFileMeta">Ready to submit</div></div></div>
+    <div class="submit-modal-actions">
+      <button class="btn-cancel-submit" id="submitModalCancelBtn">Cancel</button>
+      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-check"></i> Save &amp; Go to Portal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Big Notification Box (req #4) -->
+<div class="notif-overlay hidden" id="notifOverlay">
+  <div class="notif-box">
+    <div class="notif-box-header" id="notifHeader">
+      <div class="notif-icon-wrap" id="notifIconWrap"><i id="notifIcon" class="fas fa-check"></i></div>
+      <div><div class="notif-title" id="notifTitle">Notification</div><div class="notif-subtitle" id="notifSubtitle"></div></div>
+    </div>
+    <div class="notif-body">
+      <div class="notif-detail-row" id="notifDetailRow1" style="display:none">
+        <i class="notif-detail-icon fas fa-building" id="notifD1Icon"></i>
+        <div><div class="notif-detail-label" id="notifD1Label">Detail</div><div class="notif-detail-value" id="notifD1Value"></div></div>
+      </div>
+      <div class="notif-detail-row" id="notifDetailRow2" style="display:none">
+        <i class="notif-detail-icon fas fa-hashtag" id="notifD2Icon"></i>
+        <div><div class="notif-detail-label" id="notifD2Label">Detail</div><div class="notif-detail-value" id="notifD2Value"></div></div>
+      </div>
+      <p class="notif-message" id="notifMessage"></p>
+    </div>
+    <div class="notif-footer"><button class="notif-close-btn" id="notifCloseBtn"><i class="fas fa-check"></i> Got it</button></div>
+  </div>
+</div>
+
 <script>
+'use strict';
 /* ============================================================
-   NOTE: Taxes & Licenses does NOT have a supplier TIN column —
-   entries track government agencies, not suppliers.
-   No TIN suggestion dropdown or supplier DB is needed.
+   BACKEND CONFIG — Tauri / FastAPI / SQLite
 ============================================================ */
+const API_BASE=(()=>{
+  if(window.TAXES_API_BASE)return window.TAXES_API_BASE;
+  if(window.__TAURI__)return'http://localhost:9999/api';
+  return(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')
+    ?`${window.location.protocol}//${window.location.hostname}:9999/api`:'/api';
+})();
+let USE_API=false,authToken=null;
+async function checkBackend(){
+  const pill=document.getElementById('backendPill'),text=document.getElementById('backendPillText');
+  try{const r=await fetch(`${API_BASE}/health`,{signal:AbortSignal.timeout(3000)});if(r.ok){USE_API=true;pill.className='backend-pill online';text.textContent='API Online';const s=sessionStorage.getItem('TAXES_SESSION');if(s){try{authToken=JSON.parse(s).token||null;}catch(e){}}return;}}catch(_){}
+  USE_API=false;pill.className='backend-pill offline';text.textContent='Local Mode';
+}
+function apiHeaders(){const h={'Content-Type':'application/json'};if(authToken)h['Authorization']=`Bearer ${authToken}`;return h;}
+
+/* ============================================================
+   ROLE-BASED STORAGE NAMESPACING  (req #1)
+   Client path  → Client keys only
+   Sub-Admin path → SubAdmin keys only
+============================================================ */
+const APP_ROLE=(function(){
+  const p=window.location.pathname;
+  if(p.includes('/Client/'))return'Client';
+  if(p.includes('/Sub-Admin/'))return'SubAdmin';
+  return'Main';
+})();
+const STORAGE_NS={
+  Client:  {SESSION:'TAXES_SESSION_TABLE_Client',  COMPANY:'taxesCompanyInfo_Client',  COL_VIS:'taxesColVis_Client',  VIS:'taxesVisStates_Client'},
+  SubAdmin:{SESSION:'TAXES_SESSION_TABLE_SubAdmin',COMPANY:'taxesCompanyInfo_SubAdmin',COL_VIS:'taxesColVis_SubAdmin',VIS:'taxesVisStates_SubAdmin'},
+  Main:    {SESSION:'TAXES_SESSION_TABLE_Main',    COMPANY:'taxesCompanyInfo_Main',    COL_VIS:'taxesColVis_Main',    VIS:'taxesVisStates_Main'},
+};
+const NS=STORAGE_NS[APP_ROLE];
+
+/* ============================================================
+   FastAPI / SQLite LAYER
+============================================================ */
+function getApiId(){return`TAXES_${APP_ROLE}_general`;}
+async function apiSaveSession(tableData,companyInfo){
+  const payload={record_id:getApiId(),role:APP_ROLE,type:'taxes-licenses',table_data:tableData,company_info:companyInfo,saved_at:new Date().toISOString()};
+  localStorage.setItem(NS.SESSION,JSON.stringify({version:'1.0',timestamp:payload.saved_at,tableData,companyInfo}));
+  localStorage.setItem(NS.COMPANY,JSON.stringify(companyInfo));
+  if(USE_API){try{await fetch(`${API_BASE}/taxes-records`,{method:'POST',headers:apiHeaders(),body:JSON.stringify(payload)});}catch(_){}}
+}
+async function apiLoadSession(){
+  if(USE_API){try{const r=await fetch(`${API_BASE}/taxes-records/${getApiId()}`,{headers:apiHeaders()});if(r.ok){const d=await r.json();if(d.table_data){localStorage.setItem(NS.SESSION,JSON.stringify({version:'1.0',timestamp:d.saved_at,tableData:d.table_data,companyInfo:d.company_info||{}}));if(d.company_info)localStorage.setItem(NS.COMPANY,JSON.stringify(d.company_info));}return{tableData:d.table_data||[],companyInfo:d.company_info||{}};}}catch(_){}}
+  const raw=localStorage.getItem(NS.SESSION);if(!raw)return null;
+  try{const d=JSON.parse(raw);return{tableData:d.tableData||[],companyInfo:d.companyInfo||{}};}catch(e){return null;}
+}
 
 /* ============================================================
    UTILITY
 ============================================================ */
-function escH(t){ const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
-function showToast(msg,type='info'){
-  document.querySelectorAll('.toast').forEach(t=>t.remove());
-  const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>{ t.classList.add('fade-out'); setTimeout(()=>t.remove(),300); },2800);
+function escH(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
+function showToast(msg,type='info'){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.classList.add('fade-out');setTimeout(()=>t.remove(),300);},2800);}
+function showLPToast(msg){let t=document.querySelector('.long-press-toast');if(!t){t=document.createElement('div');t.className='long-press-toast';document.body.appendChild(t);}t.textContent=msg;}
+function hideLPToast(){const t=document.querySelector('.long-press-toast');if(t)t.remove();}
+function showSaving(msg='Saving…'){document.getElementById('savingOverlayText').textContent=msg;document.getElementById('savingOverlay').classList.remove('hidden');}
+function hideSaving(){document.getElementById('savingOverlay').classList.add('hidden');}
+
+/* ============================================================
+   BIG NOTIFICATION BOX  (req #4)
+============================================================ */
+function showNotification(type,title,subtitle,details,message){
+  const ov=document.getElementById('notifOverlay'),hd=document.getElementById('notifHeader'),
+    iw=document.getElementById('notifIconWrap'),ic=document.getElementById('notifIcon'),
+    ti=document.getElementById('notifTitle'),su=document.getElementById('notifSubtitle'),
+    mg=document.getElementById('notifMessage'),r1=document.getElementById('notifDetailRow1'),
+    r2=document.getElementById('notifDetailRow2'),d1v=document.getElementById('notifD1Value'),
+    d2v=document.getElementById('notifD2Value'),d1l=document.getElementById('notifD1Label'),
+    d2l=document.getElementById('notifD2Label');
+  hd.className='notif-box-header '+type;
+  const icons={success:'fa-check-circle',warning:'fa-exclamation-triangle',error:'fa-times-circle'};
+  ic.className='fas '+(icons[type]||'fa-info-circle');
+  ti.textContent=title;su.textContent=subtitle||'';mg.textContent=message||'';
+  const rc=type+'-row';r1.className='notif-detail-row '+rc;r2.className='notif-detail-row '+rc;
+  if(details&&details.label1!==undefined){d1l.textContent=details.label1;d1v.textContent=details.val1||'—';r1.style.display='flex';}else r1.style.display='none';
+  if(details&&details.label2!==undefined){d2l.textContent=details.label2;d2v.textContent=details.val2||'—';r2.style.display='flex';}else r2.style.display='none';
+  ov.classList.remove('hidden');
 }
-function showLPToast(msg){ let t=document.querySelector('.long-press-toast'); if(!t){t=document.createElement('div');t.className='long-press-toast';document.body.appendChild(t);} t.textContent=msg; }
-function hideLPToast(){ const t=document.querySelector('.long-press-toast'); if(t) t.remove(); }
-function formatCompanyTIN(input){ let v=input.value.replace(/\D/g,''); if(v.length>12)v=v.slice(0,12); const parts=[v.slice(0,3),v.slice(3,6),v.slice(6,9),v.slice(9,12)].filter(p=>p!==''); input.value=parts.join('-'); }
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('notifCloseBtn').addEventListener('click',()=>document.getElementById('notifOverlay').classList.add('hidden'));
+  document.getElementById('notifOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
+});
+
+/* ============================================================
+   CURRENCY FORMATTING — auto comma 1,000.00  (req #6)
+============================================================ */
+function formatCurrency(value){if(value===null||value===undefined||value==='')return'0.00';const num=parseFloat(String(value).replace(/,/g,''));if(isNaN(num))return'0.00';return num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function initCurrencyInput(input){
+  input.addEventListener('focus',function(){const raw=this.dataset.raw||this.value.replace(/,/g,'');this.value=raw;this.select();});
+  input.addEventListener('blur',function(){const raw=this.value.replace(/,/g,'');const num=parseFloat(raw);if(!isNaN(num)&&raw!==''){this.dataset.raw=raw;this.value=formatCurrency(raw);}else{this.dataset.raw='';this.value='';}});
+  input.addEventListener('input',function(){this.dataset.raw=this.value.replace(/,/g,'');});
+}
+function getInputNumber(input){if(!input)return 0;const v=(input.dataset.raw!==undefined?input.dataset.raw:input.value).replace(/,/g,'');return parseFloat(v)||0;}
+
+/* ============================================================
+   DATE HELPERS — MM/DD/YYYY with auto-slash  (req #5)
+============================================================ */
+function storageToDisplay(d){if(!d)return'';if(d.includes('/')&&d.length===10)return d;const p=d.split('-');if(p.length===3)return`${p[1]}/${p[2]}/${p[0]}`;return d;}
+function displayToStorage(d){if(!d)return'';const p=d.split('/');if(p.length===3)return`${p[2]}-${p[0]}-${p[1]}`;return d;}
+function getTodayDisplay(){const t=new Date();return String(t.getMonth()+1).padStart(2,'0')+'/'+String(t.getDate()).padStart(2,'0')+'/'+t.getFullYear();}
+function isValidDisplay(s){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);if(!m)return false;const d=new Date(+m[3],+m[1]-1,+m[2]);return d.getFullYear()===+m[3]&&d.getMonth()===+m[1]-1&&d.getDate()===+m[2];}
+function autoFormatDate(input){
+  const cur=input.value,selEnd=input.selectionEnd;
+  let v=cur.replace(/[^0-9]/g,'');if(v.length>8)v=v.slice(0,8);
+  let out='';
+  if(v.length<=2)out=v;
+  else if(v.length<=4)out=v.slice(0,2)+'/'+v.slice(2);
+  else out=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4,8);
+  if(input.value!==out){input.value=out;try{input.setSelectionRange(Math.min(selEnd,out.length),Math.min(selEnd,out.length));}catch(_){}}
+}
+function validateDateInput(input){
+  if(!input.value)return;
+  if(!isValidDisplay(input.value)){input.style.boxShadow='inset 0 0 0 2px #FECACA';}
+  else{input.style.boxShadow='';}
+}
+
+/* ============================================================
+   CALENDAR PICKER  (req #5)
+============================================================ */
+let dpState={year:0,month:0,targetInput:null};
+function showDatePicker(anchorEl){
+  closeDatePicker();
+  const input=document.getElementById('reportDate');
+  let initDate=new Date();
+  if(input.value&&isValidDisplay(input.value)){const p=input.value.split('/');initDate=new Date(+p[2],+p[0]-1,+p[1]);}
+  dpState.year=initDate.getFullYear();dpState.month=initDate.getMonth();dpState.targetInput=input;
+  const overlay=document.createElement('div');overlay.className='date-picker-overlay';overlay.id='dpOverlay';overlay.addEventListener('click',closeDatePicker);document.body.appendChild(overlay);
+  const popup=document.createElement('div');popup.className='date-picker-popup';popup.id='dpPopup';popup.addEventListener('click',e=>e.stopPropagation());document.body.appendChild(popup);
+  renderCalendar();positionPicker(anchorEl);
+}
+function positionPicker(anchor){const popup=document.getElementById('dpPopup');if(!popup||!anchor)return;const rect=anchor.getBoundingClientRect(),vpH=window.innerHeight,vpW=window.innerWidth;let top=rect.bottom+6,left=rect.right-268;if(top+320>vpH-10)top=rect.top-326;if(left<8)left=8;if(left+268>vpW-8)left=vpW-276;popup.style.top=top+'px';popup.style.left=left+'px';}
+function closeDatePicker(){document.getElementById('dpOverlay')?.remove();document.getElementById('dpPopup')?.remove();}
+function renderCalendar(){
+  const popup=document.getElementById('dpPopup');if(!popup)return;
+  const{year,month,targetInput}=dpState;
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const today=new Date();let selDay=null,selMo=null,selYr=null;
+  if(targetInput&&targetInput.value&&isValidDisplay(targetInput.value)){const p=targetInput.value.split('/');selMo=+p[0]-1;selDay=+p[1];selYr=+p[2];}
+  const firstDay=new Date(year,month,1).getDay(),dim=new Date(year,month+1,0).getDate(),dip=new Date(year,month,0).getDate();
+  let html='';
+  for(let i=firstDay-1;i>=0;i--)html+=`<button class="dp-day other-month" data-y="${year}" data-m="${month-1}" data-d="${dip-i}" type="button">${dip-i}</button>`;
+  for(let d=1;d<=dim;d++){let cls='dp-day';if(d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear())cls+=' today';if(selDay===d&&selMo===month&&selYr===year)cls+=' selected';html+=`<button class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}" type="button">${d}</button>`;}
+  const rem=(firstDay+dim)%7===0?0:7-(firstDay+dim)%7;
+  for(let d=1;d<=rem;d++)html+=`<button class="dp-day other-month" data-y="${year}" data-m="${month+1}" data-d="${d}" type="button">${d}</button>`;
+  popup.innerHTML=`<div class="dp-header"><button class="dp-nav-btn" id="dpPrev" type="button"><i class="fas fa-chevron-left"></i></button><span class="dp-month-year">${MONTHS[month]} ${year}</span><button class="dp-nav-btn" id="dpNext" type="button"><i class="fas fa-chevron-right"></i></button></div><div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dp-days">${html}</div><div class="dp-footer"><button class="dp-today-btn" id="dpTodayBtn" type="button"><i class="fas fa-crosshairs"></i> Today</button><button id="dpCancelBtn" type="button">Cancel</button></div>`;
+  popup.querySelector('#dpPrev').onclick=()=>{dpState.month--;if(dpState.month<0){dpState.month=11;dpState.year--;}renderCalendar();};
+  popup.querySelector('#dpNext').onclick=()=>{dpState.month++;if(dpState.month>11){dpState.month=0;dpState.year++;}renderCalendar();};
+  popup.querySelector('#dpTodayBtn').onclick=()=>{const t=new Date();dpState.year=t.getFullYear();dpState.month=t.getMonth();pickDate(t.getFullYear(),t.getMonth(),t.getDate());};
+  popup.querySelector('#dpCancelBtn').onclick=closeDatePicker;
+  popup.querySelectorAll('.dp-day').forEach(btn=>btn.onclick=()=>{let y=+btn.dataset.y,m=+btn.dataset.m,d=+btn.dataset.d;if(m<0){m=11;y--;}if(m>11){m=0;y++;}pickDate(y,m,d);});
+}
+function pickDate(year,month,day){
+  const input=dpState.targetInput;if(!input){closeDatePicker();return;}
+  input.value=String(month+1).padStart(2,'0')+'/'+String(day).padStart(2,'0')+'/'+year;
+  input.dispatchEvent(new Event('change',{bubbles:true}));closeDatePicker();
+}
 
 /* ============================================================
    COMPANY INFO
 ============================================================ */
 function saveCompanyInfo(){
-  const fields=['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'];
-  const data={}; fields.forEach(id=>{const el=document.getElementById(id);if(el)data[id]=el.value;});
-  localStorage.setItem('taxesCompanyInfo',JSON.stringify(data));
+  const data={};
+  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)data[id]=el.value;});
+  localStorage.setItem(NS.COMPANY,JSON.stringify(data));
+  if(USE_API){fetch(`${API_BASE}/taxes-records/${getApiId()}/company`,{method:'PATCH',headers:apiHeaders(),body:JSON.stringify(data)}).catch(()=>{});}
 }
-function loadCompanyInfo(){
-  const raw=localStorage.getItem('taxesCompanyInfo'); if(!raw) return;
-  try{ const d=JSON.parse(raw); Object.keys(d).forEach(id=>{const el=document.getElementById(id);if(el)el.value=d[id];}); }catch(e){}
+function applyCompanyInfo(data){
+  if(!data)return;
+  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
+    const el=document.getElementById(id);if(el&&data[id]!==undefined){
+      if(id==='reportDate'&&data[id])el.value=storageToDisplay(data[id]);
+      else el.value=data[id];
+    }
+  });
 }
 function clearCompanyInfo(){
-  if(!confirm('Clear all company information?')) return;
+  if(!confirm('Clear all company information?'))return;
   ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  localStorage.removeItem('taxesCompanyInfo');
-  showToast('Company info cleared','success');
+  localStorage.removeItem(NS.COMPANY);showToast('Company info cleared','success');
+}
+function formatCompanyTIN(input){let v=input.value.replace(/\D/g,'');if(v.length>12)v=v.slice(0,12);const parts=[v.slice(0,3),v.slice(3,6),v.slice(6,9),v.slice(9,12)].filter(p=>p!=='');input.value=parts.join('-');}
+
+/* ============================================================
+   AUTOSAVE  (req #2)
+============================================================ */
+let autoSaveTimer=null;
+function getCompanyData(){const f=id=>document.getElementById(id)?.value||'';return{name:f('companyName'),tin:f('companyTIN'),address:f('companyAddress'),business:f('lineOfBusiness'),telephone:f('telephone'),date:f('reportDate'),employee:f('authorizedEmployee'),email:f('email')};}
+function getTableData(){return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({date:r.querySelector('.date-input')?.value||'',referenceNumber:r.querySelector('.reference-number')?.value||'',taxType:r.querySelector('.tax-type')?.value||'',paymentMode:r.querySelector('.payment-mode')?.value||'',governmentAgency:r.querySelector('.government-agency')?.value||'',amount:(r.querySelector('.amount')?.dataset.raw||r.querySelector('.amount')?.value||'').replace(/,/g,''),remarks:r.querySelector('.remarks')?.value||''}));}
+async function saveSession(){showSaving('Saving…');await apiSaveSession(getTableData(),getCompanyData());hideSaving();}
+function scheduleAutoSave(){
+  clearTimeout(autoSaveTimer);
+  const ind=document.getElementById('autosaveIndicator');if(ind)ind.classList.add('visible');
+  autoSaveTimer=setTimeout(async()=>{await saveSession();if(ind)ind.classList.remove('visible');},1500);
+}
+async function restoreSession(){
+  showSaving('Loading…');const data=await apiLoadSession();hideSaving();
+  if(!data||!Array.isArray(data.tableData))return false;
+  if(data.companyInfo)applyCompanyInfo(data.companyInfo);
+  document.getElementById('tableBody').innerHTML='';
+  data.tableData.forEach(rd=>addRow(rd));if(data.tableData.length===0)addRow();
+  currentPage=1;renderCurrentPage();updateAllStats();return data.tableData.length;
+}
+
+/* ============================================================
+   CLIENT: SUBMIT TO PORTAL  (req #1)
+============================================================ */
+function openSubmitModal(){
+  if(APP_ROLE!=='Client')return;
+  const co=getCompanyData(),rows=getTableData();
+  const filename='TAXES_Data_'+(co.name?co.name.replace(/[^a-zA-Z0-9]/g,'_')+'_':'')+new Date().toISOString().split('T')[0]+'.taxes';
+  document.getElementById('submitModalFileName').textContent=filename;
+  document.getElementById('submitModalFileMeta').textContent=rows.length+' rows · '+(co.name||'No company name set');
+  document.getElementById('submitModalOverlay').classList.remove('hidden');
+  document.getElementById('submitModalConfirmBtn').onclick=async function(){
+    const payload=JSON.stringify({version:'1.0',type:'taxes-licenses',timestamp:new Date().toISOString(),companyInfo:co,tableData:rows},null,2);
+    sessionStorage.setItem('TAXES_CLIENT_SUBMIT_FILE',payload);sessionStorage.setItem('TAXES_CLIENT_SUBMIT_FILENAME',filename);
+    try{localStorage.setItem('TAXES_SUBMIT_BACKUP_LATEST',payload);localStorage.setItem('TAXES_SUBMIT_BACKUP_LATEST_NAME',filename);}catch(e){}
+    await saveSession();showToast('Saving & redirecting…','success');
+    document.getElementById('submitModalOverlay').classList.add('hidden');
+    setTimeout(()=>{location.href='../index.html#submit';},500);
+  };
+}
+
+/* ============================================================
+   SUB-ADMIN: LOAD FILE FROM PORTAL  (req #1)
+============================================================ */
+function checkPortalFileOnLoad(){
+  if(APP_ROLE!=='SubAdmin')return false;
+  try{
+    const content=sessionStorage.getItem('TAXES_PORTAL_OPEN_FILE'),filename=sessionStorage.getItem('TAXES_PORTAL_OPEN_FILENAME')||'portal.taxes';
+    if(!content)return false;
+    sessionStorage.removeItem('TAXES_PORTAL_OPEN_FILE');sessionStorage.removeItem('TAXES_PORTAL_OPEN_FILENAME');
+    const d=JSON.parse(content);if(!d.tableData)throw new Error('Invalid format');
+    document.getElementById('tableBody').innerHTML='';
+    if(d.companyInfo)applyCompanyInfo(d.companyInfo);
+    d.tableData.forEach(rd=>addRow(rd));if(!d.tableData.length)addRow();
+    currentPage=1;renderCurrentPage();updateAllStats();showToast('Loaded "'+filename+'" from portal','success');scheduleAutoSave();return true;
+  }catch(e){sessionStorage.removeItem('TAXES_PORTAL_OPEN_FILE');sessionStorage.removeItem('TAXES_PORTAL_OPEN_FILENAME');showToast('Could not load portal file: '+e.message,'error');return false;}
 }
 
 /* ============================================================
    COLUMN VISIBILITY
 ============================================================ */
-const COLS=[
-  {key:'date',name:'Date'},{key:'referenceNumber',name:'Reference No.'},
-  {key:'taxType',name:'Tax / Fee Type'},{key:'paymentMode',name:'Payment Mode'},
-  {key:'governmentAgency',name:'Government Agency'},{key:'amount',name:'Amount'},
-  {key:'remarks',name:'Remarks'},{key:'action',name:'Del'}
-];
+const COLS=[{key:'date',name:'Date'},{key:'referenceNumber',name:'Reference No.'},{key:'taxType',name:'Tax / Fee Type'},{key:'paymentMode',name:'Payment Mode'},{key:'governmentAgency',name:'Government Agency'},{key:'amount',name:'Amount'},{key:'remarks',name:'Remarks'},{key:'action',name:'Del'}];
 let colVis={};
 function initColVisibility(){
-  colVis=JSON.parse(localStorage.getItem('taxesColVis')||'{}');
+  colVis=JSON.parse(localStorage.getItem(NS.COL_VIS)||'{}');
   const list=document.getElementById('colList');
-  COLS.forEach((c,i)=>{
-    const item=document.createElement('div'); item.className='col-item';
-    const cb=document.createElement('input'); cb.type='checkbox'; cb.id='cv_'+c.key; cb.checked=!colVis[c.key];
-    const lbl=document.createElement('label'); lbl.htmlFor='cv_'+c.key; lbl.textContent=c.name;
-    cb.addEventListener('change',()=>{ colVis[c.key]=!cb.checked; applyColVis(); localStorage.setItem('taxesColVis',JSON.stringify(colVis)); });
-    item.appendChild(cb); item.appendChild(lbl); list.appendChild(item);
-  });
+  COLS.forEach(c=>{const item=document.createElement('div');item.className='col-item';const cb=document.createElement('input');cb.type='checkbox';cb.id='cv_'+c.key;cb.checked=!colVis[c.key];const lbl=document.createElement('label');lbl.htmlFor='cv_'+c.key;lbl.textContent=c.name;cb.addEventListener('change',()=>{colVis[c.key]=!cb.checked;applyColVis();localStorage.setItem(NS.COL_VIS,JSON.stringify(colVis));});item.appendChild(cb);item.appendChild(lbl);list.appendChild(item);});
   applyColVis();
-  document.getElementById('showAllColsBtn').addEventListener('click',()=>{
-    COLS.forEach(c=>{ colVis[c.key]=false; const cb=document.getElementById('cv_'+c.key); if(cb) cb.checked=true; });
-    applyColVis(); localStorage.setItem('taxesColVis',JSON.stringify(colVis)); showToast('All columns visible','success');
-  });
-  document.getElementById('hideAllColsBtn').addEventListener('click',()=>{
-    COLS.forEach(c=>{ colVis[c.key]=true; const cb=document.getElementById('cv_'+c.key); if(cb) cb.checked=false; });
-    applyColVis(); localStorage.setItem('taxesColVis',JSON.stringify(colVis)); showToast('All columns hidden','info');
-  });
-  const btn=document.getElementById('colVisBtn'), dd=document.getElementById('colVisDropdown');
-  btn.addEventListener('click',e=>{ e.stopPropagation(); dd.classList.toggle('open'); });
-  document.addEventListener('click',e=>{ if(!dd.contains(e.target)&&e.target!==btn) dd.classList.remove('open'); });
+  document.getElementById('showAllColsBtn').addEventListener('click',()=>{COLS.forEach(c=>{colVis[c.key]=false;const cb=document.getElementById('cv_'+c.key);if(cb)cb.checked=true;});applyColVis();localStorage.setItem(NS.COL_VIS,JSON.stringify(colVis));showToast('All columns visible','success');});
+  document.getElementById('hideAllColsBtn').addEventListener('click',()=>{COLS.forEach(c=>{colVis[c.key]=true;const cb=document.getElementById('cv_'+c.key);if(cb)cb.checked=false;});applyColVis();localStorage.setItem(NS.COL_VIS,JSON.stringify(colVis));showToast('All columns hidden','info');});
+  const btn=document.getElementById('colVisBtn'),dd=document.getElementById('colVisDropdown');
+  btn.addEventListener('click',e=>{e.stopPropagation();dd.classList.toggle('open');});
+  document.addEventListener('click',e=>{if(!dd.contains(e.target)&&e.target!==btn)dd.classList.remove('open');});
 }
-function applyColVis(){
-  const table=document.getElementById('taxesLicensesTable');
-  const ths=table.querySelectorAll('thead th');
-  COLS.forEach((c,i)=>{
-    const hide=!!colVis[c.key];
-    ths[i].classList.toggle('hidden-column',hide);
-    table.querySelectorAll('tbody tr,tfoot tr').forEach(row=>{ const td=row.children[i]; if(td) td.classList.toggle('hidden-column',hide); });
-  });
-  rebuildSummaryRow();
-}
-function applyColVisToRow(row){
-  COLS.forEach((c,i)=>{ const td=row.children[i]; if(td) td.classList.toggle('hidden-column',!!colVis[c.key]); });
-}
+function applyColVis(){const table=document.getElementById('taxesLicensesTable'),ths=table.querySelectorAll('thead th');COLS.forEach((c,i)=>{const hide=!!colVis[c.key];ths[i].classList.toggle('hidden-column',hide);table.querySelectorAll('tbody tr,tfoot tr').forEach(row=>{const td=row.children[i];if(td)td.classList.toggle('hidden-column',hide);});});rebuildSummaryRow();}
+function applyColVisToRow(row){COLS.forEach((c,i)=>{const td=row.children[i];if(td)td.classList.toggle('hidden-column',!!colVis[c.key]);});}
 
 /* ============================================================
    PAGINATION
 ============================================================ */
 let currentPage=1,rowsPerPage=25;
-function getTotalPages(){ return Math.max(1,Math.ceil(document.querySelectorAll('#tableBody tr').length/rowsPerPage)); }
-function updatePagination(){
-  const total=document.querySelectorAll('#tableBody tr').length, totalP=getTotalPages();
-  const start=total===0?0:(currentPage-1)*rowsPerPage+1, end=Math.min(currentPage*rowsPerPage,total);
-  document.getElementById('startEntry').textContent=start;
-  document.getElementById('endEntry').textContent=end;
-  document.getElementById('totalEntries').textContent=total;
-  document.getElementById('totalPages').textContent=totalP;
-  document.getElementById('currentPageDisplay').textContent=currentPage;
-  document.getElementById('entryCount').textContent=total;
-  document.getElementById('firstPageBtn').disabled=currentPage===1;
-  document.getElementById('prevPageBtn').disabled=currentPage===1;
-  document.getElementById('nextPageBtn').disabled=currentPage>=totalP;
-  document.getElementById('lastPageBtn').disabled=currentPage>=totalP;
-}
-function renderCurrentPage(){
-  const rows=Array.from(document.querySelectorAll('#tableBody tr'));
-  const start=(currentPage-1)*rowsPerPage, end=Math.min(start+rowsPerPage,rows.length);
-  rows.forEach((r,i)=>{ r.classList.toggle('page-hidden',!(i>=start&&i<end)); });
-  updatePagination();
-}
+function getTotalPages(){return Math.max(1,Math.ceil(document.querySelectorAll('#tableBody tr').length/rowsPerPage));}
+function updatePagination(){const total=document.querySelectorAll('#tableBody tr').length,totalP=getTotalPages(),start=total===0?0:(currentPage-1)*rowsPerPage+1,end=Math.min(currentPage*rowsPerPage,total);['startEntry','endEntry','totalEntries','totalPages','currentPageDisplay','entryCount'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=[start,end,total,totalP,currentPage,total][i];});document.getElementById('firstPageBtn').disabled=currentPage===1;document.getElementById('prevPageBtn').disabled=currentPage===1;document.getElementById('nextPageBtn').disabled=currentPage>=totalP;document.getElementById('lastPageBtn').disabled=currentPage>=totalP;}
+function renderCurrentPage(){const rows=Array.from(document.querySelectorAll('#tableBody tr')),start=(currentPage-1)*rowsPerPage,end=Math.min(start+rowsPerPage,rows.length);rows.forEach((r,i)=>{r.style.display=(i>=start&&i<end)?'':'none';});updatePagination();}
 function initPagination(){
-  document.getElementById('rowsPerPage').addEventListener('change',function(){ rowsPerPage=parseInt(this.value); currentPage=1; renderCurrentPage(); });
-  document.getElementById('firstPageBtn').addEventListener('click',()=>{ currentPage=1; renderCurrentPage(); });
-  document.getElementById('prevPageBtn').addEventListener('click',()=>{ if(currentPage>1){currentPage--;renderCurrentPage();} });
-  document.getElementById('nextPageBtn').addEventListener('click',()=>{ if(currentPage<getTotalPages()){currentPage++;renderCurrentPage();} });
-  document.getElementById('lastPageBtn').addEventListener('click',()=>{ currentPage=getTotalPages(); renderCurrentPage(); });
+  document.getElementById('rowsPerPage').addEventListener('change',function(){rowsPerPage=parseInt(this.value);currentPage=1;renderCurrentPage();});
+  document.getElementById('firstPageBtn').addEventListener('click',()=>{currentPage=1;renderCurrentPage();});
+  document.getElementById('prevPageBtn').addEventListener('click',()=>{if(currentPage>1){currentPage--;renderCurrentPage();}});
+  document.getElementById('nextPageBtn').addEventListener('click',()=>{if(currentPage<getTotalPages()){currentPage++;renderCurrentPage();}});
+  document.getElementById('lastPageBtn').addEventListener('click',()=>{currentPage=getTotalPages();renderCurrentPage();});
 }
 
 /* ============================================================
    TAX TYPE OPTIONS
 ============================================================ */
-const TAX_TYPES=[
-  {value:'VAT', label:'VAT'},
-  {value:'IT',  label:'Income Tax (IT)'},
-  {value:'DST', label:'Documentary Stamp Tax (DST)'},
-  {value:'WT',  label:'Withholding Tax (WT)'},
-  {value:'LTO', label:'Land Transportation Office (LTO)'},
-  {value:'BFP', label:'Bureau of Fire Protection (BFP)'},
-  {value:'BPLO',label:'Business Permit & Licensing Office (BPLO)'},
-  {value:'OTHERS',label:'OTHERS'}
-];
-function taxTypeOptions(selected=''){
-  return TAX_TYPES.map(t=>`<option value="${t.value}"${selected===t.value?' selected':''}>${escH(t.label)}</option>`).join('');
+const TAX_TYPES=[{value:'VAT',label:'VAT'},{value:'IT',label:'Income Tax (IT)'},{value:'DST',label:'Documentary Stamp Tax (DST)'},{value:'WT',label:'Withholding Tax (WT)'},{value:'LTO',label:'Land Transportation Office (LTO)'},{value:'BFP',label:'Bureau of Fire Protection (BFP)'},{value:'BPLO',label:'Business Permit & Licensing Office (BPLO)'},{value:'OTHERS',label:'OTHERS'}];
+const TAX_LICENSE_TYPES=new Set(['LTO','BFP','BPLO','OTHERS']);
+function taxTypeOptions(sel=''){return TAX_TYPES.map(t=>`<option value="${t.value}"${sel===t.value?' selected':''}>${escH(t.label)}</option>`).join('');}
+
+/* ============================================================
+   ROW COLOR DISTINCTIONS  (req #10)
+============================================================ */
+function updateRowColor(row){
+  const pm=row.querySelector('.payment-mode')?.value||'',tax=row.querySelector('.tax-type')?.value||'',amt=getInputNumber(row.querySelector('.amount'));
+  row.classList.remove('row-cash','row-charge','row-vat','row-it','row-dst','row-wt','row-license');
+  if(!amt&&!pm&&!tax)return;
+  if(pm==='Cash'){row.classList.add('row-cash');return;}
+  if(pm==='Charge'){row.classList.add('row-charge');return;}
+  if(tax==='VAT')row.classList.add('row-vat');
+  else if(tax==='IT')row.classList.add('row-it');
+  else if(tax==='DST')row.classList.add('row-dst');
+  else if(tax==='WT')row.classList.add('row-wt');
+  else if(TAX_LICENSE_TYPES.has(tax))row.classList.add('row-license');
 }
 
 /* ============================================================
    ROW CREATION
 ============================================================ */
-function getTableDate(){
-  const rd=document.getElementById('reportDate')?.value;
-  return rd||new Date().toISOString().split('T')[0];
-}
 function createRow(data={}){
   const rid='r'+(Date.now()+'').slice(-8)+'_'+Math.floor(Math.random()*1000);
-  const tr=document.createElement('tr'); tr.id=rid;
-  const today=getTableDate();
+  const tr=document.createElement('tr');tr.id=rid;
+  let dateVal=data.date||getTodayDisplay();
+  if(dateVal&&dateVal.includes('-')&&!dateVal.includes('/'))dateVal=storageToDisplay(dateVal);
+  const amtDisplay=data.amount?formatCurrency(data.amount):'';
   tr.innerHTML=`
-    <td><input type="date" value="${data.date||today}" class="date-input"></td>
+    <td><input type="text" value="${escH(dateVal)}" class="date-input" placeholder="MM/DD/YYYY" autocomplete="off"></td>
     <td><input type="text" value="${escH(data.referenceNumber||'')}" class="reference-number" placeholder="REF-001"></td>
     <td><select class="tax-type"><option value="">Select</option>${taxTypeOptions(data.taxType||'')}</select></td>
     <td><select class="payment-mode"><option value="">Select</option>${['Cash','Charge'].map(v=>`<option${data.paymentMode===v?' selected':''}>${v}</option>`).join('')}</select></td>
-    <td><input type="text" value="${escH(data.governmentAgency||'')}" class="government-agency" placeholder="e.g., BIR, LGU, etc."></td>
-    <td><input type="number" value="${data.amount||''}" step="0.01" min="0" class="amount" placeholder="0.00"></td>
+    <td><input type="text" value="${escH(data.governmentAgency||'')}" class="government-agency" placeholder="e.g., BIR, LGU…"></td>
+    <td><input type="text" value="${escH(amtDisplay)}" class="amount" placeholder="0.00" data-raw="${escH(data.amount||'')}"></td>
     <td><input type="text" value="${escH(data.remarks||'')}" class="remarks" placeholder="Remarks"></td>
-    <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>
-  `;
+    <td><button class="delete-btn" title="Delete row" onclick="deleteRow('${rid}')"><i class="fas fa-trash"></i></button></td>`;
   applyColVisToRow(tr);
-  attachRowListeners(tr);
+  initCurrencyInput(tr.querySelector('.amount'));
+  attachRowListeners(tr);updateRowColor(tr);
   return tr;
 }
-
 function attachRowListeners(row){
-  if(row.dataset.listenersAttached) return;
-  row.dataset.listenersAttached='1';
-  row.querySelectorAll('input,select').forEach(el=>{
-    el.addEventListener('input',()=>scheduleStats());
-    el.addEventListener('change',()=>scheduleStats());
-  });
+  if(row.dataset.listenersAttached)return;row.dataset.listenersAttached='1';
+  row.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',()=>{scheduleStats();scheduleAutoSave();updateRowColor(row);});el.addEventListener('change',()=>{scheduleStats();scheduleAutoSave();updateRowColor(row);});});
+  const di=row.querySelector('.date-input');
+  if(di){di.addEventListener('input',function(){autoFormatDate(this);});di.addEventListener('blur',function(){validateDateInput(this);if(this.value&&!isValidDisplay(this.value))showToast('Invalid date. Use MM/DD/YYYY','warning');});}
 }
 
 /* ============================================================
    ADD / DELETE ROWS
 ============================================================ */
-function addRow(data={}){
-  const tb=document.getElementById('tableBody');
-  const row=createRow(data); tb.appendChild(row);
-  currentPage=Math.ceil(tb.children.length/rowsPerPage);
-  renderCurrentPage(); scheduleStats();
-}
-function addBatchRows(count){
-  const tb=document.getElementById('tableBody');
-  const frag=document.createDocumentFragment();
-  for(let i=0;i<count;i++) frag.appendChild(createRow());
-  tb.appendChild(frag);
-  currentPage=Math.ceil(tb.children.length/rowsPerPage);
-  renderCurrentPage(); scheduleStats();
-}
-window.deleteRow=function(rid){
-  const row=document.getElementById(rid);
-  if(!row||!confirm('Delete this row?')) return;
-  row.style.transition='opacity .2s,transform .2s'; row.style.opacity='0'; row.style.transform='translateX(-10px)';
-  setTimeout(()=>{ row.remove(); if(currentPage>getTotalPages()) currentPage=Math.max(1,getTotalPages()); renderCurrentPage(); scheduleStats(); },200);
-};
+function addRow(data={}){const tb=document.getElementById('tableBody');const row=createRow(data);tb.appendChild(row);currentPage=Math.ceil(tb.children.length/rowsPerPage);renderCurrentPage();scheduleStats();scheduleAutoSave();return row;}
+function addBatchRows(count){const tb=document.getElementById('tableBody');const frag=document.createDocumentFragment();for(let i=0;i<count;i++)frag.appendChild(createRow());tb.appendChild(frag);currentPage=Math.ceil(tb.children.length/rowsPerPage);renderCurrentPage();scheduleStats();scheduleAutoSave();}
+window.deleteRow=function(rid){const row=document.getElementById(rid);if(!row||!confirm('Delete this row?'))return;row.style.transition='opacity .2s,transform .2s';row.style.opacity='0';row.style.transform='translateX(-10px)';setTimeout(()=>{row.remove();if(currentPage>getTotalPages())currentPage=Math.max(1,getTotalPages());renderCurrentPage();scheduleStats();scheduleAutoSave();},200);};
 
 /* ============================================================
-   STATS / TALLY UPDATE
+   STATS / TALLY
 ============================================================ */
 let statsTimer=null;
-function scheduleStats(){ clearTimeout(statsTimer); statsTimer=setTimeout(updateAllStats,60); }
-
-// Tax type category mapping
-const TAX_LICENSE_TYPES=new Set(['LTO','BFP','BPLO','OTHERS']);
-
+function scheduleStats(){clearTimeout(statsTimer);statsTimer=setTimeout(updateAllStats,60);}
 window.updateAllStats=function(){
   requestAnimationFrame(()=>{
     const rows=document.querySelectorAll('#tableBody tr');
-    let vat=0,it=0,dst=0,wt=0,lic=0,cash=0,charge=0,total=0;
-    let vatC=0,itC=0,dstC=0,wtC=0,licC=0,cashC=0,chargeC=0;
-    rows.forEach(r=>{
-      const amt=parseFloat(r.querySelector('.amount')?.value)||0;
-      const tax=r.querySelector('.tax-type')?.value||'';
-      const pm=r.querySelector('.payment-mode')?.value||'';
-      total+=amt;
-      if(tax==='VAT'){vat+=amt;vatC++;}
-      else if(tax==='IT'){it+=amt;itC++;}
-      else if(tax==='DST'){dst+=amt;dstC++;}
-      else if(tax==='WT'){wt+=amt;wtC++;}
-      else if(TAX_LICENSE_TYPES.has(tax)){lic+=amt;licC++;}
-      if(pm==='Cash'){cash+=amt;cashC++;} else if(pm==='Charge'){charge+=amt;chargeC++;}
-    });
-    const cnt=rows.length;
-    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-    // Stats bar
-    set('totalVAT',vat.toFixed(2)); set('totalIT',it.toFixed(2)); set('totalLicenses',lic.toFixed(2)); set('totalAmount',total.toFixed(2));
-    // Tally
-    set('tallyVAT',vat.toFixed(2)); set('tallyVATCount',vatC+' transaction'+(vatC!==1?'s':''));
-    set('tallyIT',it.toFixed(2)); set('tallyITCount',itC+' transaction'+(itC!==1?'s':''));
-    set('tallyDST',dst.toFixed(2)); set('tallyDSTCount',dstC+' transaction'+(dstC!==1?'s':''));
-    set('tallyWT',wt.toFixed(2)); set('tallyWTCount',wtC+' transaction'+(wtC!==1?'s':''));
-    set('tallyLic',lic.toFixed(2)); set('tallyLicCount',licC+' transaction'+(licC!==1?'s':''));
-    set('tallyCash',cash.toFixed(2)); set('tallyCashCount',cashC+' transaction'+(cashC!==1?'s':''));
-    set('tallyCharge',charge.toFixed(2)); set('tallyChargeCount',chargeC+' transaction'+(chargeC!==1?'s':''));
-    set('tallyTotal',total.toFixed(2)); set('tallyTotalCount',cnt+' total transaction'+(cnt!==1?'s':''));
-    const ec=document.getElementById('entryCount'); if(ec){ec.textContent=cnt;ec.classList.add('pulse');setTimeout(()=>ec.classList.remove('pulse'),300);}
+    let vat=0,it=0,dst=0,wt=0,lic=0,cash=0,charge=0,total=0,vatC=0,itC=0,dstC=0,wtC=0,licC=0,cashC=0,chargeC=0;
+    rows.forEach(r=>{const amt=getInputNumber(r.querySelector('.amount')),tax=r.querySelector('.tax-type')?.value||'',pm=r.querySelector('.payment-mode')?.value||'';total+=amt;if(tax==='VAT'){vat+=amt;vatC++;}else if(tax==='IT'){it+=amt;itC++;}else if(tax==='DST'){dst+=amt;dstC++;}else if(tax==='WT'){wt+=amt;wtC++;}else if(TAX_LICENSE_TYPES.has(tax)){lic+=amt;licC++;}if(pm==='Cash'){cash+=amt;cashC++;}else if(pm==='Charge'){charge+=amt;chargeC++;}});
+    const cnt=rows.length,set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    set('totalVAT',formatCurrency(vat));set('totalIT',formatCurrency(it));set('totalLicenses',formatCurrency(lic));set('totalAmount',formatCurrency(total));
+    set('tallyVAT',formatCurrency(vat));set('tallyVATCount',vatC+' transaction'+(vatC!==1?'s':''));
+    set('tallyIT',formatCurrency(it));set('tallyITCount',itC+' transaction'+(itC!==1?'s':''));
+    set('tallyDST',formatCurrency(dst));set('tallyDSTCount',dstC+' transaction'+(dstC!==1?'s':''));
+    set('tallyWT',formatCurrency(wt));set('tallyWTCount',wtC+' transaction'+(wtC!==1?'s':''));
+    set('tallyLic',formatCurrency(lic));set('tallyLicCount',licC+' transaction'+(licC!==1?'s':''));
+    set('tallyCash',formatCurrency(cash));set('tallyCashCount',cashC+' transaction'+(cashC!==1?'s':''));
+    set('tallyCharge',formatCurrency(charge));set('tallyChargeCount',chargeC+' transaction'+(chargeC!==1?'s':''));
+    set('tallyTotal',formatCurrency(total));set('tallyTotalCount',cnt+' total transaction'+(cnt!==1?'s':''));
+    const ec=document.getElementById('entryCount');if(ec){ec.textContent=cnt;ec.classList.add('pulse');setTimeout(()=>ec.classList.remove('pulse'),300);}
     rebuildSummaryRow(total);
   });
 };
-
 function rebuildSummaryRow(total){
-  const foot=document.getElementById('summaryRow'); if(!foot) return;
-  if(total===undefined){
-    total=0;
-    document.querySelectorAll('#tableBody tr').forEach(r=>{ total+=parseFloat(r.querySelector('.amount')?.value)||0; });
-  }
-  const ths=document.querySelectorAll('#taxesLicensesTable thead th');
-  let cells=''; let first=true;
-  ths.forEach((th,i)=>{
-    if(th.classList.contains('hidden-column')) return;
-    let c='';
-    if(first){c='<span class="sum-label">TOTALS</span>';first=false;}
-    // col index 5 = amount
-    else if(i===5) c='<span class="sum-value">'+total.toFixed(2)+'</span>';
-    cells+=`<td>${c}</td>`;
-  });
+  const foot=document.getElementById('summaryRow');if(!foot)return;
+  if(total===undefined){total=0;document.querySelectorAll('#tableBody tr').forEach(r=>{total+=getInputNumber(r.querySelector('.amount'));});}
+  const ths=document.querySelectorAll('#taxesLicensesTable thead th');let cells='',first=true;
+  ths.forEach((th,i)=>{if(th.classList.contains('hidden-column'))return;let c='';if(first){c='<span class="sum-label">TOTALS</span>';first=false;}else if(i===5)c='<span class="sum-value">'+formatCurrency(total)+'</span>';cells+=`<td>${c}</td>`;});
   foot.innerHTML='<tr>'+cells+'</tr>';
 }
 
 /* ============================================================
-   SAVE / LOAD  (.taxes extension)
+   REPORT DATE — apply all / auto-slash / calendar  (req #5)
 ============================================================ */
-function getCompanyData(){
-  const f=id=>document.getElementById(id)?.value||'';
-  return{name:f('companyName'),tin:f('companyTIN'),address:f('companyAddress'),business:f('lineOfBusiness'),telephone:f('telephone'),date:f('reportDate'),employee:f('authorizedEmployee'),email:f('email')};
+function updateAllDatesFromReportDate(){
+  const rd=document.getElementById('reportDate').value;
+  if(!rd){showToast('No report date set','warning');return;}
+  if(!isValidDisplay(rd)){showToast('Invalid report date format. Use MM/DD/YYYY','warning');return;}
+  const inputs=document.querySelectorAll('#tableBody .date-input');if(!inputs.length){showToast('No rows to update','info');return;}
+  let cnt=0;
+  inputs.forEach(inp=>{if(inp.value!==rd){inp.value=rd;inp.dispatchEvent(new Event('change',{bubbles:true}));cnt++;const cell=inp.closest('td');cell.classList.add('date-updated');setTimeout(()=>cell.classList.remove('date-updated'),500);}});
+  if(cnt>0){showToast(`Updated ${cnt} row(s) to ${rd}`,'success');scheduleStats();scheduleAutoSave();}else showToast('All rows already have the current report date','info');
 }
-function setCompanyData(d){
-  const map={name:'companyName',tin:'companyTIN',address:'companyAddress',business:'lineOfBusiness',telephone:'telephone',date:'reportDate',employee:'authorizedEmployee',email:'email'};
-  Object.keys(map).forEach(k=>{const el=document.getElementById(map[k]);if(el&&d[k])el.value=d[k];});
-  saveCompanyInfo();
-}
-function getTableData(){
-  return Array.from(document.querySelectorAll('#tableBody tr')).map(r=>({
-    date:r.querySelector('.date-input')?.value||'',
-    referenceNumber:r.querySelector('.reference-number')?.value||'',
-    taxType:r.querySelector('.tax-type')?.value||'',
-    paymentMode:r.querySelector('.payment-mode')?.value||'',
-    governmentAgency:r.querySelector('.government-agency')?.value||'',
-    amount:r.querySelector('.amount')?.value||'',
-    remarks:r.querySelector('.remarks')?.value||''
-  }));
-}
-function saveDataToFile(){
-  const blob=new Blob([JSON.stringify({version:'1.0',type:'taxes-licenses',timestamp:new Date().toISOString(),companyInfo:getCompanyData(),tableData:getTableData()},null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='Taxes_Licenses_'+new Date().toISOString().split('T')[0]+'.taxes';
-  a.click(); URL.revokeObjectURL(a.href); showToast('Data saved to .taxes file','success');
-}
-function loadDataFromFile(){
-  const fi=document.createElement('input'); fi.type='file'; fi.accept='.taxes,.json';
-  fi.addEventListener('change',function(){
-    const f=this.files[0]; if(!f) return;
-    const r=new FileReader();
-    r.onload=e=>{
-      try{
-        const d=JSON.parse(e.target.result);
-        if(!d.version||!d.tableData) throw new Error('Invalid format');
-        if(d.companyInfo) setCompanyData(d.companyInfo);
-        document.getElementById('tableBody').innerHTML='';
-        d.tableData.forEach(rd=>addRow(rd));
-        if(!d.tableData.length) addRow();
-        currentPage=1; renderCurrentPage(); updateAllStats();
-        showToast('Loaded '+d.tableData.length+' rows','success');
-      }catch(ex){ showToast('Error: '+ex.message,'error'); }
-    };
-    r.readAsText(f);
-  });
-  fi.click();
-}
-function loadMultipleFiles(){
-  const fi=document.createElement('input'); fi.type='file'; fi.accept='.taxes,.json'; fi.multiple=true;
-  fi.addEventListener('change',function(){
-    const files=Array.from(this.files); if(!files.length) return;
-    let allData=[],companyInfo=null,done=0,errs=[];
-    files.forEach(file=>{
-      const r=new FileReader();
-      r.onload=e=>{
-        try{ const d=JSON.parse(e.target.result); if(!d.version||!d.tableData) throw new Error('bad');
-          allData.push(...d.tableData); if(!companyInfo&&d.companyInfo) companyInfo=d.companyInfo;
-        }catch(ex){ errs.push(file.name); }
-        if(++done===files.length) mergeIntoTable(allData,companyInfo,errs,files.length);
-      };
-      r.readAsText(file);
-    });
-  });
-  fi.click();
-}
-function mergeIntoTable(rows,companyInfo,errs,total){
-  const curr=document.querySelectorAll('#tableBody tr').length;
-  let action='append';
-  if(curr>0) action=confirm('Table has '+curr+' row(s). OK=Append, Cancel=Replace')?'append':'replace';
-  if(action==='replace') document.getElementById('tableBody').innerHTML='';
-  rows.forEach(rd=>addRow(rd));
-  if(companyInfo&&action==='replace') setCompanyData(companyInfo);
-  currentPage=1; renderCurrentPage(); updateAllStats();
-  let msg='Loaded '+rows.length+' rows from '+(total-errs.length)+'/'+total+' files';
-  if(errs.length) msg+=' ('+errs.length+' failed)';
-  showToast(msg,errs.length?'warning':'success');
-}
+
+/* ============================================================
+   SAVE / LOAD FILE
+============================================================ */
+function saveDataToFile(){const blob=new Blob([JSON.stringify({version:'1.0',type:'taxes-licenses',timestamp:new Date().toISOString(),companyInfo:getCompanyData(),tableData:getTableData()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Taxes_Licenses_'+new Date().toISOString().split('T')[0]+'.taxes';a.click();URL.revokeObjectURL(a.href);showToast('Data saved to .taxes file','success');}
+function loadDataFromFile(){const fi=document.createElement('input');fi.type='file';fi.accept='.taxes,.json';fi.addEventListener('change',function(){const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{const d=JSON.parse(e.target.result);if(!d.version||!d.tableData)throw new Error('Invalid format');if(d.companyInfo)applyCompanyInfo(d.companyInfo);document.getElementById('tableBody').innerHTML='';d.tableData.forEach(rd=>addRow(rd));if(!d.tableData.length)addRow();currentPage=1;renderCurrentPage();updateAllStats();await saveSession();showToast('Loaded '+d.tableData.length+' rows','success');}catch(ex){showToast('Error: '+ex.message,'error');}};r.readAsText(f);});fi.click();}
+function loadMultipleFiles(){const fi=document.createElement('input');fi.type='file';fi.accept='.taxes,.json';fi.multiple=true;fi.addEventListener('change',function(){const files=Array.from(this.files);if(!files.length)return;let allData=[],ci=null,done=0,errs=[];files.forEach(file=>{const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.version||!d.tableData)throw new Error('bad');allData.push(...d.tableData);if(!ci&&d.companyInfo)ci=d.companyInfo;}catch(ex){errs.push(file.name);}if(++done===files.length)mergeIntoTable(allData,ci,errs,files.length);};r.readAsText(file);});});fi.click();}
+async function mergeIntoTable(rows,ci,errs,total){const curr=document.querySelectorAll('#tableBody tr').length;let action='append';if(curr>0)action=confirm('Table has '+curr+' row(s). OK=Append, Cancel=Replace')?'append':'replace';if(action==='replace')document.getElementById('tableBody').innerHTML='';rows.forEach(rd=>addRow(rd));if(ci&&action==='replace')applyCompanyInfo(ci);currentPage=1;renderCurrentPage();updateAllStats();await saveSession();let msg='Loaded '+rows.length+' rows from '+(total-errs.length)+'/'+total+' files';if(errs.length)msg+=' ('+errs.length+' failed)';showToast(msg,errs.length?'warning':'success');}
 
 /* ============================================================
    EXPORT TO EXCEL
 ============================================================ */
 function exportToExcel(){
-  const co=getCompanyData();
-  if(!co.name||!co.tin||!co.address||!co.business||!co.employee){ alert('Please fill all required company fields (*) before exporting.'); return; }
+  const co=getCompanyData();if(!co.name||!co.tin||!co.address||!co.business||!co.employee){alert('Please fill all required company fields (*) before exporting.');return;}
   const rows=document.querySelectorAll('#tableBody tr');
-  const totalAmt=parseFloat(document.getElementById('totalAmount').textContent)||0;
-  const totalVAT=parseFloat(document.getElementById('totalVAT').textContent)||0;
-  const totalIT=parseFloat(document.getElementById('totalIT').textContent)||0;
-  const totalLic=parseFloat(document.getElementById('totalLicenses').textContent)||0;
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-  let dst=0,wt=0;
-  rows.forEach(r=>{
-    const amt=parseFloat(r.querySelector('.amount')?.value)||0;
-    const tax=r.querySelector('.tax-type')?.value||'';
-    if(tax==='DST') dst+=amt;
-    else if(tax==='WT') wt+=amt;
-  });
-  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><style>
-  *{font-family:Calibri,Arial,sans-serif}
-  .title{font-size:20pt;font-weight:bold;color:#1E3A8A;text-align:center;border-bottom:2px solid #2563EB;padding-bottom:8px;margin-bottom:12px}
-  .co-table{width:100%;border-collapse:collapse;margin-bottom:16px;background:#EFF6FF}
-  .co-table td{padding:5px 10px;border:1px solid #BFDBFE}
-  .co-lbl{font-weight:bold;color:#1D4ED8;width:180px}
-  .dt{width:100%;border-collapse:collapse;margin-top:12px;font-size:9.5pt}
-  .dt th{background:#1E3A8A;color:#DBEAFE;font-weight:bold;text-align:center;padding:8px 6px;border:1px solid #1E40AF}
-  .dt td{padding:6px;border:1px solid #D1D5DB}
-  .dt tr:nth-child(even){background:#EFF6FF}
-  .num{text-align:right;font-family:Consolas,monospace}
-  .sum-row{background:#FEF3C7;font-weight:bold;border-top:2px solid #F59E0B}
-  .sec-ttl{font-size:13pt;font-weight:bold;color:#1E3A8A;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #93C5FD;padding-bottom:4px}
-  .fin-table{width:60%;margin-left:auto;border-collapse:collapse}
-  .fin-table td{padding:7px 14px;border-bottom:1px dotted #D1D5DB;font-size:10.5pt}
-  .fin-lbl{text-align:right;color:#1D4ED8;font-weight:bold}
-  .fin-val{text-align:right;font-family:Consolas,monospace;color:#111827}
-  .footer{margin-top:24px;padding-top:12px;border-top:1px solid #D1D5DB;color:#6B7280;font-size:9pt;text-align:center}
-  </style></head><body>
+  const totalAmt=parseFloat((document.getElementById('totalAmount').textContent||'0').replace(/,/g,''))||0;
+  const totalVAT=parseFloat((document.getElementById('totalVAT').textContent||'0').replace(/,/g,''))||0;
+  const totalIT=parseFloat((document.getElementById('totalIT').textContent||'0').replace(/,/g,''))||0;
+  const totalLic=parseFloat((document.getElementById('totalLicenses').textContent||'0').replace(/,/g,''))||0;
+  const now=new Date(),dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  let dst=0,wt=0;rows.forEach(r=>{const amt=getInputNumber(r.querySelector('.amount')),tax=r.querySelector('.tax-type')?.value||'';if(tax==='DST')dst+=amt;else if(tax==='WT')wt+=amt;});
+  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><style>*{font-family:Calibri,Arial,sans-serif}.title{font-size:20pt;font-weight:bold;color:#1E3A8A;text-align:center;border-bottom:2px solid #2563EB;padding-bottom:8px;margin-bottom:12px}.co-table{width:100%;border-collapse:collapse;margin-bottom:16px;background:#EFF6FF}.co-table td{padding:5px 10px;border:1px solid #BFDBFE}.co-lbl{font-weight:bold;color:#1D4ED8;width:180px}.dt{width:100%;border-collapse:collapse;margin-top:12px;font-size:9.5pt}.dt th{background:#1E3A8A;color:#DBEAFE;font-weight:bold;text-align:center;padding:8px 6px;border:1px solid #1E40AF}.dt td{padding:6px;border:1px solid #D1D5DB}.dt tr:nth-child(even){background:#EFF6FF}.num{text-align:right;font-family:Consolas,monospace}.sum-row{background:#FEF3C7;font-weight:bold;border-top:2px solid #F59E0B}.sec-ttl{font-size:13pt;font-weight:bold;color:#1E3A8A;margin-top:20px;margin-bottom:6px;border-bottom:1px solid #93C5FD;padding-bottom:4px}.fin-table{width:60%;margin-left:auto;border-collapse:collapse}.fin-table td{padding:7px 14px;border-bottom:1px dotted #D1D5DB;font-size:10.5pt}.fin-lbl{text-align:right;color:#1D4ED8;font-weight:bold}.fin-val{text-align:right;font-family:Consolas,monospace;color:#111827}.footer{margin-top:24px;padding-top:12px;border-top:1px solid #D1D5DB;color:#6B7280;font-size:9pt;text-align:center}</style></head><body>
   <div class="title">TAXES &amp; LICENSES DATA REPORT</div>
-  <table class="co-table">
-    <tr><td class="co-lbl">Company Name:</td><td>${escH(co.name)}</td><td class="co-lbl">TIN Number:</td><td>${escH(co.tin)}</td></tr>
-    <tr><td class="co-lbl">Address:</td><td>${escH(co.address)}</td><td class="co-lbl">Line of Business:</td><td>${escH(co.business)}</td></tr>
-    <tr><td class="co-lbl">Telephone:</td><td>${escH(co.telephone||'N/A')}</td><td class="co-lbl">Report Date:</td><td>${escH(co.date||'')}</td></tr>
-    <tr><td class="co-lbl">Authorized Employee:</td><td>${escH(co.employee)}</td><td class="co-lbl">Email:</td><td>${escH(co.email||'N/A')}</td></tr>
-  </table>
+  <table class="co-table"><tr><td class="co-lbl">Company Name:</td><td>${escH(co.name)}</td><td class="co-lbl">TIN Number:</td><td>${escH(co.tin)}</td></tr><tr><td class="co-lbl">Address:</td><td>${escH(co.address)}</td><td class="co-lbl">Line of Business:</td><td>${escH(co.business)}</td></tr><tr><td class="co-lbl">Telephone:</td><td>${escH(co.telephone||'N/A')}</td><td class="co-lbl">Report Date:</td><td>${escH(co.date||'')}</td></tr><tr><td class="co-lbl">Authorized Employee:</td><td>${escH(co.employee)}</td><td class="co-lbl">Email:</td><td>${escH(co.email||'N/A')}</td></tr></table>
   <div class="sec-ttl">Taxes &amp; Licenses Transactions</div>
   <table class="dt"><thead><tr><th>Date</th><th>Reference No.</th><th>Tax / Fee Type</th><th>Payment Mode</th><th>Government Agency</th><th>Amount (₱)</th><th>Remarks</th></tr></thead><tbody>`;
-  rows.forEach((r,idx)=>{
-    const v=cls=>r.querySelector(cls);
-    const tax=v('.tax-type')?.value||'';
-    const label=TAX_TYPES.find(t=>t.value===tax)?.label||tax;
-    html+=`<tr${idx%2===0?'':' style="background:#EFF6FF"'}>
-      <td style="text-align:center">${escH(v('.date-input')?.value||'')}</td>
-      <td>${escH(v('.reference-number')?.value||'')}</td>
-      <td>${escH(label)}</td>
-      <td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td>
-      <td>${escH(v('.government-agency')?.value||'')}</td>
-      <td class="num">${(parseFloat(v('.amount')?.value)||0).toFixed(2)}</td>
-      <td>${escH(v('.remarks')?.value||'')}</td>
-    </tr>`;
-  });
+  rows.forEach((r,idx)=>{const v=cls=>r.querySelector(cls);const tax=v('.tax-type')?.value||'',label=TAX_TYPES.find(t=>t.value===tax)?.label||tax,amt=getInputNumber(v('.amount'));html+=`<tr${idx%2===0?'':' style="background:#EFF6FF"'}><td style="text-align:center">${escH(v('.date-input')?.value||'')}</td><td>${escH(v('.reference-number')?.value||'')}</td><td>${escH(label)}</td><td style="text-align:center">${escH(v('.payment-mode')?.value||'')}</td><td>${escH(v('.government-agency')?.value||'')}</td><td class="num">${amt.toFixed(2)}</td><td>${escH(v('.remarks')?.value||'')}</td></tr>`;});
   html+=`</tbody><tfoot><tr class="sum-row"><td colspan="5" style="text-align:right;font-weight:bold">TOTALS:</td><td class="num">${totalAmt.toFixed(2)}</td><td>-</td></tr></tfoot></table>
   <div class="sec-ttl">Financial Summary</div>
-  <table class="fin-table">
-    <tr><td class="fin-lbl">VAT Payments:</td><td class="fin-val">₱ ${totalVAT.toFixed(2)}</td></tr>
-    <tr><td class="fin-lbl">Income Tax (IT):</td><td class="fin-val">₱ ${totalIT.toFixed(2)}</td></tr>
-    <tr><td class="fin-lbl">Documentary Stamp Tax (DST):</td><td class="fin-val">₱ ${dst.toFixed(2)}</td></tr>
-    <tr><td class="fin-lbl">Withholding Tax (WT):</td><td class="fin-val">₱ ${wt.toFixed(2)}</td></tr>
-    <tr><td class="fin-lbl">License Fees (LTO/BFP/BPLO/Others):</td><td class="fin-val">₱ ${totalLic.toFixed(2)}</td></tr>
-    <tr style="border-top:2px solid #2563EB"><td class="fin-lbl" style="color:#1E3A8A">Total Amount Paid:</td><td class="fin-val" style="color:#1E3A8A;font-weight:bold">₱ ${totalAmt.toFixed(2)}</td></tr>
-  </table>
-  <div class="footer">
-    <p>Report generated on ${dateStr} at ${timeStr}</p>
-    <p>Authorized by: ${escH(co.employee)} &nbsp;·&nbsp; Taxes &amp; Licenses Data Tracker</p>
-    <p>© ${now.getFullYear()} Taxes &amp; Licenses Data Tracker – Professional Tax and Government License Payment Tracking System</p>
-  </div></body></html>`;
-  const blob=new Blob([html],{type:'application/vnd.ms-excel'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='Taxes_Licenses_'+co.name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.xls';
-  a.click(); URL.revokeObjectURL(a.href); showToast('Excel report exported','success');
+  <table class="fin-table"><tr><td class="fin-lbl">VAT Payments:</td><td class="fin-val">₱ ${totalVAT.toFixed(2)}</td></tr><tr><td class="fin-lbl">Income Tax (IT):</td><td class="fin-val">₱ ${totalIT.toFixed(2)}</td></tr><tr><td class="fin-lbl">Documentary Stamp Tax (DST):</td><td class="fin-val">₱ ${dst.toFixed(2)}</td></tr><tr><td class="fin-lbl">Withholding Tax (WT):</td><td class="fin-val">₱ ${wt.toFixed(2)}</td></tr><tr><td class="fin-lbl">License Fees:</td><td class="fin-val">₱ ${totalLic.toFixed(2)}</td></tr><tr style="border-top:2px solid #2563EB"><td class="fin-lbl" style="color:#1E3A8A">Total Amount Paid:</td><td class="fin-val" style="color:#1E3A8A;font-weight:bold">₱ ${totalAmt.toFixed(2)}</td></tr></table>
+  <div class="footer"><p>Report generated on ${dateStr} at ${timeStr}</p><p>Authorized by: ${escH(co.employee)} · Taxes &amp; Licenses Data Tracker</p><p>© ${now.getFullYear()} Taxes &amp; Licenses Data Tracker</p></div></body></html>`;
+  const blob=new Blob([html],{type:'application/vnd.ms-excel'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Taxes_Licenses_'+co.name.replace(/[^a-zA-Z0-9]/g,'_')+'_'+new Date().toISOString().split('T')[0]+'.xls';a.click();URL.revokeObjectURL(a.href);showToast('Excel report exported','success');
 }
 
 /* ============================================================
-   SELECT MULTIPLE
+   SELECT MULTIPLE + RIGHT-CLICK CONTEXT MENU  (req #8)
 ============================================================ */
 let selectMode=false,isDragging=false,dragStart=null,selectedCells=new Set();
+function removeSelInfoBar(){document.querySelector('.selection-info-bar')?.remove();}
+function createSelInfoBar(){removeSelInfoBar();const bar=document.createElement('div');bar.className='selection-info-bar';bar.innerHTML=`<div class="sel-info-dot"></div><span id="selCount">0</span> cells selected<span class="sel-info-hint">· Right-click for options</span>`;document.body.appendChild(bar);}
+function updateSelInfoBar(){const el=document.getElementById('selCount');if(el)el.textContent=selectedCells.size;}
 function toggleSelectMode(){
   selectMode=!selectMode;
-  const tb=document.getElementById('tableBody'), btn=document.getElementById('selectMultipleBtn');
-  if(selectMode){ tb.classList.add('select-mode'); btn.classList.add('active'); btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection'; createSelToolbar(); showToast('Selection mode on','info'); document.body.style.userSelect='none'; }
-  else { tb.classList.remove('select-mode'); btn.classList.remove('active'); btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple'; clearCellSel(); document.querySelector('.selection-toolbar')?.remove(); document.body.style.userSelect=''; }
+  const tb=document.getElementById('tableBody'),btn=document.getElementById('selectMultipleBtn');
+  if(selectMode){tb.classList.add('select-mode');btn.classList.add('active');btn.innerHTML='<i class="fas fa-check-double"></i>Exit Selection';createSelInfoBar();showToast('Selection mode — drag to select, right-click for options','info');document.body.style.userSelect='none';}
+  else{tb.classList.remove('select-mode');btn.classList.remove('active');btn.innerHTML='<i class="fas fa-check-double"></i>Select Multiple';clearCellSel();removeSelInfoBar();closeCtxMenu();document.body.style.userSelect='';}
 }
-function createSelToolbar(){
-  if(document.querySelector('.selection-toolbar')) return;
-  const tb=document.createElement('div'); tb.className='selection-toolbar';
-  tb.innerHTML=`<span class="sel-tb-info"><span id="selCount">0</span> cells</span>
-    <button class="sel-tb-btn" id="selCopyBtn"><i class="fas fa-copy"></i> Copy</button>
-    <button class="sel-tb-btn" id="selPasteBtn"><i class="fas fa-paste"></i> Paste</button>
-    <button class="sel-tb-btn" id="selDelBtn"><i class="fas fa-trash"></i> Clear</button>
-    <button class="sel-tb-btn exit" id="selExitBtn"><i class="fas fa-times"></i> Exit</button>`;
-  document.body.appendChild(tb);
-  document.getElementById('selCopyBtn').addEventListener('click',copySelCells);
-  document.getElementById('selPasteBtn').addEventListener('click',pasteSelCells);
-  document.getElementById('selDelBtn').addEventListener('click',delSelCells);
-  document.getElementById('selExitBtn').addEventListener('click',toggleSelectMode);
+let activeCtxMenu=null;
+function closeCtxMenu(){if(activeCtxMenu){activeCtxMenu.remove();activeCtxMenu=null;}}
+function showCtxMenu(x,y){
+  closeCtxMenu();
+  const count=selectedCells.size,selRows=getSelectedFullRows(),hasRows=selRows.length>0;
+  const menu=document.createElement('div');menu.className='ctx-menu';
+  menu.innerHTML=`<div class="ctx-menu-header"><i class="fas fa-mouse-pointer"></i> Selection Actions <span class="ctx-count-badge">${count} cell${count!==1?'s':''}</span></div>
+    <button class="ctx-item" id="ctxCopy"><i class="fas fa-copy"></i> Copy Cells</button>
+    <button class="ctx-item" id="ctxPaste"><i class="fas fa-paste"></i> Paste Here</button>
+    <button class="ctx-item" id="ctxClear"><i class="fas fa-eraser"></i> Clear Cell Values</button>
+    <div class="ctx-divider"></div>
+    ${hasRows?`<button class="ctx-item danger" id="ctxDeleteRows"><i class="fas fa-trash-alt"></i> Delete Selected Rows <span class="ctx-count-badge" style="background:#FECACA;color:#B91C1C">${selRows.length} row${selRows.length!==1?'s':''}</span></button><div class="ctx-divider"></div>`:''}
+    <button class="ctx-item exit-item" id="ctxExit"><i class="fas fa-times-circle"></i> Exit Selection Mode</button>`;
+  document.body.appendChild(menu);activeCtxMenu=menu;
+  const mw=menu.offsetWidth,mh=menu.offsetHeight,vw=window.innerWidth,vh=window.innerHeight;
+  let left=x,top=y;if(left+mw>vw-8)left=vw-mw-8;if(top+mh>vh-8)top=vh-mh-8;if(left<8)left=8;if(top<8)top=8;
+  menu.style.left=left+'px';menu.style.top=top+'px';
+  menu.querySelector('#ctxCopy').onclick=()=>{closeCtxMenu();copySelCells();};
+  menu.querySelector('#ctxPaste').onclick=()=>{closeCtxMenu();pasteSelCells();};
+  menu.querySelector('#ctxClear').onclick=()=>{closeCtxMenu();delSelCells();};
+  if(hasRows)menu.querySelector('#ctxDeleteRows').onclick=()=>{closeCtxMenu();deleteSelectedRows(selRows);};
+  menu.querySelector('#ctxExit').onclick=()=>{closeCtxMenu();toggleSelectMode();};
+  setTimeout(()=>{const close=e=>{if(!menu.contains(e.target)){closeCtxMenu();document.removeEventListener('mousedown',close);}};document.addEventListener('mousedown',close);},0);
 }
-function getCellCoords(c){ const r=c.parentElement; const rows=Array.from(r.parentElement.children); return{row:rows.indexOf(r),col:Array.from(r.children).indexOf(c)}; }
-function selectRange(s,e){
-  clearCellSel();
-  const allRows=Array.from(document.querySelectorAll('#tableBody tr'));
-  const r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);
-  for(let r=r1;r<=r2;r++){ const row=allRows[r]; if(!row) continue; for(let c=c1;c<=c2;c++){ const cell=row.children[c]; if(!cell) continue; cell.classList.add('cell-selected'); selectedCells.add(cell); } }
-  const sc=document.getElementById('selCount'); if(sc) sc.textContent=selectedCells.size;
-}
-function clearCellSel(){ document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected')); selectedCells.clear(); const sc=document.getElementById('selCount'); if(sc) sc.textContent=0; }
-function getCellValue(c){ const inp=c.querySelector('input,select'); if(inp) return inp.value; return c.textContent.trim(); }
-function setCellValue(c,v){ const inp=c.querySelector('input'); if(inp){ inp.value=v; inp.dispatchEvent(new Event('input',{bubbles:true})); return true; } const sel=c.querySelector('select'); if(sel){ const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v); if(opt) sel.value=opt.value; sel.dispatchEvent(new Event('change',{bubbles:true})); return true; } return false; }
-function copySelCells(){ if(!selectedCells.size){showToast('No cells selected','warning');return;} const coords=[...selectedCells].map(c=>({cell:c,...getCellCoords(c)})); const minR=Math.min(...coords.map(c=>c.row)),minC=Math.min(...coords.map(c=>c.col)),maxR=Math.max(...coords.map(c=>c.row)),maxC=Math.max(...coords.map(c=>c.col)); const grid=[]; for(let r=minR;r<=maxR;r++){const row=[];for(let c=minC;c<=maxC;c++){const f=coords.find(x=>x.row===r&&x.col===c);row.push(f?getCellValue(f.cell):'');}grid.push(row);} navigator.clipboard.writeText(grid.map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+selectedCells.size+' cells','success')).catch(()=>showToast('Clipboard error','error')); }
-function pasteSelCells(){ navigator.clipboard.readText().then(text=>{ const rows=text.split('\n').map(r=>r.split('\t')); const sorted=[...selectedCells].sort((a,b)=>{const ca=getCellCoords(a),cb=getCellCoords(b);return ca.row!==cb.row?ca.row-cb.row:ca.col-cb.col;}); let cnt=0; sorted.forEach((cell,i)=>{const r=Math.floor(i/rows[0].length),c2=i%rows[0].length;if(rows[r]&&rows[r][c2]!==undefined&&setCellValue(cell,rows[r][c2]))cnt++;}); clearCellSel(); showToast('Pasted to '+cnt+' cells','success'); scheduleStats(); }).catch(()=>showToast('Clipboard read failed','error')); }
-function delSelCells(){ if(!selectedCells.size){showToast('No cells selected','warning');return;} let cnt=0; selectedCells.forEach(c=>{if(setCellValue(c,''))cnt++;}); clearCellSel(); showToast('Cleared '+cnt+' cells','success'); scheduleStats(); }
+function getSelectedFullRows(){if(!selectedCells.size)return[];const rowMap=new Map();for(const cell of selectedCells){const row=cell.parentElement;if(!rowMap.has(row))rowMap.set(row,new Set());rowMap.get(row).add(cell);}const fullRows=[];for(const[row,cells]of rowMap){const allTds=Array.from(row.children).filter(td=>!td.classList.contains('hidden-column')&&!td.querySelector('.delete-btn'));if(allTds.every(td=>cells.has(td)))fullRows.push(row);}return fullRows;}
+function deleteSelectedRows(rows){if(!rows||!rows.length)return;if(!confirm(`Delete ${rows.length} selected row${rows.length!==1?'s':''}?`))return;clearCellSel();rows.forEach(row=>{row.style.transition='opacity .15s,transform .15s';row.style.opacity='0';row.style.transform='translateX(-10px)';setTimeout(()=>row.remove(),180);});setTimeout(()=>{if(currentPage>getTotalPages())currentPage=Math.max(1,getTotalPages());renderCurrentPage();scheduleStats();scheduleAutoSave();showToast(`Deleted ${rows.length} row${rows.length!==1?'s':''}`, 'success');},220);}
+function getCellCoords(c){const r=c.parentElement;return{row:Array.from(r.parentElement.children).indexOf(r),col:Array.from(r.children).indexOf(c)};}
+function selectRange(s,e){clearCellSel();const allRows=Array.from(document.querySelectorAll('#tableBody tr')),r1=Math.min(s.row,e.row),r2=Math.max(s.row,e.row),c1=Math.min(s.col,e.col),c2=Math.max(s.col,e.col);for(let r=r1;r<=r2;r++){const row=allRows[r];if(!row)continue;for(let c=c1;c<=c2;c++){const cell=row.children[c];if(!cell)continue;cell.classList.add('cell-selected');selectedCells.add(cell);}}updateSelInfoBar();}
+function clearCellSel(){document.querySelectorAll('.cell-selected').forEach(c=>c.classList.remove('cell-selected'));selectedCells.clear();updateSelInfoBar();}
+function getCellValue(c){const inp=c.querySelector('input,select');if(inp)return inp.value;return c.textContent.trim();}
+function setCellValue(c,v){const inp=c.querySelector('input');if(inp){inp.value=v;inp.dataset.raw=v.replace(/,/g,'');inp.dispatchEvent(new Event('input',{bubbles:true}));return true;}const sel=c.querySelector('select');if(sel){const opt=Array.from(sel.options).find(o=>o.value===v||o.text===v);if(opt)sel.value=opt.value;sel.dispatchEvent(new Event('change',{bubbles:true}));return true;}return false;}
+function copySelCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}const coords=[...selectedCells].map(c=>({cell:c,...getCellCoords(c)}));const minR=Math.min(...coords.map(c=>c.row)),minC=Math.min(...coords.map(c=>c.col)),maxR=Math.max(...coords.map(c=>c.row)),maxC=Math.max(...coords.map(c=>c.col));const grid=[];for(let r=minR;r<=maxR;r++){const row=[];for(let c=minC;c<=maxC;c++){const f=coords.find(x=>x.row===r&&x.col===c);row.push(f?getCellValue(f.cell):'');}grid.push(row);}navigator.clipboard.writeText(grid.map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+selectedCells.size+' cells','success')).catch(()=>showToast('Clipboard error','error'));}
+function pasteSelCells(){navigator.clipboard.readText().then(text=>{const rows=text.split('\n').map(r=>r.split('\t'));const sorted=[...selectedCells].sort((a,b)=>{const ca=getCellCoords(a),cb=getCellCoords(b);return ca.row!==cb.row?ca.row-cb.row:ca.col-cb.col;});let cnt=0;sorted.forEach((cell,i)=>{const r=Math.floor(i/rows[0].length),c2=i%rows[0].length;if(rows[r]&&rows[r][c2]!==undefined&&setCellValue(cell,rows[r][c2]))cnt++;});clearCellSel();showToast('Pasted to '+cnt+' cells','success');scheduleStats();}).catch(()=>showToast('Clipboard read failed','error'));}
+function delSelCells(){if(!selectedCells.size){showToast('No cells selected','warning');return;}let cnt=0;selectedCells.forEach(c=>{if(setCellValue(c,''))cnt++;});clearCellSel();showToast('Cleared '+cnt+' cells','success');scheduleStats();}
 
 /* ============================================================
-   VISIBILITY TOGGLES
+   VISIBILITY TOGGLES — all hidden by default, "Show X" labels  (req #9)
 ============================================================ */
 const TOGGLE_SECTIONS={
-  toggleStatsBtn:{el:'statsSection',show:'Hide Stats Bar',hide:'Show Stats Bar'},
-  toggleTallyBtn:{el:'tallySection',show:'Hide Tally',hide:'Show Tally'},
-  toggleFooterBtn:{el:'footerEl',show:'Hide Footer',hide:'Show Footer'}
+  toggleStatsBtn: {el:'statsSection', showLabel:'Show Stats Bar', hideLabel:'Hide Stats Bar'},
+  toggleTallyBtn: {el:'tallySection', showLabel:'Show Tally',     hideLabel:'Hide Tally'},
+  toggleFooterBtn:{el:'footerEl',     showLabel:'Show Footer',    hideLabel:'Hide Footer'},
 };
 function initVisibilityToggles(){
-  const saved=JSON.parse(localStorage.getItem('taxesVisStates')||'{}');
   Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{
-    const btn=document.getElementById(btnId), el=document.getElementById(cfg.el);
-    if(!btn||!el) return;
-    if(saved[cfg.el]===true){ el.classList.add('hidden'); updateToggleBtn(btn,cfg,true); }
-    btn.addEventListener('click',()=>{ const hidden=el.classList.toggle('hidden'); updateToggleBtn(btn,cfg,hidden); const s=JSON.parse(localStorage.getItem('taxesVisStates')||'{}'); s[cfg.el]=hidden; localStorage.setItem('taxesVisStates',JSON.stringify(s)); });
+    const btn=document.getElementById(btnId),el=document.getElementById(cfg.el);if(!btn||!el)return;
+    el.classList.add('hidden');updateToggleBtn(btn,cfg,true);
+    btn.addEventListener('click',()=>{const nowHidden=el.classList.toggle('hidden');updateToggleBtn(btn,cfg,nowHidden);});
   });
-  document.getElementById('hideAllBtn').addEventListener('click',()=>{ Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{ const el=document.getElementById(cfg.el); const btn=document.getElementById(btnId); if(el&&!el.classList.contains('hidden')){ el.classList.add('hidden'); updateToggleBtn(btn,cfg,true); } }); const s={}; Object.values(TOGGLE_SECTIONS).forEach(c=>s[c.el]=true); localStorage.setItem('taxesVisStates',JSON.stringify(s)); });
-  document.getElementById('showAllBtn').addEventListener('click',()=>{ Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{ const el=document.getElementById(cfg.el); const btn=document.getElementById(btnId); if(el){ el.classList.remove('hidden'); updateToggleBtn(btn,cfg,false); } }); localStorage.setItem('taxesVisStates','{}'); });
+  document.getElementById('hideAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el){el.classList.add('hidden');updateToggleBtn(btn,cfg,true);}});});
+  document.getElementById('showAllBtn').addEventListener('click',()=>{Object.entries(TOGGLE_SECTIONS).forEach(([btnId,cfg])=>{const el=document.getElementById(cfg.el),btn=document.getElementById(btnId);if(el){el.classList.remove('hidden');updateToggleBtn(btn,cfg,false);}});});
 }
-function updateToggleBtn(btn,cfg,isHidden){ if(!btn) return; const spans=btn.querySelectorAll('span'); const last=spans[spans.length-1]; if(last) last.textContent=isHidden?cfg.hide:cfg.show; btn.classList.toggle('toggled',!isHidden); }
+function updateToggleBtn(btn,cfg,isHidden){if(!btn)return;const icon=btn.querySelector('i');btn.innerHTML=(icon?icon.outerHTML:'')+(isHidden?cfg.showLabel:cfg.hideLabel);btn.classList.toggle('toggled',!isHidden);}
 
 /* ============================================================
    SIDEBAR TOGGLES
 ============================================================ */
 function initSidebarToggles(){
-  const left=document.getElementById('leftSidebar'), right=document.getElementById('rightPanel');
-  const lBtn=document.getElementById('headerLeftToggle'), rBtn=document.getElementById('headerRightToggle');
-  const isMobile=()=>window.innerWidth<=900;
-  let lOpen=!isMobile(), rOpen=!isMobile();
-  function applyLeft(){ if(isMobile()){left.classList.toggle('mobile-open',lOpen);left.classList.remove('collapsed');}else{left.classList.toggle('collapsed',!lOpen);left.classList.remove('mobile-open');} }
-  function applyRight(){ if(isMobile()){right.classList.toggle('mobile-open',rOpen);right.classList.remove('collapsed');}else{right.classList.toggle('collapsed',!rOpen);right.classList.remove('mobile-open');} }
-  lBtn.addEventListener('click',()=>{lOpen=!lOpen;applyLeft();});
-  rBtn.addEventListener('click',()=>{rOpen=!rOpen;applyRight();});
-  applyLeft(); applyRight();
-  window.addEventListener('resize',()=>{applyLeft();applyRight();});
+  const left=document.getElementById('leftSidebar'),right=document.getElementById('rightPanel'),lBtn=document.getElementById('headerLeftToggle'),rBtn=document.getElementById('headerRightToggle');
+  const isMobile=()=>window.innerWidth<=900;let lOpen=!isMobile(),rOpen=!isMobile();
+  function applyLeft(){if(isMobile()){left.classList.toggle('mobile-open',lOpen);left.classList.remove('collapsed');}else{left.classList.toggle('collapsed',!lOpen);left.classList.remove('mobile-open');}}
+  function applyRight(){if(isMobile()){right.classList.toggle('mobile-open',rOpen);right.classList.remove('collapsed');}else{right.classList.toggle('collapsed',!rOpen);right.classList.remove('mobile-open');}}
+  lBtn.addEventListener('click',()=>{lOpen=!lOpen;applyLeft();});rBtn.addEventListener('click',()=>{rOpen=!rOpen;applyRight();});
+  applyLeft();applyRight();window.addEventListener('resize',()=>{applyLeft();applyRight();});
 }
 
 /* ============================================================
-   LONG PRESS
+   LONG PRESS (add-row button)
 ============================================================ */
-function initLongPress(btn){
-  let timer=null,interval=null,pressing=false,added=0;
-  function start(e){ e.preventDefault(); timer=setTimeout(()=>{ pressing=true;added=0; showLPToast('Adding rows… release to stop'); interval=setInterval(()=>{addBatchRows(3);added+=3;showLPToast('Added '+added+' rows…');},250); },500); }
-  function stop(e){ if(e) e.preventDefault(); clearTimeout(timer); clearInterval(interval); if(pressing){ pressing=false; showLPToast('✓ Added '+added+' rows'); setTimeout(hideLPToast,2000); scheduleStats(); } }
-  btn.addEventListener('mousedown',start); btn.addEventListener('mouseup',stop); btn.addEventListener('mouseleave',stop);
-  btn.addEventListener('touchstart',start,{passive:false}); btn.addEventListener('touchend',stop,{passive:false});
-}
+function initLongPress(btn){let timer=null,interval=null,pressing=false,added=0;function start(e){e.preventDefault();timer=setTimeout(()=>{pressing=true;added=0;showLPToast('Adding rows…');interval=setInterval(()=>{addBatchRows(3);added+=3;showLPToast('Added '+added+' rows…');},250);},500);}function stop(e){if(e)e.preventDefault();clearTimeout(timer);clearInterval(interval);if(pressing){pressing=false;showLPToast('✓ Added '+added+' rows');setTimeout(hideLPToast,2000);scheduleStats();}else if(timer)clearTimeout(timer);}btn.addEventListener('mousedown',start);btn.addEventListener('mouseup',stop);btn.addEventListener('mouseleave',stop);btn.addEventListener('touchstart',start,{passive:false});btn.addEventListener('touchend',stop,{passive:false});}
 
 /* ============================================================
    TABLE FOCUS MODE
 ============================================================ */
-function initTableFocusMode(){
-  document.getElementById('tableFocusBtn').addEventListener('click',function(){
-    const inFocus=document.body.classList.toggle('table-focus');
-    if(inFocus){ document.querySelectorAll('.stats-bar,.tally-section,.footer').forEach(el=>el.classList.add('hidden')); this.innerHTML='<i class="fas fa-compress"></i>Exit Focus Mode'; }
-    else { document.querySelectorAll('.stats-bar,.tally-section,.footer').forEach(el=>el.classList.remove('hidden')); this.innerHTML='<i class="fas fa-expand"></i>Table Focus Mode'; }
-  });
-}
+function initTableFocusMode(){document.getElementById('tableFocusBtn').addEventListener('click',function(){const inFocus=document.body.classList.toggle('table-focus');if(inFocus){document.querySelectorAll('.stats-bar,.tally-section,.footer').forEach(el=>el.classList.add('hidden'));this.innerHTML='<i class="fas fa-compress"></i>Exit Focus Mode';}else{document.querySelectorAll('.stats-bar,.tally-section,.footer').forEach(el=>el.classList.remove('hidden'));this.innerHTML='<i class="fas fa-expand"></i>Table Focus Mode';}});}
 
 /* ============================================================
-   ENTER KEY NAVIGATION
+   ENTER KEY NAV
 ============================================================ */
-function initEnterNav(){
-  document.getElementById('tableBody').addEventListener('keydown',e=>{
-    if(e.key!=='Enter') return;
-    const el=document.activeElement;
-    if(!el||!['INPUT','SELECT'].includes(el.tagName)) return;
-    const td=el.closest('td'); if(!td) return;
-    const tr=td.parentElement;
-    let nextTr=tr.nextElementSibling;
-    if(!nextTr){ e.preventDefault(); addRow(); const rows=document.querySelectorAll('#tableBody tr'); if(rows.length) nextTr=rows[rows.length-1]; }
-    if(!nextTr) return;
-    const idx=Array.from(tr.children).indexOf(td);
-    const nextTd=nextTr.children[idx]; if(!nextTd) return;
-    const nextEl=nextTd.querySelector('input,select');
-    if(nextEl){ e.preventDefault(); nextEl.focus(); if(nextEl.tagName==='INPUT') nextEl.select(); }
-  });
-}
+function initEnterNav(){document.getElementById('tableBody').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const el=document.activeElement;if(!el||!['INPUT','SELECT'].includes(el.tagName))return;const td=el.closest('td');if(!td)return;const tr=td.parentElement;let nextTr=tr.nextElementSibling;if(!nextTr){e.preventDefault();addRow();const rows=document.querySelectorAll('#tableBody tr');if(rows.length)nextTr=rows[rows.length-1];}if(!nextTr)return;const idx=Array.from(tr.children).indexOf(td);const nextTd=nextTr.children[idx];if(!nextTd)return;const nextEl=nextTd.querySelector('input,select');if(nextEl){e.preventDefault();nextEl.focus();if(nextEl.tagName==='INPUT')nextEl.select();}});}
 
 /* ============================================================
-   SELECTION MOUSE EVENTS
+   SELECTION MOUSE EVENTS + RIGHT-CLICK  (req #8)
 ============================================================ */
 function initSelectionMouseEvents(){
   const tb=document.getElementById('tableBody');
-  tb.addEventListener('mousedown',e=>{
-    if(!selectMode) return;
-    const td=e.target.closest('td'); if(!td) return;
-    e.preventDefault(); isDragging=true; dragStart=getCellCoords(td);
-    clearCellSel(); td.classList.add('cell-selected'); selectedCells.add(td);
-    const sc=document.getElementById('selCount'); if(sc) sc.textContent=1;
-  });
-  tb.addEventListener('mousemove',e=>{
-    if(!selectMode||!isDragging) return;
-    const td=e.target.closest('td'); if(!td) return;
-    selectRange(dragStart,getCellCoords(td));
-  });
-  document.addEventListener('mouseup',()=>{ if(isDragging) isDragging=false; });
-  document.addEventListener('keydown',e=>{
-    if(!selectMode) return;
-    if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelCells();}
-    if(e.ctrlKey&&e.key==='v'){e.preventDefault();pasteSelCells();}
-    if(e.key==='Delete'){e.preventDefault();delSelCells();}
-    if(e.key==='Escape'){if(selectedCells.size>0)clearCellSel();else toggleSelectMode();}
-  });
+  tb.addEventListener('mousedown',e=>{if(!selectMode)return;if(e.button===2)return;const td=e.target.closest('td');if(!td)return;e.preventDefault();isDragging=true;dragStart=getCellCoords(td);clearCellSel();td.classList.add('cell-selected');selectedCells.add(td);updateSelInfoBar();});
+  tb.addEventListener('mousemove',e=>{if(!selectMode||!isDragging)return;const td=e.target.closest('td');if(!td)return;selectRange(dragStart,getCellCoords(td));});
+  tb.addEventListener('contextmenu',e=>{if(!selectMode)return;e.preventDefault();const td=e.target.closest('td');if(td&&!selectedCells.has(td)){clearCellSel();td.classList.add('cell-selected');selectedCells.add(td);updateSelInfoBar();}showCtxMenu(e.clientX,e.clientY);});
+  document.addEventListener('mouseup',()=>{if(isDragging)isDragging=false;});
+  document.addEventListener('keydown',e=>{if(!selectMode)return;if(e.ctrlKey&&e.key==='c'){e.preventDefault();copySelCells();}if(e.ctrlKey&&e.key==='v'){e.preventDefault();pasteSelCells();}if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();delSelCells();}if(e.key==='Escape'){if(activeCtxMenu){closeCtxMenu();}else if(selectedCells.size>0){clearCellSel();}else{toggleSelectMode();}}});
 }
 
 /* ============================================================
-   REPORT DATE → TABLE DATE SYNC
+   BEFOREUNLOAD
 ============================================================ */
-function initReportDateSync(){
-  const rdInput=document.getElementById('reportDate');
-  if(!rdInput) return;
-  rdInput.addEventListener('change',function(){
-    const newDate=this.value; if(!newDate) return;
-    saveCompanyInfo();
-    if(confirm('Update all table dates to match the new report date ('+newDate+')?')){
-      document.querySelectorAll('#tableBody tr .date-input').forEach(di=>{ di.value=newDate; });
-      showToast('All dates updated to '+newDate,'success');
-    }
-  });
-}
+window.addEventListener('beforeunload',()=>{const localData={version:'1.0',timestamp:new Date().toISOString(),tableData:getTableData(),companyInfo:getCompanyData()};localStorage.setItem(NS.SESSION,JSON.stringify(localData));localStorage.setItem(NS.COMPANY,JSON.stringify(localData.companyInfo));});
 
 /* ============================================================
    INIT
 ============================================================ */
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('reportDate').value=new Date().toISOString().split('T')[0];
-  loadCompanyInfo();
-  initColVisibility();
-  initPagination();
-  addRow();
-  updateAllStats();
-  initSidebarToggles();
-  initVisibilityToggles();
-  initEnterNav();
-  initTableFocusMode();
-  initSelectionMouseEvents();
-  initReportDateSync();
+document.addEventListener('DOMContentLoaded',async()=>{
+  await checkBackend();
+  const sub=APP_ROLE==='Client'?'Client':APP_ROLE==='SubAdmin'?'Sub-Admin':'';
+  document.getElementById('topbarSub').textContent='Professional Tax & License Tracking'+(sub?' · '+sub:'');
+  if(APP_ROLE==='Client')document.getElementById('submitPortalHeadBtn').classList.remove('hidden');
 
-  // Company info auto-save
-  ['companyName','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email']
-    .forEach(id=>{const el=document.getElementById(id);if(el) el.addEventListener('change',saveCompanyInfo);});
+  const rdEl=document.getElementById('reportDate');if(rdEl&&!rdEl.value)rdEl.value=getTodayDisplay();
 
-  // Company TIN auto-format with dashes (xxx-xxx-xxx-xxx)
-  const cTIN=document.getElementById('companyTIN');
-  if(cTIN){
-    cTIN.addEventListener('input',()=>formatCompanyTIN(cTIN));
-    cTIN.addEventListener('change',()=>{ formatCompanyTIN(cTIN); saveCompanyInfo(); });
+  initColVisibility();initPagination();initSidebarToggles();initVisibilityToggles();initEnterNav();initTableFocusMode();initSelectionMouseEvents();
+
+  let startupDone=false;
+  if(APP_ROLE==='SubAdmin')startupDone=checkPortalFileOnLoad();
+  if(!startupDone){const restored=await restoreSession();if(restored===false||restored===null){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();}else if(restored>0)showToast(`Loaded ${restored} row(s) from session`,'success');}
+
+  ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('change',()=>{saveCompanyInfo();scheduleAutoSave();});el.addEventListener('input',()=>scheduleAutoSave());}});
+  const cTIN=document.getElementById('companyTIN');if(cTIN){cTIN.addEventListener('input',()=>formatCompanyTIN(cTIN));cTIN.addEventListener('blur',()=>{formatCompanyTIN(cTIN);saveCompanyInfo();});}
+
+  if(rdEl){
+    rdEl.addEventListener('input',function(){autoFormatDate(this);});
+    rdEl.addEventListener('blur',function(){if(this.value&&!isValidDisplay(this.value))showToast('Invalid date format. Use MM/DD/YYYY','warning');});
+    let prevDate=rdEl.value;
+    rdEl.addEventListener('change',function(){const newDate=this.value;if(prevDate&&newDate&&newDate!==prevDate){const cnt=document.querySelectorAll('#tableBody .date-input').length;if(cnt>0&&confirm(`Update all ${cnt} rows to new report date (${newDate})?`))updateAllDatesFromReportDate();}prevDate=newDate;saveCompanyInfo();});
   }
 
-  // Nav buttons
+  document.getElementById('reportDatePickerBtn').addEventListener('click',function(e){e.stopPropagation();if(document.getElementById('dpPopup')){closeDatePicker();return;}showDatePicker(this);});
+  document.getElementById('applyDateBadge').addEventListener('click',updateAllDatesFromReportDate);
+
   document.getElementById('addRowBtn').addEventListener('click',()=>addRow());
   document.getElementById('addRowBtnHead').addEventListener('click',()=>addRow());
   initLongPress(document.getElementById('addRowBtn'));
-
-  document.getElementById('addBatchRowsBtn').addEventListener('click',()=>{
-    const n=parseInt(prompt('How many rows?','10'));
-    if(n>0&&n<=5000) addBatchRows(n);
-    else if(n>5000) showToast('Max 5000 rows at a time','warning');
-  });
-
+  document.getElementById('addBatchRowsBtn').addEventListener('click',()=>{const n=parseInt(prompt('How many rows?','10'));if(n>0&&n<=5000)addBatchRows(n);else if(n>5000)showToast('Max 5000 rows at a time','warning');});
   document.getElementById('exportBtn').addEventListener('click',exportToExcel);
   document.getElementById('exportBtnHead').addEventListener('click',exportToExcel);
   document.getElementById('saveDataBtn').addEventListener('click',saveDataToFile);
   document.getElementById('loadDataBtn').addEventListener('click',loadDataFromFile);
   document.getElementById('loadMultipleFilesBtn').addEventListener('click',loadMultipleFiles);
-
-  document.getElementById('clearBtn').addEventListener('click',()=>{
-    if(confirm('Clear all table data? Cannot be undone.')){
-      document.getElementById('tableBody').innerHTML='';
-      addRow(); currentPage=1; renderCurrentPage(); updateAllStats();
-      showToast('Table cleared','success');
-    }
-  });
+  document.getElementById('clearBtn').addEventListener('click',async()=>{if(confirm('Clear all table data?')){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();await saveSession();showToast('Table cleared','success');}});
   document.getElementById('clearInfoBtn').addEventListener('click',clearCompanyInfo);
   document.getElementById('clearInfoBtnPanel').addEventListener('click',clearCompanyInfo);
   document.getElementById('selectMultipleBtn').addEventListener('click',toggleSelectMode);
   document.getElementById('entryCounterBtn').addEventListener('click',()=>addRow());
+
+  if(APP_ROLE==='Client'){
+    const sb=document.getElementById('submitPortalHeadBtn');
+    if(sb){sb.addEventListener('click',function(e){e.preventDefault();openSubmitModal();});}
+    document.getElementById('submitModalCancelBtn').addEventListener('click',()=>document.getElementById('submitModalOverlay').classList.add('hidden'));
+    document.getElementById('submitModalOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
+  }
 });
 </script>
+
+<!-- ============================================================
+   UNDO / REDO  — Ctrl+Z / Ctrl+Y  (req #7)
+============================================================ -->
+<script>
+(function(){
+  let undoStack=[],redoStack=[],isBusy=false;
+  function snap(){
+    const rows=document.querySelectorAll('#tableBody tr');
+    return{
+      tableData:Array.from(rows).map(r=>({
+        date:r.querySelector('.date-input')?.value||'',
+        referenceNumber:r.querySelector('.reference-number')?.value||'',
+        taxType:r.querySelector('.tax-type')?.value||'',
+        paymentMode:r.querySelector('.payment-mode')?.value||'',
+        governmentAgency:r.querySelector('.government-agency')?.value||'',
+        amount:(r.querySelector('.amount')?.dataset.raw||r.querySelector('.amount')?.value||'').replace(/,/g,''),
+        remarks:r.querySelector('.remarks')?.value||''
+      })),
+      companyInfo:{companyName:document.getElementById('companyName')?.value||'',companyTIN:document.getElementById('companyTIN')?.value||'',companyAddress:document.getElementById('companyAddress')?.value||'',lineOfBusiness:document.getElementById('lineOfBusiness')?.value||'',telephone:document.getElementById('telephone')?.value||'',reportDate:document.getElementById('reportDate')?.value||'',authorizedEmployee:document.getElementById('authorizedEmployee')?.value||'',email:document.getElementById('email')?.value||''}
+    };
+  }
+  function restore(snapshot){
+    if(!snapshot)return;isBusy=true;
+    const tbody=document.getElementById('tableBody');
+    if(tbody&&snapshot.tableData){tbody.innerHTML='';snapshot.tableData.forEach(rd=>tbody.appendChild(createRow(rd)));if(!snapshot.tableData.length)addRow();if(typeof currentPage!=='undefined')currentPage=1;if(typeof renderCurrentPage==='function')renderCurrentPage();if(typeof updateAllStats==='function')updateAllStats();}
+    if(snapshot.companyInfo){['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el&&snapshot.companyInfo[id]!==undefined)el.value=snapshot.companyInfo[id];});if(typeof saveCompanyInfo==='function')saveCompanyInfo();}
+    if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+    setTimeout(()=>{isBusy=false;},10);
+  }
+  function push(){if(isBusy)return;redoStack=[];while(undoStack.length>50)undoStack.shift();undoStack.push(snap());upBtns();}
+  function undo(){if(!undoStack.length){showToast('Nothing to undo','info');return;}redoStack.push(snap());while(redoStack.length>50)redoStack.shift();restore(undoStack.pop());showToast('Undo successful','success');upBtns();}
+  function redo(){if(!redoStack.length){showToast('Nothing to redo','info');return;}undoStack.push(snap());while(undoStack.length>50)undoStack.shift();restore(redoStack.pop());showToast('Redo successful','success');upBtns();}
+  function upBtns(){const u=document.getElementById('globalUndoBtn'),r=document.getElementById('globalRedoBtn');if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;}
+  let ct=null;
+  function record(){if(isBusy)return;if(ct)clearTimeout(ct);ct=setTimeout(()=>{push();ct=null;},150);}
+  function addBtns(){const actions=document.querySelector('.topbar-actions');if(!actions||document.getElementById('globalUndoBtn'))return;const u=document.createElement('button');u.id='globalUndoBtn';u.className='topbar-btn';u.innerHTML='<i class="fas fa-undo-alt"></i> Undo';u.title='Undo (Ctrl+Z)';u.onclick=undo;const r=document.createElement('button');r.id='globalRedoBtn';r.className='topbar-btn';r.innerHTML='<i class="fas fa-redo-alt"></i> Redo';r.title='Redo (Ctrl+Y)';r.onclick=redo;actions.insertBefore(u,actions.firstChild);actions.insertBefore(r,actions.firstChild);upBtns();}
+  function setup(){
+    const tb=document.getElementById('tableBody');if(tb){tb.addEventListener('input',record);tb.addEventListener('change',record);}
+    ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',record);el.addEventListener('change',record);}});
+    document.body.addEventListener('click',e=>{if(e.target.closest('.delete-btn')&&!isBusy)push();});
+    ['clearBtn','loadDataBtn','loadMultipleFilesBtn','clearInfoBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{if(!isBusy)push();});});
+    const origAdd=window.addRow,origBatch=window.addBatchRows;
+    if(origAdd)window.addRow=function(data){if(!isBusy)push();return origAdd(data);};
+    if(origBatch)window.addBatchRows=function(count){if(!isBusy)push();return origBatch(count);};
+  }
+  function init(){
+    addBtns();setup();
+    window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}if((e.ctrlKey||e.metaKey)&&e.key==='y'){e.preventDefault();redo();}});
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',()=>setTimeout(push,600));}else setTimeout(push,600);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
 </body>
 </html>
