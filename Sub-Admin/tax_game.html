@@ -3,1259 +3,1193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes">
-    <title>Tax Game - VAT Tracking System</title>
+    <title>Tax Trivia Challenge – BIR Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Import styles from main system */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-        }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --primary-color: #00ff9d;
-            --secondary-color: #0a0f1a;
-            --card-bg: rgba(0, 30, 20, 0.9);
-            --header-bg: linear-gradient(135deg, rgba(0, 30, 20, 0.9) 0%, rgba(0, 40, 25, 0.95) 100%);
-            --text-color: #e0f7e9;
-            --text-secondary: #80ffd4;
-            --sidebar-bg: rgba(0, 20, 15, 0.98);
+            --bg:       #0e1117;
+            --surface:  #161b27;
+            --surface2: #1c2336;
+            --border:   rgba(255,255,255,0.07);
+            --gold:     #f4c542;
+            --gold2:    #e6a30a;
+            --blue:     #4f8ef7;
+            --red:      #e05555;
+            --green:    #3ecf8e;
+            --text:     #e8eaf2;
+            --muted:    #7b85a0;
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'DM Mono', monospace;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #0a0f1a 0%, #0d1913 100%);
-            color: var(--text-color);
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+
+        /* ─── BACKGROUND GRID ─── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(79,142,247,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79,142,247,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none; z-index: 0;
         }
-        
-        /* Header */
+
+        .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+        /* ─── HEADER ─── */
         .header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            background: var(--header-bg);
-            border-radius: 15px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(0, 255, 157, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex; align-items: center; gap: 20px;
+            padding: 28px 32px;
+            background: linear-gradient(135deg, #1a2545 0%, #111827 100%);
+            border: 1px solid rgba(244,197,66,0.2);
+            border-radius: 20px;
+            margin-bottom: 28px;
+            position: relative; overflow: hidden;
         }
-        
-        .header-icon {
-            font-size: 3rem;
-            color: var(--primary-color);
-            background: rgba(0, 40, 25, 0.8);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        .header::after {
+            content: '';
+            position: absolute; top: 0; right: -60px; width: 260px; height: 100%;
+            background: radial-gradient(ellipse at center, rgba(244,197,66,0.12) 0%, transparent 70%);
+            pointer-events: none;
         }
-        
-        .header-text h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(to right, #a7ffeb, #00ff9d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+        .header-logo {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: #1a1100;
+            flex-shrink: 0;
+            box-shadow: 0 0 30px rgba(244,197,66,0.35);
         }
-        
-        .header-text p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
+        .header-info h1 {
+            font-family: var(--font-head);
+            font-size: 1.9rem; font-weight: 800;
+            color: var(--gold);
+            line-height: 1.1;
+            letter-spacing: -0.5px;
         }
-        
-        /* Game Container */
-        .game-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+        .header-info p { color: var(--muted); font-size: 0.92rem; margin-top: 4px; font-weight: 300; }
+        .header-badge {
+            margin-left: auto; flex-shrink: 0;
+            background: rgba(244,197,66,0.12); border: 1px solid rgba(244,197,66,0.3);
+            padding: 6px 14px; border-radius: 999px;
+            font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold);
+            letter-spacing: 1px; text-transform: uppercase;
         }
-        
-        @media (max-width: 768px) {
-            .game-container {
-                grid-template-columns: 1fr;
-            }
+
+        /* ─── LAYOUT ─── */
+        .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 22px; }
+        @media(max-width: 820px) { .main-grid { grid-template-columns: 1fr; } }
+
+        /* ─── CARD ─── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
         }
-        
-        /* Game Area */
-        .game-area {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(0, 255, 157, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        .card-title {
+            font-family: var(--font-head); font-size: 1.05rem; font-weight: 700;
+            color: var(--gold); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+            padding-bottom: 14px; border-bottom: 1px solid var(--border);
         }
-        
-        .game-title {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .card-title i { font-size: 0.95rem; }
+
+        /* ─── STATS ROW ─── */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+        .stat-chip {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px 10px; text-align: center;
         }
-        
-        /* Game Stats */
-        .game-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+        .stat-val {
+            font-family: var(--font-mono); font-size: 1.6rem; font-weight: 500;
+            color: var(--gold); line-height: 1;
         }
-        
-        .stat-box {
-            background: rgba(0, 40, 25, 0.6);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid rgba(0, 255, 157, 0.2);
+        .stat-val.lives { color: var(--red); }
+        .stat-val.timer { color: var(--blue); }
+        .stat-val.timer.danger { color: var(--red); animation: pulse 0.7s infinite; }
+        .stat-key { font-size: 0.73rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
+
+        /* ─── DIFFICULTY ─── */
+        .diff-row { display: flex; gap: 8px; margin-bottom: 20px; }
+        .diff-btn {
+            flex: 1; padding: 9px 0;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 9px; color: var(--muted);
+            font-family: var(--font-head); font-size: 0.82rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
         }
-        
-        .stat-value {
-            font-size: 2rem;
-            color: var(--primary-color);
-            font-weight: bold;
-            margin-bottom: 5px;
+        .diff-btn:hover { border-color: var(--gold); color: var(--text); }
+        .diff-btn.active { background: rgba(244,197,66,0.12); border-color: var(--gold); color: var(--gold); }
+
+        /* ─── PROGRESS ─── */
+        .progress-wrap { margin-bottom: 22px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
+        .progress-track {
+            height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden;
         }
-        
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold2), var(--gold)); border-radius: 99px; width: 0%; transition: width 0.5s ease; }
+
+        /* ─── GAME AREAS ─── */
+        .game-section { display: none; }
+        .game-section.active { display: block; }
+
+        .game-prompt {
+            font-size: 1.05rem; font-weight: 500; color: var(--text);
+            margin-bottom: 20px; line-height: 1.55;
+            padding: 14px 18px; background: var(--surface2); border-radius: 10px;
+            border-left: 3px solid var(--gold);
         }
-        
-        /* Game Controls */
-        .game-controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
+
+        /* ─── PUZZLE GRID ─── */
+        .puzzle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        @media(max-width: 500px) { .puzzle-grid { grid-template-columns: 1fr 1fr; } }
+
+        .p-card {
+            background: var(--surface2); border: 1.5px solid var(--border);
+            border-radius: 11px; padding: 16px 12px;
+            text-align: center; cursor: pointer;
+            font-size: 0.82rem; line-height: 1.45; color: var(--text);
+            transition: all 0.18s; min-height: 72px;
+            display: flex; align-items: center; justify-content: center;
+            user-select: none;
         }
-        
+        .p-card.term { font-family: var(--font-mono); font-weight: 500; font-size: 0.9rem; color: var(--gold); }
+        .p-card:hover { border-color: var(--gold); background: rgba(244,197,66,0.06); }
+        .p-card.selected { border-color: var(--blue); background: rgba(79,142,247,0.12); color: var(--blue); }
+        .p-card.matched { border-color: var(--green); background: rgba(62,207,142,0.1); color: var(--green); opacity: 0.6; pointer-events: none; }
+        .p-card.wrong { border-color: var(--red); background: rgba(224,85,85,0.12); animation: shake 0.35s ease; }
+        .p-card.disabled { pointer-events: none; opacity: 0.45; }
+
+        /* ─── QUIZ ─── */
+        .quiz-q { font-size: 1.08rem; font-weight: 500; margin-bottom: 18px; line-height: 1.55; color: var(--text); }
+        .quiz-opts { display: flex; flex-direction: column; gap: 10px; }
+        .q-opt {
+            background: var(--surface2); border: 1.5px solid var(--border);
+            border-radius: 11px; padding: 14px 18px;
+            cursor: pointer; color: var(--text); font-size: 0.9rem; transition: all 0.18s;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .q-opt::before {
+            content: attr(data-letter);
+            width: 26px; height: 26px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted);
+            flex-shrink: 0;
+        }
+        .q-opt:hover { border-color: var(--gold); background: rgba(244,197,66,0.06); }
+        .q-opt.correct { border-color: var(--green); background: rgba(62,207,142,0.1); color: var(--green); pointer-events: none; }
+        .q-opt.correct::before { background: var(--green); color: #fff; border-color: var(--green); }
+        .q-opt.incorrect { border-color: var(--red); background: rgba(224,85,85,0.1); color: var(--red); pointer-events: none; }
+        .q-opt.incorrect::before { background: var(--red); color: #fff; border-color: var(--red); }
+        .q-opt.disabled { pointer-events: none; }
+
+        /* ─── CALCULATOR GAME ─── */
+        .calc-setup { display: flex; flex-direction: column; gap: 14px; }
+        .calc-scenario {
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+        }
+        .calc-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .calc-val { font-family: var(--font-mono); font-size: 1.4rem; color: var(--gold); font-weight: 500; }
+        .calc-input-row { display: flex; gap: 10px; }
+        .calc-input {
+            flex: 1; background: var(--surface2); border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 13px 16px;
+            color: var(--text); font-family: var(--font-mono); font-size: 1rem;
+            transition: border-color 0.2s; outline: none;
+        }
+        .calc-input:focus { border-color: var(--gold); }
+        .calc-input::placeholder { color: var(--muted); }
+        .calc-hint { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+        .calc-result {
+            padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; display: none;
+            font-weight: 500;
+        }
+        .calc-result.success { background: rgba(62,207,142,0.1); border: 1px solid var(--green); color: var(--green); display: block; }
+        .calc-result.error { background: rgba(224,85,85,0.1); border: 1px solid var(--red); color: var(--red); display: block; }
+
+        /* ─── CONTROLS ─── */
+        .ctrl-row { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
         .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%);
-            color: #002614;
-            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
+            padding: 12px 22px; border: none; border-radius: 10px;
+            font-family: var(--font-head); font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s; letter-spacing: 0.3px;
         }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.5);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: #1a1100;
+            box-shadow: 0 4px 18px rgba(244,197,66,0.3);
         }
-        
-        .btn:active {
-            transform: translateY(-1px);
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(244,197,66,0.45); }
+        .btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+        .btn-ghost:hover { border-color: var(--gold); color: var(--text); }
+        .btn-next { background: rgba(79,142,247,0.12); border: 1px solid var(--blue); color: var(--blue); display: none; }
+        .btn-next:hover { background: rgba(79,142,247,0.22); }
+
+        /* ─── FLASH MESSAGE ─── */
+        .flash {
+            padding: 12px 16px; border-radius: 10px; font-size: 0.88rem;
+            font-weight: 500; margin-top: 16px; display: none;
         }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .flash.success { background: rgba(62,207,142,0.1); border: 1px solid var(--green); color: var(--green); display: block; }
+        .flash.error { background: rgba(224,85,85,0.1); border: 1px solid var(--red); color: var(--red); display: block; }
+        .flash.info { background: rgba(79,142,247,0.1); border: 1px solid var(--blue); color: var(--blue); display: block; }
+
+        /* ─── GAME MODE TABS ─── */
+        .mode-tabs { display: flex; gap: 6px; margin-bottom: 22px; }
+        .mode-tab {
+            flex: 1; padding: 9px 8px; text-align: center;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 9px; cursor: pointer; font-size: 0.78rem;
+            color: var(--muted); font-family: var(--font-head); font-weight: 600;
+            transition: all 0.2s;
         }
-        
-        /* Tax Puzzle */
-        .tax-puzzle {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
+        .mode-tab:hover { border-color: var(--gold); color: var(--text); }
+        .mode-tab.active { background: rgba(244,197,66,0.1); border-color: var(--gold); color: var(--gold); }
+        .mode-tab i { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar { display: flex; flex-direction: column; gap: 18px; }
+
+        /* ─── ACHIEVEMENTS ─── */
+        .badge-grid { display: flex; flex-direction: column; gap: 8px; }
+        .badge-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px; border-radius: 10px;
+            background: var(--surface2); border: 1px solid var(--border);
+            transition: all 0.2s;
         }
-        
-        .puzzle-piece {
-            background: rgba(0, 40, 25, 0.7);
-            border: 2px solid rgba(0, 255, 157, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
+        .badge-row.earned { border-color: rgba(244,197,66,0.3); }
+        .badge-icon { font-size: 1.2rem; width: 32px; text-align: center; }
+        .badge-info { flex: 1; }
+        .badge-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+        .badge-desc { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+        .badge-lock { font-size: 0.8rem; color: var(--muted); }
+
+        /* ─── TAX TIPS ─── */
+        .tip-box {
+            background: linear-gradient(135deg, rgba(244,197,66,0.08), rgba(244,197,66,0.03));
+            border: 1px solid rgba(244,197,66,0.2);
+            border-radius: 12px; padding: 18px;
         }
-        
-        .puzzle-piece:hover {
-            background: rgba(0, 255, 157, 0.2);
-            transform: scale(1.05);
+        .tip-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .tip-text { font-size: 0.83rem; color: var(--text); line-height: 1.6; }
+        .tip-nav { display: flex; justify-content: flex-end; gap: 6px; margin-top: 12px; }
+        .tip-btn {
+            width: 28px; height: 28px; border-radius: 7px;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--muted); cursor: pointer; font-size: 0.75rem;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
         }
-        
-        .puzzle-piece.selected {
-            background: rgba(0, 255, 157, 0.3);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        .tip-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* ─── HIGHSCORE BOARD ─── */
+        .hs-list { display: flex; flex-direction: column; gap: 6px; }
+        .hs-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: 8px;
+            background: var(--surface2); font-size: 0.82rem;
         }
-        
-        /* Game Messages */
-        .game-message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
+        .hs-rank { font-family: var(--font-mono); color: var(--muted); width: 20px; text-align: center; }
+        .hs-name { flex: 1; color: var(--text); }
+        .hs-pts { font-family: var(--font-mono); color: var(--gold); }
+        .hs-row.you { border: 1px solid rgba(244,197,66,0.25); }
+
+        /* ─── MODAL ─── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(10,13,22,0.92);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000; padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--surface);
+            border: 1px solid rgba(244,197,66,0.25);
+            border-radius: 22px; padding: 40px 36px;
+            max-width: 460px; width: 100%; text-align: center;
+            box-shadow: 0 0 60px rgba(244,197,66,0.15);
+            animation: popIn 0.3s ease;
+        }
+        .modal-icon { font-size: 3rem; margin-bottom: 18px; }
+        .modal-title { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; color: var(--gold); margin-bottom: 8px; }
+        .modal-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .modal-score { font-family: var(--font-mono); font-size: 3.5rem; color: var(--gold); font-weight: 500; margin-bottom: 6px; }
+        .modal-score-label { color: var(--muted); font-size: 0.82rem; margin-bottom: 28px; }
+        .modal-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 26px; }
+        .modal-stat { background: var(--surface2); border-radius: 10px; padding: 14px; }
+        .modal-stat-val { font-family: var(--font-mono); font-size: 1.4rem; color: var(--text); }
+        .modal-stat-key { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; margin-top: 3px; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
+
+        /* ─── IDLE SCREEN ─── */
+        .idle-screen { text-align: center; padding: 30px 0; }
+        .idle-icon { font-size: 4rem; margin-bottom: 20px; }
+        .idle-title { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; color: var(--gold); margin-bottom: 10px; }
+        .idle-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 28px; line-height: 1.6; }
+
+        /* ─── FOOTER ─── */
+        .footer { text-align: center; padding: 24px 0 8px; color: var(--muted); font-size: 0.78rem; }
+        .footer a { color: var(--muted); text-decoration: none; }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+        @keyframes popIn { from{transform:scale(0.88);opacity:0} to{transform:scale(1);opacity:1} }
+        @keyframes fadeUp { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
+        .anim-fadeup { animation: fadeUp 0.3s ease; }
+
+        /* ─── BACK LINK ─── */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--muted); font-size: 0.82rem; text-decoration: none;
+            margin-bottom: 18px; transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--gold); }
+
+        /* ─── COMBO INDICATOR ─── */
+        .combo-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .combo-tag {
+            background: rgba(244,197,66,0.12); border: 1px solid rgba(244,197,66,0.3);
+            padding: 4px 12px; border-radius: 99px;
+            font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold);
             display: none;
         }
-        
-        .game-message.success {
-            background: rgba(0, 255, 157, 0.1);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            display: block;
-        }
-        
-        .game-message.error {
-            background: rgba(255, 51, 51, 0.1);
-            border: 1px solid #ff3333;
-            color: #ff6666;
-            display: block;
-        }
-        
-        /* Tax Quiz */
-        .quiz-question {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .quiz-option {
-            background: rgba(0, 40, 25, 0.6);
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 255, 157, 0.2);
-        }
-        
-        .quiz-option:hover {
-            background: rgba(0, 255, 157, 0.1);
-            transform: translateX(5px);
-        }
-        
-        .quiz-option.correct {
-            background: rgba(0, 255, 157, 0.2);
-            border-color: var(--primary-color);
-        }
-        
-        .quiz-option.incorrect {
-            background: rgba(255, 51, 51, 0.2);
-            border-color: #ff3333;
-        }
-        
-        /* Back Button */
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%);
-            color: #002614;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: bold;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
-        }
-        
-        .back-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.5);
-        }
-        
-        /* Game Instructions */
-        .instructions {
-            background: rgba(0, 40, 25, 0.6);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(0, 255, 157, 0.2);
-            margin-top: 30px;
-        }
-        
-        .instructions h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .instructions ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-            padding-left: 25px;
-            position: relative;
-        }
-        
-        .instructions li:before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        
-        /* Tax Visualization */
-        .tax-visual {
-            height: 200px;
-            background: rgba(0, 40, 25, 0.6);
-            border-radius: 10px;
-            margin: 20px 0;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            padding: 20px;
-            border: 1px solid rgba(0, 255, 157, 0.2);
-        }
-        
-        .tax-bar {
-            width: 50px;
-            background: linear-gradient(to top, #00ff9d, #00b36b);
-            border-radius: 5px 5px 0 0;
-            transition: height 0.5s ease;
-            position: relative;
-        }
-        
-        .tax-bar-label {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--text-color);
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-        
-        /* Progress Bar */
-        .progress-bar {
-            height: 10px;
-            background: rgba(0, 40, 25, 0.6);
-            border-radius: 5px;
-            margin: 20px 0;
-            overflow: hidden;
-            border: 1px solid rgba(0, 255, 157, 0.2);
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff9d, #00cc7a);
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-        
-        /* Difficulty Selector */
-        .difficulty-selector {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .difficulty-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid rgba(0, 255, 157, 0.3);
-            background: rgba(0, 40, 25, 0.6);
-            color: var(--text-color);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .difficulty-btn:hover {
-            background: rgba(0, 255, 157, 0.1);
-        }
-        
-        .difficulty-btn.active {
-            background: rgba(0, 255, 157, 0.2);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
-        }
-        
-        /* Timer */
-        .timer {
-            font-size: 2rem;
-            color: var(--primary-color);
-            font-weight: bold;
-            text-align: center;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-        }
-        
-        /* Game Over Modal */
-        .game-over-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(10, 15, 26, 0.95);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .modal-content {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            border: 2px solid var(--primary-color);
-            box-shadow: 0 0 50px rgba(0, 255, 157, 0.5);
-        }
-        
-        .modal-title {
-            color: var(--primary-color);
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-        
-        .modal-score {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin: 20px 0;
-        }
-        
-        /* Achievement Badges */
-        .achievements {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        
-        .badge {
-            background: rgba(0, 255, 157, 0.1);
-            border: 1px solid rgba(0, 255, 157, 0.3);
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .badge i {
-            color: var(--primary-color);
-        }
-        
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #80cbc4;
-            font-size: 0.9rem;
-            margin-top: 40px;
-            border-top: 1px solid rgba(0, 255, 157, 0.2);
-        }
+        .combo-tag.visible { display: inline-block; animation: fadeUp 0.3s ease; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-icon">
-                <i class="fas fa-gamepad"></i>
-            </div>
-            <div class="header-text">
-                <h1>Tax Game</h1>
-                <p>Learn VAT concepts through fun, interactive challenges and puzzles</p>
-            </div>
+<div class="wrapper">
+    <a href="index2.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-logo"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="header-info">
+            <h1>Tax Trivia Challenge</h1>
+            <p>Test your VAT &amp; BIR knowledge. Learn while you play.</p>
         </div>
-        
-        <!-- Game Container -->
-        <div class="game-container">
-            <!-- Game Area -->
-            <div class="game-area">
-                <h2 class="game-title">
-                    <i class="fas fa-puzzle-piece"></i>
-                    Tax Puzzle Challenge
-                </h2>
-                
-                <div class="game-stats">
-                    <div class="stat-box">
-                        <div class="stat-value" id="score">0</div>
-                        <div class="stat-label">Score</div>
+        <div class="header-badge">BIR Edition</div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+
+        <!-- LEFT: GAME PANEL -->
+        <div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-gamepad"></i> Game Arena</div>
+
+                <!-- STATS -->
+                <div class="stats-row">
+                    <div class="stat-chip">
+                        <div class="stat-val" id="statScore">0</div>
+                        <div class="stat-key">Score</div>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="level">1</div>
-                        <div class="stat-label">Level</div>
+                    <div class="stat-chip">
+                        <div class="stat-val" id="statLevel">1</div>
+                        <div class="stat-key">Level</div>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="lives">3</div>
-                        <div class="stat-label">Lives</div>
+                    <div class="stat-chip">
+                        <div class="stat-val lives" id="statLives">♥ ♥ ♥</div>
+                        <div class="stat-key">Lives</div>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="time">60</div>
-                        <div class="stat-label">Seconds</div>
+                    <div class="stat-chip">
+                        <div class="stat-val timer" id="statTimer">60</div>
+                        <div class="stat-key">Seconds</div>
                     </div>
                 </div>
-                
-                <!-- Puzzle Area -->
-                <div id="puzzleArea">
-                    <div class="quiz-question" id="question">
-                        Match the tax term with its correct definition:
+
+                <!-- DIFFICULTY -->
+                <div class="diff-row" id="diffRow">
+                    <button class="diff-btn active" data-level="easy">🟢 Easy</button>
+                    <button class="diff-btn" data-level="medium">🟡 Medium</button>
+                    <button class="diff-btn" data-level="hard">🔴 Hard</button>
+                </div>
+
+                <!-- MODE TABS -->
+                <div class="mode-tabs" id="modeTabs">
+                    <div class="mode-tab active" data-mode="match"><i class="fas fa-link"></i>Match</div>
+                    <div class="mode-tab" data-mode="quiz"><i class="fas fa-question-circle"></i>Quiz</div>
+                    <div class="mode-tab" data-mode="calc"><i class="fas fa-calculator"></i>Calculate</div>
+                </div>
+
+                <!-- COMBO -->
+                <div class="combo-wrap">
+                    <span class="combo-tag" id="comboTag">🔥 x<span id="comboNum">2</span> Combo!</span>
+                </div>
+
+                <!-- IDLE SCREEN -->
+                <div id="idleScreen" class="game-section active">
+                    <div class="idle-screen">
+                        <div class="idle-icon">🏛️</div>
+                        <div class="idle-title">Ready to File?</div>
+                        <div class="idle-sub">Choose your difficulty and game mode,<br>then press <strong>Start Game</strong> to begin your tax journey.</div>
+                        <button class="btn btn-primary" id="startBtnIdle" style="margin: 0 auto;">
+                            <i class="fas fa-play"></i> Start Game
+                        </button>
                     </div>
-                    
-                    <div class="tax-puzzle" id="puzzleContainer">
-                        <!-- Puzzle pieces will be generated here -->
-                    </div>
-                    
-                    <div class="game-message" id="message"></div>
                 </div>
-                
-                <!-- Quiz Area (hidden initially) -->
-                <div id="quizArea" style="display: none;">
-                    <div class="quiz-question" id="quizQuestion"></div>
-                    
-                    <div class="quiz-options" id="quizOptions">
-                        <!-- Options will be generated here -->
-                    </div>
-                    
-                    <div class="game-message" id="quizMessage"></div>
+
+                <!-- MATCH GAME -->
+                <div id="matchSection" class="game-section">
+                    <div class="game-prompt" id="matchPrompt">Match each tax term with its correct definition below:</div>
+                    <div class="puzzle-grid" id="matchGrid"></div>
+                    <div class="flash" id="matchFlash"></div>
                 </div>
-                
-                <div class="game-controls">
-                    <button class="btn" id="startBtn">
-                        <i class="fas fa-play"></i>
-                        Start Game
-                    </button>
-                    <button class="btn btn-secondary" id="resetBtn">
-                        <i class="fas fa-redo"></i>
-                        Reset Game
-                    </button>
-                    <button class="btn" id="nextGameBtn" style="display: none;">
-                        <i class="fas fa-arrow-right"></i>
-                        Next Challenge
-                    </button>
+
+                <!-- QUIZ GAME -->
+                <div id="quizSection" class="game-section">
+                    <div class="quiz-q" id="quizQ"></div>
+                    <div class="quiz-opts" id="quizOpts"></div>
+                    <div class="flash" id="quizFlash"></div>
                 </div>
-                
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                
-                <div class="difficulty-selector">
-                    <button class="difficulty-btn active" data-level="easy">Easy</button>
-                    <button class="difficulty-btn" data-level="medium">Medium</button>
-                    <button class="difficulty-btn" data-level="hard">Hard</button>
-                </div>
-            </div>
-            
-            <!-- Instructions & Info -->
-            <div>
-                <div class="game-area">
-                    <h2 class="game-title">
-                        <i class="fas fa-graduation-cap"></i>
-                        How to Play
-                    </h2>
-                    
-                    <div class="instructions">
-                        <h3><i class="fas fa-info-circle"></i> Game Rules</h3>
-                        <ul>
-                            <li>Match tax terms with their correct definitions</li>
-                            <li>Answer VAT calculation questions correctly</li>
-                            <li>Complete challenges within the time limit</li>
-                            <li>Earn points for correct answers</li>
-                            <li>Level up every 100 points</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="instructions" style="margin-top: 20px;">
-                        <h3><i class="fas fa-trophy"></i> Achievements</h3>
-                        <div class="achievements">
-                            <div class="badge">
-                                <i class="fas fa-star"></i>
-                                Tax Novice
-                            </div>
-                            <div class="badge">
-                                <i class="fas fa-star-half-alt"></i>
-                                VAT Learner
-                            </div>
-                            <div class="badge">
-                                <i class="fas fa-crown"></i>
-                                Tax Master
-                            </div>
+
+                <!-- CALCULATOR GAME -->
+                <div id="calcSection" class="game-section">
+                    <div class="calc-setup">
+                        <div class="calc-scenario">
+                            <div class="calc-label" id="calcLabel">Net Sales</div>
+                            <div class="calc-val" id="calcVal">₱0.00</div>
                         </div>
-                    </div>
-                    
-                    <div class="tax-visual" id="taxVisual">
-                        <!-- Tax visualization bars will be added here -->
+                        <div class="calc-scenario" id="calcExtraBox" style="display:none">
+                            <div class="calc-label" id="calcExtraLabel">Input Tax</div>
+                            <div class="calc-val" id="calcExtraVal">₱0.00</div>
+                        </div>
+                        <div class="calc-prompt" id="calcPrompt" style="font-size:0.9rem;color:var(--muted);padding:4px 0;"></div>
+                        <div class="calc-input-row">
+                            <input class="calc-input" id="calcInput" type="number" placeholder="Enter your answer (₱)..." />
+                            <button class="btn btn-primary" id="calcSubmit"><i class="fas fa-check"></i></button>
+                        </div>
+                        <div class="calc-hint" id="calcHint"></div>
+                        <div class="calc-result" id="calcResult"></div>
                     </div>
                 </div>
-                
-                <a href="index2.html" class="back-button">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Dashboard
-                </a>
-            </div>
-        </div>
-        
-        <!-- Game Over Modal -->
-        <div class="game-over-modal" id="gameOverModal">
-            <div class="modal-content">
-                <h2 class="modal-title">Game Over!</h2>
-                <div class="modal-score" id="finalScore">0</div>
-                <p id="gameOverMessage">Great effort! Try again to beat your high score.</p>
-                <div class="game-controls" style="margin-top: 30px;">
-                    <button class="btn" id="playAgainBtn">
-                        <i class="fas fa-redo"></i>
-                        Play Again
+
+                <!-- PROGRESS -->
+                <div class="progress-wrap" style="margin-top: 20px;">
+                    <div class="progress-label">
+                        <span>Level Progress</span>
+                        <span id="progressPct">0 / 100 pts</span>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                </div>
+
+                <!-- CONTROLS -->
+                <div class="ctrl-row">
+                    <button class="btn btn-primary" id="startBtn" style="display:none;">
+                        <i class="fas fa-play"></i> Start
                     </button>
-                    <button class="btn btn-secondary" id="closeModalBtn">
-                        <i class="fas fa-times"></i>
-                        Close
+                    <button class="btn btn-ghost" id="pauseBtn" style="display:none;">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button class="btn btn-ghost" id="resetBtn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button class="btn btn-next" id="nextBtn">
+                        <i class="fas fa-arrow-right"></i> Next Challenge
                     </button>
                 </div>
             </div>
         </div>
-        
-        <div class="footer">
-            <p>© 2026 MGAA VAT Tracking System | Tax Game - Educational Entertainment Module</p>
+
+        <!-- RIGHT: SIDEBAR -->
+        <div class="sidebar">
+
+            <!-- TIP OF THE ROUND -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-lightbulb"></i> Tax Tip</div>
+                <div class="tip-box">
+                    <div class="tip-label">💡 Did You Know?</div>
+                    <div class="tip-text" id="tipText">Loading tip...</div>
+                    <div class="tip-nav">
+                        <button class="tip-btn" id="tipPrev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="tip-btn" id="tipNext"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACHIEVEMENTS -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-medal"></i> Achievements</div>
+                <div class="badge-grid" id="badgeGrid"></div>
+            </div>
+
+            <!-- LEADERBOARD -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-trophy"></i> Session Board</div>
+                <div class="hs-list" id="hsList"></div>
+            </div>
+
         </div>
     </div>
-    
-    <script>
-        // Game Variables
-        let score = 0;
-        let level = 1;
-        let lives = 3;
-        let timeLeft = 60;
-        let gameActive = false;
-        let timer;
-        let currentGame = 'puzzle';
-        let difficulty = 'easy';
-        
-        // Tax Terms and Definitions
-        const taxTerms = {
-            easy: [
-                { term: 'VAT', definition: 'Value Added Tax on goods and services' },
-                { term: 'TIN', definition: 'Tax Identification Number for taxpayers' },
-                { term: 'BIR', definition: 'Bureau of Internal Revenue' },
-                { term: 'Input Tax', definition: 'VAT on business purchases' },
-                { term: 'Output Tax', definition: 'VAT on business sales' },
-                { term: 'Exempt', definition: 'Not subject to VAT' },
-                { term: 'Zero-rated', definition: 'Subject to 0% VAT rate' },
-                { term: 'Receipt', definition: 'Proof of transaction for taxes' },
-                { term: 'Withholding Tax', definition: 'Tax deducted at source' }
-            ],
-            medium: [
-                { term: 'Vatable Sales', definition: 'Sales subject to 12% VAT' },
-                { term: 'Non-Vatable', definition: 'Sales not subject to VAT' },
-                { term: 'VAT Payable', definition: 'Output tax minus input tax' },
-                { term: 'VAT Refund', definition: 'Excess input tax to be refunded' },
-                { term: 'Capital Goods', definition: 'Assets subject to VAT' },
-                { term: 'Creditable Tax', definition: 'Tax that can be deducted' },
-                { term: 'Gross Sales', definition: 'Total sales before VAT' },
-                { term: 'Net Sales', definition: 'Gross sales divided by 1.12' },
-                { term: 'Percentage Tax', definition: 'Tax based on gross sales' }
-            ],
-            hard: [
-                { term: 'Expanded Withholding Tax', definition: 'Withholding tax on certain income payments' },
-                { term: 'Final Withholding Tax', definition: 'Full tax withheld at source' },
-                { term: 'Graduated Tax', definition: 'Tax rate increases with income' },
-                { term: 'Optional Standard Deduction', definition: '40% of gross income deduction' },
-                { term: 'Itemized Deduction', definition: 'Actual expenses deduction' },
-                { term: 'Fringe Benefit Tax', definition: 'Tax on non-cash benefits' },
-                { term: 'Donor\'s Tax', definition: 'Tax on gifts and donations' },
-                { term: 'Estate Tax', definition: 'Tax on inherited property' },
-                { term: 'Documentary Stamp Tax', definition: 'Tax on documents and instruments' }
-            ]
-        };
-        
-        // Quiz Questions
-        const quizQuestions = {
-            easy: [
-                {
-                    question: 'What is the current VAT rate in the Philippines?',
-                    options: ['10%', '12%', '15%', '18%'],
-                    answer: 1
-                },
-                {
-                    question: 'What does VAT stand for?',
-                    options: [
-                        'Value Added Tax',
-                        'Variable Amount Tax',
-                        'Volume Assessment Tax',
-                        'Value Assessment Tax'
-                    ],
-                    answer: 0
-                },
-                {
-                    question: 'Which government agency collects VAT?',
-                    options: [
-                        'Bureau of Customs',
-                        'Bureau of Internal Revenue',
-                        'Department of Finance',
-                        'Securities and Exchange Commission'
-                    ],
-                    answer: 1
-                },
-                {
-                    question: 'If a product costs ₱1,120 including VAT, what is the net price?',
-                    options: ['₱1,000', '₱1,100', '₱1,120', '₱1,200'],
-                    answer: 0
-                }
-            ],
-            medium: [
-                {
-                    question: 'Calculate VAT on ₱10,000 net sales:',
-                    options: ['₱1,000', '₱1,200', '₱1,500', '₱2,000'],
-                    answer: 1
-                },
-                {
-                    question: 'What is the formula for calculating net sales?',
-                    options: [
-                        'Gross Sales × 1.12',
-                        'Gross Sales ÷ 1.12',
-                        'Gross Sales × 0.12',
-                        'Gross Sales ÷ 0.12'
-                    ],
-                    answer: 1
-                },
-                {
-                    question: 'Which sales are VAT-exempt?',
-                    options: [
-                        'Export sales',
-                        'Sales to senior citizens',
-                        'Sales of agricultural products',
-                        'All of the above'
-                    ],
-                    answer: 3
-                },
-                {
-                    question: 'What is the threshold for VAT registration?',
-                    options: [
-                        '₱1.5M annual sales',
-                        '₱3M annual sales',
-                        '₱5M annual sales',
-                        '₱10M annual sales'
-                    ],
-                    answer: 1
-                }
-            ],
-            hard: [
-                {
-                    question: 'Calculate VAT payable with ₱50,000 output tax and ₱30,000 input tax:',
-                    options: ['₱20,000', '₱30,000', '₱50,000', '₱80,000'],
-                    answer: 0
-                },
-                {
-                    question: 'What percentage of input tax can be claimed as credit?',
-                    options: ['70%', '80%', '90%', '100%'],
-                    answer: 3
-                },
-                {
-                    question: 'When is VAT return due?',
-                    options: [
-                        'Every 10th day of the month',
-                        'Every 20th day of the month',
-                        'Every 25th day of the month',
-                        'Every 30th day of the month'
-                    ],
-                    answer: 1
-                },
-                {
-                    question: 'Which is subject to percentage tax instead of VAT?',
-                    options: [
-                        'Non-VAT registered businesses',
-                        'Banks and financial institutions',
-                        'Insurance companies',
-                        'All of the above'
-                    ],
-                    answer: 3
-                }
-            ]
-        };
-        
-        // DOM Elements
-        const scoreElement = document.getElementById('score');
-        const levelElement = document.getElementById('level');
-        const livesElement = document.getElementById('lives');
-        const timeElement = document.getElementById('time');
-        const puzzleContainer = document.getElementById('puzzleContainer');
-        const messageElement = document.getElementById('message');
-        const startBtn = document.getElementById('startBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const nextGameBtn = document.getElementById('nextGameBtn');
-        const gameOverModal = document.getElementById('gameOverModal');
-        const finalScoreElement = document.getElementById('finalScore');
-        const playAgainBtn = document.getElementById('playAgainBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const progressFill = document.getElementById('progressFill');
-        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
-        const quizArea = document.getElementById('quizArea');
-        const puzzleArea = document.getElementById('puzzleArea');
-        const quizQuestion = document.getElementById('quizQuestion');
-        const quizOptions = document.getElementById('quizOptions');
-        const quizMessage = document.getElementById('quizMessage');
-        const taxVisual = document.getElementById('taxVisual');
-        
-        // Initialize Game
-        function initGame() {
-            updateUI();
-            createTaxVisualization();
-        }
-        
-        // Start Game
-        startBtn.addEventListener('click', function() {
-            if (!gameActive) {
-                startGame();
-            }
-        });
-        
-        function startGame() {
-            gameActive = true;
-            score = 0;
-            level = 1;
-            lives = 3;
-            timeLeft = 60;
-            
-            updateUI();
-            startTimer();
-            generatePuzzle();
-            
-            startBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Game';
-            startBtn.onclick = pauseGame;
-        }
-        
-        // Pause Game
-        function pauseGame() {
-            gameActive = false;
-            clearInterval(timer);
-            startBtn.innerHTML = '<i class="fas fa-play"></i> Resume Game';
-            startBtn.onclick = resumeGame;
-        }
-        
-        // Resume Game
-        function resumeGame() {
-            gameActive = true;
-            startTimer();
-            startBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Game';
-            startBtn.onclick = pauseGame;
-        }
-        
-        // Reset Game
-        resetBtn.addEventListener('click', function() {
-            resetGame();
-        });
-        
-        function resetGame() {
-            gameActive = false;
-            clearInterval(timer);
-            
-            score = 0;
-            level = 1;
-            lives = 3;
-            timeLeft = 60;
-            
-            updateUI();
-            puzzleContainer.innerHTML = '';
-            messageElement.style.display = 'none';
-            
-            startBtn.innerHTML = '<i class="fas fa-play"></i> Start Game';
-            startBtn.onclick = startGame;
-            
-            // Hide quiz area, show puzzle area
-            quizArea.style.display = 'none';
-            puzzleArea.style.display = 'block';
-            nextGameBtn.style.display = 'none';
-            
-            // Reset progress
-            progressFill.style.width = '0%';
-        }
-        
-        // Next Game
-        nextGameBtn.addEventListener('click', function() {
-            if (currentGame === 'puzzle') {
-                startQuiz();
-            } else {
-                generatePuzzle();
-            }
-        });
-        
-        // Update UI
-        function updateUI() {
-            scoreElement.textContent = score;
-            levelElement.textContent = level;
-            livesElement.textContent = lives;
-            timeElement.textContent = timeLeft;
-            
-            // Update progress
-            const progress = (score % 100) / 100 * 100;
-            progressFill.style.width = progress + '%';
-            
-            // Update level based on score
-            const newLevel = Math.floor(score / 100) + 1;
-            if (newLevel !== level) {
-                level = newLevel;
-                showMessage(`🎉 Level Up! You're now at level ${level}`, 'success');
+
+    <div class="footer">© 2026 MGAA VAT Tracking System · Tax Trivia Challenge · <a href="#">Help</a></div>
+</div>
+
+<!-- GAME OVER MODAL -->
+<div class="modal-overlay" id="gameOverModal">
+    <div class="modal-box">
+        <div class="modal-icon" id="modalIcon">📋</div>
+        <div class="modal-title" id="modalTitle">Session Complete</div>
+        <div class="modal-sub" id="modalSub">Great effort, taxpayer!</div>
+        <div class="modal-score" id="modalScore">0</div>
+        <div class="modal-score-label">POINTS</div>
+        <div class="modal-stats">
+            <div class="modal-stat">
+                <div class="modal-stat-val" id="modalLevel">1</div>
+                <div class="modal-stat-key">Level Reached</div>
+            </div>
+            <div class="modal-stat">
+                <div class="modal-stat-val" id="modalCorrect">0</div>
+                <div class="modal-stat-key">Correct Answers</div>
+            </div>
+        </div>
+        <div class="modal-btns">
+            <button class="btn btn-primary" id="playAgainBtn"><i class="fas fa-redo"></i> Play Again</button>
+            <button class="btn btn-ghost" id="closeModalBtn"><i class="fas fa-times"></i> Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+
+const taxTerms = {
+    easy: [
+        { term: 'VAT',            definition: 'Value Added Tax on goods and services' },
+        { term: 'TIN',            definition: 'Taxpayer Identification Number issued by BIR' },
+        { term: 'BIR',            definition: 'Bureau of Internal Revenue – tax collection agency' },
+        { term: 'Input Tax',      definition: 'VAT paid on business purchases (creditable)' },
+        { term: 'Output Tax',     definition: 'VAT collected on business sales' },
+        { term: 'Zero-rated',     definition: 'Sales taxed at 0%, e.g., exports' },
+        { term: 'VAT-Exempt',     definition: 'Transactions not subject to VAT at all' },
+        { term: 'OR',             definition: 'Official Receipt – proof of sale or service' },
+        { term: 'Filing',         definition: 'Submitting a tax return to the BIR' },
+        { term: 'Withholding Tax',definition: 'Tax deducted from payment at source' },
+    ],
+    medium: [
+        { term: 'VAT Payable',    definition: 'Output Tax minus allowable Input Tax' },
+        { term: 'Excess Input',   definition: 'Input tax exceeding output tax – carries over' },
+        { term: 'Gross Sales',    definition: 'Total sales amount including VAT (VAT-inclusive)' },
+        { term: 'Net Sales',      definition: 'Gross sales divided by 1.12 (VAT-exclusive)' },
+        { term: 'Percentage Tax', definition: 'Tax for non-VAT registered businesses (under ₱3M)' },
+        { term: 'Capital Goods',  definition: 'Depreciable assets on which VAT may be claimed' },
+        { term: 'EWT',            definition: 'Expanded Withholding Tax on certain payments' },
+        { term: 'VAT Refund',     definition: 'Claim for excess creditable input tax' },
+        { term: 'BIR Form 2550M', definition: 'Monthly VAT return filed by registered taxpayers' },
+    ],
+    hard: [
+        { term: 'OSD',            definition: 'Optional Standard Deduction – 40% of gross income' },
+        { term: 'MCIT',           definition: 'Minimum Corporate Income Tax (2% of gross income)' },
+        { term: 'FBT',            definition: 'Fringe Benefit Tax – 35% on grossed-up monetary value' },
+        { term: 'Estate Tax',     definition: 'Tax on transfer of net estate of a deceased person' },
+        { term: "Donor's Tax",    definition: 'Tax on gratuitous transfer of property to another' },
+        { term: 'DST',            definition: 'Documentary Stamp Tax on specific documents and instruments' },
+        { term: 'TRAIN Law',      definition: 'Tax Reform for Acceleration and Inclusion Act (RA 10963)' },
+        { term: 'CWT',            definition: 'Creditable Withholding Tax – deductible from income tax due' },
+        { term: 'IAET',           definition: 'Improperly Accumulated Earnings Tax (10% on retained earnings)' },
+    ]
+};
+
+const quizQuestions = {
+    easy: [
+        { q: 'What is the current VAT rate in the Philippines?', opts: ['10%','12%','15%','8%'], a: 1 },
+        { q: 'Which BIR form is used for Monthly VAT filing?', opts: ['BIR Form 1701','BIR Form 2550M','BIR Form 1601E','BIR Form 2307'], a: 1 },
+        { q: 'VAT stands for:', opts: ['Value Added Tax','Variable Assessment Tax','Volume Amount Tax','Valued Account Tax'], a: 0 },
+        { q: 'If a product costs ₱1,120 inclusive of VAT, what is the VAT amount?', opts: ['₱120','₱112','₱100','₱134.40'], a: 0 },
+        { q: 'Which agency administers and collects taxes in the Philippines?', opts: ['DOF','BOC','BIR','BSP'], a: 2 },
+        { q: 'What does OR stand for in tax practice?', opts: ['Official Receipt','Order Record','Original Report','Office Remittance'], a: 0 },
+        { q: 'A zero-rated sale is:', opts: ['Not subject to any tax','Taxed at 0% – input VAT is recoverable','Same as VAT-exempt','Taxed at reduced rate'], a: 1 },
+    ],
+    medium: [
+        { q: 'What is the VAT registration threshold under TRAIN Law?', opts: ['₱1.5M gross sales','₱2M gross sales','₱3M gross sales','₱5M gross sales'], a: 2 },
+        { q: 'Net sales from a ₱11,200 VAT-inclusive amount is:', opts: ['₱10,000','₱10,500','₱9,800','₱11,000'], a: 0 },
+        { q: 'VAT Payable = Output Tax _____ Input Tax', opts: ['plus','minus','multiplied by','divided by'], a: 1 },
+        { q: 'Percentage Tax rate for non-VAT registered businesses is:', opts: ['1%','2%','3%','5%'], a: 2 },
+        { q: 'The monthly VAT return (2550M) is due on the:', opts: ['10th day','20th day','25th day','Last day of the month'], a: 1 },
+        { q: 'Which of the following is VAT-EXEMPT?', opts: ['Exported goods','Educational services under DepEd','Sale of raw agricultural food','All of the above'], a: 3 },
+        { q: 'Input Tax credit is claimed against:', opts: ['Payroll taxes','Output VAT','Income tax due','Customs duties'], a: 1 },
+    ],
+    hard: [
+        { q: 'MCIT is imposed when it exceeds the normal income tax rate of:', opts: ['20%','25%','30%','35%'], a: 1 },
+        { q: 'Estate tax rate under TRAIN Law is a flat:', opts: ['5%','6%','8%','10%'], a: 1 },
+        { q: 'OSD is ______ of gross income for individuals (optional deduction):', opts: ['20%','30%','40%','50%'], a: 2 },
+        { q: 'Fringe Benefit Tax is computed on the ______ monetary value of the benefit:', opts: ['Grossed-up','Net','Reduced','Discounted'], a: 0 },
+        { q: 'DST on original issuance of shares (no par value) is:', opts: ['₱1 per share','₱2 per share','₱0.50 per share','Exempt'], a: 0 },
+        { q: "Donor's Tax flat rate under TRAIN Law is:", opts: ['3%','5%','6%','10%'], a: 2 },
+        { q: 'IAET is assessed on corporations that improperly accumulate earnings beyond:', opts: ['₱50M','₱75M','₱100M','No set amount'], a: 3 },
+    ]
+};
+
+// VAT calculation scenarios
+const calcScenarios = {
+    easy: [
+        { type: 'vat_from_net', label: 'Net Sales (VAT-exclusive)', hint: 'VAT = Net Sales × 12%', genVal: () => rnd(5000,50000,1000) },
+        { type: 'net_from_gross', label: 'Gross Amount (VAT-inclusive)', hint: 'Net = Gross ÷ 1.12', genVal: () => rnd(5600,56000,1120) },
+        { type: 'gross_from_net', label: 'Net Amount', hint: 'Gross = Net × 1.12', genVal: () => rnd(5000,50000,1000) },
+    ],
+    medium: [
+        { type: 'vat_payable', label: 'Output Tax', hint: 'VAT Payable = Output Tax − Input Tax', genVal: () => rnd(10000,100000,5000), extraLabel: 'Input Tax', extraGen: (ot) => rnd(1000, ot-1000, 1000) },
+        { type: 'excess_input', label: 'Input Tax', hint: 'Excess Input = Input Tax − Output Tax', genVal: () => rnd(15000,100000,5000), extraLabel: 'Output Tax', extraGen: (it) => rnd(1000, it-2000, 1000) },
+        { type: 'vat_from_net', label: 'Net Sales (VAT-exclusive)', hint: 'VAT = Net Sales × 12%', genVal: () => rnd(50000,500000,10000) },
+    ],
+    hard: [
+        { type: 'vat_payable', label: 'Output Tax', hint: 'VAT Payable = Output Tax − Input Tax', genVal: () => rnd(50000,500000,10000), extraLabel: 'Input Tax', extraGen: (ot) => rnd(5000, ot-5000, 5000) },
+        { type: 'net_from_gross', label: 'Gross Amount (VAT-inclusive)', hint: 'Net = Gross ÷ 1.12, rounded to 2 decimals', genVal: () => rnd(100000,2000000,11200) },
+        { type: 'gross_from_net', label: 'Net Amount', hint: 'Gross = Net × 1.12', genVal: () => rnd(100000,2000000,10000) },
+    ]
+};
+
+const taxTips = [
+    "VAT-registered businesses must issue an Official Receipt (OR) or Sales Invoice for every transaction.",
+    "Under TRAIN Law (RA 10963), the VAT registration threshold is ₱3,000,000 in annual gross sales.",
+    "Zero-rated sales allow you to claim a refund or tax credit for input VAT paid – unlike VAT-exempt transactions.",
+    "The monthly VAT return (BIR Form 2550M) is due on or before the 20th day of the following month.",
+    "Input tax from capital goods costing more than ₱1M must be amortized over 60 months or the asset's life.",
+    "Percentage Tax (BIR Form 2551Q) is 3% of gross quarterly sales for non-VAT businesses.",
+    "Senior citizens and persons with disability enjoy a 20% discount + VAT exemption on basic necessities.",
+    "Estate tax under TRAIN Law is a flat 6% of the net estate – regardless of the estate's size.",
+    "Expanded Withholding Tax (EWT) must be remitted to BIR using Form 1601-EQ every quarter.",
+    "The MCIT (2% of gross income) applies when it exceeds the normal corporate income tax (25%).",
+    "Excess input tax may be carried forward to the next quarter – it does not expire.",
+    "Documentary Stamp Tax (DST) on loan agreements is ₱1 for every ₱200 of loan amount."
+];
+
+const achievements = [
+    { id: 'novice',    icon: '📄', name: 'Tax Novice',      desc: 'Score your first 50 points', req: s => s >= 50 },
+    { id: 'clerk',     icon: '🗂️', name: 'BIR Clerk',       desc: 'Reach 200 points',            req: s => s >= 200 },
+    { id: 'examiner',  icon: '🔍', name: 'Tax Examiner',    desc: 'Reach level 3',               req: (s,l) => l >= 3 },
+    { id: 'accountant',icon: '📊', name: 'CPA in Training', desc: 'Answer 10 correctly',         req: (s,l,c) => c >= 10 },
+    { id: 'master',    icon: '🏛️', name: 'Tax Master',      desc: 'Score 500+ points',           req: s => s >= 500 },
+    { id: 'combo',     icon: '🔥', name: 'Combo King',      desc: 'Get a 5x combo',              req: (s,l,c,mx) => mx >= 5 },
+];
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+
+let state = {
+    score: 0, level: 1, lives: 3, timeLeft: 60,
+    active: false, paused: false,
+    mode: 'match', diff: 'easy',
+    combo: 0, maxCombo: 0, correct: 0,
+    earned: new Set(),
+    sessions: [],
+    timer: null,
+};
+
+let currentCalcAnswer = 0;
+let currentCalcExtra = null;
+let selectedPiece = null;
+let currentTip = 0;
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+
+function rnd(min, max, step=1) {
+    const steps = Math.floor((max - min) / step);
+    return min + Math.floor(Math.random() * steps) * step;
+}
+
+function peso(n) { return '₱' + n.toLocaleString('en-PH', {minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function shuffle(arr) {
+    for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    return arr;
+}
+
+function pick(arr, n) { return shuffle([...arr]).slice(0, n); }
+
+function $id(id) { return document.getElementById(id); }
+
+// ══════════════════════════════════════════════
+//  UI UPDATES
+// ══════════════════════════════════════════════
+
+function renderStats() {
+    $id('statScore').textContent = state.score;
+    $id('statLevel').textContent = state.level;
+    $id('statLives').textContent = '♥ '.repeat(state.lives).trim() || '✗';
+    $id('statLives').style.fontSize = state.lives > 0 ? '' : '1rem';
+    const t = $id('statTimer');
+    t.textContent = state.timeLeft;
+    t.classList.toggle('danger', state.timeLeft <= 10 && state.active);
+
+    const lvlScore = state.score % 100;
+    $id('progressFill').style.width = lvlScore + '%';
+    $id('progressPct').textContent = lvlScore + ' / 100 pts';
+}
+
+function renderCombo() {
+    const tag = $id('comboTag');
+    if(state.combo >= 2) {
+        tag.classList.add('visible');
+        $id('comboNum').textContent = state.combo;
+    } else { tag.classList.remove('visible'); }
+}
+
+function renderAchievements() {
+    const grid = $id('badgeGrid');
+    grid.innerHTML = '';
+    achievements.forEach(a => {
+        const earned = state.earned.has(a.id);
+        grid.innerHTML += `<div class="badge-row ${earned?'earned':''}">
+            <div class="badge-icon">${earned ? a.icon : '🔒'}</div>
+            <div class="badge-info">
+                <div class="badge-name" style="color:${earned?'var(--gold)':'var(--muted)'}">${a.name}</div>
+                <div class="badge-desc">${a.desc}</div>
+            </div>
+        </div>`;
+    });
+}
+
+function checkAchievements() {
+    achievements.forEach(a => {
+        if(!state.earned.has(a.id)) {
+            if(a.req(state.score, state.level, state.correct, state.maxCombo)) {
+                state.earned.add(a.id);
+                flash('matchFlash', `🏅 Achievement unlocked: ${a.name}!`, 'info');
             }
         }
-        
-        // Timer
-        function startTimer() {
-            clearInterval(timer);
-            timer = setInterval(function() {
-                if (gameActive && timeLeft > 0) {
-                    timeLeft--;
-                    timeElement.textContent = timeLeft;
-                    
-                    // Visual timer warning
-                    if (timeLeft <= 10) {
-                        timeElement.style.color = '#ff3333';
-                        timeElement.style.animation = 'pulse 1s infinite';
-                    }
-                } else if (timeLeft <= 0) {
-                    endGame('Time\'s up!');
-                }
-            }, 1000);
+    });
+    renderAchievements();
+}
+
+function renderLeaderboard() {
+    const list = $id('hsList');
+    const board = [...state.sessions].sort((a,b)=>b.score-a.score).slice(0,5);
+    if(!board.length) { list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;padding:10px;">No sessions yet – play to rank!</div>'; return; }
+    list.innerHTML = board.map((s,i) => `<div class="hs-row ${s.you?'you':''}">
+        <span class="hs-rank">${i+1}</span>
+        <span class="hs-name">${s.you?'⭐ You':('Player '+s.id)}</span>
+        <span class="hs-pts">${s.score}</span>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+//  FLASH / MESSAGE
+// ══════════════════════════════════════════════
+
+function flash(elId, msg, type, duration=3000) {
+    const el = $id(elId);
+    if(!el) return;
+    el.textContent = msg; el.className = 'flash ' + type;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.className = 'flash', duration);
+}
+
+// ══════════════════════════════════════════════
+//  SECTIONS SHOW/HIDE
+// ══════════════════════════════════════════════
+
+function showSection(id) {
+    ['idleScreen','matchSection','quizSection','calcSection'].forEach(s => {
+        const el = $id(s);
+        el.classList.toggle('active', el.id === id);
+    });
+}
+
+// ══════════════════════════════════════════════
+//  TIMER
+// ══════════════════════════════════════════════
+
+function startTimer() {
+    clearInterval(state.timer);
+    state.timer = setInterval(() => {
+        if(!state.active || state.paused) return;
+        state.timeLeft--;
+        renderStats();
+        if(state.timeLeft <= 0) endGame("Time's up! ⏰");
+    }, 1000);
+}
+
+// ══════════════════════════════════════════════
+//  MATCH GAME
+// ══════════════════════════════════════════════
+
+function startMatch() {
+    showSection('matchSection');
+    selectedPiece = null;
+    $id('matchGrid').innerHTML = '';
+    const el = $id('matchFlash'); el.className = 'flash';
+
+    const terms = pick(taxTerms[state.diff], 4);
+    const items = [];
+    terms.forEach(t => {
+        items.push({text: t.term,       type:'term', key: t.term});
+        items.push({text: t.definition, type:'def',  key: t.term});
+    });
+    shuffle(items);
+
+    $id('matchPrompt').textContent = `Match ${state.diff} tax terms with their correct definitions (${terms.length} pairs):`;
+
+    items.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'p-card ' + (item.type === 'term' ? 'term' : '');
+        div.textContent = item.text;
+        div.dataset.type = item.type;
+        div.dataset.key  = item.key;
+        div.dataset.idx  = idx;
+        div.addEventListener('click', handleMatchClick);
+        $id('matchGrid').appendChild(div);
+    });
+}
+
+function handleMatchClick(e) {
+    if(!state.active || state.paused) return;
+    const card = e.currentTarget;
+    if(card.classList.contains('matched') || card.classList.contains('disabled')) return;
+
+    if(!selectedPiece) {
+        selectedPiece = card;
+        card.classList.add('selected');
+        return;
+    }
+
+    if(selectedPiece === card) {
+        card.classList.remove('selected'); selectedPiece = null; return;
+    }
+
+    // Can't match two of same type
+    if(selectedPiece.dataset.type === card.dataset.type) {
+        selectedPiece.classList.remove('selected');
+        selectedPiece = card; card.classList.add('selected'); return;
+    }
+
+    const a = selectedPiece, b = card;
+    a.classList.remove('selected');
+
+    if(a.dataset.key === b.dataset.key) {
+        // Correct
+        a.classList.add('matched'); b.classList.add('matched');
+        state.combo++; if(state.combo > state.maxCombo) state.maxCombo = state.combo;
+        const pts = (state.diff === 'easy' ? 15 : state.diff === 'medium' ? 25 : 40) + (state.combo > 1 ? state.combo * 5 : 0);
+        addScore(pts);
+        flash('matchFlash', `✅ Correct match! +${pts} pts${state.combo>1?' 🔥':''}`, 'success');
+        renderCombo();
+        checkRoundComplete();
+    } else {
+        // Wrong
+        state.combo = 0; renderCombo();
+        a.classList.add('wrong'); b.classList.add('wrong');
+        setTimeout(() => { a.classList.remove('wrong'); b.classList.remove('wrong'); }, 400);
+        state.lives--;
+        flash('matchFlash', '❌ Not a match – try again!', 'error');
+        renderStats();
+        if(state.lives <= 0) endGame('Out of lives! 💔');
+    }
+    selectedPiece = null;
+}
+
+function checkRoundComplete() {
+    setTimeout(() => {
+        const remaining = $id('matchGrid').querySelectorAll('.p-card:not(.matched)');
+        if(remaining.length === 0) {
+            flash('matchFlash', '🎉 Round complete! Click Next Challenge.', 'info', 5000);
+            $id('nextBtn').style.display = 'flex';
         }
-        
-        // Generate Puzzle
-        function generatePuzzle() {
-            currentGame = 'puzzle';
-            puzzleArea.style.display = 'block';
-            quizArea.style.display = 'none';
-            nextGameBtn.style.display = 'none';
-            
-            // Clear previous puzzle
-            puzzleContainer.innerHTML = '';
-            messageElement.style.display = 'none';
-            
-            // Get terms based on difficulty
-            const terms = [...taxTerms[difficulty]];
-            const selectedTerms = [];
-            
-            // Select 6 random terms (3 pairs)
-            for (let i = 0; i < 3; i++) {
-                const randomIndex = Math.floor(Math.random() * terms.length);
-                selectedTerms.push(terms[randomIndex]);
-                terms.splice(randomIndex, 1);
-            }
-            
-            // Create shuffled array of all items
-            const allItems = [];
-            selectedTerms.forEach(item => {
-                allItems.push({ type: 'term', text: item.term });
-                allItems.push({ type: 'definition', text: item.definition, match: item.term });
-            });
-            
-            // Shuffle array
-            shuffleArray(allItems);
-            
-            // Create puzzle pieces
-            allItems.forEach((item, index) => {
-                const piece = document.createElement('div');
-                piece.className = 'puzzle-piece';
-                piece.textContent = item.text;
-                piece.dataset.index = index;
-                piece.dataset.type = item.type;
-                piece.dataset.match = item.match || '';
-                
-                piece.addEventListener('click', function() {
-                    handlePuzzleClick(this);
-                });
-                
-                puzzleContainer.appendChild(piece);
-            });
-            
-            // Update question
-            document.getElementById('question').textContent = 
-                `Match ${difficulty} tax terms with their correct definitions:`;
-        }
-        
-        // Handle Puzzle Click
-        let selectedPiece = null;
-        
-        function handlePuzzleClick(piece) {
-            if (!gameActive) return;
-            
-            if (!selectedPiece) {
-                // First selection
-                selectedPiece = piece;
-                piece.classList.add('selected');
-            } else {
-                // Second selection
-                if (selectedPiece === piece) {
-                    // Deselect if same piece clicked
-                    piece.classList.remove('selected');
-                    selectedPiece = null;
-                    return;
-                }
-                
-                // Check if match
-                if (
-                    (selectedPiece.dataset.type === 'term' && piece.dataset.type === 'definition' && 
-                     selectedPiece.textContent === piece.dataset.match) ||
-                    (selectedPiece.dataset.type === 'definition' && piece.dataset.type === 'term' && 
-                     selectedPiece.dataset.match === piece.textContent)
-                ) {
-                    // Correct match
-                    selectedPiece.classList.add('selected');
-                    piece.classList.add('selected');
-                    
-                    // Disable pieces
-                    selectedPiece.style.opacity = '0.5';
-                    selectedPiece.style.cursor = 'default';
-                    piece.style.opacity = '0.5';
-                    piece.style.cursor = 'default';
-                    
-                    // Remove event listeners
-                    selectedPiece.replaceWith(selectedPiece.cloneNode(true));
-                    piece.replaceWith(piece.cloneNode(true));
-                    
-                    // Add score
-                    score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 15 : 20;
-                    showMessage('✅ Correct match! +' + (difficulty === 'easy' ? 10 : difficulty === 'medium' ? 15 : 20) + ' points', 'success');
-                    
-                    // Check if all matches found
-                    const remainingPieces = document.querySelectorAll('.puzzle-piece:not([style*="opacity: 0.5"])');
-                    if (remainingPieces.length === 0) {
-                        setTimeout(() => {
-                            showMessage('🎉 Puzzle Complete! Starting next challenge...', 'success');
-                            nextGameBtn.style.display = 'flex';
-                        }, 1000);
-                    }
-                } else {
-                    // Wrong match
-                    selectedPiece.classList.remove('selected');
-                    piece.classList.add('selected');
-                    setTimeout(() => {
-                        piece.classList.remove('selected');
-                    }, 500);
-                    
-                    lives--;
-                    showMessage('❌ Wrong match! Try again.', 'error');
-                    
-                    if (lives <= 0) {
-                        endGame('No more lives!');
-                    }
-                }
-                
-                selectedPiece = null;
-                updateUI();
-            }
-        }
-        
-        // Start Quiz
-        function startQuiz() {
-            currentGame = 'quiz';
-            puzzleArea.style.display = 'none';
-            quizArea.style.display = 'block';
-            nextGameBtn.style.display = 'none';
-            
-            // Clear previous quiz
-            quizOptions.innerHTML = '';
-            quizMessage.style.display = 'none';
-            
-            // Get random question
-            const questions = quizQuestions[difficulty];
-            const question = questions[Math.floor(Math.random() * questions.length)];
-            
-            // Display question
-            quizQuestion.textContent = question.question;
-            
-            // Display options
-            question.options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'quiz-option';
-                optionElement.textContent = option;
-                optionElement.dataset.index = index;
-                
-                optionElement.addEventListener('click', function() {
-                    handleQuizAnswer(this, question.answer);
-                });
-                
-                quizOptions.appendChild(optionElement);
-            });
-        }
-        
-        // Handle Quiz Answer
-        function handleQuizAnswer(option, correctIndex) {
-            if (!gameActive) return;
-            
-            const options = document.querySelectorAll('.quiz-option');
-            options.forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-                opt.style.cursor = 'default';
-                
-                // Remove event listeners
-                opt.replaceWith(opt.cloneNode(true));
-            });
-            
-            // Show correct answer
-            options[correctIndex].classList.add('correct');
-            
-            if (parseInt(option.dataset.index) === correctIndex) {
-                // Correct answer
-                option.classList.add('correct');
-                score += difficulty === 'easy' ? 15 : difficulty === 'medium' ? 25 : 35;
-                quizMessage.textContent = '✅ Correct answer! +' + (difficulty === 'easy' ? 15 : difficulty === 'medium' ? 25 : 35) + ' points';
-                quizMessage.className = 'game-message success';
-                
-                // Show next game button
-                setTimeout(() => {
-                    nextGameBtn.style.display = 'flex';
-                }, 1000);
-            } else {
-                // Wrong answer
-                option.classList.add('incorrect');
-                lives--;
-                quizMessage.textContent = '❌ Wrong answer! Try again next time.';
-                quizMessage.className = 'game-message error';
-                
-                if (lives <= 0) {
-                    setTimeout(() => {
-                        endGame('No more lives!');
-                    }, 1500);
-                }
-            }
-            
-            quizMessage.style.display = 'block';
-            updateUI();
-        }
-        
-        // Show Message
-        function showMessage(text, type) {
-            messageElement.textContent = text;
-            messageElement.className = 'game-message ' + type;
-            messageElement.style.display = 'block';
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                messageElement.style.display = 'none';
-            }, 3000);
-        }
-        
-        // End Game
-        function endGame(reason) {
-            gameActive = false;
-            clearInterval(timer);
-            
-            // Update modal
-            finalScoreElement.textContent = score;
-            document.getElementById('gameOverMessage').textContent = reason;
-            
-            // Show modal
-            gameOverModal.style.display = 'flex';
-        }
-        
-        // Play Again
-        playAgainBtn.addEventListener('click', function() {
-            gameOverModal.style.display = 'none';
-            resetGame();
-            startGame();
-        });
-        
-        // Close Modal
-        closeModalBtn.addEventListener('click', function() {
-            gameOverModal.style.display = 'none';
-        });
-        
-        // Difficulty Selector
-        difficultyBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                difficultyBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                difficulty = this.dataset.level;
-                
-                if (gameActive) {
-                    // Regenerate current game with new difficulty
-                    if (currentGame === 'puzzle') {
-                        generatePuzzle();
-                    } else {
-                        startQuiz();
-                    }
-                }
-            });
-        });
-        
-        // Create Tax Visualization
-        function createTaxVisualization() {
-            taxVisual.innerHTML = '';
-            
-            const taxData = [
-                { label: 'VAT (12%)', value: 12, color: '#00ff9d' },
-                { label: 'Income Tax', value: 8, color: '#667eea' },
-                { label: 'Excise Tax', value: 5, color: '#764ba2' },
-                { label: 'Withholding', value: 7, color: '#ff9900' },
-                { label: 'Percentage', value: 3, color: '#ff3333' }
-            ];
-            
-            taxData.forEach(data => {
-                const bar = document.createElement('div');
-                bar.className = 'tax-bar';
-                bar.style.height = (data.value * 15) + 'px';
-                bar.style.background = `linear-gradient(to top, ${data.color}, ${data.color}99)`;
-                
-                const label = document.createElement('div');
-                label.className = 'tax-bar-label';
-                label.textContent = data.label;
-                
-                bar.appendChild(label);
-                taxVisual.appendChild(bar);
-            });
-        }
-        
-        // Utility Functions
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-        
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', function() {
-            initGame();
-            
-            // Add keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && gameActive) {
-                    pauseGame();
-                }
-                if (e.key === 'r' && e.ctrlKey) {
-                    resetGame();
-                }
-                if (e.key === ' ' && !gameActive) {
-                    startGame();
-                }
-            });
-            
-            // Add CSS for pulse animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                }
-            `;
-            document.head.appendChild(style);
-        });
-    </script>
+    }, 200);
+}
+
+// ══════════════════════════════════════════════
+//  QUIZ GAME
+// ══════════════════════════════════════════════
+
+function startQuiz() {
+    showSection('quizSection');
+    $id('quizFlash').className = 'flash';
+    $id('nextBtn').style.display = 'none';
+
+    const pool = quizQuestions[state.diff];
+    const q = pool[Math.floor(Math.random() * pool.length)];
+    $id('quizQ').textContent = q.q;
+
+    const optsEl = $id('quizOpts');
+    optsEl.innerHTML = '';
+    const letters = ['A','B','C','D'];
+    q.opts.forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'q-opt';
+        div.dataset.letter = letters[i];
+        div.dataset.idx = i;
+        div.textContent = opt;
+        div.addEventListener('click', () => handleQuizAnswer(div, q.a));
+        optsEl.appendChild(div);
+    });
+}
+
+function handleQuizAnswer(clicked, correct) {
+    if(!state.active) return;
+    const all = $id('quizOpts').querySelectorAll('.q-opt');
+    all.forEach(o => o.classList.add('disabled'));
+
+    all[correct].classList.add('correct');
+    const chosen = parseInt(clicked.dataset.idx);
+
+    if(chosen === correct) {
+        state.combo++; if(state.combo > state.maxCombo) state.maxCombo = state.combo;
+        const pts = (state.diff==='easy'?20:state.diff==='medium'?35:55) + (state.combo>1?state.combo*5:0);
+        addScore(pts);
+        flash('quizFlash', `✅ Correct! +${pts} pts${state.combo>1?' 🔥 x'+state.combo+' Combo!':''}`, 'success');
+        renderCombo();
+        setTimeout(() => $id('nextBtn').style.display='flex', 800);
+    } else {
+        clicked.classList.add('incorrect');
+        state.combo = 0; renderCombo();
+        state.lives--;
+        flash('quizFlash', `❌ Incorrect! The answer is: ${all[correct].textContent}`, 'error', 4000);
+        renderStats();
+        if(state.lives <= 0) setTimeout(() => endGame('Out of lives! 💔'), 1500);
+        else setTimeout(() => $id('nextBtn').style.display='flex', 1500);
+    }
+}
+
+// ══════════════════════════════════════════════
+//  CALCULATOR GAME
+// ══════════════════════════════════════════════
+
+function startCalc() {
+    showSection('calcSection');
+    $id('calcResult').className = 'calc-result';
+    $id('nextBtn').style.display = 'none';
+    $id('calcInput').value = '';
+
+    const scenarios = calcScenarios[state.diff];
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+    const baseVal = sc.genVal();
+
+    $id('calcLabel').textContent = sc.label;
+    $id('calcVal').textContent = peso(baseVal);
+    $id('calcHint').textContent = '💡 ' + sc.hint;
+
+    const extraBox = $id('calcExtraBox');
+    currentCalcExtra = null;
+
+    if(sc.extraLabel) {
+        const extraVal = sc.extraGen(baseVal);
+        currentCalcExtra = { label: sc.extraLabel, val: extraVal };
+        $id('calcExtraLabel').textContent = sc.extraLabel;
+        $id('calcExtraVal').textContent = peso(extraVal);
+        extraBox.style.display = 'block';
+    } else {
+        extraBox.style.display = 'none';
+    }
+
+    // Compute correct answer
+    if(sc.type === 'vat_from_net') {
+        currentCalcAnswer = Math.round(baseVal * 0.12 * 100) / 100;
+        $id('calcPrompt').textContent = 'What is the VAT amount?';
+    } else if(sc.type === 'net_from_gross') {
+        currentCalcAnswer = Math.round((baseVal / 1.12) * 100) / 100;
+        $id('calcPrompt').textContent = 'What is the net (VAT-exclusive) amount?';
+    } else if(sc.type === 'gross_from_net') {
+        currentCalcAnswer = Math.round(baseVal * 1.12 * 100) / 100;
+        $id('calcPrompt').textContent = 'What is the gross (VAT-inclusive) amount?';
+    } else if(sc.type === 'vat_payable') {
+        currentCalcAnswer = Math.round((baseVal - currentCalcExtra.val) * 100) / 100;
+        $id('calcPrompt').textContent = 'What is the VAT Payable?';
+    } else if(sc.type === 'excess_input') {
+        currentCalcAnswer = Math.round((baseVal - currentCalcExtra.val) * 100) / 100;
+        $id('calcPrompt').textContent = 'What is the Excess Input Tax (to carry forward)?';
+    }
+}
+
+function handleCalcSubmit() {
+    if(!state.active || state.paused) return;
+    const raw = parseFloat($id('calcInput').value);
+    if(isNaN(raw)) { $id('calcResult').className='calc-result error'; $id('calcResult').textContent='Please enter a number.'; return; }
+
+    const tol = Math.abs(currentCalcAnswer) * 0.005; // 0.5% tolerance for rounding
+    const correct = Math.abs(raw - currentCalcAnswer) <= Math.max(tol, 1);
+
+    if(correct) {
+        state.combo++; if(state.combo>state.maxCombo) state.maxCombo=state.combo;
+        const pts = (state.diff==='easy'?20:state.diff==='medium'?30:50) + (state.combo>1?state.combo*5:0);
+        addScore(pts);
+        $id('calcResult').className='calc-result success';
+        $id('calcResult').textContent=`✅ Correct! The answer is ${peso(currentCalcAnswer)}. +${pts} pts`;
+        renderCombo();
+        setTimeout(() => $id('nextBtn').style.display='flex', 600);
+    } else {
+        state.combo = 0; renderCombo();
+        state.lives--;
+        $id('calcResult').className='calc-result error';
+        $id('calcResult').textContent=`❌ Not quite. The correct answer is ${peso(currentCalcAnswer)}.`;
+        renderStats();
+        if(state.lives <= 0) setTimeout(() => endGame('Out of lives! 💔'), 1500);
+        else setTimeout(() => $id('nextBtn').style.display='flex', 1500);
+    }
+}
+
+// ══════════════════════════════════════════════
+//  SCORE / LEVEL
+// ══════════════════════════════════════════════
+
+function addScore(pts) {
+    const prevLevel = state.level;
+    state.score += pts;
+    state.correct++;
+    state.level = Math.floor(state.score / 100) + 1;
+    if(state.level !== prevLevel) flash('matchFlash', `⬆️ Level Up! You're now Level ${state.level}`, 'info', 3000);
+    renderStats();
+    checkAchievements();
+}
+
+// ══════════════════════════════════════════════
+//  GAME FLOW
+// ══════════════════════════════════════════════
+
+function startGame() {
+    state.score = 0; state.level = 1; state.lives = 3;
+    state.timeLeft = state.diff==='easy'?90:state.diff==='medium'?70:55;
+    state.active = true; state.paused = false;
+    state.combo = 0; state.maxCombo = 0; state.correct = 0;
+    state.earned = new Set();
+    renderStats(); renderAchievements(); renderCombo();
+    $id('nextBtn').style.display = 'none';
+    $id('startBtn').style.display = 'none';
+    $id('pauseBtn').style.display = 'flex';
+    startTimer();
+    launchCurrentMode();
+}
+
+function launchCurrentMode() {
+    if(state.mode === 'match') startMatch();
+    else if(state.mode === 'quiz') startQuiz();
+    else startCalc();
+}
+
+function endGame(reason) {
+    state.active = false; clearInterval(state.timer);
+    state.sessions.push({ score: state.score, id: state.sessions.length+1, you: true });
+    renderLeaderboard();
+
+    // Medal
+    const medal = state.score >= 500 ? '🏆' : state.score >= 200 ? '🥈' : state.score >= 50 ? '🥉' : '📋';
+    const title = state.score >= 500 ? 'Tax Master!' : state.score >= 200 ? 'Great Work!' : 'Session Over';
+    $id('modalIcon').textContent = medal;
+    $id('modalTitle').textContent = title;
+    $id('modalSub').textContent = reason;
+    $id('modalScore').textContent = state.score;
+    $id('modalLevel').textContent = state.level;
+    $id('modalCorrect').textContent = state.correct;
+    $id('gameOverModal').classList.add('open');
+}
+
+function resetAll() {
+    state.active = false; state.paused = false;
+    clearInterval(state.timer);
+    state.score=0; state.level=1; state.lives=3; state.timeLeft=90;
+    state.combo=0; state.maxCombo=0; state.correct=0;
+    renderStats(); renderCombo();
+    $id('nextBtn').style.display='none';
+    $id('startBtn').style.display='flex';
+    $id('pauseBtn').style.display='none';
+    $id('comboTag').classList.remove('visible');
+    showSection('idleScreen');
+}
+
+// ══════════════════════════════════════════════
+//  TIPS
+// ══════════════════════════════════════════════
+
+function renderTip() { $id('tipText').textContent = taxTips[currentTip]; }
+
+// ══════════════════════════════════════════════
+//  EVENTS
+// ══════════════════════════════════════════════
+
+$id('startBtnIdle').addEventListener('click', startGame);
+$id('startBtn').addEventListener('click', startGame);
+
+$id('pauseBtn').addEventListener('click', () => {
+    state.paused = !state.paused;
+    $id('pauseBtn').innerHTML = state.paused
+        ? '<i class="fas fa-play"></i> Resume'
+        : '<i class="fas fa-pause"></i> Pause';
+});
+
+$id('resetBtn').addEventListener('click', resetAll);
+
+$id('nextBtn').addEventListener('click', () => {
+    if(!state.active) return;
+    $id('nextBtn').style.display = 'none';
+    // Rotate modes for variety
+    const modes = ['match','quiz','calc'];
+    const idx = modes.indexOf(state.mode);
+    // Stay on same mode type but if level progressed, suggest next mode tab
+    launchCurrentMode();
+});
+
+$id('playAgainBtn').addEventListener('click', () => {
+    $id('gameOverModal').classList.remove('open');
+    resetAll();
+    // auto start
+    setTimeout(startGame, 100);
+});
+$id('closeModalBtn').addEventListener('click', () => {
+    $id('gameOverModal').classList.remove('open');
+    resetAll();
+});
+
+// Difficulty buttons
+document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if(state.active) return;
+        document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state.diff = btn.dataset.level;
+    });
+});
+
+// Mode tabs
+document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        if(state.active) return;
+        document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        state.mode = tab.dataset.mode;
+    });
+});
+
+// Calc submit
+$id('calcSubmit').addEventListener('click', handleCalcSubmit);
+$id('calcInput').addEventListener('keydown', e => { if(e.key==='Enter') handleCalcSubmit(); });
+
+// Tips
+$id('tipNext').addEventListener('click', () => { currentTip=(currentTip+1)%taxTips.length; renderTip(); });
+$id('tipPrev').addEventListener('click', () => { currentTip=(currentTip-1+taxTips.length)%taxTips.length; renderTip(); });
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+
+renderTip();
+renderAchievements();
+renderLeaderboard();
+renderStats();
+showSection('idleScreen');
+$id('startBtn').style.display='none';
+</script>
 </body>
 </html>

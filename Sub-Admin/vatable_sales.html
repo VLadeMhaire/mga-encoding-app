@@ -394,6 +394,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   <div class="sidebar-nav">
     <a href="monthly_record.html" class="nav-btn"><i class="fas fa-calendar-alt"></i>Monthly Records</a>
     <a href="index2.html" class="nav-btn"><i class="fas fa-home"></i>Back to Dashboard</a>
+    <a href="company_information.html" class="nav-btn"><i class="fas fa-building"></i>Company Info</a>
     <div class="nav-section">Session</div>
     <div class="autosave-indicator" id="autosaveIndicator"><span class="autosave-dot"></span> Autosaving…</div>
     <div class="nav-section">Data Management</div>
@@ -1082,10 +1083,10 @@ function openSubmitModal(){
   document.getElementById('submitModalFileMeta').textContent=rows.length+' rows · '+(co.name||'No company name set');
   document.getElementById('submitModalOverlay').classList.remove('hidden');
   document.getElementById('submitModalConfirmBtn').onclick = async function(){
-    // CHANGE 2: Build payload and save to BOTH sessionStorage AND localStorage before navigating
+    // Build payload and save to BOTH sessionStorage AND localStorage before navigating
     const payload = JSON.stringify({version:'1.0',timestamp:new Date().toISOString(),companyInfo:co,tableData:rows},null,2);
 
-    // Save to sessionStorage for portal pickup
+    // Save to sessionStorage for portal auto-submit pickup
     sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILE', payload);
     sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILENAME', filename);
 
@@ -1096,12 +1097,22 @@ function openSubmitModal(){
       localStorage.setItem('VAT_SUBMIT_BACKUP_LATEST_NAME', filename);
     } catch(e) { /* quota exceeded — non-fatal */ }
 
+    // Save data to .vat file (download) so the client has a local copy
+    try {
+      const blob = new Blob([payload], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch(e) { /* download failed — non-fatal, portal will still receive it */ }
+
     // Also trigger a full session save so nothing is lost
     await saveSession();
 
-    showToast('Saving & redirecting to portal…', 'success');
+    showToast('File saved locally & redirecting to portal…', 'success');
     document.getElementById('submitModalOverlay').classList.add('hidden');
-    setTimeout(()=>{ location.href = '../index.html#submit'; }, 500);
+    setTimeout(()=>{ location.href = '../index.html#submit'; }, 600);
   };
 }
 
@@ -1675,6 +1686,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(restored===false||restored===null){document.getElementById('tableBody').innerHTML='';addRow();currentPage=1;renderCurrentPage();updateAllStats();}
     else{const label=IS_MONTHLY?MONTHLY_CTX.label:'session';showToast(`Loaded ${restored} row(s) from ${label}`,'success');}
   }
+  /* ── Load company info saved by company_information.html (takes priority over session data) ── */
+  (function loadExternalCompanyInfo(){
+    const keys=['vatCompanyInfo_Main','vatCompanyInfo_Client','vatCompanyInfo_SubAdmin'];
+    for(const k of keys){
+      const raw=localStorage.getItem(k);
+      if(!raw)continue;
+      try{const d=JSON.parse(raw);if(d&&typeof d==='object'&&d.companyName!==undefined){applyCompanyInfo(d);break;}}catch(e){}
+    }
+  })();
 
   ['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{
     const el=document.getElementById(id);
@@ -1710,6 +1730,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('submitModalCancelBtn').addEventListener('click',()=>{document.getElementById('submitModalOverlay').classList.add('hidden');});
     document.getElementById('submitModalOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
   }
+
+  /* ── Live cross-tab sync from company_information.html ── */
+  window.addEventListener('storage',function(e){
+    if(!['vatCompanyInfo_Main','vatCompanyInfo_Client','vatCompanyInfo_SubAdmin'].includes(e.key))return;
+    try{const d=JSON.parse(e.newValue);if(d&&d.companyName!==undefined){applyCompanyInfo(d);showToast('Company info updated','success');}}catch(err){}
+  });
 });
 </script>
 

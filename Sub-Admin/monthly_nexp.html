@@ -713,22 +713,27 @@ function fmtDate(iso) {
 ============================================================ */
 function openMonthInTracker(year, month) {
   const contextKey = makeStorageKey(year, month);
+  const label      = `${MONTHS[month-1]} ${year}`;
 
-  // Pre-load any existing month data into the active session key
-  // so non_vat_expenses.html can read it via its own save key
-  const existing = localStorage.getItem(contextKey);
-  if (existing) {
-    // Write into the key that non_vat_expenses will look at
-    // when it starts up with this context
-    localStorage.setItem(contextKey, existing);
-  }
-
+  // non_vat_expenses.html reads monthly context from URL query params:
+  //   ?key=...&year=...&month=...&label=...
+  // It uses those to set its active session key (= contextKey here),
+  // so data it saves will land exactly under contextKey in localStorage.
+  // We also stash them in sessionStorage so checkReturnFromTracker()
+  // can pick them up when the user navigates back.
   sessionStorage.setItem('NEXP_MONTHLY_CONTEXT_KEY',   contextKey);
   sessionStorage.setItem('NEXP_MONTHLY_CONTEXT_YEAR',  String(year));
   sessionStorage.setItem('NEXP_MONTHLY_CONTEXT_MONTH', String(month));
   sessionStorage.setItem('NEXP_MONTHLY_CONTEXT_ROLE',  APP_ROLE);
-  sessionStorage.setItem('NEXP_MONTHLY_CONTEXT_LABEL', `${MONTHS[month-1]} ${year}`);
-  window.location.href = 'non_vat_expenses.html';
+  sessionStorage.setItem('NEXP_MONTHLY_CONTEXT_LABEL', label);
+
+  const params = new URLSearchParams({
+    key:   contextKey,
+    year:  String(year),
+    month: String(month),
+    label: label,
+  });
+  window.location.href = 'non_vat_expenses.html?' + params.toString();
 }
 
 /* ============================================================
@@ -1003,17 +1008,43 @@ function checkReturnFromTracker() {
   if (!key || !yr || !mo) return;
   if (role !== APP_ROLE) return;
 
-  // non_vat_expenses.html writes data under the context key
+  // non_vat_expenses.html (IS_MONTHLY mode) saves table data under:
+  //   getActiveSessionKey() = MONTHLY_CTX.key = our contextKey
+  // and company info under:
+  //   getActiveCompanyKey() = `${MONTHLY_CTX.key}_NVCOMPANY`
   const rawSession = localStorage.getItem(key);
+  const rawCompany = localStorage.getItem(key + '_NVCOMPANY');
 
   if (rawSession) {
     try {
       const session = JSON.parse(rawSession);
-      // Support both {tableData, companyInfo} and {tableData, companyInfo:{...}}
-      if (session && (session.tableData || Array.isArray(session))) {
-        const tableData   = session.tableData   || [];
-        const companyInfo = session.companyInfo || {};
-        saveMonthData(parseInt(yr), parseInt(mo), { tableData, companyInfo });
+      // non_vat_expenses.html stores: { version, timestamp, tableData, companyInfo }
+      const tableData = session.tableData || (Array.isArray(session) ? session : []);
+
+      // Company info: prefer the dedicated company key, fall back to session blob
+      let companyInfo = {};
+      if (rawCompany) {
+        try { companyInfo = JSON.parse(rawCompany); } catch(e) {}
+      } else if (session.companyInfo) {
+        companyInfo = session.companyInfo;
+      }
+
+      // Normalise companyInfo field names: non_vat_expenses uses short names
+      // (name, tin, address, business, date, employee, email) but saveMonthData
+      // expects companyName / companyTIN / etc.  Map both so meta is correct.
+      const normalised = {
+        companyName:       companyInfo.companyName || companyInfo.name      || '',
+        companyTIN:        companyInfo.companyTIN  || companyInfo.tin       || '',
+        companyAddress:    companyInfo.companyAddress || companyInfo.address || '',
+        lineOfBusiness:    companyInfo.lineOfBusiness || companyInfo.business || '',
+        telephone:         companyInfo.telephone   || '',
+        reportDate:        companyInfo.reportDate  || companyInfo.date      || '',
+        authorizedEmployee:companyInfo.authorizedEmployee || companyInfo.employee || '',
+        email:             companyInfo.email        || '',
+      };
+
+      if (tableData.length > 0 || rawCompany) {
+        saveMonthData(parseInt(yr), parseInt(mo), { tableData, companyInfo: normalised });
         showToast(`Saved non-VAT expenses for ${MONTHS[parseInt(mo)-1]} ${yr}`, 'success');
       }
     } catch(e) {
@@ -1087,10 +1118,14 @@ document.addEventListener('DOMContentLoaded', async () => {
        saved_at     TEXT
      );
 
-   Note: non_vat_expenses.html needs to be updated to read
-   NEXP_MONTHLY_CONTEXT_* from sessionStorage on init, use that
-   key as its active session key, and write data there — matching
-   the pattern in non_vat_purchases.html (NPURCH_MONTHLY_CONTEXT_*).
+   INTEGRATION PATTERN (corrected):
+   non_vat_expenses.html reads monthly context from URL query params:
+     ?key=NEXP_MONTHLY_Main_2026_01&year=2026&month=1&label=January+2026
+   When IS_MONTHLY, it sets:
+     getActiveSessionKey() = MONTHLY_CTX.key          → table data
+     getActiveCompanyKey() = MONTHLY_CTX.key + '_NVCOMPANY' → company info
+   So openMonthInTracker() must navigate with those URL params, and
+   checkReturnFromTracker() must read from key and key+'_NVCOMPANY'.
 ============================================================ */
 </script>
 </body>
