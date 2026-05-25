@@ -497,7 +497,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>Input Tax = 0 (Non-VAT) · W/T = Gross × Rate · 0%/1%/2%/5% withholding categories</p>
     </div>
     <div class="header-actions">
-      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-arrow-right"></i>Go to Portal</button>
+      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit Receipt</button>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
@@ -675,11 +675,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 <!-- SUBMIT/GO TO PORTAL MODAL -->
 <div class="modal-overlay hidden" id="submitModalOverlay">
   <div class="modal-box">
-    <div class="modal-title"><i class="fas fa-arrow-right" style="color:var(--blue-500);margin-right:8px"></i>Go to Portal</div>
-    <div class="modal-body">Your current data will be saved before navigating to the portal. Continue?</div>
+    <div class="modal-title"><i class="fas fa-paper-plane" style="color:var(--blue-500);margin-right:8px"></i>Submit Receipt</div>
+    <div class="modal-body">This will redirect you to the portal's submission page.</div>
     <div class="modal-actions">
       <button class="btn-secondary" id="submitModalCancelBtn">Cancel</button>
-      <button class="btn-submit" id="submitModalConfirmBtn"><i class="fas fa-arrow-right"></i> Go to Portal</button>
+      <button class="btn-submit" id="submitModalConfirmBtn"><i class="fas fa-paper-plane"></i> Submit Receipt</button>
     </div>
   </div>
 </div>
@@ -1258,6 +1258,51 @@ window.deleteRow=function(rid){
   row.style.transition='opacity .2s,transform .2s'; row.style.opacity='0'; row.style.transform='translateX(-10px)';
   setTimeout(()=>{ row.remove(); if(currentPage>getTotalPages()) currentPage=Math.max(1,getTotalPages()); renderCurrentPage(); scheduleStats(); scheduleAutoSave(); },200);
 };
+
+/* ============================================================
+   CROSS-TAB COMPANY INFO SYNC
+   Watches localStorage for changes written by company_information.html
+   and immediately reflects them in the left-sidebar fields.
+============================================================ */
+(function(){
+  // Main role uses 'nvatExpCompanyInfo' (no suffix) — matches NS.COMPANY_INFO for Main
+  const WATCH_KEYS = [
+    'nvatExpCompanyInfo',
+    'nvatExpCompanyInfo_Client',
+    'nvatExpCompanyInfo_SubAdmin'
+  ];
+
+  // On load: if sidebar is empty after restoreSession, pull from any populated watched key
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const own = document.getElementById('companyName');
+      if (own && own.value.trim()) return;
+      for (const k of WATCH_KEYS) {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        try {
+          const data = JSON.parse(raw);
+          if (data && typeof data === 'object' && data.companyName) {
+            applyCompanyInfo(data);
+            break;
+          }
+        } catch(e) {}
+      }
+    }, 300);
+  });
+
+  // Cross-tab: fire when company_information.html saves in another tab/window
+  window.addEventListener('storage', (e) => {
+    if (!WATCH_KEYS.includes(e.key)) return;
+    if (!e.newValue) return;
+    try {
+      const data = JSON.parse(e.newValue);
+      if (!data || typeof data !== 'object' || !('companyName' in data)) return;
+      applyCompanyInfo(data);
+      showToast('Company info synced from Company Information page', 'success');
+    } catch(e) {}
+  });
+})();
 
 /* ============================================================
    AUTOSAVE & SESSION

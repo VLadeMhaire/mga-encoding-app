@@ -184,6 +184,11 @@ html, body { min-height:100%; background:#f5f6f9; color:var(--gray-900); font-fa
     <a href="vatable_sales.html" class="nav-link"><i class="fas fa-file-invoice-dollar"></i> VAT Sales</a>
     <a href="vatable_purchases.html" class="nav-link"><i class="fas fa-shopping-cart"></i> VAT Purchases</a>
     <a href="vatable_expenses.html" class="nav-link"><i class="fas fa-receipt"></i> VAT Expenses</a>
+    <a href="non_vat_purchases.html" class="nav-link"><i class="fas fa-shopping-bag"></i> Non-VAT Purchases</a>
+    <a href="non_vat_expenses.html" class="nav-link"><i class="fas fa-file-alt"></i> Non-VAT Expenses</a>
+    <a href="capex.html" class="nav-link"><i class="fas fa-tools"></i> CAPEX</a>
+    <a href="taxes_licenses.html" class="nav-link"><i class="fas fa-landmark"></i> Taxes &amp; Licenses</a>
+    <a href="purchase_returns.html" class="nav-link"><i class="fas fa-undo-alt"></i> Purchase Returns</a>
   </div>
 </nav>
 
@@ -199,7 +204,7 @@ html, body { min-height:100%; background:#f5f6f9; color:var(--gray-900); font-fa
       <div class="hero-text">
         <div class="hero-eyebrow">MGAA VAT System</div>
         <div class="hero-title">Company <span>Information</span></div>
-        <div class="hero-sub">Manage business details. Saved data loads automatically into VAT Sales, Purchases, and Expenses.</div>
+        <div class="hero-sub">Manage business details. Saved data loads automatically into all VAT and Non-VAT modules, CAPEX, Taxes &amp; Licenses, and Purchase Returns.</div>
       </div>
       <div class="sync-pill">
         <div class="sync-dot idle" id="syncDot"></div>
@@ -291,6 +296,11 @@ html, body { min-height:100%; background:#f5f6f9; color:var(--gray-900); font-fa
         <button class="btn btn-success" id="openVatBtn"><i class="fas fa-file-invoice-dollar"></i> Open VAT Sales</button>
         <button class="btn btn-success" id="openPurchBtn"><i class="fas fa-shopping-cart"></i> Open VAT Purchases</button>
         <button class="btn btn-success" id="openExpBtn"><i class="fas fa-receipt"></i> Open VAT Expenses</button>
+        <button class="btn btn-success" id="openNPurchBtn"><i class="fas fa-shopping-bag"></i> Open Non-VAT Purchases</button>
+        <button class="btn btn-success" id="openNExpBtn"><i class="fas fa-file-alt"></i> Open Non-VAT Expenses</button>
+        <button class="btn btn-success" id="openCapexBtn"><i class="fas fa-tools"></i> Open CAPEX</button>
+        <button class="btn btn-success" id="openTaxesBtn"><i class="fas fa-landmark"></i> Open Taxes &amp; Licenses</button>
+        <button class="btn btn-success" id="openReturnsBtn"><i class="fas fa-undo-alt"></i> Open Purchase Returns</button>
         <button class="btn btn-secondary" id="reloadBtn"><i class="fas fa-undo"></i> Reload Saved</button>
         <button class="btn btn-danger" id="clearBtn"><i class="fas fa-eraser"></i> Clear All</button>
       </div>
@@ -357,9 +367,37 @@ html, body { min-height:100%; background:#f5f6f9; color:var(--gray-900); font-fa
             <li class="target-item"><i class="fas fa-check-circle"></i> Expenses Client <span class="target-key">expCompanyInfo_Client</span></li>
             <li class="target-item"><i class="fas fa-check-circle"></i> Expenses SubAdmin <span class="target-key">expCompanyInfo_SubAdmin</span></li>
           </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Non-VAT Purchases</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Purch. Main <span class="target-key">npurchCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Purch. Client <span class="target-key">npurchCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Purch. SubAdmin <span class="target-key">npurchCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Non-VAT Expenses</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Exp. Main <span class="target-key">nvatExpCompanyInfo</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Exp. Client <span class="target-key">nvatExpCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Exp. SubAdmin <span class="target-key">nvatExpCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">CAPEX</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> CAPEX Main <span class="target-key">capexCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> CAPEX Client <span class="target-key">capexCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> CAPEX SubAdmin <span class="target-key">capexCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Taxes &amp; Licenses</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Taxes Main <span class="target-key">taxesCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Taxes Client <span class="target-key">taxesCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Taxes SubAdmin <span class="target-key">taxesCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Purchase Returns</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Purchase Returns <span class="target-key">purchaseReturnsCompanyInfo</span></li>
+          </ul>
           <div class="sync-note">
             <i class="fas fa-info-circle"></i>
-            <span>Open any VAT module after saving — all three read from these keys on every page load.</span>
+            <span>Open any module after saving — all eight read from these keys on every page load.</span>
           </div>
         </div>
       </div>
@@ -391,7 +429,25 @@ const COMPANY_KEYS = [
   // VAT Expenses
   'expCompanyInfo_Main',
   'expCompanyInfo_Client',
-  'expCompanyInfo_SubAdmin'
+  'expCompanyInfo_SubAdmin',
+  // Non-VAT Purchases
+  'npurchCompanyInfo_Main',
+  'npurchCompanyInfo_Client',
+  'npurchCompanyInfo_SubAdmin',
+  // Non-VAT Expenses (Main key has no suffix)
+  'nvatExpCompanyInfo',
+  'nvatExpCompanyInfo_Client',
+  'nvatExpCompanyInfo_SubAdmin',
+  // CAPEX
+  'capexCompanyInfo_Main',
+  'capexCompanyInfo_Client',
+  'capexCompanyInfo_SubAdmin',
+  // Taxes & Licenses
+  'taxesCompanyInfo_Main',
+  'taxesCompanyInfo_Client',
+  'taxesCompanyInfo_SubAdmin',
+  // Purchase Returns (single key, no role split)
+  'purchaseReturnsCompanyInfo'
 ];
 
 // These IDs match EXACTLY the getElementById() calls in vatable_sales.html
@@ -441,15 +497,30 @@ function loadSaved() {
   const allKeys = [
     'vatCompanyInfo_Main', 'vatCompanyInfo_Client', 'vatCompanyInfo_SubAdmin',
     'purchCompanyInfo_Main', 'purchCompanyInfo_Client', 'purchCompanyInfo_SubAdmin',
-    'expCompanyInfo_Main', 'expCompanyInfo_Client', 'expCompanyInfo_SubAdmin'
+    'expCompanyInfo_Main', 'expCompanyInfo_Client', 'expCompanyInfo_SubAdmin',
+    'npurchCompanyInfo_Main', 'npurchCompanyInfo_Client', 'npurchCompanyInfo_SubAdmin',
+    'nvatExpCompanyInfo', 'nvatExpCompanyInfo_Client', 'nvatExpCompanyInfo_SubAdmin',
+    'capexCompanyInfo_Main', 'capexCompanyInfo_Client', 'capexCompanyInfo_SubAdmin',
+    'taxesCompanyInfo_Main', 'taxesCompanyInfo_Client', 'taxesCompanyInfo_SubAdmin',
+    'purchaseReturnsCompanyInfo'
   ];
   for (const k of allKeys) {
     const raw = localStorage.getItem(k);
     if (!raw) continue;
     try {
       const d = JSON.parse(raw);
-      // Must have full-key fields (not session short-keys)
-      if (d && typeof d === 'object' && 'companyName' in d) return d;
+      if (!d || typeof d !== 'object') continue;
+      // Full-ID format (most modules): has companyName field
+      if ('companyName' in d) return d;
+      // Short-key format (capex): has 'name' field — normalise to full-ID format
+      if ('name' in d) {
+        return {
+          companyName: d.name || '', companyTIN: d.tin || '',
+          companyAddress: d.address || '', lineOfBusiness: d.business || '',
+          telephone: d.telephone || '', reportDate: d.date || '',
+          authorizedEmployee: d.employee || '', email: d.email || ''
+        };
+      }
     } catch(e) {}
   }
   return null;
@@ -483,8 +554,32 @@ function buildData() {
 
 /* ── Write to all company keys ── */
 function writeData(data) {
-  const json = JSON.stringify(data);
-  COMPANY_KEYS.forEach(k => localStorage.setItem(k, json));
+  // Full-ID format (used by most modules): {companyName, companyTIN, ...}
+  const fullJson = JSON.stringify(data);
+
+  // Short-key format used by capex.html: {name, tin, address, business, telephone, date, employee, email}
+  const shortData = {
+    name: data.companyName || '',
+    tin:  data.companyTIN  || '',
+    address:  data.companyAddress  || '',
+    business: data.lineOfBusiness  || '',
+    telephone: data.telephone      || '',
+    date:     data.reportDate      || '',
+    employee: data.authorizedEmployee || '',
+    email:    data.email           || ''
+  };
+  const shortJson = JSON.stringify(shortData);
+
+  // purchase_returns.html stores reportDate as YYYY-MM-DD (native <input type="date">)
+  // data.reportDate is already in storage format (YYYY-MM-DD) so it's compatible as-is.
+
+  const CAPEX_KEYS = new Set([
+    'capexCompanyInfo_Main', 'capexCompanyInfo_Client', 'capexCompanyInfo_SubAdmin'
+  ]);
+
+  COMPANY_KEYS.forEach(k => {
+    localStorage.setItem(k, CAPEX_KEYS.has(k) ? shortJson : fullJson);
+  });
 }
 
 /* ── Live preview ── */
@@ -543,7 +638,7 @@ function save() {
     const pill = document.getElementById('savedPill');
     pill.classList.add('show');
     setTimeout(() => pill.classList.remove('show'), 2500);
-    toast('Company info saved — all VAT modules (Sales, Purchases, Expenses) are synced', 'success');
+    toast('Company info saved — all modules synced (VAT Sales/Purchases/Expenses, Non-VAT Purchases/Expenses, CAPEX, Taxes & Licenses, Purchase Returns)', 'success');
     return true;
   } catch(e) {
     setSyncStatus('idle', 'Error');
@@ -681,6 +776,31 @@ document.addEventListener('DOMContentLoaded', () => {
   // Open VAT Expenses (save first)
   document.getElementById('openExpBtn').addEventListener('click', () => {
     if (save()) setTimeout(() => { location.href = 'vatable_expenses.html'; }, 500);
+  });
+
+  // Open Non-VAT Purchases (save first)
+  document.getElementById('openNPurchBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'non_vat_purchases.html'; }, 500);
+  });
+
+  // Open Non-VAT Expenses (save first)
+  document.getElementById('openNExpBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'non_vat_expenses.html'; }, 500);
+  });
+
+  // Open CAPEX (save first)
+  document.getElementById('openCapexBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'capex.html'; }, 500);
+  });
+
+  // Open Taxes & Licenses (save first)
+  document.getElementById('openTaxesBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'taxes_licenses.html'; }, 500);
+  });
+
+  // Open Purchase Returns (save first)
+  document.getElementById('openReturnsBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'purchase_returns.html'; }, 500);
   });
 
   // Reload

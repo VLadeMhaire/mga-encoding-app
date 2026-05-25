@@ -495,7 +495,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>Net Purchases = Vatable Gross ÷ 1.12 · Input Tax = Net × 12% · Withholding Tax entered manually</p>
     </div>
     <div class="header-actions">
-      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-arrow-right"></i>Go to Portal</button>
+      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit Receipt</button>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
@@ -706,11 +706,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 <!-- GO TO PORTAL MODAL -->
 <div class="modal-overlay hidden" id="submitModalOverlay">
   <div class="modal-box">
-    <div class="modal-title"><i class="fas fa-arrow-right" style="color:var(--blue-500);margin-right:8px"></i>Go to Portal</div>
-    <div class="modal-body">Your current data will be saved before navigating to the portal. Continue?</div>
+    <div class="modal-title"><i class="fas fa-paper-plane" style="color:var(--blue-500);margin-right:8px"></i>Submit Receipt</div>
+    <div class="modal-body">This will redirect you to the portal's submission page.</div>
     <div class="modal-actions">
       <button class="btn-secondary" id="submitModalCancelBtn">Cancel</button>
-      <button class="btn-submit" id="submitModalConfirmBtn"><i class="fas fa-arrow-right"></i> Go to Portal</button>
+      <button class="btn-submit" id="submitModalConfirmBtn"><i class="fas fa-paper-plane"></i> Submit Receipt</button>
     </div>
   </div>
 </div>
@@ -837,6 +837,53 @@ function positionPicker(anchor){const popup=document.getElementById('dpPopup');i
 function closeDatePicker(){document.getElementById('dpOverlay')?.remove();document.getElementById('dpPopup')?.remove();}
 function renderCalendar(){const popup=document.getElementById('dpPopup');if(!popup)return;const{year,month,targetInput}=dpState;const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'],DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];const today=new Date();let selDay=null,selMonth=null,selYear=null;if(targetInput&&targetInput.value&&validateDisplayDate(targetInput.value)){const p=targetInput.value.split('/');selMonth=+p[0]-1;selDay=+p[1];selYear=+p[2];}const firstDay=new Date(year,month,1).getDay(),daysInMonth=new Date(year,month+1,0).getDate(),daysInPrev=new Date(year,month,0).getDate();let daysHTML='';for(let i=firstDay-1;i>=0;i--)daysHTML+=`<button class="dp-day other-month" data-y="${year}" data-m="${month-1}" data-d="${daysInPrev-i}" type="button">${daysInPrev-i}</button>`;for(let d=1;d<=daysInMonth;d++){let cls='dp-day';if(d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear())cls+=' today';if(selDay===d&&selMonth===month&&selYear===year)cls+=' selected';daysHTML+=`<button class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}" type="button">${d}</button>`;}const remaining=(firstDay+daysInMonth)%7===0?0:7-(firstDay+daysInMonth)%7;for(let d=1;d<=remaining;d++)daysHTML+=`<button class="dp-day other-month" data-y="${year}" data-m="${month+1}" data-d="${d}" type="button">${d}</button>`;popup.innerHTML=`<div class="dp-header"><button class="dp-nav-btn" id="dpPrev" type="button"><i class="fas fa-chevron-left"></i></button><span class="dp-month-year">${MONTHS[month]} ${year}</span><button class="dp-nav-btn" id="dpNext" type="button"><i class="fas fa-chevron-right"></i></button></div><div class="dp-weekdays">${DAYS.map(d=>`<span>${d}</span>`).join('')}</div><div class="dp-days">${daysHTML}</div><div class="dp-footer"><button class="dp-today-btn" id="dpTodayBtn" type="button"><i class="fas fa-crosshairs"></i> Today</button><button id="dpCancelBtn" type="button">Cancel</button></div>`;popup.querySelector('#dpPrev').addEventListener('click',()=>{dpState.month--;if(dpState.month<0){dpState.month=11;dpState.year--;}renderCalendar();});popup.querySelector('#dpNext').addEventListener('click',()=>{dpState.month++;if(dpState.month>11){dpState.month=0;dpState.year++;}renderCalendar();});popup.querySelector('#dpTodayBtn').addEventListener('click',()=>{const t=new Date();dpState.year=t.getFullYear();dpState.month=t.getMonth();selectDate(t.getFullYear(),t.getMonth(),t.getDate());});popup.querySelector('#dpCancelBtn').addEventListener('click',closeDatePicker);popup.querySelectorAll('.dp-day').forEach(btn=>btn.addEventListener('click',()=>{let y=+btn.dataset.y,m=+btn.dataset.m,d=+btn.dataset.d;if(m<0){m=11;y--;}if(m>11){m=0;y++;}selectDate(y,m,d);}));}
 function selectDate(year,month,day){const input=dpState.targetInput;if(!input){closeDatePicker();return;}const mm=String(month+1).padStart(2,'0'),dd=String(day).padStart(2,'0');input.value=`${mm}/${dd}/${year}`;input.dispatchEvent(new Event('change',{bubbles:true}));closeDatePicker();}
+
+/* ============================================================
+   CROSS-TAB COMPANY INFO SYNC
+   Watches localStorage for changes written by company_information.html
+   and immediately reflects them in the left-sidebar fields.
+   company_information.html writes capex keys in short-key format:
+   {name, tin, address, business, telephone, date, employee, email}
+============================================================ */
+(function(){
+  const WATCH_KEYS = [
+    'capexCompanyInfo_Main',
+    'capexCompanyInfo_Client',
+    'capexCompanyInfo_SubAdmin'
+  ];
+
+  // On load: if sidebar is empty after restoreSession, pull from any populated watched key
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const own = document.getElementById('companyName');
+      if (own && own.value.trim()) return;
+      for (const k of WATCH_KEYS) {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        try {
+          const data = JSON.parse(raw);
+          if (data && typeof data === 'object' && (data.name || data.companyName)) {
+            applyCompanyInfoRaw(data);
+            break;
+          }
+        } catch(e) {}
+      }
+    }, 300);
+  });
+
+  // Cross-tab: fire when company_information.html saves in another tab/window
+  window.addEventListener('storage', (e) => {
+    if (!WATCH_KEYS.includes(e.key)) return;
+    if (!e.newValue) return;
+    try {
+      const data = JSON.parse(e.newValue);
+      if (!data || typeof data !== 'object') return;
+      if (!data.name && !data.companyName) return;
+      applyCompanyInfoRaw(data);
+      showToast('Company info synced from Company Information page', 'success');
+    } catch(e) {}
+  });
+})();
 
 /* ============================================================
    AUTOSAVE — localStorage session persistence
@@ -1990,10 +2037,29 @@ if (IS_MONTHLY) {
   // ATTACH ALL BUTTON LISTENERS (THIS IS THE CRITICAL FIX)
   attachAllButtonListeners();
 
-  // Submit portal button (Client only)
+  // Submit Receipt button (Client only)
   if (APP_ROLE === 'Client') {
     const submitBtn = document.getElementById('submitPortalHeadBtn');
-    if (submitBtn) submitBtn.classList.remove('hidden');
+    if (submitBtn) {
+      submitBtn.classList.remove('hidden');
+      submitBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('submitModalOverlay').classList.remove('hidden');
+      });
+    }
+    const confirmBtn = document.getElementById('submitModalConfirmBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async function() {
+        await saveSession();
+        showToast('Navigating to portal…', 'success');
+        document.getElementById('submitModalOverlay').classList.add('hidden');
+        setTimeout(() => { location.href = '../index.html'; }, 400);
+      });
+    }
+    const cancelBtn = document.getElementById('submitModalCancelBtn');
+    if (cancelBtn) cancelBtn.addEventListener('click', () => document.getElementById('submitModalOverlay').classList.add('hidden'));
+    const overlay = document.getElementById('submitModalOverlay');
+    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) this.classList.add('hidden'); });
   }
 }
 

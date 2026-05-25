@@ -572,9 +572,9 @@ td.hidden-column {
 .table-wrapper table {
     direction: ltr;
     width: 100%;
-    min-width: 2800px;
+    min-width: 1600px;
     border-collapse: collapse;
-    table-layout: auto;
+    table-layout: fixed;
     position: relative;
     z-index: 2;
     background: transparent;
@@ -606,24 +606,44 @@ thead {
     background: var(--blue-900);
 }
 th {
-    padding: 11px 10px;
+    padding: 9px 5px;
     text-align: center;
     font-weight: 700;
-    font-size: 0.68rem;
+    font-size: 0.63rem;
     border-right: 1px solid rgba(255,255,255,.12);
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.4px;
     color: white;
     text-shadow: none;
     white-space: normal;
     word-break: break-word;
-    min-width: 80px;
-    line-height: 1.35;
+    min-width: 60px;
+    line-height: 1.2;
     vertical-align: middle;
     transition: background 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-th:first-child { min-width: 52px; width: 52px; }
-th:last-child  { min-width: 60px; width: 60px; }
+th:first-child { width: 44px; min-width: 44px; }  /* Seq No */
+th:nth-child(2) { width: 110px; }                  /* TIN */
+th:nth-child(3) { width: 100px; }                  /* Last Name */
+th:nth-child(4) { width: 90px; }                   /* First Name */
+th:nth-child(5) { width: 80px; }                   /* Middle Name */
+th:nth-child(6) { width: 72px; }                   /* Daily Rate */
+th:nth-child(7) { width: 80px; }                   /* Basic Salary */
+th:nth-child(8) { width: 80px; }                   /* Allowances */
+th:nth-child(9) { width: 72px; }                   /* De Minimis */
+th:nth-child(10){ width: 72px; }                   /* 13th Month */
+th:nth-child(11){ width: 80px; }                   /* Total Comp */
+th:nth-child(12){ width: 72px; }                   /* SSS */
+th:nth-child(13){ width: 72px; }                   /* PhilHealth */
+th:nth-child(14){ width: 72px; }                   /* Pag-ibig */
+th:nth-child(15){ width: 80px; }                   /* Total Contrib */
+th:nth-child(16){ width: 80px; }                   /* Total Deduction */
+th:nth-child(17){ width: 80px; }                   /* Taxable Comp */
+th:nth-child(18){ width: 72px; }                   /* Exemption */
+th:nth-child(19){ width: 80px; }                   /* Net Taxable */
+th:last-child   { width: 46px; min-width: 46px; }  /* Action */
 /* Numeric / money columns — right-align headers to match cell values */
 th:nth-child(n+6):not(:last-child) { text-align: right; }
 th:hover { background: var(--blue-800); }
@@ -637,7 +657,8 @@ td {
     border-right: 1px solid var(--gray-200);
     border-bottom: 1px solid var(--gray-100);
     vertical-align: middle;
-    height: 38px;
+    height: 36px;
+    overflow: hidden;
 }
 
 /* ROW STYLES — semi-transparent so watermark shows through */
@@ -657,15 +678,18 @@ tbody tr:hover {
 td input, td select, td .uneditable, td button {
     width: 100%;
     height: 100%;
-    min-height: 38px;
-    padding: 4px 8px;
+    min-height: 36px;
+    padding: 3px 6px;
     border: none;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     background: transparent;
     color: var(--gray-800);
     transition: all 0.15s ease;
     box-sizing: border-box;
     font-family: var(--font);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 td input:focus, td select:focus {
     outline: none;
@@ -689,11 +713,14 @@ td .uneditable {
     font-weight: 700;
     text-align: right;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 4px 10px;
+    padding: 3px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 td button.delete-btn {
     color: var(--red-500);
@@ -722,32 +749,39 @@ td button.delete-btn:hover {
 tfoot tr.summary-row {
     background: var(--blue-900);
     border-top: 2px solid var(--blue-700);
-    position: relative;
-    z-index: 3;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
 }
 tfoot tr.summary-row td {
-    padding: 7px 10px;
+    padding: 6px 8px;
     font-weight: 700;
-    font-size: 0.73rem;
+    font-size: 0.68rem;
     color: white;
     text-shadow: none;
     border-right: 1px solid rgba(255,255,255,.12);
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 tfoot tr.summary-row td:first-child {
     text-align: center;
     font-weight: 700;
     letter-spacing: 0.3px;
     color: var(--blue-200);
-    font-size: 0.68rem;
+    font-size: 0.63rem;
 }
 tfoot tr.summary-row td .uneditable {
     background: transparent;
     color: #fff;
     font-weight: 800;
     text-shadow: none;
-    font-size: 0.73rem;
+    font-size: 0.68rem;
     justify-content: flex-end;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* PAGINATION CONTROLS */
@@ -853,6 +887,11 @@ tfoot tr.summary-row td .uneditable {
     border: 1px solid var(--blue-100);
     transition: all 0.2s ease;
     box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
 }
 .stat-item:hover {
     transform: translateY(-2px);
@@ -860,18 +899,22 @@ tfoot tr.summary-row td .uneditable {
     box-shadow: var(--shadow-md);
 }
 .stat-label {
+    display: block;
     font-size: 0.65rem;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     color: var(--gray-500);
     text-transform: uppercase;
     letter-spacing: 0.8px;
     font-weight: 600;
+    line-height: 1.3;
 }
 .stat-value {
+    display: block;
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--blue-800);
     text-shadow: none;
+    line-height: 1.2;
 }
 
 /* FOOTER */
@@ -1263,6 +1306,16 @@ th[data-shortened="true"]:hover::after {
                     <i class="fas fa-building"></i>
                     <span>Company Information</span>
                 </div>
+                <!-- Autosave status indicator -->
+                <div id="autosaveIndicator" style="
+                    display:flex;align-items:center;gap:5px;padding:5px 10px;
+                    background:rgba(255,255,255,.12);border-radius:6px;
+                    font-size:0.63rem;color:rgba(255,255,255,.7);cursor:default;
+                    border:1px solid rgba(255,255,255,.15);
+                " title="Table data is automatically saved to this browser">
+                    <i class="fas fa-cloud" style="font-size:0.7rem;"></i>
+                    <span id="autosaveStatus">Saved</span>
+                </div>
             </div>
         </header>
         
@@ -1275,26 +1328,26 @@ th[data-shortened="true"]:hover::after {
             <table id="compensationTable">
                 <thead>
                     <tr>
-                        <th>Seq No</th>
-                        <th>TIN Number</th>
-                        <th>Last Name</th>
-                        <th>First Name</th>
-                        <th>Middle Name</th>
-                        <th>Daily Rate</th>
-                        <th>Basic Salary</th>
-                        <th>Holiday/Allowances/Overtime Pay</th>
-                        <th>De Minimis Benefits</th>
-                        <th>13th Month Pay</th>
-                        <th>Total Compensation</th>
-                        <th>SSS Employee Share</th>
-                        <th>PhilHealth Employee Share</th>
-                        <th>Pag-ibig Employee Share</th>
-                        <th>Total SSS, PHIC, and Pag-ibig</th>
-                        <th>Total Deduction</th>
-                        <th>Total Taxable Compensation</th>
-                        <th>Exemption Amount</th>
-                        <th>Net Taxable Compensation</th>
-                        <th>Action</th>
+                        <th title="Sequence Number">Seq No</th>
+                        <th title="TIN Number">TIN</th>
+                        <th title="Last Name">Last Name</th>
+                        <th title="First Name">First Name</th>
+                        <th title="Middle Name">Middle Name</th>
+                        <th title="Daily Rate">Daily Rate</th>
+                        <th title="Basic Salary">Basic Salary</th>
+                        <th title="Holiday / Allowances / Overtime Pay">Allow. / OT Pay</th>
+                        <th title="De Minimis Benefits">De Minimis</th>
+                        <th title="13th Month Pay">13th Month</th>
+                        <th title="Total Compensation">Total Comp.</th>
+                        <th title="SSS Employee Share">SSS</th>
+                        <th title="PhilHealth Employee Share">PhilHealth</th>
+                        <th title="Pag-ibig Employee Share">Pag-ibig</th>
+                        <th title="Total SSS, PhilHealth, and Pag-ibig Contributions">Total Contribs.</th>
+                        <th title="Total Deduction">Total Deduction</th>
+                        <th title="Total Taxable Compensation">Taxable Comp.</th>
+                        <th title="Exemption Amount">Exemption</th>
+                        <th title="Net Taxable Compensation">Net Taxable</th>
+                        <th title="Action">Action</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -1695,12 +1748,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load saved company info if exists
     loadCompanyInfo();
-    
-    // Initialize table with one empty row
-    addNewRow();
-    updateRowCount(); // This will update both row count and entry counter
-    updateTotals();
-    updateSummaryRow();
+
+    // Load saved table data (or start with one blank row)
+    const hadSavedData = loadTableData();
+    if (!hadSavedData) {
+        // Initialize table with one empty row
+        addNewRow();
+        updateRowCount();
+        updateTotals();
+        updateSummaryRow();
+    }
+
+    // Wire up table autosave
+    initTableAutosave();
 
     // Initialize column visibility
     initColumnVisibility();
@@ -1985,9 +2045,10 @@ function deleteRow(rowId) {
         
         setTimeout(() => {
             row.remove();
-            updateRowCount(); // This will update both row count and entry counter
+            updateRowCount();
             updateTotals();
             updateSummaryRow();
+            saveTableData();
         }, 300);
     }
 
@@ -2003,12 +2064,103 @@ function clearAllData() {
     if (tableBody) {
         tableBody.innerHTML = '';
         addNewRow();
-        updateRowCount(); // This will update both row count and entry counter
+        updateRowCount();
         updateTotals();
         updateSummaryRow();
     }
-
+    localStorage.removeItem('compensationTableData');
     renderCurrentPage();
+    showToast('All employee data cleared', 'success');
+}
+
+// ===== TABLE AUTOSAVE / AUTOLOAD =====
+const COMP_TABLE_KEY = 'compensationTableData';
+let autoSaveTimer = null;
+
+function getTableData() {
+    const rows = document.querySelectorAll('#tableBody tr');
+    return Array.from(rows).map(row => ({
+        tin:           row.querySelector('.employee-tin')?.value         || '',
+        lastName:      row.querySelector('.last-name')?.value            || '',
+        firstName:     row.querySelector('.first-name')?.value           || '',
+        middleName:    row.querySelector('.middle-name')?.value          || '',
+        dailyRate:     row.querySelector('.daily-rate')?.value           || '',
+        basicSalary:   row.querySelector('.basic-salary')?.value         || '',
+        allowances:    row.querySelector('.allowances')?.value           || '',
+        deMinimis:     row.querySelector('.de-minimis')?.value           || '',
+        thirteenthMonth: row.querySelector('.thirteenth-month')?.value   || '',
+        sssShare:      row.querySelector('.sss-share')?.value            || '',
+        philhealthShare: row.querySelector('.philhealth-share')?.value   || '',
+        pagibigShare:  row.querySelector('.pagibig-share')?.value        || '',
+        exemptionAmount: row.querySelector('.exemption-amount')?.value   || ''
+    }));
+}
+
+function saveTableData() {
+    try {
+        localStorage.setItem(COMP_TABLE_KEY, JSON.stringify(getTableData()));
+        const s = document.getElementById('autosaveStatus');
+        const i = document.getElementById('autosaveIndicator');
+        if (s) { s.textContent = 'Saved'; }
+        if (i) { i.style.color = 'rgba(167,243,208,.9)'; }
+        setTimeout(() => {
+            if (i) i.style.color = 'rgba(255,255,255,.7)';
+        }, 1500);
+    } catch(e) { /* storage full — fail silently */ }
+}
+
+function scheduleAutoSave() {
+    const s = document.getElementById('autosaveStatus');
+    const i = document.getElementById('autosaveIndicator');
+    if (s) { s.textContent = 'Saving…'; }
+    if (i) { i.style.color = 'rgba(253,230,138,.9)'; }
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(saveTableData, 800);
+}
+
+function loadTableData() {
+    const raw = localStorage.getItem(COMP_TABLE_KEY);
+    if (!raw) return false;
+    let rows;
+    try { rows = JSON.parse(raw); } catch(e) { return false; }
+    if (!Array.isArray(rows) || rows.length === 0) return false;
+
+    const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return false;
+    tableBody.innerHTML = '';
+
+    rows.forEach(data => {
+        addNewRow();
+        const row = tableBody.lastElementChild;
+        if (!row) return;
+        const set = (sel, val) => { const el = row.querySelector(sel); if (el) el.value = val; };
+        set('.employee-tin',      data.tin);
+        set('.last-name',         data.lastName);
+        set('.first-name',        data.firstName);
+        set('.middle-name',       data.middleName);
+        set('.daily-rate',        data.dailyRate);
+        set('.basic-salary',      data.basicSalary);
+        set('.allowances',        data.allowances);
+        set('.de-minimis',        data.deMinimis);
+        set('.thirteenth-month',  data.thirteenthMonth);
+        set('.sss-share',         data.sssShare);
+        set('.philhealth-share',  data.philhealthShare);
+        set('.pagibig-share',     data.pagibigShare);
+        set('.exemption-amount',  data.exemptionAmount);
+        updateCalculations(row);
+    });
+    updateRowCount();
+    updateTotals();
+    updateSummaryRow();
+    return true;
+}
+
+function initTableAutosave() {
+    // Hook every input change to schedule a save
+    document.getElementById('tableBody')?.addEventListener('input', scheduleAutoSave);
+    document.getElementById('tableBody')?.addEventListener('change', scheduleAutoSave);
+    // Also save before page unload
+    window.addEventListener('beforeunload', saveTableData);
 }
 
 // ===== CALCULATION FUNCTIONS =====
@@ -2716,115 +2868,91 @@ function calculateSummaryData() {
 }
 
 function initSidebarFunctionality() {
-    const leftSidebar = document.getElementById('leftSidebar');
+    const leftSidebar  = document.getElementById('leftSidebar');
     const rightSidebar = document.getElementById('rightSidebar');
-    const leftSidebarToggle = document.getElementById('leftSidebarToggle');
+    const leftSidebarToggle  = document.getElementById('leftSidebarToggle');
     const rightSidebarToggle = document.getElementById('rightSidebarToggle');
-    const headerLeftSidebarToggle = document.getElementById('headerLeftSidebarToggle');
+    const headerLeftSidebarToggle  = document.getElementById('headerLeftSidebarToggle');
     const headerRightSidebarToggle = document.getElementById('headerRightSidebarToggle');
     const body = document.body;
 
-    // Sidebar state management
-    let isLeftSidebarExpanded = false;
-    let isRightSidebarExpanded = false;
+    // Create overlay for mobile close-on-outside-click
+    const overlay = document.createElement('div');
+    overlay.id = 'sidebarOverlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.25);backdrop-filter:blur(1px);transition:opacity .25s';
+    document.body.appendChild(overlay);
 
-    function toggleLeftSidebar() {
-        isLeftSidebarExpanded = !isLeftSidebarExpanded;
-        
-        if (isLeftSidebarExpanded) {
-            leftSidebar.classList.add('open');  // Changed from 'sidebar-expanded' to 'open'
+    // Persisted open/closed state
+    let isLeftOpen  = localStorage.getItem('compLeftSidebar')  !== 'closed';
+    let isRightOpen = localStorage.getItem('compRightSidebar') !== 'closed';
+
+    function updateOverlay() {
+        const anyOpen = (isLeftOpen || isRightOpen) && window.innerWidth <= 900;
+        overlay.style.display = anyOpen ? 'block' : 'none';
+    }
+
+    function applyLeft() {
+        if (isLeftOpen) {
+            leftSidebar.classList.add('open');
             body.classList.add('left-sidebar-expanded');
         } else {
-            leftSidebar.classList.remove('open');  // Changed from 'sidebar-expanded' to 'open'
+            leftSidebar.classList.remove('open');
             body.classList.remove('left-sidebar-expanded');
         }
-        
-        // Update button appearance
         if (headerLeftSidebarToggle) {
             const icon = headerLeftSidebarToggle.querySelector('i');
-            if (isLeftSidebarExpanded) {
-                icon.style.transform = 'rotate(90deg)';
-            } else {
-                icon.style.transform = 'rotate(0deg)';
-            }
+            if (icon) icon.style.transform = isLeftOpen ? 'rotate(90deg)' : 'rotate(0deg)';
+            headerLeftSidebarToggle.title = isLeftOpen ? 'Close Payroll Menu' : 'Open Payroll Menu';
         }
+        localStorage.setItem('compLeftSidebar', isLeftOpen ? 'open' : 'closed');
+        updateOverlay();
     }
 
-    function toggleRightSidebar() {
-        isRightSidebarExpanded = !isRightSidebarExpanded;
-        
-        if (isRightSidebarExpanded) {
-            rightSidebar.classList.add('open');  // Changed from 'sidebar-expanded' to 'open'
+    function applyRight() {
+        if (isRightOpen) {
+            rightSidebar.classList.add('open');
             body.classList.add('right-sidebar-expanded');
         } else {
-            rightSidebar.classList.remove('open');  // Changed from 'sidebar-expanded' to 'open'
+            rightSidebar.classList.remove('open');
             body.classList.remove('right-sidebar-expanded');
         }
-        
-        // Update button appearance
         if (headerRightSidebarToggle) {
             const icon = headerRightSidebarToggle.querySelector('i');
-            if (isRightSidebarExpanded) {
-                icon.style.transform = 'rotate(-90deg)';
-            } else {
-                icon.style.transform = 'rotate(0deg)';
-            }
+            if (icon) icon.style.transform = isRightOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+            headerRightSidebarToggle.title = isRightOpen ? 'Close Company Info' : 'Open Company Info';
         }
+        localStorage.setItem('compRightSidebar', isRightOpen ? 'open' : 'closed');
+        updateOverlay();
     }
 
-    if (leftSidebarToggle) {
-        leftSidebarToggle.addEventListener('click', toggleLeftSidebar);
-    }
+    function toggleLeft()  { isLeftOpen  = !isLeftOpen;  applyLeft(); }
+    function toggleRight() { isRightOpen = !isRightOpen; applyRight(); }
 
-    if (rightSidebarToggle) {
-        rightSidebarToggle.addEventListener('click', toggleRightSidebar);
-    }
+    // Inner sidebar ✕ buttons
+    if (leftSidebarToggle)  leftSidebarToggle.addEventListener('click',  function(e){ e.stopPropagation(); toggleLeft(); });
+    if (rightSidebarToggle) rightSidebarToggle.addEventListener('click', function(e){ e.stopPropagation(); toggleRight(); });
 
-    if (headerLeftSidebarToggle) {
-        headerLeftSidebarToggle.addEventListener('click', toggleLeftSidebar);
-    }
+    // Header toggle buttons
+    if (headerLeftSidebarToggle)  headerLeftSidebarToggle.addEventListener('click',  function(e){ e.stopPropagation(); toggleLeft(); });
+    if (headerRightSidebarToggle) headerRightSidebarToggle.addEventListener('click', function(e){ e.stopPropagation(); toggleRight(); });
 
-    if (headerRightSidebarToggle) {
-        headerRightSidebarToggle.addEventListener('click', toggleRightSidebar);
-    }
-    
-    // Close sidebars when clicking outside on mobile
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768) {
-            if (isLeftSidebarExpanded && leftSidebar && headerLeftSidebarToggle && 
-                !leftSidebar.contains(e.target) && 
-                !headerLeftSidebarToggle.contains(e.target)) {
-                toggleLeftSidebar();
-            }
-            if (isRightSidebarExpanded && rightSidebar && headerRightSidebarToggle && 
-                !rightSidebar.contains(e.target) && 
-                !headerRightSidebarToggle.contains(e.target)) {
-                toggleRightSidebar();
-            }
+    // Overlay click → close both
+    overlay.addEventListener('click', function() {
+        if (isLeftOpen)  { isLeftOpen  = false; applyLeft(); }
+        if (isRightOpen) { isRightOpen = false; applyRight(); }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (isRightOpen) { isRightOpen = false; applyRight(); }
+            else if (isLeftOpen)  { isLeftOpen  = false; applyLeft(); }
         }
     });
-    
-    // Initialize sidebar states (open by default)
-    isLeftSidebarExpanded = true;
-    isRightSidebarExpanded = true;
-    
-    // Update sidebar classes - use 'open' class
-    leftSidebar.classList.add('open');
-    rightSidebar.classList.add('open');
-    
-    // Update body classes
-    body.classList.add('left-sidebar-expanded', 'right-sidebar-expanded');
-    
-    // Update button appearances
-    if (headerLeftSidebarToggle) {
-        const icon = headerLeftSidebarToggle.querySelector('i');
-        icon.style.transform = 'rotate(90deg)';
-    }
-    
-    if (headerRightSidebarToggle) {
-        const icon = headerRightSidebarToggle.querySelector('i');
-        icon.style.transform = 'rotate(-90deg)';
-    }
+
+    // Apply initial states
+    applyLeft();
+    applyRight();
 }
 
 // ===== BUTTON LISTENERS =====
@@ -2837,6 +2965,21 @@ function initButtonListeners() {
     const clearInfoBtnSidebar = document.getElementById('clearInfoBtnSidebar');
     const selectMultipleBtn = document.getElementById('selectMultipleBtn');
     const entryCounterBtn = document.getElementById('entryCounterBtn');
+
+    // ── clearCompanyInfo (inline — removes dependency on missing company_info.js) ──
+    function clearCompanyInfo() {
+        if (!confirm('Clear all company information?')) return;
+        ['companyName','companyTIN','companyAddress','lineOfBusiness',
+         'payrollPeriod','payrollDate','authorizedEmployee','email'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        localStorage.removeItem('companyInfo');
+        showToast('Company information cleared', 'success');
+    }
+
+    if (clearInfoBtn)        clearInfoBtn.addEventListener('click', clearCompanyInfo);
+    if (clearInfoBtnSidebar) clearInfoBtnSidebar.addEventListener('click', clearCompanyInfo);
     
     // Add event listeners to sidebar buttons
     if (addRowBtn) {
@@ -4173,6 +4316,6 @@ function renderCurrentPage() {
 }
     </script>
 
-    <script src="company_info.js"></script>
+    <!-- company info functions are inlined above -->
 </body>
 </html>

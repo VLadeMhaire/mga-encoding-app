@@ -150,9 +150,13 @@ table#purchaseReturnsTable tfoot .sum-value{font-family:var(--font-mono);font-we
 .field-group label .req{color:var(--blue-500);margin-left:2px}
 .field-group input,.field-group select{width:100%;border:1px solid var(--gray-200);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--gray-800);background:white;font-family:var(--font);transition:var(--transition)}
 .field-group input:focus,.field-group select:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
-/* Report date — larger hit area & date-picker friendly */
-#reportDate{padding:7px 10px;font-size:13px;cursor:pointer;color:var(--gray-800);background:var(--blue-50);border-color:var(--blue-200)}
-#reportDate:focus{background:white;border-color:var(--blue-400)}
+/* Report date */
+#reportDate{font-family:var(--font-mono);letter-spacing:0.5px}
+.date-updated{animation:datePulse 0.5s ease}
+@keyframes datePulse{0%{background-color:transparent}50%{background-color:rgba(59,130,246,.2)}100%{background-color:transparent}}
+.report-date-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-100);color:var(--blue-800);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;margin-left:10px;cursor:pointer;transition:var(--transition)}
+.report-date-badge:hover{background:var(--blue-200);transform:scale(1.02)}
+.report-date-badge i{font-size:10px}
 #companyTIN{font-family:var(--font-mono);letter-spacing:.5px}
 .right-panel-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400)}
 
@@ -199,6 +203,30 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 .pulse{animation:pulse .25s ease}
 
+/* DATE PICKER POPUP */
+.date-picker-overlay{position:fixed;inset:0;z-index:9000;background:transparent}
+.date-picker-popup{position:fixed;z-index:9001;background:white;border:1px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden;width:268px;animation:popIn .15s ease}
+@keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.dp-header{background:var(--blue-900);color:white;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.dp-month-year{font-size:14px;font-weight:700;flex:1;text-align:center;letter-spacing:.3px}
+.dp-nav-btn{background:rgba(255,255,255,.15);border:none;color:white;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.dp-nav-btn:hover{background:rgba(255,255,255,.3)}
+.dp-weekdays{display:grid;grid-template-columns:repeat(7,1fr);background:var(--blue-50);border-bottom:1px solid var(--gray-100)}
+.dp-weekdays span{text-align:center;padding:7px 0;font-size:10px;font-weight:700;color:var(--blue-700);text-transform:uppercase;letter-spacing:.5px}
+.dp-days{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 8px 10px;gap:2px}
+.dp-day{text-align:center;padding:7px 2px;font-size:12px;border-radius:6px;cursor:pointer;border:none;background:none;color:var(--gray-700);font-family:var(--font);transition:background .1s,color .1s;line-height:1}
+.dp-day:hover{background:var(--blue-100);color:var(--blue-800)}
+.dp-day.today{font-weight:700;color:var(--blue-600)}
+.dp-day.selected{background:var(--blue-600);color:white;font-weight:700}
+.dp-day.selected:hover{background:var(--blue-700)}
+.dp-day.other-month{color:var(--gray-300)}
+.dp-day.other-month:hover{background:var(--gray-50);color:var(--gray-400)}
+.dp-footer{border-top:1px solid var(--gray-100);padding:8px 10px;display:flex;gap:6px;justify-content:flex-end}
+.dp-footer button{font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:var(--font);border:1px solid var(--gray-200);background:white;color:var(--gray-600);transition:var(--transition)}
+.dp-footer button:hover{background:var(--gray-50)}
+.dp-footer button.dp-today-btn{background:var(--blue-600);color:white;border-color:var(--blue-600)}
+.dp-footer button.dp-today-btn:hover{background:var(--blue-700)}
+
 @media(max-width:900px){
   .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;width:240px;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   .sidebar.mobile-open{transform:translateX(0);width:240px}
@@ -206,6 +234,16 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
   .right-panel.mobile-open{transform:translateX(0);width:260px}
   .tally-grid{grid-template-columns:repeat(2,1fr)}
 }
+.btn-submit{display:flex;align-items:center;gap:6px;background:var(--green-500);color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font);white-space:nowrap}
+.btn-submit:hover{background:var(--green-700);box-shadow:var(--shadow)}
+.btn-submit i{font-size:11px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10002}
+.modal-box{background:white;border-radius:14px;padding:28px;max-width:400px;width:92%;box-shadow:0 20px 40px rgba(0,0,0,.15)}
+.modal-title{font-size:16px;font-weight:700;color:var(--blue-900);margin-bottom:8px}
+.modal-body{font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:18px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel-submit{background:white;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:7px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--font);transition:var(--transition)}
+.btn-cancel-submit:hover{background:var(--gray-50)}
 </style>
 </head>
 <body>
@@ -285,6 +323,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>Gross Returns · Net Returns · Input Tax Return · VAT Calculations (÷ 1.12)</p>
     </div>
     <div class="header-actions">
+      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit Receipt</button>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
@@ -406,7 +445,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <div class="field-group"><label>Telephone</label><input type="tel" id="telephone" placeholder="Telephone number"></div>
     <div class="field-group">
       <label>Report Date</label>
-      <input type="date" id="reportDate">
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex:1;" autocomplete="off">
+        <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding:7px 12px;width:auto;flex-shrink:0;"><i class="fas fa-calendar-alt"></i></button>
+      </div>
+      <small style="font-size:9px;color:var(--gray-400);margin-top:2px;display:block;">Format: MM/DD/YYYY</small>
     </div>
     <div class="field-group"><label>Authorized Employee <span class="req">*</span></label><input type="text" id="authorizedEmployee" placeholder="Employee name"></div>
     <div class="field-group"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
@@ -436,12 +479,12 @@ function showToast(msg,type='info'){
 ============================================================ */
 function saveCompanyInfo(){
   const fields=['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'];
-  const data={}; fields.forEach(id=>{const el=document.getElementById(id);if(el)data[id]=el.value;});
+  const data={}; fields.forEach(id=>{const el=document.getElementById(id);if(el)data[id]=(id==='reportDate'&&el.value)?displayToStorageDate(el.value):el.value;});
   localStorage.setItem('purchaseReturnsCompanyInfo',JSON.stringify(data));
 }
 function loadCompanyInfo(){
   const raw=localStorage.getItem('purchaseReturnsCompanyInfo'); if(!raw) return;
-  try{ const d=JSON.parse(raw); Object.keys(d).forEach(id=>{const el=document.getElementById(id);if(el)el.value=d[id];}); }catch(e){}
+  try{ const d=JSON.parse(raw); Object.keys(d).forEach(id=>{const el=document.getElementById(id);if(el)el.value=(id==='reportDate'&&d[id])?storageToDisplayDate(d[id]):d[id];}); }catch(e){}
 }
 function clearCompanyInfo(){
   if(!confirm('Clear all company information?')) return;
@@ -449,6 +492,59 @@ function clearCompanyInfo(){
   localStorage.removeItem('purchaseReturnsCompanyInfo');
   showToast('Company info cleared','success');
 }
+
+/* ============================================================
+   CROSS-TAB COMPANY INFO SYNC
+   Watches localStorage for changes written by company_information.html
+   and immediately reflects them in the sidebar fields.
+   Note: reportDate is stored as YYYY-MM-DD and displayed as MM/DD/YYYY.
+============================================================ */
+(function(){
+  const WATCH_KEY = 'purchaseReturnsCompanyInfo';
+
+  function applyCompanyInfo(data) {
+    if (!data || typeof data !== 'object') return;
+    const fieldMap = {
+      companyName: 'companyName', companyTIN: 'companyTIN',
+      companyAddress: 'companyAddress', lineOfBusiness: 'lineOfBusiness',
+      telephone: 'telephone', reportDate: 'reportDate',
+      authorizedEmployee: 'authorizedEmployee', email: 'email'
+    };
+    Object.entries(fieldMap).forEach(([prop, id]) => {
+      const el = document.getElementById(id);
+      if (el && data[prop] !== undefined) {
+        if (id === 'reportDate' && data[prop]) el.value = storageToDisplayDate(data[prop]);
+        else el.value = data[prop];
+      }
+    });
+  }
+
+  // On load: if sidebar is empty after loadCompanyInfo, pull from watched key
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const own = document.getElementById('companyName');
+      if (own && own.value.trim()) return;
+      const raw = localStorage.getItem(WATCH_KEY);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (data && typeof data === 'object' && data.companyName) applyCompanyInfo(data);
+      } catch(e) {}
+    }, 300);
+  });
+
+  // Cross-tab: fire when company_information.html saves in another tab/window
+  window.addEventListener('storage', (e) => {
+    if (e.key !== WATCH_KEY) return;
+    if (!e.newValue) return;
+    try {
+      const data = JSON.parse(e.newValue);
+      if (!data || typeof data !== 'object' || !('companyName' in data)) return;
+      applyCompanyInfo(data);
+      showToast('Company info synced from Company Information page', 'success');
+    } catch(e) {}
+  });
+})();
 
 /* TIN auto-format xxx-xxx-xxx */
 function formatTIN(input){
@@ -543,7 +639,7 @@ function initPagination(){
    ROW CREATION
 ============================================================ */
 function getTableDate(){
-  return document.getElementById('reportDate')?.value || new Date().toISOString().split('T')[0];
+  return document.getElementById('reportDate')?.value || getTodayDisplayDate();
 }
 
 function createRow(data={}){
@@ -553,7 +649,7 @@ function createRow(data={}){
   const returnModes=['Cash Refund','Credit Memo','Exchange','Store Credit','Others'];
   const modeOpts=returnModes.map(m=>`<option value="${m}"${data.returnMode===m?' selected':''}>${m}</option>`).join('');
   tr.innerHTML=`
-    <td><input type="date" value="${data.returnDate||today}" class="return-date"></td>
+    <td><input type="text" value="${data.returnDate||today}" class="return-date" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" style="font-family:var(--font-mono);letter-spacing:0.3px"></td>
     <td><input type="text" value="${escH(data.returnNumber||'')}" class="return-number" placeholder="RTN-001"></td>
     <td><input type="text" value="${escH(data.originalInvoice||'')}" class="original-invoice" placeholder="INV-001"></td>
     <td><select class="return-mode"><option value="">Select</option>${modeOpts}</select></td>
@@ -580,6 +676,11 @@ function recalcRow(row){
 function attachRowListeners(row){
   if(row.dataset.listenersAttached) return;
   row.dataset.listenersAttached='1';
+  const dateInput=row.querySelector('.return-date');
+  if(dateInput){
+    dateInput.addEventListener('input',function(){autoFormatReportDate(this);});
+    dateInput.addEventListener('blur',function(){if(this.value&&!validateDisplayDate(this.value)){this.style.borderColor='var(--red-500)';this.style.backgroundColor='var(--red-50)';}else{this.style.borderColor='';this.style.backgroundColor='';}});
+  }
   row.querySelectorAll('input,select').forEach(el=>{
     el.addEventListener('input',()=>{ recalcRow(row); scheduleStats(); });
     el.addEventListener('change',()=>{ recalcRow(row); scheduleStats(); });
@@ -932,11 +1033,33 @@ function initSelectionMouseEvents(){
 }
 
 /* ============================================================
+   DATE HELPERS  (MM/DD/YYYY ↔ YYYY-MM-DD)
+============================================================ */
+function displayToStorageDate(d){if(!d)return'';const p=d.split('/');if(p.length===3)return`${p[2]}-${p[0]}-${p[1]}`;return d;}
+function storageToDisplayDate(d){if(!d)return'';const p=d.split('-');if(p.length===3)return`${p[1]}/${p[2]}/${p[0]}`;return d;}
+function getTodayDisplayDate(){const t=new Date();return String(t.getMonth()+1).padStart(2,'0')+'/'+String(t.getDate()).padStart(2,'0')+'/'+t.getFullYear();}
+function validateDisplayDate(dateStr){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dateStr);if(!m)return false;const d=new Date(m[3],m[1]-1,m[2]);return d.getFullYear()===+m[3]&&d.getMonth()===+m[1]-1&&d.getDate()===+m[2];}
+function autoFormatReportDate(input){let v=input.value.replace(/[^0-9]/g,'');if(v.length>=2&&v.length<4)v=v.slice(0,2)+'/'+v.slice(2);else if(v.length>=4&&v.length<6)v=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4);else if(v.length>=6)v=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4,8);input.value=v;}
+function validateReportDate(input){if(!input.value)return true;if(!validateDisplayDate(input.value)){input.style.borderColor='var(--red-500)';input.style.backgroundColor='var(--red-50)';return false;}else{input.style.borderColor='var(--gray-200)';input.style.backgroundColor='white';return true;}}
+
+/* ============================================================
+   CALENDAR PICKER
+============================================================ */
+let dpState={year:0,month:0,targetInput:null};
+function showDatePicker(anchorEl){closeDatePicker();const input=document.getElementById('reportDate');let initDate=new Date();if(input.value&&validateDisplayDate(input.value)){const p=input.value.split('/');initDate=new Date(+p[2],+p[0]-1,+p[1]);}dpState.year=initDate.getFullYear();dpState.month=initDate.getMonth();dpState.targetInput=input;const overlay=document.createElement('div');overlay.className='date-picker-overlay';overlay.id='dpOverlay';overlay.addEventListener('click',closeDatePicker);document.body.appendChild(overlay);const popup=document.createElement('div');popup.className='date-picker-popup';popup.id='dpPopup';popup.addEventListener('click',e=>e.stopPropagation());document.body.appendChild(popup);renderCalendar();positionPicker(anchorEl||document.getElementById('reportDatePickerBtn'));}
+function positionPicker(anchor){const popup=document.getElementById('dpPopup');if(!popup||!anchor)return;const rect=anchor.getBoundingClientRect(),vpH=window.innerHeight,vpW=window.innerWidth,pW=268,pH=320;let top=rect.bottom+6,left=rect.right-pW;if(top+pH>vpH-10)top=rect.top-pH-6;if(left<8)left=8;if(left+pW>vpW-8)left=vpW-pW-8;popup.style.top=top+'px';popup.style.left=left+'px';}
+function closeDatePicker(){document.getElementById('dpOverlay')?.remove();document.getElementById('dpPopup')?.remove();}
+function renderCalendar(){const popup=document.getElementById('dpPopup');if(!popup)return;const{year,month,targetInput}=dpState;const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'],DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];const today=new Date();let selDay=null,selMonth=null,selYear=null;if(targetInput&&targetInput.value&&validateDisplayDate(targetInput.value)){const p=targetInput.value.split('/');selMonth=+p[0]-1;selDay=+p[1];selYear=+p[2];}const firstDay=new Date(year,month,1).getDay(),daysInMonth=new Date(year,month+1,0).getDate(),daysInPrev=new Date(year,month,0).getDate();let daysHTML='';for(let i=firstDay-1;i>=0;i--)daysHTML+=`<button class="dp-day other-month" data-y="${year}" data-m="${month-1}" data-d="${daysInPrev-i}" type="button">${daysInPrev-i}</button>`;for(let d=1;d<=daysInMonth;d++){let cls='dp-day';if(d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear())cls+=' today';if(selDay===d&&selMonth===month&&selYear===year)cls+=' selected';daysHTML+=`<button class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}" type="button">${d}</button>`;}const remaining=(firstDay+daysInMonth)%7===0?0:7-(firstDay+daysInMonth)%7;for(let d=1;d<=remaining;d++)daysHTML+=`<button class="dp-day other-month" data-y="${year}" data-m="${month+1}" data-d="${d}" type="button">${d}</button>`;popup.innerHTML=`<div class="dp-header"><button class="dp-nav-btn" id="dpPrev" type="button"><i class="fas fa-chevron-left"></i></button><span class="dp-month-year">${MONTHS[month]} ${year}</span><button class="dp-nav-btn" id="dpNext" type="button"><i class="fas fa-chevron-right"></i></button></div><div class="dp-weekdays">${DAYS.map(d=>`<span>${d}</span>`).join('')}</div><div class="dp-days">${daysHTML}</div><div class="dp-footer"><button class="dp-today-btn" id="dpTodayBtn" type="button"><i class="fas fa-crosshairs"></i> Today</button><button id="dpCancelBtn" type="button">Cancel</button></div>`;popup.querySelector('#dpPrev').addEventListener('click',()=>{dpState.month--;if(dpState.month<0){dpState.month=11;dpState.year--;}renderCalendar();});popup.querySelector('#dpNext').addEventListener('click',()=>{dpState.month++;if(dpState.month>11){dpState.month=0;dpState.year++;}renderCalendar();});popup.querySelector('#dpTodayBtn').addEventListener('click',()=>{const t=new Date();dpState.year=t.getFullYear();dpState.month=t.getMonth();selectDate(t.getFullYear(),t.getMonth(),t.getDate());});popup.querySelector('#dpCancelBtn').addEventListener('click',closeDatePicker);popup.querySelectorAll('.dp-day').forEach(btn=>btn.addEventListener('click',()=>{let y=+btn.dataset.y,m=+btn.dataset.m,d=+btn.dataset.d;if(m<0){m=11;y--;}if(m>11){m=0;y++;}selectDate(y,m,d);}));}
+function selectDate(year,month,day){const input=dpState.targetInput;if(!input){closeDatePicker();return;}const mm=String(month+1).padStart(2,'0'),dd=String(day).padStart(2,'0');input.value=`${mm}/${dd}/${year}`;input.dispatchEvent(new Event('change',{bubbles:true}));closeDatePicker();}
+
+/* ============================================================
    REPORT DATE → TABLE DATE SYNC
 ============================================================ */
 function initReportDateSync(){
   const rdInput=document.getElementById('reportDate');
   if(!rdInput) return;
+  rdInput.addEventListener('input',function(){autoFormatReportDate(this);});
+  rdInput.addEventListener('blur',function(){validateReportDate(this);if(this.value&&!validateDisplayDate(this.value))showToast('Invalid date format. Use MM/DD/YYYY','warning');});
   rdInput.addEventListener('change',function(){
     const newDate=this.value; if(!newDate) return;
     saveCompanyInfo();
@@ -951,7 +1074,8 @@ function initReportDateSync(){
    INIT
 ============================================================ */
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('reportDate').value=new Date().toISOString().split('T')[0];
+  const rdEl=document.getElementById('reportDate');
+  if(rdEl&&!rdEl.value) rdEl.value=getTodayDisplayDate();
   loadCompanyInfo();
   initColVisibility();
   initPagination();
@@ -999,9 +1123,41 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   document.getElementById('clearInfoBtn').addEventListener('click',clearCompanyInfo);
   document.getElementById('clearInfoBtnPanel').addEventListener('click',clearCompanyInfo);
+  const datePickerBtn=document.getElementById('reportDatePickerBtn');
+  if(datePickerBtn){datePickerBtn.addEventListener('click',function(e){e.stopPropagation();if(document.getElementById('dpPopup')){closeDatePicker();return;}showDatePicker(this);});}
   document.getElementById('selectMultipleBtn').addEventListener('click',toggleSelectMode);
   document.getElementById('entryCounterBtn').addEventListener('click',()=>addRow());
+
+  // Submit Receipt button (Client role only)
+  const _prRole = location.pathname.includes('/Client/') ? 'Client' : location.pathname.includes('/Sub-Admin/') ? 'SubAdmin' : 'Main';
+  if (_prRole === 'Client') {
+    const submitBtn = document.getElementById('submitPortalHeadBtn');
+    if (submitBtn) submitBtn.classList.remove('hidden');
+    submitBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('submitModalOverlay').classList.remove('hidden');
+    });
+    document.getElementById('submitModalConfirmBtn').addEventListener('click', function() {
+      showToast('Navigating to portal…', 'success');
+      document.getElementById('submitModalOverlay').classList.add('hidden');
+      setTimeout(() => { location.href = '../index.html'; }, 400);
+    });
+    document.getElementById('submitModalCancelBtn').addEventListener('click', () => document.getElementById('submitModalOverlay').classList.add('hidden'));
+    document.getElementById('submitModalOverlay').addEventListener('click', function(e) { if (e.target === this) this.classList.add('hidden'); });
+  }
 });
 </script>
+<!-- SUBMIT RECEIPT MODAL -->
+<div class="modal-overlay hidden" id="submitModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title"><i class="fas fa-paper-plane" style="color:var(--blue-500);margin-right:8px"></i>Submit Receipt</div>
+    <div class="modal-body">This will redirect you to the portal's submission page.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel-submit" id="submitModalCancelBtn">Cancel</button>
+      <button class="btn-submit" id="submitModalConfirmBtn"><i class="fas fa-paper-plane"></i> Submit Receipt</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
