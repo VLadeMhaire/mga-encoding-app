@@ -448,7 +448,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>Automated VAT calculations · Net = Gross ÷ 1.12 · Output Tax = Net × 12%</p>
     </div>
     <div class="header-actions">
-      <a href="../index.html" class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit to Portal</a>
+      <a href="../index.html" class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit Receipt</a>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
@@ -583,18 +583,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 
 <div class="submit-modal-overlay hidden" id="submitModalOverlay">
   <div class="submit-modal">
-    <div class="submit-modal-title"><i class="fas fa-paper-plane"></i>Submit to Portal</div>
-    <div class="submit-modal-sub">This will save your current data as a .vat file and redirect you to the portal's submit page.</div>
-    <div class="submit-modal-file">
-      <i class="fas fa-file-code"></i>
-      <div>
-        <div class="submit-modal-file-name" id="submitModalFileName">VAT_Data.vat</div>
-        <div class="submit-modal-file-meta" id="submitModalFileMeta">Ready to submit</div>
-      </div>
-    </div>
+    <div class="submit-modal-title"><i class="fas fa-paper-plane"></i>Submit Receipt</div>
+    <div class="submit-modal-sub">This will redirect you to the portal's submission page.</div>
     <div class="submit-modal-actions">
       <button class="btn-cancel-submit" id="submitModalCancelBtn">Cancel</button>
-      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-check"></i> Save & Go to Portal</button>
+      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-paper-plane"></i> Submit Receipt</button>
     </div>
   </div>
 </div>
@@ -1077,40 +1070,12 @@ function checkPortalFileOnLoad(){
 ============================================================ */
 function openSubmitModal(){
   if(APP_ROLE!=='Client') return;
-  const co=getCompanyData(),rows=getTableData();
-  const filename='VAT_Data_'+(co.name?co.name.replace(/[^a-zA-Z0-9]/g,'_')+'_':'')+new Date().toISOString().split('T')[0]+'.vat';
-  document.getElementById('submitModalFileName').textContent=filename;
-  document.getElementById('submitModalFileMeta').textContent=rows.length+' rows · '+(co.name||'No company name set');
   document.getElementById('submitModalOverlay').classList.remove('hidden');
   document.getElementById('submitModalConfirmBtn').onclick = async function(){
-    // Build payload and save to BOTH sessionStorage AND localStorage before navigating
-    const payload = JSON.stringify({version:'1.0',timestamp:new Date().toISOString(),companyInfo:co,tableData:rows},null,2);
-
-    // Save to sessionStorage for portal auto-submit pickup
-    sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILE', payload);
-    sessionStorage.setItem('VAT_CLIENT_SUBMIT_FILENAME', filename);
-
-    // Also save to localStorage as persistent backup (keyed by filename)
-    try {
-      localStorage.setItem('VAT_SUBMIT_BACKUP_'+filename, payload);
-      localStorage.setItem('VAT_SUBMIT_BACKUP_LATEST', payload);
-      localStorage.setItem('VAT_SUBMIT_BACKUP_LATEST_NAME', filename);
-    } catch(e) { /* quota exceeded — non-fatal */ }
-
-    // Save data to .vat file (download) so the client has a local copy
-    try {
-      const blob = new Blob([payload], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    } catch(e) { /* download failed — non-fatal, portal will still receive it */ }
-
-    // Also trigger a full session save so nothing is lost
+    // Save session so nothing is lost, then redirect to portal submission
     await saveSession();
 
-    showToast('File saved locally & redirecting to portal…', 'success');
+    showToast('Redirecting to portal…', 'success');
     document.getElementById('submitModalOverlay').classList.add('hidden');
     setTimeout(()=>{ location.href = '../index.html#submit'; }, 600);
   };

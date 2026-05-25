@@ -452,7 +452,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     </div>
     <div class="header-actions">
       <!-- CHANGE 2: "Go to Portal" — no file download -->
-      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-arrow-right"></i>Go to Portal</button>
+      <button class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit Receipt</button>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
@@ -585,11 +585,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 <!-- CHANGE 2: Simplified Go to Portal modal -->
 <div class="submit-modal-overlay hidden" id="submitModalOverlay">
   <div class="submit-modal">
-    <div class="submit-modal-title"><i class="fas fa-arrow-right"></i>Go to Portal</div>
-    <div class="submit-modal-sub">Your current session is autosaved. Click below to navigate to the portal.</div>
+    <div class="submit-modal-title"><i class="fas fa-paper-plane"></i>Submit Receipt</div>
+    <div class="submit-modal-sub">This will redirect you to the portal's submission page.</div>
     <div class="submit-modal-actions">
       <button class="btn-cancel-submit" id="submitModalCancelBtn">Cancel</button>
-      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-arrow-right"></i> Go to Portal</button>
+      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-paper-plane"></i> Submit Receipt</button>
     </div>
   </div>
 </div>
@@ -751,6 +751,63 @@ function selectCalDate(year,month,day){const input=dpState.targetInput;if(!input
 async function saveCompanyInfo(){const data={};['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el){if(id==='reportDate'&&el.value)data[id]=displayToStorageDate(el.value);else data[id]=el.value;}});localStorage.setItem(getActiveCompanyKey(),JSON.stringify(data));if(USE_API){try{await fetch(`${API_BASE}/exp-records/${getApiRecordId()}/company`,{method:'PATCH',headers:apiHeaders(),body:JSON.stringify(data)});}catch(_){}}}
 function applyCompanyInfo(data){if(!data)return;['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el&&data[id]!==undefined){if(id==='reportDate'&&data[id])el.value=storageToDisplayDate(data[id]);else el.value=data[id];}});}
 function clearCompanyInfo(){if(!confirm('Clear all company information?'))return;['companyName','companyTIN','companyAddress','lineOfBusiness','telephone','reportDate','authorizedEmployee','email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});localStorage.removeItem(getActiveCompanyKey());if(USE_API){fetch(`${API_BASE}/exp-records/${getApiRecordId()}/company`,{method:'DELETE',headers:apiHeaders()}).catch(()=>{});}showToast('Company info cleared','success');}
+
+/* ============================================================
+   CROSS-TAB COMPANY INFO SYNC
+   Watches localStorage for changes written by company_information.html
+   and immediately reflects them in the right-panel fields.
+============================================================ */
+(function(){
+  // All keys that company_information.html writes to for expenses
+  const WATCH_KEYS = [
+    'expCompanyInfo_Main',
+    'expCompanyInfo_Client',
+    'expCompanyInfo_SubAdmin'
+  ];
+
+  function applyFromKey(key) {
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      if (!data || typeof data !== 'object' || !('companyName' in data)) return;
+      applyCompanyInfo(data);
+      showToast('Company info synced from Company Information page', 'success');
+    } catch(e) {}
+  }
+
+  // On load: pull from any populated watched key if our own key is empty
+  document.addEventListener('DOMContentLoaded', () => {
+    // Delay to run after restoreSession() has already populated fields
+    setTimeout(() => {
+      const own = document.getElementById('companyName');
+      if (own && own.value.trim()) return; // already populated, skip
+      for (const k of WATCH_KEYS) {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        try {
+          const data = JSON.parse(raw);
+          if (data && typeof data === 'object' && data.companyName) {
+            applyCompanyInfo(data);
+            break;
+          }
+        } catch(e) {}
+      }
+    }, 300);
+  });
+
+  // Cross-tab: fire when company_information.html saves in another tab/window
+  window.addEventListener('storage', (e) => {
+    if (!WATCH_KEYS.includes(e.key)) return;
+    if (!e.newValue) return;
+    try {
+      const data = JSON.parse(e.newValue);
+      if (!data || typeof data !== 'object' || !('companyName' in data)) return;
+      applyCompanyInfo(data);
+      showToast('Company info synced from Company Information page', 'success');
+    } catch(e) {}
+  });
+})();
 
 /* ============================================================
    AUTOSAVE

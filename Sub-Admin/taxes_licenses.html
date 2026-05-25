@@ -176,9 +176,9 @@ table#taxesLicensesTable tfoot .sum-value{font-family:var(--font-mono);font-weig
 .right-panel-footer{padding:12px 16px;border-top:1px solid var(--gray-100);font-size:10px;color:var(--gray-400)}
 
 /* Report date badge */
-.report-date-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-100);color:var(--blue-800);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:500;margin-left:8px;cursor:pointer;transition:var(--transition)}
-.report-date-badge:hover{background:var(--blue-200)}
-.report-date-badge i{font-size:9px}
+.report-date-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-100);color:var(--blue-800);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;transition:var(--transition);border:none;font-family:var(--font)}
+.report-date-badge:hover{background:var(--blue-200);transform:scale(1.02)}
+.report-date-badge i{font-size:10px}
 #reportDate{font-family:var(--font-mono);letter-spacing:0.5px}
 .date-updated{animation:datePulse 0.5s ease}
 @keyframes datePulse{0%{background-color:transparent}50%{background-color:rgba(59,130,246,.2)}100%{background-color:transparent}}
@@ -402,7 +402,7 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
       <p>VAT · Income Tax · Documentary Stamp Tax · Withholding Tax · Government License Fees</p>
     </div>
     <div class="header-actions">
-      <a href="../index.html" class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit to Portal</a>
+      <a href="../index.html" class="btn-submit hidden" id="submitPortalHeadBtn"><i class="fas fa-paper-plane"></i>Submit Receipt</a>
       <button class="btn-secondary" id="exportBtnHead"><i class="fas fa-file-excel"></i>Export</button>
       <button class="btn-primary" id="addRowBtnHead"><i class="fas fa-plus"></i>Add Row</button>
     </div>
@@ -497,12 +497,13 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
     <div class="field-group"><label>Line of Business <span class="req">*</span></label><input type="text" id="lineOfBusiness" placeholder="Line of business"></div>
     <div class="field-group"><label>Telephone</label><input type="tel" id="telephone" placeholder="Telephone number"></div>
     <div class="field-group">
-      <label>Report Date <span class="report-date-badge" id="applyDateBadge" title="Apply to all table rows"><i class="fas fa-calendar-check"></i> Apply to all rows</span></label>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex:1" autocomplete="off">
-        <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding:7px 12px;width:auto;flex-shrink:0"><i class="fas fa-calendar-alt"></i></button>
+      <label>Report Date</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="reportDate" placeholder="MM/DD/YYYY" style="flex:1;" autocomplete="off">
+        <button type="button" id="reportDatePickerBtn" class="btn-secondary" style="padding:7px 12px;width:auto;flex-shrink:0;"><i class="fas fa-calendar-alt"></i></button>
       </div>
-      <small style="font-size:9px;color:var(--gray-400);margin-top:2px;display:block">Format: MM/DD/YYYY · slashes auto-inserted</small>
+      <small style="font-size:9px;color:var(--gray-400);margin-top:2px;display:block;">Format: MM/DD/YYYY</small>
+      <button type="button" id="applyDateBadge" class="report-date-badge" title="Apply to all table rows" style="margin-top:5px;width:100%;justify-content:center;"><i class="fas fa-calendar-check"></i> Apply to all rows</button>
     </div>
     <div class="field-group"><label>Authorized Employee <span class="req">*</span></label><input type="text" id="authorizedEmployee" placeholder="Employee name"></div>
     <div class="field-group"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
@@ -521,12 +522,11 @@ td.cell-selected{background:rgba(37,99,235,.12)!important;outline:1.5px solid va
 <!-- Submit modal (Client only) -->
 <div class="submit-modal-overlay hidden" id="submitModalOverlay">
   <div class="submit-modal">
-    <div class="submit-modal-title"><i class="fas fa-paper-plane"></i>Submit to Portal</div>
-    <div class="submit-modal-sub">This will save your current data as a .taxes file and redirect you to the portal's submit page.</div>
-    <div class="submit-modal-file"><i class="fas fa-file-code"></i><div><div class="submit-modal-file-name" id="submitModalFileName">TAXES_Data.taxes</div><div class="submit-modal-file-meta" id="submitModalFileMeta">Ready to submit</div></div></div>
+    <div class="submit-modal-title"><i class="fas fa-paper-plane"></i>Submit Receipt</div>
+    <div class="submit-modal-sub">This will redirect you to the portal's submission page.</div>
     <div class="submit-modal-actions">
       <button class="btn-cancel-submit" id="submitModalCancelBtn">Cancel</button>
-      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-check"></i> Save &amp; Go to Portal</button>
+      <button class="btn-confirm-submit" id="submitModalConfirmBtn"><i class="fas fa-paper-plane"></i> Submit Receipt</button>
     </div>
   </div>
 </div>
@@ -661,12 +661,25 @@ function getTodayDisplay(){const t=new Date();return String(t.getMonth()+1).padS
 function isValidDisplay(s){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);if(!m)return false;const d=new Date(+m[3],+m[1]-1,+m[2]);return d.getFullYear()===+m[3]&&d.getMonth()===+m[1]-1&&d.getDate()===+m[2];}
 function autoFormatDate(input){
   const cur=input.value,selEnd=input.selectionEnd;
+  // Count digit characters before the caret in the original string
+  const digitsBeforeCaret=cur.slice(0,selEnd).replace(/[^0-9]/g,'').length;
   let v=cur.replace(/[^0-9]/g,'');if(v.length>8)v=v.slice(0,8);
   let out='';
   if(v.length<=2)out=v;
   else if(v.length<=4)out=v.slice(0,2)+'/'+v.slice(2);
   else out=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4,8);
-  if(input.value!==out){input.value=out;try{input.setSelectionRange(Math.min(selEnd,out.length),Math.min(selEnd,out.length));}catch(_){}}
+  if(input.value!==out){
+    input.value=out;
+    // Walk formatted string to land after digitsBeforeCaret digits, then skip any trailing slash
+    let digits=0,pos=0;
+    for(;pos<out.length;pos++){
+      if(out[pos]>='0'&&out[pos]<='9'){digits++;if(digits===digitsBeforeCaret)break;}
+    }
+    let caretPos=(digitsBeforeCaret===0)?0:Math.min(pos+1,out.length);
+    if(caretPos<out.length&&out[caretPos]==='/')caretPos++;
+    caretPos=Math.min(caretPos,out.length);
+    try{input.setSelectionRange(caretPos,caretPos);}catch(_){}
+  }
 }
 function validateDateInput(input){
   if(!input.value)return;
@@ -741,6 +754,50 @@ function clearCompanyInfo(){
 function formatCompanyTIN(input){let v=input.value.replace(/\D/g,'');if(v.length>12)v=v.slice(0,12);const parts=[v.slice(0,3),v.slice(3,6),v.slice(6,9),v.slice(9,12)].filter(p=>p!=='');input.value=parts.join('-');}
 
 /* ============================================================
+   CROSS-TAB COMPANY INFO SYNC
+   Watches localStorage for changes written by company_information.html
+   and immediately reflects them in the left-sidebar fields.
+============================================================ */
+(function(){
+  const WATCH_KEYS = [
+    'taxesCompanyInfo_Main',
+    'taxesCompanyInfo_Client',
+    'taxesCompanyInfo_SubAdmin'
+  ];
+
+  // On load: if sidebar is empty after restoreSession, pull from any populated watched key
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const own = document.getElementById('companyName');
+      if (own && own.value.trim()) return;
+      for (const k of WATCH_KEYS) {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        try {
+          const data = JSON.parse(raw);
+          if (data && typeof data === 'object' && data.companyName) {
+            applyCompanyInfo(data);
+            break;
+          }
+        } catch(e) {}
+      }
+    }, 300);
+  });
+
+  // Cross-tab: fire when company_information.html saves in another tab/window
+  window.addEventListener('storage', (e) => {
+    if (!WATCH_KEYS.includes(e.key)) return;
+    if (!e.newValue) return;
+    try {
+      const data = JSON.parse(e.newValue);
+      if (!data || typeof data !== 'object' || !('companyName' in data)) return;
+      applyCompanyInfo(data);
+      showToast('Company info synced from Company Information page', 'success');
+    } catch(e) {}
+  });
+})();
+
+/* ============================================================
    AUTOSAVE  (req #2)
 ============================================================ */
 let autoSaveTimer=null;
@@ -766,16 +823,9 @@ async function restoreSession(){
 ============================================================ */
 function openSubmitModal(){
   if(APP_ROLE!=='Client')return;
-  const co=getCompanyData(),rows=getTableData();
-  const filename='TAXES_Data_'+(co.name?co.name.replace(/[^a-zA-Z0-9]/g,'_')+'_':'')+new Date().toISOString().split('T')[0]+'.taxes';
-  document.getElementById('submitModalFileName').textContent=filename;
-  document.getElementById('submitModalFileMeta').textContent=rows.length+' rows · '+(co.name||'No company name set');
   document.getElementById('submitModalOverlay').classList.remove('hidden');
   document.getElementById('submitModalConfirmBtn').onclick=async function(){
-    const payload=JSON.stringify({version:'1.0',type:'taxes-licenses',timestamp:new Date().toISOString(),companyInfo:co,tableData:rows},null,2);
-    sessionStorage.setItem('TAXES_CLIENT_SUBMIT_FILE',payload);sessionStorage.setItem('TAXES_CLIENT_SUBMIT_FILENAME',filename);
-    try{localStorage.setItem('TAXES_SUBMIT_BACKUP_LATEST',payload);localStorage.setItem('TAXES_SUBMIT_BACKUP_LATEST_NAME',filename);}catch(e){}
-    await saveSession();showToast('Saving & redirecting…','success');
+    await saveSession();showToast('Redirecting to portal…','success');
     document.getElementById('submitModalOverlay').classList.add('hidden');
     setTimeout(()=>{location.href='../index.html#submit';},500);
   };
