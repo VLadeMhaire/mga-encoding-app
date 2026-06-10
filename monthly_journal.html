@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monthly Journal Records — VAT Tally Ledger</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-900: #0a1f3d;
+  --blue-800: #0f2d57;
+  --blue-700: #1a3f73;
+  --blue-600: #1e5799;
+  --blue-500: #2168c0;
+  --blue-400: #4a90d9;
+  --blue-300: #7eb6f0;
+  --blue-200: #b3d4f5;
+  --blue-100: #ddeeff;
+  --blue-50:  #f0f7ff;
+  --white:    #ffffff;
+  --gray-50:  #f8fafb;
+  --gray-100: #eef2f7;
+  --gray-200: #dde4ee;
+  --gray-300: #b8c4d8;
+  --gray-400: #8899b4;
+  --gray-500: #6b7f9e;
+  --gray-600: #4d5f7a;
+  --gray-700: #3d4f66;
+  --gray-800: #2c3a4f;
+  --gray-900: #1a2433;
+  --accent:   #c8392b;
+  --accent-light: #fde8e6;
+  --gold:     #b8920a;
+  --gold-light: #fdf3d0;
+  --green:    #1a7340;
+  --green-light: #e6f5ee;
+  --green-500: #22c55e;
+  --amber-400: #fbbf24;
+  --purple-500: #8b5cf6;
+  --shadow-sm: 0 1px 3px rgba(10,31,61,0.08), 0 1px 2px rgba(10,31,61,0.06);
+  --shadow-md: 0 4px 12px rgba(10,31,61,0.10), 0 2px 6px rgba(10,31,61,0.06);
+  --shadow-lg: 0 12px 32px rgba(10,31,61,0.12), 0 4px 12px rgba(10,31,61,0.08);
+  --shadow-xl: 0 20px 48px rgba(10,31,61,0.16), 0 8px 20px rgba(10,31,61,0.08);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --topbar-h: 56px;
+  --sidebar-w: 296px;
+  --font: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Playfair Display', serif;
+  --tr: 0.2s cubic-bezier(.4,0,.2,1);
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--font); background: var(--gray-50); color: var(--gray-900); display: flex; flex-direction: column; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--blue-300); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-400); }
+
+/* ─── TOPBAR ─────────────────────────────────────────────── */
+.topbar {
+  height: var(--topbar-h);
+  background: var(--blue-900);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(10,31,61,0.4);
+  z-index: 100;
+  border-bottom: 2px solid var(--blue-700);
+}
+.topbar-logo {
+  width: 34px; height: 34px;
+  background: var(--blue-600); border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: white; flex-shrink: 0;
+}
+.topbar-brand { font-family: var(--font-display); font-size: 15px; color: white; flex: 1; line-height: 1.2; }
+.topbar-brand span { color: var(--blue-300); font-size: 13px; display: block; font-family: var(--font); font-weight: 400; margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.topbar-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--radius-sm); padding: 6px 13px;
+  font-size: 12px; color: white; cursor: pointer; transition: var(--tr);
+  font-family: var(--font); text-decoration: none; white-space: nowrap;
+}
+.topbar-btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.3); }
+.topbar-btn i { font-size: 11px; opacity: .85; }
+
+/* ── Identity badges ── */
+.identity-strip { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.id-badge { display: flex; align-items: center; gap: 6px; border-radius: 20px; padding: 5px 13px; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.id-badge i { font-size: 11px; flex-shrink: 0; }
+.id-badge-subadmin { background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.45); color: #c4b5fd; }
+.id-badge-client   { background: rgba(34,197,94,.18);  border: 1px solid rgba(34,197,94,.4);  color: #86efac; }
+.id-badge-sep { font-size: 11px; color: rgba(255,255,255,.3); flex-shrink: 0; }
+
+/* ─── LAYOUT ─────────────────────────────────────────────── */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ─── LEFT PANEL ──────────────────────────────────────────── */
+.left-panel {
+  width: var(--sidebar-w); background: var(--white);
+  border-right: 1px solid var(--gray-200);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.left-panel-header {
+  padding: 14px 18px 12px; border-bottom: 1px solid var(--gray-100);
+  background: var(--blue-50);
+}
+.left-panel-header h3 {
+  font-size: 11px; font-weight: 700; color: var(--blue-800);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  display: flex; align-items: center; gap: 8px;
+}
+.left-panel-header h3 i { color: var(--blue-500); }
+.left-panel-body { padding: 14px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+
+/* ─── YEAR NAVIGATOR ──────────────────────────────────────── */
+.year-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--blue-900); color: white; border-radius: var(--radius-md); padding: 10px 14px;
+}
+.year-display { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.year-sub { font-size: 10px; color: var(--blue-300); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+.year-btns { display: flex; gap: 6px; }
+.year-nav-btn {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--radius-sm); color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: var(--tr);
+}
+.year-nav-btn:hover { background: rgba(255,255,255,.25); }
+
+/* ─── MONTH GRID ──────────────────────────────────────────── */
+.month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.month-btn {
+  padding: 9px 5px; border: 1.5px solid var(--gray-100); border-radius: var(--radius-md);
+  background: var(--white); cursor: pointer; text-align: center; transition: var(--tr);
+  font-family: var(--font); position: relative; overflow: hidden;
+}
+.month-btn:hover { border-color: var(--blue-300); background: var(--blue-50); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.month-btn.selected { border-color: var(--blue-500); background: var(--blue-600); color: white; box-shadow: var(--shadow-md); }
+.month-btn.current-month:not(.selected) { border-color: var(--amber-400); }
+.month-btn.has-data::after {
+  content: ''; position: absolute; top: 5px; right: 5px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green-500);
+}
+.month-btn.selected.has-data::after { background: rgba(255,255,255,.9); }
+.month-btn-name { font-size: 12px; font-weight: 600; color: inherit; }
+.month-btn.selected .month-btn-name { color: white; }
+.month-btn-count { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+.month-btn.selected .month-btn-count { color: rgba(255,255,255,.7); }
+
+/* ─── QUICK STATS ─────────────────────────────────────────── */
+.quick-stats {
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md); padding: 12px 14px;
+}
+.qs-title { font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.qs-title i { color: var(--blue-400); }
+.qs-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 11.5px; }
+.qs-label { color: var(--gray-500); }
+.qs-value { font-weight: 700; color: var(--gray-800); font-family: var(--font-mono); font-size: 11px; }
+.qs-divider { height: 1px; background: var(--gray-200); margin: 7px 0; }
+.qs-row.balance-ok .qs-value { color: var(--green); }
+.qs-row.balance-err .qs-value { color: var(--accent); }
+
+/* ─── SECTION TALLY ───────────────────────────────────────── */
+.section-tally {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md); overflow: hidden;
+}
+.section-tally-header {
+  background: var(--blue-50); padding: 8px 12px;
+  font-size: 10px; font-weight: 700; color: var(--blue-700);
+  text-transform: uppercase; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 6px;
+}
+.section-tally-header i { color: var(--blue-500); }
+.section-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px; border-bottom: 1px solid var(--gray-100);
+  font-size: 11px;
+}
+.section-row:last-child { border-bottom: none; }
+.section-row-name { color: var(--gray-600); display: flex; align-items: center; gap: 6px; }
+.section-row-name i { color: var(--blue-300); font-size: 10px; width: 12px; }
+.section-row-val { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; color: var(--blue-700); }
+.section-row-val.zero { color: var(--gray-300); font-weight: 400; }
+
+/* ─── SEARCH ──────────────────────────────────────────────── */
+.search-box { position: relative; }
+.search-box input {
+  width: 100%; padding: 7px 10px 7px 30px;
+  border: 1.5px solid var(--gray-200); border-radius: var(--radius-md);
+  font-family: var(--font); font-size: 12px; color: var(--gray-800);
+  transition: var(--tr); background: var(--gray-50);
+}
+.search-box input:focus { outline: none; border-color: var(--blue-400); box-shadow: 0 0 0 3px rgba(33,104,192,.08); background: white; }
+.search-box i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 11px; pointer-events: none; }
+
+/* ─── MAIN CONTENT ────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+.content-header {
+  background: var(--white); border-bottom: 1px solid var(--gray-200);
+  padding: 14px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm);
+}
+.content-header-left h2 {
+  font-family: var(--font-display); font-size: 16px; color: var(--blue-900);
+  display: flex; align-items: center; gap: 8px;
+}
+.content-header-left h2 i { color: var(--blue-400); font-size: 14px; }
+.content-header-left p { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: var(--tr);
+  border: 1px solid transparent; white-space: nowrap; text-decoration: none;
+}
+.btn i { font-size: 11px; }
+.btn-primary { background: var(--blue-600); color: white; border-color: var(--blue-700); }
+.btn-primary:hover { background: var(--blue-700); box-shadow: var(--shadow-sm); }
+.btn-secondary { background: white; color: var(--gray-700); border-color: var(--gray-200); }
+.btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.btn-danger-soft { background: var(--accent-light); color: var(--accent); border-color: #f5c6c2; }
+.btn-danger-soft:hover { background: #fbbdb8; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.content-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+
+/* ─── MONTH HERO ──────────────────────────────────────────── */
+.month-hero {
+  background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 100%);
+  border-radius: var(--radius-xl); padding: 26px 30px;
+  position: relative; overflow: hidden; box-shadow: var(--shadow-xl);
+}
+.month-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.month-hero-orb {
+  position: absolute; border-radius: 50%; filter: blur(50px); opacity: .18;
+  width: 260px; height: 260px; background: var(--blue-300);
+  right: -70px; top: -70px;
+  animation: orbDrift 14s ease-in-out infinite;
+}
+@keyframes orbDrift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(12px,16px)} }
+.month-hero-content {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+}
+.month-hero-badge {
+  font-size: 10px; font-weight: 600; color: var(--blue-300);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 5px; display: flex; align-items: center; gap: 6px;
+}
+.month-hero-title {
+  font-family: var(--font-display); font-size: 2.2rem;
+  color: white; line-height: 1; letter-spacing: -0.5px; margin-bottom: 5px;
+}
+.month-hero-sub { font-size: 12px; color: rgba(255,255,255,.55); }
+.month-hero-stats { display: flex; gap: 22px; }
+.hero-stat { text-align: right; }
+.hero-stat-value { font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: white; }
+.hero-stat-label { font-size: 10px; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .8px; margin-top: 2px; }
+
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 10px;
+}
+.status-active  { background: rgba(34,197,94,.18); color: #86efac; border: 1px solid rgba(34,197,94,.25); }
+.status-empty   { background: rgba(255,255,255,.08); color: rgba(255,255,255,.45); border: 1px solid rgba(255,255,255,.12); }
+.status-balanced { background: rgba(34,197,94,.18); color: #86efac; border: 1px solid rgba(34,197,94,.25); }
+.status-unbalanced { background: rgba(200,57,43,.25); color: #fca5a5; border: 1px solid rgba(200,57,43,.3); }
+
+.month-hero-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.hero-open-btn {
+  background: white; color: var(--blue-800); border: none;
+  border-radius: var(--radius-md); padding: 10px 22px;
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: var(--tr);
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+}
+.hero-open-btn:hover { background: var(--blue-50); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.hero-open-btn i { color: var(--blue-600); }
+.hero-export-btn {
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+  color: white; border-radius: var(--radius-md); padding: 9px 16px;
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 7px;
+}
+.hero-export-btn:hover { background: rgba(255,255,255,.22); }
+
+/* ─── SECTION SUMMARY BARS (inside hero) ─────────────────── */
+.hero-section-bars {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;
+}
+.hero-section-bar {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  font-size: 10px; color: rgba(255,255,255,.7);
+  display: flex; align-items: center; gap: 5px;
+}
+.hero-section-bar i { font-size: 9px; color: var(--blue-300); }
+.hero-section-bar .bar-val { font-family: var(--font-mono); font-size: 10px; color: white; font-weight: 600; }
+.hero-section-bar.empty-bar { opacity: .4; }
+
+/* ─── TIMELINE ────────────────────────────────────────────── */
+.section-title {
+  font-size: 11px; font-weight: 700; color: var(--gray-500);
+  text-transform: uppercase; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 7px; margin-bottom: 10px;
+}
+.section-title i { color: var(--blue-400); }
+
+.timeline-row { display: flex; gap: 4px; align-items: flex-end; overflow-x: auto; padding-bottom: 4px; }
+.timeline-month {
+  flex-shrink: 0; width: 54px; border-radius: var(--radius-md); padding: 7px 5px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; transition: var(--tr);
+  border: 1.5px solid var(--gray-200); background: var(--white); position: relative;
+}
+.timeline-month:hover { border-color: var(--blue-400); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.timeline-month.tm-selected { border-color: var(--blue-500); background: var(--blue-600); }
+.timeline-month.tm-has-data { border-bottom: 3px solid var(--green-500); }
+.timeline-month.tm-selected.tm-has-data { border-bottom-color: rgba(255,255,255,.6); }
+.tm-abbr { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); }
+.timeline-month.tm-selected .tm-abbr { color: rgba(255,255,255,.7); }
+.tm-bar { width: 6px; border-radius: 3px; background: var(--gray-200); min-height: 8px; max-height: 48px; transition: var(--tr); }
+.timeline-month.tm-has-data .tm-bar { background: var(--blue-400); }
+.timeline-month.tm-selected .tm-bar { background: rgba(255,255,255,.3); }
+.timeline-month.tm-selected.tm-has-data .tm-bar { background: rgba(255,255,255,.7); }
+.tm-label { font-size: 8px; color: var(--gray-400); text-align: center; font-family: var(--font-mono); }
+.timeline-month.tm-selected .tm-label { color: rgba(255,255,255,.6); }
+
+/* ─── RECORDS GRID ────────────────────────────────────────── */
+.records-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+
+.record-card {
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: 14px 16px;
+  cursor: pointer; transition: var(--tr); position: relative; overflow: hidden;
+}
+.record-card:hover { border-color: var(--blue-300); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.record-card.selected-card { border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(33,104,192,.12); }
+.record-card.has-data-card { border-left: 4px solid var(--green-500); }
+.record-card.balanced-card { border-left-color: var(--green); }
+.record-card.unbalanced-card { border-left-color: var(--accent); }
+.record-card.empty-card { border-left: 4px solid var(--gray-200); opacity: .7; }
+.record-card.empty-card:hover { opacity: 1; }
+
+.record-card-month { font-family: var(--font-display); font-size: 14px; color: var(--blue-900); margin-bottom: 2px; }
+.record-card-year { font-size: 11px; color: var(--gray-400); font-weight: 500; }
+.record-card-totals {
+  margin-top: 9px; display: flex; gap: 12px;
+  padding-top: 8px; border-top: 1px solid var(--gray-100);
+}
+.record-card-total-col { flex: 1; }
+.record-card-total-label { font-size: 9px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px; }
+.record-card-total-val { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--blue-700); }
+.record-card-total-val.zero { color: var(--gray-300); }
+
+.balance-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; margin-top: 6px;
+}
+.chip-balanced { background: var(--green-light); color: var(--green); }
+.chip-unbalanced { background: var(--accent-light); color: var(--accent); }
+.chip-empty { background: var(--gray-100); color: var(--gray-400); }
+
+.record-card-date { font-size: 9.5px; color: var(--gray-400); margin-top: 6px; }
+.record-card-actions {
+  position: absolute; top: 10px; right: 10px;
+  display: flex; gap: 4px; opacity: 0; transition: var(--tr);
+}
+.record-card:hover .record-card-actions { opacity: 1; }
+.rc-action-btn {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm); width: 24px; height: 24px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--gray-500); transition: var(--tr);
+}
+.rc-action-btn:hover { background: var(--accent-light); border-color: #f5c6c2; color: var(--accent); }
+.rc-action-btn.open-btn:hover { background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-600); }
+
+.record-card-new {
+  border-style: dashed; border-color: var(--blue-200); background: var(--blue-50);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px;
+}
+.record-card-new i { font-size: 20px; color: var(--blue-300); margin-bottom: 6px; }
+.record-card-new span { font-size: 12px; color: var(--blue-500); font-weight: 500; }
+
+/* ─── SECTION PILLS IN RECORD CARD ──────────────────────────── */
+.section-pills { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 7px; }
+.section-pill {
+  font-size: 8.5px; font-weight: 600; padding: 1px 6px;
+  border-radius: 20px; background: var(--blue-50); color: var(--blue-600);
+  font-family: var(--font-mono);
+}
+.section-pill.empty-pill { background: var(--gray-100); color: var(--gray-400); }
+
+/* ─── EMPTY STATE ─────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+.empty-state i { font-size: 3rem; display: block; margin-bottom: 14px; opacity: .25; }
+.empty-state h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--gray-500); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+
+/* ─── TOAST ──────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--blue-900); color: white;
+  border: 1px solid var(--blue-700); border-left: 4px solid var(--blue-400);
+  border-radius: var(--radius-md); padding: 10px 16px;
+  font-size: 12px; font-weight: 500;
+  box-shadow: var(--shadow-lg); z-index: 9999;
+  animation: toastIn .2s ease; pointer-events: none; max-width: 300px;
+}
+.toast.success { border-left-color: var(--green-500); }
+.toast.error   { border-left-color: var(--accent); }
+.toast.warning { border-left-color: var(--amber-400); }
+@keyframes toastIn { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+.toast.out { opacity: 0; transform: translateY(8px); transition: .25s; }
+
+/* ─── CONFIRM MODAL ──────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(10,31,61,.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9000; opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-backdrop.show { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--white); border-radius: var(--radius-lg);
+  width: 90%; max-width: 380px;
+  box-shadow: var(--shadow-xl); transform: translateY(16px) scale(.97); transition: transform .2s; overflow: hidden;
+}
+.modal-backdrop.show .modal { transform: translateY(0) scale(1); }
+.modal-header { padding: 16px 18px 12px; border-bottom: 1px solid var(--gray-100); background: var(--blue-50); }
+.modal-header h3 { font-size: 14px; font-weight: 700; color: var(--blue-900); display: flex; align-items: center; gap: 8px; }
+.modal-body { padding: 14px 18px; font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.modal-footer { padding: 12px 18px; border-top: 1px solid var(--gray-100); display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ─── OPEN OVERLAY ───────────────────────────────────────── */
+.open-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,31,61,.8); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 8000; opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.open-overlay.show { opacity: 1; pointer-events: all; }
+.open-card {
+  background: var(--white); border-radius: var(--radius-xl); padding: 28px;
+  max-width: 400px; width: 90%; box-shadow: var(--shadow-xl);
+  transform: scale(.92); transition: transform .28s cubic-bezier(.34,1.56,.64,1);
+  text-align: center;
+}
+.open-overlay.show .open-card { transform: scale(1); }
+.open-icon {
+  width: 64px; height: 64px;
+  background: var(--blue-50); border: 2px solid var(--blue-200);
+  border-radius: var(--radius-lg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: var(--blue-600); margin: 0 auto 14px;
+}
+.open-title { font-family: var(--font-display); font-size: 1.3rem; color: var(--blue-900); margin-bottom: 5px; }
+.open-sub { font-size: 12px; color: var(--gray-500); margin-bottom: 18px; line-height: 1.55; }
+.open-meta {
+  background: var(--blue-50); border: 1px solid var(--blue-100);
+  border-radius: var(--radius-md); padding: 11px 15px; margin-bottom: 18px; text-align: left;
+}
+.open-meta-row { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 4px; }
+.open-meta-label { color: var(--gray-500); font-weight: 500; }
+.open-meta-value { color: var(--blue-800); font-weight: 700; font-family: var(--font-mono); font-size: 11px; }
+.open-actions { display: flex; gap: 10px; justify-content: center; }
+.open-cancel-btn {
+  background: var(--white); color: var(--gray-600); border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md); padding: 9px 18px;
+  font-family: var(--font); font-size: 13px; cursor: pointer; transition: var(--tr);
+}
+.open-cancel-btn:hover { background: var(--gray-50); }
+.open-go-btn {
+  background: var(--blue-600); color: white; border: none;
+  border-radius: var(--radius-md); padding: 9px 24px;
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 7px;
+}
+.open-go-btn:hover { background: var(--blue-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* ─── FOOTER ──────────────────────────────────────────────── */
+.footer {
+  background: var(--blue-900); color: var(--blue-300);
+  text-align: center; padding: 9px 20px; font-size: 11px; flex-shrink: 0;
+  border-top: 1px solid var(--blue-800);
+}
+
+@media (max-width: 900px) {
+  :root { --sidebar-w: 250px; }
+  .month-hero-title { font-size: 1.7rem; }
+  .records-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+}
+@media (max-width: 700px) {
+  .left-panel { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── TOPBAR ─────────────────────────────────────────────── -->
+<div class="topbar">
+  <div class="topbar-logo"><i class="fas fa-book-open"></i></div>
+  <div style="flex:1">
+    <div class="topbar-brand">Monthly Journal Records
+      <span>VAT Tally Ledger System · General Journal</span>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <!-- Identity strip: role-specific badges -->
+    <div class="identity-strip" id="identityStrip" style="display:none">
+      <div class="id-badge id-badge-subadmin hidden" id="subAdminBadge"><i class="fas fa-user-shield"></i><span id="subAdminBadgeLabel">—</span></div>
+      <span class="id-badge-sep hidden" id="identitySep">›</span>
+      <div class="id-badge id-badge-client hidden" id="clientBadge"><i class="fas fa-user"></i><span id="clientBadgeLabel">—</span></div>
+    </div>
+    <a href="../index.html" class="topbar-btn"><i class="fas fa-file-invoice-dollar"></i> Portal</a>
+    <a href="journal_entry.html" class="topbar-btn"><i class="fas fa-book-open"></i> Current Journal</a>
+    <a href="index2.html" class="topbar-btn"><i class="fas fa-home"></i> Dashboard</a>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- ─── LEFT PANEL ─────────────────────────────────────────── -->
+<div class="left-panel">
+  <div class="left-panel-header">
+    <h3><i class="fas fa-sliders"></i> Controls</h3>
+  </div>
+  <div class="left-panel-body">
+
+    <!-- Year Navigator -->
+    <div class="year-nav">
+      <div>
+        <div class="year-display" id="yearDisplay">2026</div>
+        <div class="year-sub">Fiscal Year</div>
+      </div>
+      <div class="year-btns">
+        <button class="year-nav-btn" id="yearPrevBtn" title="Previous year"><i class="fas fa-chevron-left"></i></button>
+        <button class="year-nav-btn" id="yearTodayBtn" title="Current year"><i class="fas fa-crosshairs"></i></button>
+        <button class="year-nav-btn" id="yearNextBtn" title="Next year"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Month Grid -->
+    <div class="month-grid" id="monthGrid"></div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="qs-title"><i class="fas fa-chart-bar"></i> Year Summary</div>
+      <div class="qs-row"><span class="qs-label">Months with data</span><span class="qs-value" id="qsActiveMonths">—</span></div>
+      <div class="qs-row"><span class="qs-label">Total entries saved</span><span class="qs-value" id="qsTotalSaved">—</span></div>
+      <div class="qs-divider"></div>
+      <div class="qs-row" id="qsDebitRow"><span class="qs-label">Total Debits (YTD)</span><span class="qs-value" id="qsDebits">—</span></div>
+      <div class="qs-row" id="qsCreditRow"><span class="qs-label">Total Credits (YTD)</span><span class="qs-value" id="qsCredits">—</span></div>
+      <div class="qs-divider"></div>
+      <div class="qs-row" id="qsBalRow"><span class="qs-label">Balance Status</span><span class="qs-value" id="qsBalance">—</span></div>
+    </div>
+
+    <!-- Section Tally -->
+    <div class="section-tally">
+      <div class="section-tally-header"><i class="fas fa-list-check"></i> Section Totals (Selected)</div>
+      <div id="sectionTallyBody">
+        <div class="section-row"><span class="section-row-name"><i class="fas fa-circle"></i> No month selected</span></div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search month or year…">
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── MAIN CONTENT ───────────────────────────────────────── -->
+<div class="main">
+  <div class="content-header">
+    <div class="content-header-left">
+      <h2><i class="fas fa-book-open"></i> <span id="contentTitle">Monthly Journal Records</span></h2>
+      <p id="contentSub">Select a month to view or open its General Journal</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="exportYearBtn"><i class="fas fa-download"></i> Export Year</button>
+      <button class="btn btn-primary" id="openSelectedBtn" disabled><i class="fas fa-external-link-alt"></i> Open Selected</button>
+    </div>
+  </div>
+
+  <div class="content-body" id="contentBody">
+
+    <!-- Month Hero -->
+    <div id="monthHeroWrap" style="display:none">
+      <div class="month-hero">
+        <div class="month-hero-orb"></div>
+        <div class="month-hero-content">
+          <div style="flex:1">
+            <div class="month-hero-badge"><i class="fas fa-calendar-check"></i> Selected Period</div>
+            <div class="month-hero-title" id="heroMonthTitle">—</div>
+            <div class="month-hero-sub" id="heroMonthSub">No data yet for this period</div>
+            <div class="hero-section-bars" id="heroSectionBars"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-end">
+            <div class="month-hero-stats">
+              <div class="hero-stat"><div class="hero-stat-value" id="heroDebits">₱0</div><div class="hero-stat-label">Debits</div></div>
+              <div class="hero-stat"><div class="hero-stat-value" id="heroCredits">₱0</div><div class="hero-stat-label">Credits</div></div>
+            </div>
+            <span class="status-badge" id="heroStatusBadge"><i class="fas fa-circle" style="font-size:7px"></i> <span>Empty</span></span>
+            <div class="month-hero-actions">
+              <button class="hero-export-btn" id="heroExportBtn"><i class="fas fa-download"></i> Export Month</button>
+              <button class="hero-open-btn" id="heroOpenBtn"><i class="fas fa-external-link-alt"></i> Open Journal</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline Bar -->
+    <div>
+      <div class="section-title"><i class="fas fa-chart-gantt"></i> Year Timeline — <span id="timelineYear">2026</span></div>
+      <div class="timeline-row" id="timelineRow"></div>
+    </div>
+
+    <!-- Records Grid -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="section-title" style="margin-bottom:0"><i class="fas fa-folder-open"></i> All Monthly Records</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-secondary" id="viewAllYearsBtn"><i class="fas fa-layer-group"></i> All Years</button>
+          <button class="btn btn-sm btn-secondary" id="sortBtn"><i class="fas fa-sort"></i> Newest First</button>
+        </div>
+      </div>
+      <div class="records-grid" id="recordsGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<div class="footer">© 2026 VAT Tally Ledger System · General Journal Monthly Records Organizer</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header"><h3><i class="fas fa-exclamation-triangle" style="color:var(--accent)"></i> Confirm Deletion</h3></div>
+    <div class="modal-body" id="confirmModalBody">Are you sure?</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger-soft" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- OPEN OVERLAY -->
+<div class="open-overlay" id="openOverlay">
+  <div class="open-card">
+    <div class="open-icon"><i class="fas fa-book-open"></i></div>
+    <div class="open-title" id="overlayTitle">Open Journal</div>
+    <div class="open-sub">Opening the General Journal for this period. Existing data will be loaded automatically.</div>
+    <div class="open-meta">
+      <div class="open-meta-row"><span class="open-meta-label">Period</span><span class="open-meta-value" id="overlayPeriod">—</span></div>
+      <div class="open-meta-row"><span class="open-meta-label">Balance Status</span><span class="open-meta-value" id="overlayBalance">—</span></div>
+      <div class="open-meta-row"><span class="open-meta-label">Storage Key</span><span class="open-meta-value" id="overlayKey" style="font-size:9px">—</span></div>
+    </div>
+    <div class="open-actions">
+      <button class="open-cancel-btn" onclick="closeOpenOverlay()"><i class="fas fa-times"></i> Cancel</button>
+      <button class="open-go-btn" id="overlayGoBtn"><i class="fas fa-external-link-alt"></i> Open Journal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG & CONSTANTS
+============================================================ */
+const MONTHS      = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const SECTIONS = [
+  { name:"Sales",              icon:"fa-chart-line"    },
+  { name:"Purchases",          icon:"fa-cart-shopping" },
+  { name:"Expenses",           icon:"fa-receipt"       },
+  { name:"Taxes and Licenses", icon:"fa-landmark"      },
+  { name:"CAPEX",              icon:"fa-building"      }
+];
+
+const APP_ROLE = (function(){
+  const p = window.location.pathname;
+  if (p.includes('/Client/')) return 'Client';
+  if (p.includes('/Sub-Admin/')) return 'SubAdmin';
+  return 'Main';
+})();
+
+// Per-account user ID so client1 and client2 never share the same localStorage key.
+const APP_USER_ID = (function(){
+  try {
+    const s = sessionStorage.getItem('VAT_SESSION');
+    if (s) {
+      const p = JSON.parse(s);
+      return p.id || p.sub || p.user_id || p.username || 'anon';
+    }
+  } catch(e) {}
+  return 'anon';
+})();
+
+function makeStorageKey(year, month) {
+  return `JOURNAL_MONTHLY_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+function makeMetaKey(year, month) {
+  return `JOURNAL_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+let selectedYear  = new Date().getFullYear();
+let selectedMonth = new Date().getMonth() + 1;
+let newestFirst   = true;
+let showAllYears  = false;
+
+/* ============================================================
+   DATA LAYER
+============================================================ */
+
+/**
+ * Extract summary from journal rows array.
+ */
+function summarizeJournalRows(rows) {
+  if (!Array.isArray(rows)) return { totalDebit:0, totalCredit:0, balanced:null, sectionTotals:{} };
+  let totalDebit=0, totalCredit=0;
+  const sectionTotals = {};
+
+  // Build per-section totals
+  let currentSection = null;
+  rows.forEach(r => {
+    if (r.type === 'subheader') { currentSection = r.sectionName; if(!sectionTotals[currentSection]) sectionTotals[currentSection]={debit:0,credit:0}; }
+    if (r.type === 'account' && currentSection) {
+      sectionTotals[currentSection].debit  += parseFloat(r.debitVal)  || 0;
+      sectionTotals[currentSection].credit += parseFloat(r.creditVal) || 0;
+    }
+    if (r.type === 'grandtotal') {
+      totalDebit  = parseFloat(r.debitVal)  || 0;
+      totalCredit = parseFloat(r.creditVal) || 0;
+    }
+  });
+
+  // If no grandtotal row found, sum subtotals
+  if (totalDebit === 0 && totalCredit === 0) {
+    rows.forEach(r => {
+      if (r.type === 'subtotal') {
+        totalDebit  += parseFloat(r.debitVal)  || 0;
+        totalCredit += parseFloat(r.creditVal) || 0;
+      }
+    });
+  }
+
+  const balanced = (totalDebit > 0 || totalCredit > 0)
+    ? Math.abs(totalDebit - totalCredit) < 0.01
+    : null; // null = empty
+
+  return { totalDebit, totalCredit, balanced, sectionTotals };
+}
+
+/**
+ * Save a journal snapshot for a month.
+ */
+function saveMonthData(year, month, journalData) {
+  const key = makeStorageKey(year, month);
+  const summary = summarizeJournalRows(journalData.rows);
+  const meta = {
+    year, month,
+    totalDebit:  summary.totalDebit,
+    totalCredit: summary.totalCredit,
+    balanced:    summary.balanced,
+    sectionTotals: summary.sectionTotals,
+    lastModified: new Date().toISOString(),
+  };
+  localStorage.setItem(key, JSON.stringify(journalData));
+  localStorage.setItem(makeMetaKey(year, month), JSON.stringify(meta));
+  return meta;
+}
+
+/**
+ * Load month data. Returns null if nothing stored.
+ */
+function loadMonthData(year, month) {
+  const raw    = localStorage.getItem(makeStorageKey(year, month));
+  const metaRaw = localStorage.getItem(makeMetaKey(year, month));
+  if (!raw) return null;
+  try {
+    return {
+      data: JSON.parse(raw),
+      meta: metaRaw ? JSON.parse(metaRaw) : null
+    };
+  } catch(e) { return null; }
+}
+
+/**
+ * Delete a month's data.
+ */
+function deleteMonthData(year, month) {
+  localStorage.removeItem(makeStorageKey(year, month));
+  localStorage.removeItem(makeMetaKey(year, month));
+}
+
+/**
+ * Get meta for all 12 months of a year (null where no data).
+ */
+function getAllMonthMetaForYear(year) {
+  return Array.from({length:12}, (_,i) => {
+    const raw = localStorage.getItem(makeMetaKey(year, i+1));
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch(e) { return null; }
+  });
+}
+
+/**
+ * Get all years that have stored journal data.
+ */
+function getAllStoredYears() {
+  const years = new Set();
+  for (let i=0; i<localStorage.length; i++) {
+    const k = localStorage.key(i);
+    const m = k && k.match(new RegExp(`JOURNAL_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_(\\d{4})_`));
+    if (m) years.add(parseInt(m[1]));
+  }
+  return Array.from(years).sort((a,b) => b-a);
+}
+
+/* Format helpers */
+function fmtPHP(n) {
+  n = parseFloat(n) || 0;
+  return '₱' + n.toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch(e) { return iso; }
+}
+
+/* ============================================================
+   OPEN MONTH IN JOURNAL
+============================================================ */
+function openMonthInJournal(year, month) {
+  const contextKey = makeStorageKey(year, month);
+  sessionStorage.setItem('JOURNAL_MONTHLY_CONTEXT_KEY',       contextKey);
+  sessionStorage.setItem('JOURNAL_MONTHLY_CONTEXT_YEAR',      String(year));
+  sessionStorage.setItem('JOURNAL_MONTHLY_CONTEXT_MONTH',     String(month));
+  sessionStorage.setItem('JOURNAL_MONTHLY_CONTEXT_CLIENT_ID', APP_USER_ID);
+
+  // Build context label: for Client role, append the client's username so
+  // journal_entry.html shows e.g. "January 2026 — client1" in the yellow
+  // badge and monthly banner. Stored in JOURNAL_MONTHLY_CONTEXT_LABEL which
+  // journal_entry.html reads as MONTHLY_CTX.label on startup.
+  let label = `${MONTHS[month-1]} ${year}`;
+  if (APP_ROLE === 'Client') {
+    try {
+      const sess = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null');
+      const clientName = sess?.username || '';
+      if (clientName) label += ` — ${clientName}`;
+    } catch(e) {}
+  }
+  sessionStorage.setItem('JOURNAL_MONTHLY_CONTEXT_LABEL', label);
+  window.location.href = 'journal_entry.html';
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+function renderMonthGrid() {
+  const now = new Date();
+  const curY=now.getFullYear(), curM=now.getMonth()+1;
+  const metas = getAllMonthMetaForYear(selectedYear);
+  const grid = document.getElementById('monthGrid');
+
+  grid.innerHTML = MONTHS.map((name,i) => {
+    const m=i+1, meta=metas[i];
+    const isSelected = (m===selectedMonth);
+    const isCurrent  = (selectedYear===curY && m===curM);
+    const hasData    = !!meta;
+
+    let cls='month-btn';
+    if(isSelected) cls+=' selected';
+    if(isCurrent)  cls+=' current-month';
+    if(hasData)    cls+=' has-data';
+
+    const count = hasData ? `${meta.balanced===true?'✓':meta.balanced===false?'!':'?'} saved` : 'Empty';
+    return `<button class="${cls}" data-month="${m}" title="${name} ${selectedYear}${isCurrent?' (Current)':''}">
+      <div class="month-btn-name">${name.slice(0,3)}</div>
+      <div class="month-btn-count">${count}</div>
+    </button>`;
+  }).join('');
+
+  grid.querySelectorAll('.month-btn').forEach(btn => {
+    btn.addEventListener('click', () => { selectedMonth=parseInt(btn.dataset.month); updateAll(); });
+  });
+}
+
+function renderTimeline() {
+  const metas = getAllMonthMetaForYear(selectedYear);
+  const maxD = Math.max(...metas.map(m=>m?m.totalDebit:0), 1);
+  const row = document.getElementById('timelineRow');
+  document.getElementById('timelineYear').textContent = selectedYear;
+
+  row.innerHTML = MONTHS_ABBR.map((abbr,i) => {
+    const m=i+1, meta=metas[i];
+    const isSelected=(m===selectedMonth), hasData=!!meta;
+    const barH = hasData ? Math.max(8, Math.round((meta.totalDebit/maxD)*46)) : 5;
+
+    let cls='timeline-month';
+    if(isSelected) cls+=' tm-selected';
+    if(hasData)    cls+=' tm-has-data';
+
+    const label = hasData ? fmtPHP(meta.totalDebit).replace('₱','').split('.')[0] : '';
+    return `<div class="${cls}" data-month="${m}" title="${MONTHS[i]} ${selectedYear}">
+      <div class="tm-abbr">${abbr}</div>
+      <div class="tm-bar" style="height:${barH}px"></div>
+      <div class="tm-label">${label}</div>
+    </div>`;
+  }).join('');
+
+  row.querySelectorAll('.timeline-month').forEach(el => {
+    el.addEventListener('click', () => { selectedMonth=parseInt(el.dataset.month); updateAll(); });
+  });
+}
+
+function renderHero() {
+  const wrap = document.getElementById('monthHeroWrap');
+  const metas = getAllMonthMetaForYear(selectedYear);
+  const meta  = metas[selectedMonth-1];
+  const label = `${MONTHS[selectedMonth-1]} ${selectedYear}`;
+
+  document.getElementById('heroMonthTitle').textContent = label;
+  document.getElementById('contentTitle').textContent   = label;
+
+  if (meta) {
+    document.getElementById('heroMonthSub').textContent  = `Last modified: ${fmtDate(meta.lastModified)}`;
+    document.getElementById('heroDebits').textContent    = fmtPHP(meta.totalDebit);
+    document.getElementById('heroCredits').textContent   = fmtPHP(meta.totalCredit);
+    document.getElementById('contentSub').textContent    = `Debits: ${fmtPHP(meta.totalDebit)} · Credits: ${fmtPHP(meta.totalCredit)}`;
+
+    // Balance status
+    const badge = document.getElementById('heroStatusBadge');
+    if (meta.balanced === true) {
+      badge.className='status-badge status-balanced';
+      badge.innerHTML='<i class="fas fa-check-circle" style="font-size:9px"></i> Balanced';
+    } else if (meta.balanced === false) {
+      badge.className='status-badge status-unbalanced';
+      badge.innerHTML='<i class="fas fa-exclamation-triangle" style="font-size:9px"></i> Unbalanced';
+    } else {
+      badge.className='status-badge status-empty';
+      badge.innerHTML='<i class="fas fa-circle" style="font-size:7px"></i> Empty';
+    }
+
+    // Section bars
+    const barsEl = document.getElementById('heroSectionBars');
+    barsEl.innerHTML = SECTIONS.map(s => {
+      const st = meta.sectionTotals && meta.sectionTotals[s.name];
+      const hasVal = st && (st.debit>0 || st.credit>0);
+      return `<div class="hero-section-bar${hasVal?'':' empty-bar'}">
+        <i class="fas ${s.icon}"></i>
+        <span>${s.name}</span>
+        <span class="bar-val">${hasVal ? fmtPHP(st.debit) : '—'}</span>
+      </div>`;
+    }).join('');
+
+    // Section tally panel
+    renderSectionTally(meta);
+  } else {
+    document.getElementById('heroMonthSub').textContent  = 'No data saved for this period. Click "Open Journal" to start.';
+    document.getElementById('heroDebits').textContent    = '₱0';
+    document.getElementById('heroCredits').textContent   = '₱0';
+    document.getElementById('contentSub').textContent    = 'No journal entries yet for this period.';
+    const badge=document.getElementById('heroStatusBadge');
+    badge.className='status-badge status-empty';
+    badge.innerHTML='<i class="fas fa-circle" style="font-size:7px"></i> Empty';
+    document.getElementById('heroSectionBars').innerHTML='';
+    renderSectionTally(null);
+  }
+
+  wrap.style.display='';
+}
+
+function renderSectionTally(meta) {
+  const body = document.getElementById('sectionTallyBody');
+  if (!meta || !meta.sectionTotals) {
+    body.innerHTML='<div class="section-row"><span class="section-row-name"><i class="fas fa-circle-minus"></i> No data</span></div>';
+    return;
+  }
+  body.innerHTML = SECTIONS.map(s => {
+    const st = meta.sectionTotals[s.name] || {debit:0,credit:0};
+    const hasVal = st.debit>0 || st.credit>0;
+    return `<div class="section-row">
+      <span class="section-row-name"><i class="fas ${s.icon}"></i> ${s.name}</span>
+      <span class="section-row-val${hasVal?'':' zero'}">${hasVal?fmtPHP(st.debit):'—'}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderYearStats() {
+  const metas = getAllMonthMetaForYear(selectedYear).filter(Boolean);
+  const activeMonths = metas.length;
+  const totalSaved   = metas.length;
+  const totalDebits  = metas.reduce((s,m)=>s+(m.totalDebit||0),0);
+  const totalCredits = metas.reduce((s,m)=>s+(m.totalCredit||0),0);
+  const diff         = Math.abs(totalDebits-totalCredits);
+  const allBalanced  = metas.length>0 && metas.every(m=>m.balanced===true);
+
+  document.getElementById('yearDisplay').textContent  = selectedYear;
+  document.getElementById('qsActiveMonths').textContent = `${activeMonths} / 12`;
+  document.getElementById('qsTotalSaved').textContent   = `${totalSaved} month${totalSaved!==1?'s':''}`;
+  document.getElementById('qsDebits').textContent       = fmtPHP(totalDebits);
+  document.getElementById('qsCredits').textContent      = fmtPHP(totalCredits);
+
+  const balEl = document.getElementById('qsBalance');
+  const balRow = document.getElementById('qsBalRow');
+  if (metas.length===0) {
+    balEl.textContent = '—';
+    balRow.className='qs-row';
+  } else if (allBalanced) {
+    balEl.textContent='All Balanced ✓';
+    balRow.className='qs-row balance-ok';
+  } else {
+    balEl.textContent=`Diff ₱${diff.toFixed(2)}`;
+    balRow.className='qs-row balance-err';
+  }
+}
+
+function renderRecordsGrid() {
+  const grid = document.getElementById('recordsGrid');
+  const searchQ = document.getElementById('searchInput').value.toLowerCase();
+
+  let records=[];
+  const yearsToShow = showAllYears ? getAllStoredYears() : [selectedYear];
+  for (const yr of yearsToShow) {
+    const metas = getAllMonthMetaForYear(yr);
+    for (let i=0;i<12;i++) {
+      const m=i+1, meta=metas[i];
+      if (meta) records.push({ year:yr, month:m, meta, label:`${MONTHS[i]} ${yr}` });
+    }
+  }
+
+  // Search
+  if (searchQ) records = records.filter(r => r.label.toLowerCase().includes(searchQ) || String(r.year).includes(searchQ));
+
+  // Sort
+  records.sort((a,b) => newestFirst
+    ? (b.year*100+b.month)-(a.year*100+a.month)
+    : (a.year*100+a.month)-(b.year*100+b.month));
+
+  if (!records.length) {
+    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty-state"><i class="fas fa-book-open"></i><h3>No journal records found</h3><p>${searchQ?'No months match your search.':'Open a month in the General Journal to start recording entries.'}</p></div></div>`;
+    return;
+  }
+
+  const newCardHtml = (!showAllYears && !searchQ) ? `
+    <div class="record-card record-card-new" onclick="triggerOpenOverlay(${selectedYear},${selectedMonth})">
+      <i class="fas fa-plus"></i>
+      <span>Open ${MONTHS[selectedMonth-1]} ${selectedYear}</span>
+    </div>` : '';
+
+  grid.innerHTML = newCardHtml + records.map(r => {
+    const isSelected = (r.year===selectedYear && r.month===selectedMonth);
+    const bal = r.meta.balanced;
+    let cls = 'record-card has-data-card';
+    if (isSelected) cls+=' selected-card';
+    if (bal===true)  cls+=' balanced-card';
+    if (bal===false) cls+=' unbalanced-card';
+
+    const chipHtml = bal===true
+      ? `<span class="balance-chip chip-balanced"><i class="fas fa-check"></i> Balanced</span>`
+      : bal===false
+      ? `<span class="balance-chip chip-unbalanced"><i class="fas fa-exclamation"></i> Unbalanced</span>`
+      : `<span class="balance-chip chip-empty">Empty</span>`;
+
+    const st = r.meta.sectionTotals || {};
+    const pillsHtml = '<div class="section-pills">' + SECTIONS.map(s => {
+      const sv = st[s.name];
+      const hasVal = sv && (sv.debit>0||sv.credit>0);
+      return `<span class="section-pill${hasVal?'':' empty-pill'}">${s.name.slice(0,4)}</span>`;
+    }).join('') + '</div>';
+
+    return `<div class="${cls}" data-year="${r.year}" data-month="${r.month}" onclick="selectCard(${r.year},${r.month})">
+      <div class="record-card-actions">
+        <button class="rc-action-btn open-btn" title="Open Journal" onclick="event.stopPropagation();triggerOpenOverlay(${r.year},${r.month})"><i class="fas fa-external-link-alt"></i></button>
+        <button class="rc-action-btn" title="Delete record" onclick="event.stopPropagation();confirmDelete(${r.year},${r.month})"><i class="fas fa-trash"></i></button>
+      </div>
+      <div class="record-card-month">${MONTHS[r.month-1]}</div>
+      <div class="record-card-year">${r.year}</div>
+      <div class="record-card-totals">
+        <div class="record-card-total-col">
+          <div class="record-card-total-label">Debits</div>
+          <div class="record-card-total-val${r.meta.totalDebit>0?'':' zero'}">${fmtPHP(r.meta.totalDebit)}</div>
+        </div>
+        <div class="record-card-total-col">
+          <div class="record-card-total-label">Credits</div>
+          <div class="record-card-total-val${r.meta.totalCredit>0?'':' zero'}">${fmtPHP(r.meta.totalCredit)}</div>
+        </div>
+      </div>
+      ${chipHtml}
+      ${pillsHtml}
+      <div class="record-card-date">Saved: ${fmtDate(r.meta.lastModified)}</div>
+    </div>`;
+  }).join('');
+}
+
+function updateAll() {
+  document.getElementById('openSelectedBtn').disabled = false;
+  renderMonthGrid();
+  renderTimeline();
+  renderHero();
+  renderRecordsGrid();
+  renderYearStats();
+}
+
+/* ============================================================
+   OPEN OVERLAY
+============================================================ */
+function triggerOpenOverlay(year, month) {
+  const metas = getAllMonthMetaForYear(year);
+  const meta  = metas[month-1];
+  const bal   = meta ? (meta.balanced===true ? '✓ Balanced' : meta.balanced===false ? '✗ Unbalanced' : 'No data') : 'No data (new)';
+
+  document.getElementById('overlayTitle').textContent   = `Open ${MONTHS[month-1]} ${year}`;
+  document.getElementById('overlayPeriod').textContent  = `${MONTHS[month-1]} ${year}`;
+  document.getElementById('overlayBalance').textContent = bal;
+  document.getElementById('overlayKey').textContent     = makeStorageKey(year, month);
+  document.getElementById('overlayGoBtn').onclick       = () => { closeOpenOverlay(); openMonthInJournal(year, month); };
+  document.getElementById('openOverlay').classList.add('show');
+}
+function closeOpenOverlay() { document.getElementById('openOverlay').classList.remove('show'); }
+
+/* ============================================================
+   CONFIRM / DELETE
+============================================================ */
+function confirmDelete(year, month) {
+  document.getElementById('confirmModalBody').innerHTML =
+    `Delete the journal record for <strong>${MONTHS[month-1]} ${year}</strong>? This cannot be undone.`;
+  document.getElementById('confirmOkBtn').onclick = () => {
+    deleteMonthData(year, month);
+    closeConfirm();
+    showToast(`Deleted ${MONTHS[month-1]} ${year}`, 'success');
+    updateAll();
+  };
+  document.getElementById('confirmModal').classList.add('show');
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('show'); }
+
+/* ============================================================
+   SELECT CARD
+============================================================ */
+function selectCard(year, month) {
+  selectedYear=year; selectedMonth=month; updateAll();
+}
+
+/* ============================================================
+   EXPORT YEAR SUMMARY  (plain-text TSV)
+============================================================ */
+function exportYearSummary() {
+  const metas = getAllMonthMetaForYear(selectedYear).filter(Boolean);
+  if (!metas.length) { showToast('No data to export for '+selectedYear,'warning'); return; }
+  const header = 'Month\tYear\tTotal Debit\tTotal Credit\tBalanced\tLast Modified\n';
+  const rows   = metas.map(m =>
+    `${MONTHS[m.month-1]}\t${m.year}\t${(m.totalDebit||0).toFixed(2)}\t${(m.totalCredit||0).toFixed(2)}\t${m.balanced===true?'Yes':m.balanced===false?'No':'—'}\t${m.lastModified||''}`
+  ).join('\n');
+  const blob = new Blob([header+rows],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Journal_Year_Summary_${selectedYear}.txt`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`Exported ${metas.length} months for ${selectedYear}`,'success');
+}
+
+function exportMonthData(year, month) {
+  const key=makeStorageKey(year,month), raw=localStorage.getItem(key);
+  if(!raw){showToast('No data to export','warning');return;}
+  const blob=new Blob([raw],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Journal_${MONTHS[month-1]}_${year}.jrnl`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`Exported ${MONTHS[month-1]} ${year}`,'success');
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function showToast(msg, type='info') {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300);},2800);
+}
+
+/* ============================================================
+   RETURN FROM JOURNAL  — read session key, save meta
+============================================================ */
+function checkReturnFromJournal() {
+  const key   = sessionStorage.getItem('JOURNAL_MONTHLY_CONTEXT_KEY');
+  const yr    = sessionStorage.getItem('JOURNAL_MONTHLY_CONTEXT_YEAR');
+  const mo    = sessionStorage.getItem('JOURNAL_MONTHLY_CONTEXT_MONTH');
+
+  if (!key || !yr || !mo) return;
+
+  // Read from the monthly key that journal_entry.html writes to
+  const rawSession = localStorage.getItem(key);
+  if (rawSession) {
+    try {
+      const session = JSON.parse(rawSession);
+      if (session && session.rows) {
+        saveMonthData(parseInt(yr), parseInt(mo), session);
+        showToast(`Saved journal for ${MONTHS[parseInt(mo)-1]} ${yr}`, 'success');
+      }
+    } catch(e) { console.error('Failed to parse journal session:', e); }
+  }
+
+  // Clear context
+  sessionStorage.removeItem('JOURNAL_MONTHLY_CONTEXT_KEY');
+  sessionStorage.removeItem('JOURNAL_MONTHLY_CONTEXT_YEAR');
+  sessionStorage.removeItem('JOURNAL_MONTHLY_CONTEXT_MONTH');
+  sessionStorage.removeItem('JOURNAL_MONTHLY_CONTEXT_LABEL');
+
+  selectedYear  = parseInt(yr);
+  selectedMonth = parseInt(mo);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  checkReturnFromJournal();
+
+  /* ── Identity badges ─────────────────────────────────────────
+     Rules (strict, no cross-contamination):
+
+     Sub-Admin/monthly_journal.html (own page, JOURNAL_TRACKER_READONLY absent):
+       → ONLY show SA badge. Clear any stale VAT_TRACKER_VIEWING_CLIENT
+         that may linger from a previous client-view navigation.
+
+     Sub-Admin/monthly_journal.html (client-view, JOURNAL_TRACKER_READONLY=1):
+       → Show SA badge › Client badge: "associate1 › client1"
+
+     Client/monthly_journal.html:
+       → ONLY show Client badge.
+  ────────────────────────────────────────────────────────────── */
+  (function() {
+    const _saReadOnly   = sessionStorage.getItem('JOURNAL_TRACKER_READONLY') === '1';
+    const _saClientName = sessionStorage.getItem('VAT_TRACKER_VIEWING_CLIENT') || '';
+
+    let vatSession = null;
+    try { vatSession = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null'); } catch(e) {}
+    const loggedInUser = vatSession?.username || '';
+
+    const strip   = document.getElementById('identityStrip');
+    const saBadge = document.getElementById('subAdminBadge');
+    const saLabel = document.getElementById('subAdminBadgeLabel');
+    const clBadge = document.getElementById('clientBadge');
+    const clLabel = document.getElementById('clientBadgeLabel');
+    const sep     = document.getElementById('identitySep');
+
+    if (APP_ROLE === 'SubAdmin') {
+      if (_saReadOnly && _saClientName) {
+        // Sub-Admin viewing a client's monthly journal (read-only mode)
+        const saName = loggedInUser;
+        if (saName) { saLabel.textContent = saName; saBadge.classList.remove('hidden'); }
+        clLabel.textContent = _saClientName;
+        clBadge.classList.remove('hidden');
+        if (saName) sep.classList.remove('hidden');
+        strip.style.display = 'flex';
+      } else {
+        // Sub-Admin on their OWN monthly journal.
+        // Clear any stale client-view keys so they don't contaminate this view.
+        sessionStorage.removeItem('VAT_TRACKER_VIEWING_CLIENT');
+        sessionStorage.removeItem('JOURNAL_TRACKER_READONLY');
+        const saName = loggedInUser;
+        if (saName) {
+          saLabel.textContent = saName;
+          saBadge.classList.remove('hidden');
+          strip.style.display = 'flex';
+        }
+      }
+
+    } else if (APP_ROLE === 'Client') {
+      // Client's own monthly journal — show ONLY the client badge.
+      const clName = loggedInUser;
+      if (clName) {
+        clLabel.textContent = clName;
+        clBadge.classList.remove('hidden');
+        strip.style.display = 'flex';
+      }
+    }
+  })();
+
+  // Year navigation
+  document.getElementById('yearPrevBtn').addEventListener('click',  () => { selectedYear--; updateAll(); });
+  document.getElementById('yearNextBtn').addEventListener('click',  () => { selectedYear++; updateAll(); });
+  document.getElementById('yearTodayBtn').addEventListener('click', () => { selectedYear=new Date().getFullYear(); selectedMonth=new Date().getMonth()+1; updateAll(); });
+
+  // Header buttons
+  document.getElementById('openSelectedBtn').addEventListener('click',() => triggerOpenOverlay(selectedYear,selectedMonth));
+  document.getElementById('exportYearBtn').addEventListener('click',  exportYearSummary);
+
+  // Hero buttons
+  document.getElementById('heroOpenBtn').addEventListener('click',   () => triggerOpenOverlay(selectedYear,selectedMonth));
+  document.getElementById('heroExportBtn').addEventListener('click',  () => exportMonthData(selectedYear,selectedMonth));
+
+  // Sort / All Years
+  document.getElementById('sortBtn').addEventListener('click',function(){
+    newestFirst=!newestFirst;
+    this.innerHTML=`<i class="fas fa-sort"></i> ${newestFirst?'Newest First':'Oldest First'}`;
+    renderRecordsGrid();
+  });
+  document.getElementById('viewAllYearsBtn').addEventListener('click',function(){
+    showAllYears=!showAllYears;
+    this.innerHTML=`<i class="fas fa-layer-group"></i> ${showAllYears?'Current Year':'All Years'}`;
+    renderRecordsGrid();
+  });
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', () => renderRecordsGrid());
+
+  // Backdrop click
+  document.getElementById('openOverlay').addEventListener('click',function(e){if(e.target===this)closeOpenOverlay();});
+  document.getElementById('confirmModal').addEventListener('click',function(e){if(e.target===this)closeConfirm();});
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key==='Escape'){closeOpenOverlay();closeConfirm();}
+  });
+
+  updateAll();
+});
+</script>
+</body>
+</html>

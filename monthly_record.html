@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monthly Sales Records — MGAA System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-50:  #EFF6FF; --blue-100: #DBEAFE; --blue-200: #BFDBFE;
+  --blue-300: #93C5FD; --blue-400: #60A5FA; --blue-500: #3B82F6;
+  --blue-600: #2563EB; --blue-700: #1D4ED8; --blue-800: #1E40AF;
+  --blue-900: #1E3A8A; --blue-950: #172554;
+  --gray-50: #F9FAFB;  --gray-100: #F3F4F6; --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB; --gray-400: #9CA3AF; --gray-500: #6B7280;
+  --gray-600: #4B5563; --gray-700: #374151; --gray-800: #1F2937;
+  --gray-900: #111827;
+  --green-50: #F0FDF4; --green-400: #4ADE80; --green-500: #22C55E; --green-700: #15803D;
+  --amber-50: #FFFBEB; --amber-400: #FBBF24; --amber-600: #D97706;
+  --red-50: #FEF2F2; --red-400: #F87171; --red-500: #EF4444;
+  --purple-500: #8B5CF6; --purple-700: #6D28D9;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow:    0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.05);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,.12), 0 8px 16px rgba(0,0,0,.06);
+  --font: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --tr: 0.22s cubic-bezier(.4,0,.2,1);
+  --topbar-h: 56px;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--font); background: var(--gray-100); color: var(--gray-800); display: flex; flex-direction: column; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--blue-300); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-500); }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: var(--topbar-h); background: var(--blue-900);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px;
+  flex-shrink: 0; box-shadow: var(--shadow-md); z-index: 100;
+}
+.topbar-logo { width: 36px; height: 36px; background: var(--blue-600); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; flex-shrink: 0; }
+.topbar-brand { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: white; flex: 1; }
+.topbar-brand span { color: var(--blue-300); }
+.topbar-sub { font-size: 11px; color: var(--blue-300); font-weight: 400; display: block; margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.topbar-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; padding: 6px 13px; font-size: 12px; color: white; cursor: pointer; transition: var(--tr); font-family: var(--font); text-decoration: none; }
+.topbar-btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.3); }
+.topbar-btn i { font-size: 11px; opacity: .85; }
+
+/* ─── LAYOUT ─── */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ─── LEFT PANEL ─── */
+.left-panel {
+  width: 300px; background: white; border-right: 1px solid var(--gray-200);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.left-panel-header {
+  padding: 16px 20px 14px; border-bottom: 1px solid var(--gray-100);
+  background: var(--blue-50);
+}
+.left-panel-header h3 {
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+  color: var(--blue-800); text-transform: uppercase; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 8px;
+}
+.left-panel-header h3 i { color: var(--blue-600); }
+.left-panel-body { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─── YEAR NAVIGATOR ─── */
+.year-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--blue-900); color: white; border-radius: 10px; padding: 10px 14px;
+}
+.year-display { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.year-sub { font-size: 10px; color: var(--blue-300); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+.year-btns { display: flex; gap: 6px; }
+.year-nav-btn {
+  width: 30px; height: 30px; background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2); border-radius: 6px;
+  color: white; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; transition: var(--tr);
+}
+.year-nav-btn:hover { background: rgba(255,255,255,.25); }
+
+/* ─── MONTH GRID ─── */
+.month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.month-btn {
+  padding: 10px 6px; border: 1.5px solid var(--gray-100); border-radius: 8px;
+  background: white; cursor: pointer; text-align: center; transition: var(--tr);
+  font-family: var(--font); position: relative; overflow: hidden;
+}
+.month-btn:hover { border-color: var(--blue-300); background: var(--blue-50); transform: translateY(-1px); box-shadow: var(--shadow); }
+.month-btn.selected { border-color: var(--blue-500); background: var(--blue-600); color: white; box-shadow: var(--shadow-md); }
+.month-btn.current-month { border-color: var(--amber-400); }
+.month-btn.has-data::after {
+  content: ''; position: absolute; top: 6px; right: 6px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green-500);
+}
+.month-btn.selected.has-data::after { background: rgba(255,255,255,.9); }
+.month-btn-name { font-size: 12px; font-weight: 600; color: inherit; }
+.month-btn.selected .month-btn-name { color: white; }
+.month-btn-count { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+.month-btn.selected .month-btn-count { color: rgba(255,255,255,.7); }
+
+/* ─── QUICK STATS ─── */
+.quick-stats { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px 14px; }
+.qs-title { font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.qs-title i { color: var(--blue-500); }
+.qs-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; }
+.qs-label { color: var(--gray-500); }
+.qs-value { font-weight: 700; color: var(--gray-800); font-family: monospace; }
+.qs-divider { height: 1px; background: var(--gray-200); margin: 8px 0; }
+
+/* ─── FILTERS / SEARCH ─── */
+.search-box { position: relative; }
+.search-box input { width: 100%; padding: 8px 10px 8px 32px; border: 1.5px solid var(--gray-200); border-radius: 7px; font-family: var(--font); font-size: 12px; color: var(--gray-800); transition: var(--tr); background: var(--gray-50); }
+.search-box input:focus { outline: none; border-color: var(--blue-400); box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
+.search-box i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 11px; pointer-events: none; }
+
+/* ─── MAIN CONTENT ─── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+.content-header {
+  background: white; border-bottom: 1px solid var(--gray-200);
+  padding: 14px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm);
+}
+.content-header-left h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--blue-900); }
+.content-header-left p { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; transition: var(--tr); border: 1px solid transparent; white-space: nowrap; text-decoration: none; }
+.btn i { font-size: 11px; }
+.btn-primary { background: var(--blue-600); color: white; border-color: var(--blue-600); }
+.btn-primary:hover { background: var(--blue-700); box-shadow: var(--shadow); }
+.btn-primary.large { font-size: 14px; padding: 10px 22px; font-weight: 700; border-radius: 9px; }
+.btn-primary.large i { font-size: 13px; }
+.btn-secondary { background: white; color: var(--gray-700); border-color: var(--gray-200); }
+.btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.btn-success { background: var(--green-500); color: white; }
+.btn-success:hover { background: var(--green-700); box-shadow: var(--shadow); }
+.btn-danger-soft { background: var(--red-50); color: var(--red-500); border-color: #FECACA; }
+.btn-danger-soft:hover { background: #FECACA; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.content-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* ─── SELECTED MONTH HERO ─── */
+.month-hero {
+  background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 100%);
+  border-radius: 14px; padding: 28px 32px; position: relative; overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+.month-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.month-hero-orb {
+  position: absolute; border-radius: 50%; filter: blur(50px); opacity: .2;
+  width: 280px; height: 280px; background: var(--blue-300); right: -80px; top: -80px;
+  animation: orbDrift 12s ease-in-out infinite;
+}
+@keyframes orbDrift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,20px)} }
+.month-hero-content { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.month-hero-left {}
+.month-hero-badge { font-size: 10px; font-weight: 700; color: var(--blue-300); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.month-hero-title { font-family: var(--font-display); font-size: 2.4rem; font-weight: 800; color: white; line-height: 1; letter-spacing: -1px; margin-bottom: 6px; }
+.month-hero-sub { font-size: 13px; color: rgba(255,255,255,.6); }
+.month-hero-stats { display: flex; gap: 24px; }
+.hero-stat { text-align: right; }
+.hero-stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: white; }
+.hero-stat-label { font-size: 10px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .8px; margin-top: 2px; }
+.month-hero-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hero-open-btn {
+  background: white; color: var(--blue-800); border: none;
+  border-radius: 9px; padding: 11px 24px; font-family: var(--font-display);
+  font-size: 14px; font-weight: 800; cursor: pointer; transition: var(--tr);
+  display: flex; align-items: center; gap: 8px; letter-spacing: -.2px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+}
+.hero-open-btn:hover { background: var(--blue-50); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.hero-open-btn i { color: var(--blue-600); }
+.hero-export-btn {
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+  color: white; border-radius: 9px; padding: 10px 18px;
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 7px;
+}
+.hero-export-btn:hover { background: rgba(255,255,255,.22); }
+
+/* ─── STATUS BADGE ─── */
+.status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+.status-active  { background: rgba(34,197,94,.15); color: #86efac; border: 1px solid rgba(34,197,94,.25); }
+.status-empty   { background: rgba(255,255,255,.1); color: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.15); }
+
+/* ─── RECORDS GRID ─── */
+.section-title { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+.section-title i { color: var(--blue-500); }
+
+.records-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.record-card {
+  background: white; border: 1.5px solid var(--gray-200); border-radius: 11px;
+  padding: 16px; cursor: pointer; transition: var(--tr); position: relative;
+}
+.record-card:hover { border-color: var(--blue-300); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.record-card.selected-card { border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+.record-card.has-data-card { border-left: 4px solid var(--green-500); }
+.record-card.empty-card { border-left: 4px solid var(--gray-200); opacity: .7; }
+.record-card.empty-card:hover { opacity: 1; }
+.record-card-month { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--blue-900); margin-bottom: 4px; }
+.record-card-year { font-size: 11px; color: var(--gray-400); font-weight: 500; }
+.record-card-rows { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gray-600); margin-top: 10px; }
+.record-card-rows i { color: var(--blue-400); font-size: 11px; }
+.record-card-gross { font-size: 13px; font-weight: 700; color: var(--gray-800); font-family: monospace; margin-top: 4px; }
+.record-card-date { font-size: 10px; color: var(--gray-400); margin-top: 6px; }
+.record-card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: var(--tr); z-index: 10; pointer-events: none; }
+.record-card:hover .record-card-actions { opacity: 1; pointer-events: all; }
+.record-card.has-data-card .record-card-actions { opacity: 0.35; pointer-events: all; }
+.record-card.has-data-card:hover .record-card-actions { opacity: 1; }
+.rc-action-btn { background: white; border: 1px solid var(--gray-200); border-radius: 5px; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gray-500); transition: var(--tr); }
+.rc-action-btn:hover { background: var(--red-50); border-color: #FECACA; color: var(--red-500); }
+.rc-action-btn.open-btn:hover { background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-600); }
+.record-card-new { border-style: dashed; border-color: var(--blue-200); background: var(--blue-50); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px; }
+.record-card-new i { font-size: 20px; color: var(--blue-300); margin-bottom: 6px; }
+.record-card-new span { font-size: 12px; color: var(--blue-500); font-weight: 500; }
+
+/* ─── YEAR TIMELINE ─── */
+.timeline-row { display: flex; gap: 4px; align-items: stretch; overflow-x: auto; padding-bottom: 4px; }
+.timeline-month {
+  flex-shrink: 0; width: 56px; border-radius: 8px; padding: 8px 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: var(--tr); border: 1.5px solid var(--gray-200);
+  background: white; position: relative;
+}
+.timeline-month:hover { border-color: var(--blue-400); transform: translateY(-2px); box-shadow: var(--shadow); }
+.timeline-month.tm-selected { border-color: var(--blue-500); background: var(--blue-600); }
+.timeline-month.tm-has-data { border-bottom: 3px solid var(--green-500); }
+.timeline-month.tm-selected.tm-has-data { border-bottom-color: rgba(255,255,255,.6); }
+.tm-abbr { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); }
+.timeline-month.tm-selected .tm-abbr { color: rgba(255,255,255,.7); }
+.tm-bar { width: 6px; border-radius: 3px; background: var(--gray-200); min-height: 20px; max-height: 50px; transition: var(--tr); }
+.timeline-month.tm-has-data .tm-bar { background: var(--green-400); }
+.timeline-month.tm-selected .tm-bar { background: rgba(255,255,255,.3); }
+.timeline-month.tm-selected.tm-has-data .tm-bar { background: rgba(255,255,255,.7); }
+.tm-label { font-size: 9px; color: var(--gray-400); text-align: center; }
+.timeline-month.tm-selected .tm-label { color: rgba(255,255,255,.6); }
+
+/* ─── BACKEND STATUS ─── */
+.backend-pill { display: flex; align-items: center; gap: 5px; font-size: 10px; padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,.15); }
+.backend-pill.online  { background: rgba(34,197,94,.15); color: #86efac; }
+.backend-pill.offline { background: rgba(239,68,68,.15); color: #fca5a5; }
+.backend-pill.checking{ background: rgba(251,191,36,.15); color: #fde68a; }
+.bp-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.online  .bp-dot { background: #22c55e; animation: bpulse 2s infinite; }
+.offline .bp-dot { background: #ef4444; }
+.checking .bp-dot { background: #fbbf24; animation: bpulse 1s infinite; }
+@keyframes bpulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+/* ── Identity badges ── */
+.identity-strip { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.id-badge { display: flex; align-items: center; gap: 6px; border-radius: 20px; padding: 5px 13px; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.id-badge i { font-size: 11px; flex-shrink: 0; }
+.id-badge-subadmin { background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.45); color: #c4b5fd; }
+.id-badge-client   { background: rgba(34,197,94,.18);  border: 1px solid rgba(34,197,94,.4);  color: #86efac; }
+.id-badge-sep { font-size: 11px; color: rgba(255,255,255,.3); flex-shrink: 0; }
+
+/* ─── EMPTY STATE ─── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+.empty-state i { font-size: 3rem; display: block; margin-bottom: 14px; opacity: .3; }
+.empty-state h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--gray-500); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; bottom: 20px; right: 20px; background: white; border: 1px solid var(--gray-200); border-left: 4px solid var(--blue-500); border-radius: 8px; padding: 10px 16px; font-size: 13px; color: var(--gray-700); box-shadow: var(--shadow-lg); z-index: 9999; animation: toastIn .2s ease; pointer-events: none; }
+.toast.success { border-left-color: var(--green-500); }
+.toast.error   { border-left-color: var(--red-500); }
+.toast.warning { border-left-color: var(--amber-400); }
+@keyframes toastIn { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+.toast.out { opacity: 0; transform: translateY(8px); transition: .25s; }
+
+/* ─── CONFIRM MODAL ─── */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 9000; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.modal-backdrop.show { opacity: 1; pointer-events: all; }
+.modal { background: white; border-radius: 14px; width: 90%; max-width: 400px; box-shadow: var(--shadow-xl); transform: translateY(20px) scale(.97); transition: transform .2s; overflow: hidden; }
+.modal-backdrop.show .modal { transform: translateY(0) scale(1); }
+.modal-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--gray-100); }
+.modal-header h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--blue-900); display: flex; align-items: center; gap: 8px; }
+.modal-body { padding: 16px 20px; font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.modal-footer { padding: 14px 20px; border-top: 1px solid var(--gray-100); display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ─── OPEN MONTH OVERLAY ─── */
+.open-overlay { position: fixed; inset: 0; background: rgba(14,30,70,.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 8000; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.open-overlay.show { opacity: 1; pointer-events: all; }
+.open-card { background: white; border-radius: 18px; padding: 32px; max-width: 420px; width: 90%; box-shadow: var(--shadow-xl); transform: scale(.9); transition: transform .3s cubic-bezier(.34,1.56,.64,1); text-align: center; }
+.open-overlay.show .open-card { transform: scale(1); }
+.open-icon { width: 72px; height: 72px; background: var(--blue-50); border: 2px solid var(--blue-200); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--blue-600); margin: 0 auto 16px; }
+.open-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: var(--blue-900); margin-bottom: 6px; }
+.open-sub { font-size: 13px; color: var(--gray-500); margin-bottom: 22px; line-height: 1.5; }
+.open-meta { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; text-align: left; }
+.open-meta-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.open-meta-label { color: var(--gray-500); font-weight: 500; }
+.open-meta-value { color: var(--blue-800); font-weight: 700; font-family: monospace; }
+.open-actions { display: flex; gap: 10px; justify-content: center; }
+.open-cancel-btn { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); border-radius: 9px; padding: 10px 20px; font-family: var(--font); font-size: 13px; cursor: pointer; transition: var(--tr); }
+.open-cancel-btn:hover { background: var(--gray-50); }
+.open-go-btn { background: var(--blue-600); color: white; border: none; border-radius: 9px; padding: 10px 28px; font-family: var(--font-display); font-size: 14px; font-weight: 800; cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 8px; }
+.open-go-btn:hover { background: var(--blue-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* ─── PURCH FILE BADGE ─── */
+.vat-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--blue-50); border: 1px solid var(--blue-200);
+  color: var(--blue-700); padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.vat-badge i { font-size: 10px; }
+
+
+
+/* ─── FOOTER ─── */
+.footer { background: var(--blue-900); color: var(--blue-300); text-align: center; padding: 10px 20px; font-size: 11px; flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  .left-panel { width: 260px; }
+  .month-hero-title { font-size: 1.8rem; }
+  .records-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+}
+@media (max-width: 700px) {
+  .left-panel { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo"><i class="fas fa-calendar-alt"></i></div>
+  <div style="flex:1">
+    <div class="topbar-brand">Monthly Sales <span>Records</span></div>
+    <span class="topbar-sub">MGAA VAT Tracking System v2.0</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="backend-pill checking" id="backendPill"><div class="bp-dot"></div><span id="backendPillText">Connecting…</span></div>
+    <!-- Identity strip: role-specific badges -->
+    <div class="identity-strip" id="identityStrip" style="display:none">
+      <div class="id-badge id-badge-subadmin hidden" id="subAdminBadge"><i class="fas fa-user-shield"></i><span id="subAdminBadgeLabel">—</span></div>
+      <span class="id-badge-sep hidden" id="identitySep">›</span>
+      <div class="id-badge id-badge-client hidden" id="clientBadge"><i class="fas fa-user"></i><span id="clientBadgeLabel">—</span></div>
+    </div>
+    <a href="../index.html" class="topbar-btn"><i class="fas fa-home"></i> Portal</a>
+    <a href="vatable_sales.html" class="topbar-btn"><i class="fas fa-table-list"></i> Current Tracker</a>
+    <a href="Graphical_Analysis.html" class="topbar-btn"><i class="fas fa-chart-line"></i> Graphical Analysis</a>
+    <a href="index2.html" class="topbar-btn"><i class="fas fa-home"></i>Dashboard</a>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-panel-header">
+    <h3><i class="fas fa-sliders"></i> Controls</h3>
+  </div>
+  <div class="left-panel-body">
+
+    <!-- Year Navigator -->
+    <div class="year-nav">
+      <div>
+        <div class="year-display" id="yearDisplay">2026</div>
+        <div class="year-sub">Fiscal Year</div>
+      </div>
+      <div class="year-btns">
+        <button class="year-nav-btn" id="yearPrevBtn" title="Previous year"><i class="fas fa-chevron-left"></i></button>
+        <button class="year-nav-btn" id="yearTodayBtn" title="Current year"><i class="fas fa-crosshairs"></i></button>
+        <button class="year-nav-btn" id="yearNextBtn" title="Next year"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Month Grid -->
+    <div class="month-grid" id="monthGrid"></div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="qs-title"><i class="fas fa-chart-bar"></i> Year Summary</div>
+      <div class="qs-row"><span class="qs-label">Months with data</span><span class="qs-value" id="qsActiveMonths">—</span></div>
+      <div class="qs-row"><span class="qs-label">Total entries</span><span class="qs-value" id="qsTotalEntries">—</span></div>
+      <div class="qs-divider"></div>
+      <div class="qs-row"><span class="qs-label">Gross Sales (YTD)</span><span class="qs-value" id="qsGross">—</span></div>
+      <div class="qs-row"><span class="qs-label">Net Sales (YTD)</span><span class="qs-value" id="qsNet">—</span></div>
+      <div class="qs-row"><span class="qs-label">Output Tax (YTD)</span><span class="qs-value" id="qsTax">—</span></div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search month or year…">
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="content-header">
+    <div class="content-header-left">
+      <h2 id="contentTitle">Monthly Sales Records</h2>
+      <p id="contentSub">Select a month to view or open its VAT Sales Tracker</p>
+    </div>
+    <div class="header-actions">
+      <span class="vat-badge"><i class="fas fa-file-code"></i> .vat files</span>
+      <button class="btn btn-secondary" id="exportYearBtn"><i class="fas fa-download"></i> Export Year</button>
+      <button class="btn btn-primary" id="openSelectedBtn" disabled><i class="fas fa-external-link-alt"></i> Open Selected</button>
+    </div>
+  </div>
+
+  <div class="content-body" id="contentBody">
+
+    <!-- Month Hero (shown when month selected) -->
+    <div id="monthHeroWrap" style="display:none">
+      <div class="month-hero">
+        <div class="month-hero-orb"></div>
+        <div class="month-hero-content">
+          <div class="month-hero-left">
+            <div class="month-hero-badge"><i class="fas fa-calendar-check"></i> Selected Period</div>
+            <div class="month-hero-title" id="heroMonthTitle">—</div>
+            <div class="month-hero-sub" id="heroMonthSub">No data yet for this period</div>
+            <div style="margin-top:12px">
+              <span class="status-badge" id="heroStatusBadge">
+                <i class="fas fa-circle" style="font-size:7px"></i> <span>Empty</span>
+              </span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-end">
+            <div class="month-hero-stats" id="heroStats">
+              <div class="hero-stat"><div class="hero-stat-value" id="heroRows">0</div><div class="hero-stat-label">Entries</div></div>
+              <div class="hero-stat"><div class="hero-stat-value" id="heroGross">₱0</div><div class="hero-stat-label">Gross</div></div>
+              <div class="hero-stat"><div class="hero-stat-value" id="heroTax">₱0</div><div class="hero-stat-label">Tax</div></div>
+            </div>
+            <div class="month-hero-actions">
+              <button class="hero-export-btn" id="heroExportBtn"><i class="fas fa-file-excel"></i> Export Month</button>
+              <button class="hero-open-btn" id="heroOpenBtn">
+                <i class="fas fa-external-link-alt"></i> Open in VAT Tracker
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline Bar -->
+    <div>
+      <div class="section-title" style="margin-bottom:10px"><i class="fas fa-chart-gantt"></i> Year Timeline — <span id="timelineYear">2026</span></div>
+      <div class="timeline-row" id="timelineRow"></div>
+    </div>
+
+    <!-- Records Grid -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="section-title"><i class="fas fa-folder-open"></i> All Sales Records</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-secondary" id="viewAllYearsBtn"><i class="fas fa-layer-group"></i> All Years</button>
+          <button class="btn btn-sm btn-secondary" id="sortBtn"><i class="fas fa-sort"></i> Newest First</button>
+        </div>
+      </div>
+      <div class="records-grid" id="recordsGrid"></div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">© 2026 MGAA VAT Monthly Records Organizer &nbsp;·&nbsp; Professional VAT-Compliant System</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header"><h3><i class="fas fa-exclamation-triangle" style="color:var(--red-500)"></i> Confirm Action</h3></div>
+    <div class="modal-body" id="confirmModalBody">Are you sure?</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="window.closeConfirm()">Cancel</button>
+      <button class="btn btn-danger-soft" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- OPEN MONTH OVERLAY -->
+<div class="open-overlay" id="openOverlay">
+  <div class="open-card">
+    <div class="open-icon"><i class="fas fa-folder-open"></i></div>
+    <div class="open-title" id="overlayTitle">Open VAT Tracker</div>
+    <div class="open-sub">You are about to open the VAT Sales Tracker for this period. Your existing data for this month will be loaded automatically.</div>
+    <div class="open-meta">
+      <div class="open-meta-row"><span class="open-meta-label">Period</span><span class="open-meta-value" id="overlayPeriod">—</span></div>
+      <div class="open-meta-row"><span class="open-meta-label">Entries</span><span class="open-meta-value" id="overlayEntries">—</span></div>
+      <div class="open-meta-row"><span class="open-meta-label">Storage Key</span><span class="open-meta-value" id="overlayKey" style="font-size:10px">—</span></div>
+    </div>
+    <div class="open-actions">
+      <button class="open-cancel-btn" onclick="closeOpenOverlay()"><i class="fas fa-times"></i> Cancel</button>
+      <button class="open-go-btn" id="overlayGoBtn"><i class="fas fa-external-link-alt"></i> Open Tracker</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   SUB-ADMIN CONTEXT
+   When monthly_record.html is opened by a sub-admin viewing a
+   client's data (via index.html → openClientMonthReadOnly), the
+   portal sets these sessionStorage flags before navigating here.
+   We capture them so timeline/card double-click can open
+   vatable_sales.html with the same read-only client context that
+   index.html uses — matching mrMakeStorageKey(clientUid, 'Client', …).
+============================================================ */
+const _saReadOnly      = sessionStorage.getItem('VAT_TRACKER_READONLY') === '1';
+const _saClientName    = sessionStorage.getItem('VAT_TRACKER_VIEWING_CLIENT') || '';
+const _saContextKey    = sessionStorage.getItem('VAT_MONTHLY_CONTEXT_KEY') || '';
+const _saContextRole   = sessionStorage.getItem('VAT_MONTHLY_CONTEXT_ROLE') || '';
+
+// Derive the client uid from the context key.
+// Key format (from index.html mrMakeStorageKey):
+//   VAT_MONTHLY_<clientUid>_<role>_<YYYY>_<MM>
+// We strip the outer parts to extract clientUid.
+const _saClientUid = (() => {
+  if (!_saContextKey || !_saContextRole) return '';
+  // Remove prefix 'VAT_MONTHLY_' and suffix '_<role>_<YYYY>_<MM>'
+  const prefix = 'VAT_MONTHLY_';
+  if (!_saContextKey.startsWith(prefix)) return '';
+  const inner = _saContextKey.slice(prefix.length); // '<uid>_<role>_<YYYY>_<MM>'
+  const roleSuffix = `_${_saContextRole}_`;
+  const idx = inner.indexOf(roleSuffix);
+  return idx > 0 ? inner.slice(0, idx) : '';
+})();
+
+/**
+ * Open vatable_sales.html for the given month, respecting whether
+ * this page is running in sub-admin (read-only client view) mode or
+ * as the client's own monthly_record.html.
+ *
+ * Sub-admin path: mirrors index.html openClientMonthReadOnly exactly —
+ *   uses client uid + 'Client' role for the storage key and sets all
+ *   the read-only session flags before navigating to Sub-Admin/vatable_sales.html.
+ *
+ * Own-account path: calls the existing openMonthInTracker function.
+ */
+function openMonthInTrackerDirect(year, month) {
+  if (_saReadOnly && _saClientUid && _saContextRole) {
+    // Build client's storage key (matches mrMakeStorageKey in index.html)
+    const contextKey = `VAT_MONTHLY_${_saClientUid}_${_saContextRole}_${year}_${String(month).padStart(2,'0')}`;
+    const raw = localStorage.getItem(contextKey);
+    if (!raw) {
+      showToast(`No sales data for ${MONTHS[month-1]} ${year}`, 'warning');
+      return;
+    }
+    // Set session context exactly as index.html openClientMonthReadOnly does
+    sessionStorage.setItem('VAT_MONTHLY_CONTEXT_KEY',   contextKey);
+    sessionStorage.setItem('VAT_MONTHLY_CONTEXT_YEAR',  String(year));
+    sessionStorage.setItem('VAT_MONTHLY_CONTEXT_MONTH', String(month));
+    sessionStorage.setItem('VAT_MONTHLY_CONTEXT_ROLE',  _saContextRole);
+    sessionStorage.setItem('VAT_MONTHLY_CONTEXT_LABEL', `${MONTHS[month-1]} ${year}${_saClientName ? ' — ' + _saClientName : ''}`);
+    // Full read-only lock (mirrors index.html openClientMonthReadOnly)
+    sessionStorage.setItem('VAT_TRACKER_READONLY',      '1');
+    sessionStorage.setItem('PURCH_TRACKER_READONLY',    '1');
+    sessionStorage.setItem('EXP_TRACKER_READONLY',      '1');
+    sessionStorage.setItem('NPURCH_TRACKER_READONLY',   '1');
+    sessionStorage.setItem('NEXP_TRACKER_READONLY',     '1');
+    sessionStorage.setItem('CAPEX_TRACKER_READONLY',    '1');
+    sessionStorage.setItem('TAXES_TRACKER_READONLY',    '1');
+    sessionStorage.setItem('RETURNS_TRACKER_READONLY',  '1');
+    sessionStorage.setItem('VAT_TRACKER_VIEWING_CLIENT', _saClientName);
+    showToast(`Opening ${MONTHS[month-1]} ${year}${_saClientName ? ' for ' + _saClientName : ''} (read-only)…`, 'success');
+    location.href = 'vatable_sales.html';
+  } else {
+    // Own-account path: use existing function (shows overlay)
+    openMonthInTracker(year, month);
+  }
+}
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Backend detection (mirrors index.html logic)
+const API_BASE = (() => {
+  if (window.VAT_API_BASE) return window.VAT_API_BASE;
+  if (window.__TAURI__) return 'http://localhost:8000/api';
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? `${window.location.protocol}//${window.location.hostname}:8000/api`
+    : '/api';
+})();
+
+let USE_API = false;
+let authToken = null;
+
+// Role detection (mirrors vatable_sales.html)
+const APP_ROLE = (function(){
+  const path = window.location.pathname;
+  if (path.includes('/Client/')) return 'Client';
+  if (path.includes('/Sub-Admin/')) return 'SubAdmin';
+  return 'Main';
+})();
+
+// Resolve the logged-in user account ID from the portal session so each
+// client's data is stored under their own unique key and cannot be read by
+// other clients or the wrong sub-admin.
+// Format must match index.html mrMakeStorageKey: VAT_MONTHLY_${uid}_${role}_${year}_${MM}
+const APP_USER_ID = (function(){
+  try {
+    const s = sessionStorage.getItem('VAT_SESSION');
+    if (s) {
+      const parsed = JSON.parse(s);
+      // Accept either id (local mode) or sub / user_id (JWT-backed API mode)
+      return parsed.id || parsed.sub || parsed.user_id || 'anon';
+    }
+  } catch(e) {}
+  return 'anon';
+})();
+
+// Storage key namespace — scoped per user id AND role so each client account
+// gets its own isolated key space (matches index.html mrMakeStorageKey).
+function makeStorageKey(year, month) {
+  const m = String(month).padStart(2, '0');
+  return `VAT_MONTHLY_${APP_USER_ID}_${APP_ROLE}_${year}_${m}`;
+}
+
+function makeMetaKey(year, month) {
+  const m = String(month).padStart(2, '0');
+  return `VAT_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${m}`;
+}
+
+/* ============================================================
+   LOCAL META SYNC
+   vatable_sales.html writes the raw data key (VAT_MONTHLY_<Role>_YYYY_MM)
+   every time it autosaves or on beforeunload — but it does NOT write the
+   meta key (VAT_MONTHLY_META_*) that monthly_record.html reads for counts.
+   This function scans all matching raw-data keys in localStorage, rebuilds
+   the meta from the actual tableData, and writes it so the month-grid
+   indicators always show the real entry count — even without navigating
+   back through the session-handshake flow.
+
+   Called:
+     • On DOMContentLoaded (catches data written before this page opened)
+     • On the window 'storage' event (catches same-browser live writes)
+     • From the SSE 'update' handler (cross-computer path already has fresh
+       data pushed via API, but local cache also needs the meta rebuilt)
+============================================================ */
+function syncAllLocalMeta() {
+  const prefix = `VAT_MONTHLY_${APP_USER_ID}_${APP_ROLE}_`;
+  const metaPrefix = `VAT_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`;
+  let changed = false;
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith(prefix) || k.startsWith(metaPrefix)) continue;
+
+    // Key shape: VAT_MONTHLY_<uid>_<Role>_<YYYY>_<MM>
+    const suffix = k.slice(prefix.length); // e.g. "2026_05"
+    const parts  = suffix.split('_');
+    if (parts.length !== 2) continue;
+    const year  = parseInt(parts[0]);
+    const month = parseInt(parts[1]);
+    if (!year || !month || month < 1 || month > 12) continue;
+
+    // Read raw data written by vatable_sales.html
+    let raw;
+    try { raw = JSON.parse(localStorage.getItem(k)); } catch(e) { continue; }
+    if (!raw || !Array.isArray(raw.tableData)) continue;
+
+    // Check if meta is missing or has a different rowCount (stale)
+    const metaKey = makeMetaKey(year, month);
+    let existingMeta = null;
+    try { existingMeta = JSON.parse(localStorage.getItem(metaKey)); } catch(e) {}
+
+    const freshRowCount = raw.tableData.length;
+    if (existingMeta && existingMeta.rowCount === freshRowCount) continue; // already up to date
+
+    // Rebuild meta from actual table data
+    const meta = {
+      year, month,
+      rowCount:     freshRowCount,
+      grossSales:   calcGross(raw.tableData),
+      netSales:     calcNet(raw.tableData),
+      outputTax:    calcTax(raw.tableData),
+      lastModified: raw.timestamp || new Date().toISOString(),
+      companyName:  raw.companyInfo?.companyName || raw.companyInfo?.name || '',
+      reportDate:   raw.companyInfo?.reportDate  || raw.companyInfo?.date || '',
+    };
+    localStorage.setItem(metaKey, JSON.stringify(meta));
+    changed = true;
+  }
+  return changed; // caller can decide whether to re-render
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+let selectedYear  = new Date().getFullYear();
+let selectedMonth = new Date().getMonth() + 1; // 1-indexed
+let newestFirst   = true;
+let showAllYears  = false;
+
+/* ============================================================
+   VAT → MONTHLY AUTO-SYNC
+   Called on every page load (after checkBackend sets authToken).
+   Asks the backend to promote any vatable_sales.html entries that
+   carry a year+month into the monthly-records table so they show
+   up in "All Sales Records" without ever needing to open the VAT
+   Tracker page-by-page.
+============================================================ */
+async function syncVatToMonthly() {
+  if (!USE_API || !authToken) return;
+  try {
+    const r = await fetch(
+      `${API_BASE}/monthly-records/sync-from-vat?role=${APP_ROLE}`,
+      {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` },
+      }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      if (d.synced > 0) {
+        console.log(`[sync-from-vat] Synced ${d.synced} month(s) from VAT Sales Tracker.`);
+      }
+    }
+  } catch (e) {
+    console.warn('[sync-from-vat] Sync skipped (backend unavailable):', e);
+  }
+}
+
+/* ============================================================
+   BACKEND HEALTH
+============================================================ */
+async function checkBackend() {
+  const pill = document.getElementById('backendPill');
+  const text = document.getElementById('backendPillText');
+  try {
+    const r = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      USE_API = true;
+      pill.className = 'backend-pill online';
+      text.textContent = 'API Online';
+      // Restore auth token from session - CRITICAL FIX
+      const session = sessionStorage.getItem('VAT_SESSION');
+      if (session) {
+        try { 
+          const s = JSON.parse(session); 
+          // Try different possible token field names
+          authToken = s.token || s.access_token || s._token || null;
+          console.log('Token loaded:', authToken ? 'Yes' : 'No');
+        } catch(e) { 
+          console.error('Failed to parse session', e);
+        }
+      }
+      return;
+    }
+  } catch(_) {
+    console.log('Backend not available');
+  }
+  USE_API = false;
+  pill.className = 'backend-pill offline';
+  text.textContent = 'Local Mode';
+}
+
+/* ============================================================
+   DATA LAYER — localStorage (with SQLite/API bridge when online)
+============================================================ */
+
+/**
+ * Save month data to localStorage (+ SQLite via API if available).
+ * dataObj = { tableData: [...], companyInfo: {...} }
+ */
+async function saveMonthData(year, month, dataObj) {
+  const key = makeStorageKey(year, month);
+  const meta = {
+    year, month,
+    rowCount: Array.isArray(dataObj.tableData) ? dataObj.tableData.length : 0,
+    grossSales: calcGross(dataObj.tableData),
+    netSales:   calcNet(dataObj.tableData),
+    outputTax:  calcTax(dataObj.tableData),
+    lastModified: new Date().toISOString(),
+    companyName: dataObj.companyInfo?.name || '',
+    reportDate:  dataObj.companyInfo?.date || '',
+  };
+  localStorage.setItem(key, JSON.stringify(dataObj));
+  localStorage.setItem(makeMetaKey(year, month), JSON.stringify(meta));
+
+  if (USE_API && authToken) {
+    try {
+      await fetch(`${API_BASE}/monthly-records`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        body: JSON.stringify({ year, month, data: dataObj, meta }),
+      });
+    } catch(_) { /* local fallback already done */ }
+  }
+  return meta;
+}
+
+/**
+ * Load month data. Returns null if no data.
+ */
+async function loadMonthData(year, month) {
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-records/${year}/${String(month).padStart(2,'0')}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const d = await r.json();
+        // Also cache locally
+        localStorage.setItem(makeStorageKey(year, month), JSON.stringify(d.data));
+        localStorage.setItem(makeMetaKey(year, month), JSON.stringify(d.meta));
+        return { data: d.data, meta: d.meta };
+      }
+    } catch(_) {}
+  }
+  // Local fallback
+  const raw = localStorage.getItem(makeStorageKey(year, month));
+  const metaRaw = localStorage.getItem(makeMetaKey(year, month));
+  if (!raw) return null;
+  try {
+    return { data: JSON.parse(raw), meta: metaRaw ? JSON.parse(metaRaw) : null };
+  } catch(e) { return null; }
+}
+
+/**
+ * Delete a month's data.
+ */
+async function deleteMonthData(year, month) {
+  // 1. Remove from localStorage immediately
+  localStorage.removeItem(makeStorageKey(year, month));
+  localStorage.removeItem(makeMetaKey(year, month));
+
+  // 2. Bust ALL in-memory meta caches (not just for this year)
+  //    because getAllStoredYears() might have cached other years too
+  _metaRequestCache.clear();
+  
+  // Also clear any pending requests cache
+  if (_pendingRequests) {
+    _pendingRequests.clear();
+  }
+
+  // 3. Delete from API if online
+  if (USE_API && authToken) {
+    try {
+      await fetch(`${API_BASE}/monthly-records/${year}/${String(month).padStart(2,'0')}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+    } catch(_) {}
+  }
+  
+  // 4. Force a complete refresh of all data
+  // Wait a moment for the API delete to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+}
+
+/**
+ * Get metadata for all months of a given year.
+ * When API is online, fetches from server so other computers always see fresh data.
+ */
+// In monthly_record.html, modify getAllMonthMetaForYear:
+
+let _metaRequestCache = new Map();
+let _metaRequestTimer = null;
+
+async function getAllMonthMetaForYear(year) {
+  // Create a cache key for this request
+  const cacheKey = `meta_${year}_${APP_ROLE}`;
+  const now = Date.now();
+  const cached = _metaRequestCache.get(cacheKey);
+  
+  // Use cached result if it's less than 5 seconds old
+  if (cached && (now - cached.timestamp) < 5000) {
+    console.log(`Using cached meta data for ${year} (${now - cached.timestamp}ms old)`);
+    return cached.data;
+  }
+  
+  // When online, fetch from API
+  if (USE_API && authToken) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const r = await fetch(`${API_BASE}/monthly-records?year=${year}&role=${APP_ROLE}`, {
+        headers: { 
+          'Authorization': `Bearer ${authToken}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        },
+        cache: 'no-store',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (r.ok) {
+        const records = await r.json();
+        const result = Array(12).fill(null);
+        for (const item of records) {
+          const idx = item.month - 1;
+          if (idx >= 0 && idx < 12) {
+            const meta = item.meta || {
+              year: item.year, month: item.month,
+              rowCount: (item.table_data || []).length,
+              grossSales: (item.table_data || []).reduce((s, r) => s + (parseFloat(r.grossSales) || 0), 0),
+              netSales: (item.table_data || []).reduce((s, r) => s + ((parseFloat(r.grossSales) || 0) / 1.12), 0),
+              outputTax: (item.table_data || []).reduce((s, r) => s + ((parseFloat(r.grossSales) || 0) / 1.12 * 0.12), 0),
+              lastModified: item.saved_at || '',
+              companyName: (item.company_info || {}).companyName || '',
+            };
+            result[idx] = meta;
+            // Update cache for offline fallback
+            localStorage.setItem(makeMetaKey(item.year, item.month), JSON.stringify(meta));
+          }
+        }
+        
+        // Cache the result
+        _metaRequestCache.set(cacheKey, { data: result, timestamp: now });
+        // Clear cache after 10 seconds
+        setTimeout(() => {
+          if (_metaRequestCache.get(cacheKey)?.timestamp === now) {
+            _metaRequestCache.delete(cacheKey);
+          }
+        }, 10000);
+        
+        return result;
+      }
+    } catch(e) {
+      if (e.name === 'AbortError') {
+        console.warn('API fetch timeout, falling back to localStorage');
+      } else if (e.message === 'Failed to fetch') {
+        console.warn('API fetch failed (connection refused), falling back to localStorage');
+        USE_API = false;
+      } else {
+        console.warn('API fetch failed, falling back to localStorage:', e);
+      }
+    }
+  }
+  
+  // Fallback to localStorage
+  syncAllLocalMeta();
+  const result = [];
+  for (let m = 1; m <= 12; m++) {
+    const metaRaw = localStorage.getItem(makeMetaKey(year, m));
+    result.push(metaRaw ? JSON.parse(metaRaw) : null);
+  }
+  
+  // Cache the result even for localStorage fallback
+  _metaRequestCache.set(cacheKey, { data: result, timestamp: now });
+  setTimeout(() => {
+    if (_metaRequestCache.get(cacheKey)?.timestamp === now) {
+      _metaRequestCache.delete(cacheKey);
+    }
+  }, 5000);
+  
+  return result;
+}
+
+/**
+ * Get all years that have any stored data.
+ * When API is online, fetches from server so remote computers see all years.
+ */
+async function getAllStoredYears() {
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-records/years?role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        cache: 'no-store'
+      });
+      if (r.ok) {
+        const d = await r.json();
+        if (Array.isArray(d.years) && d.years.length) {
+          // Also cache locally
+          for (const yr of d.years) {
+            // Fetch and cache each year's data
+            await refreshYearFromAPI(yr);
+          }
+          return d.years;
+        }
+      }
+    } catch(e) {}
+  }
+  // Local fallback — sync first, then scan both raw and meta keys for years
+  syncAllLocalMeta();
+  const years = new Set();
+  const rawPrefix  = `VAT_MONTHLY_${APP_USER_ID}_${APP_ROLE}_`;
+  const metaPrefix = `VAT_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k) continue;
+    // Match raw data keys: VAT_MONTHLY_<uid>_<Role>_<YYYY>_<MM>
+    if (k.startsWith(rawPrefix) && !k.startsWith(metaPrefix)) {
+      const m = k.match(new RegExp(`VAT_MONTHLY_${APP_USER_ID}_${APP_ROLE}_(\\d{4})_\\d{2}$`));
+      if (m) years.add(parseInt(m[1]));
+    }
+    // Match meta keys: VAT_MONTHLY_META_<uid>_<Role>_<YYYY>_<MM>
+    if (k.startsWith(metaPrefix)) {
+      const m = k.match(new RegExp(`VAT_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_(\\d{4})_`));
+      if (m) years.add(parseInt(m[1]));
+    }
+  }
+  return Array.from(years).sort((a,b) => b - a);
+}
+
+// Calculations
+function calcGross(tableData) {
+  if (!Array.isArray(tableData)) return 0;
+  return tableData.reduce((s, r) => s + (parseFloat(r.grossSales) || 0), 0);
+}
+function calcNet(tableData) {
+  if (!Array.isArray(tableData)) return 0;
+  return tableData.reduce((s, r) => s + ((parseFloat(r.grossSales) || 0) / 1.12), 0);
+}
+function calcTax(tableData) {
+  if (!Array.isArray(tableData)) return 0;
+  return tableData.reduce((s, r) => {
+    const gross = parseFloat(r.grossSales) || 0;
+    return s + (gross / 1.12) * 0.12;
+  }, 0);
+}
+function fmtPHP(n) { return '₱' + n.toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch(e) { return iso; }
+}
+
+/* ============================================================
+   VAT TRACKER INTEGRATION
+   Sets the monthly context key before navigating to vatable_sales.html
+============================================================ */
+function openMonthInTracker(year, month) {
+  // Store the active month context so vatable_sales.html can pick it up
+  const contextKey = makeStorageKey(year, month);
+  sessionStorage.setItem('VAT_MONTHLY_CONTEXT_KEY', contextKey);
+  sessionStorage.setItem('VAT_MONTHLY_CONTEXT_YEAR', String(year));
+  sessionStorage.setItem('VAT_MONTHLY_CONTEXT_MONTH', String(month));
+  sessionStorage.setItem('VAT_MONTHLY_CONTEXT_ROLE', APP_ROLE);
+
+  // Build the context label: for Client role, append the client's username
+  // so vatable_sales.html shows e.g. "January 2026 — Client1" in the yellow badge.
+  let ctxLabel = `${MONTHS[month-1]} ${year}`;
+  if (APP_ROLE === 'Client') {
+    try {
+      const sess = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null');
+      const clientName = sess?.username || '';
+      if (clientName) ctxLabel += ` — ${clientName}`;
+    } catch(e) {}
+  }
+  sessionStorage.setItem('VAT_MONTHLY_CONTEXT_LABEL', ctxLabel);
+
+  // Snapshot current session back to monthly slot if coming from tracker
+  // (handled on tracker side via integration bridge)
+  window.location.href = 'vatable_sales.html';
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+async function renderMonthGrid() {
+  const now = new Date();
+  const curY = now.getFullYear(), curM = now.getMonth() + 1;
+  const metas = await getAllMonthMetaForYear(selectedYear);
+  const grid = document.getElementById('monthGrid');
+
+  grid.innerHTML = MONTHS.map((name, i) => {
+    const m = i + 1;
+    const meta = metas[i];
+    const isSelected = selectedYear === selectedYear && m === selectedMonth;
+    const isCurrent  = selectedYear === curY && m === curM;
+    const hasData    = !!meta;
+
+    let cls = 'month-btn';
+    if (isSelected) cls += ' selected';
+    if (isCurrent)  cls += ' current-month';
+    if (hasData)    cls += ' has-data';
+
+    const count = hasData ? `${meta.rowCount} entr${meta.rowCount===1?'y':'ies'}` : 'Empty';
+
+    return `<button class="${cls}" data-month="${m}" title="${name} ${selectedYear}${isCurrent?' (Current)':''}">
+      <div class="month-btn-name">${name.slice(0,3)}</div>
+      <div class="month-btn-count">${count}</div>
+    </button>`;
+  }).join('');
+
+  grid.querySelectorAll('.month-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedMonth = parseInt(btn.dataset.month);
+      updateAll();
+    });
+  });
+}
+
+async function renderTimeline() {
+  const metas = await getAllMonthMetaForYear(selectedYear);
+  const maxGross = Math.max(...metas.map(m => m ? m.grossSales : 0), 1);
+  const row = document.getElementById('timelineRow');
+  document.getElementById('timelineYear').textContent = selectedYear;
+
+  row.innerHTML = MONTHS_ABBR.map((abbr, i) => {
+    const m = i + 1;
+    const meta = metas[i];
+    const isSelected = m === selectedMonth;
+    const hasData = !!meta;
+    const barH = hasData ? Math.max(10, Math.round((meta.grossSales / maxGross) * 50)) : 6;
+    const barStyle = `height:${barH}px`;
+
+    let cls = 'timeline-month';
+    if (isSelected) cls += ' tm-selected';
+    if (hasData)    cls += ' tm-has-data';
+
+    const label = hasData ? fmtPHP(meta.grossSales).replace('₱','').split('.')[0] : '';
+
+    return `<div class="${cls}" data-month="${m}" title="${MONTHS[i]} ${selectedYear}${hasData ? ' · Double-click to open in Tracker' : ''}">
+      <div class="tm-abbr">${abbr}</div>
+      <div class="tm-bar" style="${barStyle}"></div>
+      <div class="tm-label">${label}</div>
+    </div>`;
+  }).join('');
+
+  row.querySelectorAll('.timeline-month').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedMonth = parseInt(el.dataset.month);
+      updateAll();
+    });
+    /* ── double-click → open vatable_sales.html for that month ── */
+    el.addEventListener('dblclick', () => {
+      const m = parseInt(el.dataset.month);
+      const meta = metas[m - 1];
+      if (!meta) { showToast(`No sales data for ${MONTHS[m-1]} ${selectedYear}`, 'warning'); return; }
+      openMonthInTrackerDirect(selectedYear, m);
+    });
+  });
+}
+
+async function renderHero() {
+  const wrap = document.getElementById('monthHeroWrap');
+  const metas = await getAllMonthMetaForYear(selectedYear);
+  const meta  = metas[selectedMonth - 1];
+  const label = `${MONTHS[selectedMonth-1]} ${selectedYear}`;
+
+  document.getElementById('heroMonthTitle').textContent = label;
+  document.getElementById('contentTitle').textContent = label;
+
+  if (meta) {
+    document.getElementById('heroMonthSub').textContent = `Company: ${meta.companyName || '—'} · Last modified: ${fmtDate(meta.lastModified)}`;
+    document.getElementById('heroStatusBadge').className = 'status-badge status-active';
+    document.getElementById('heroStatusBadge').innerHTML = '<i class="fas fa-circle" style="font-size:7px"></i> Has Data';
+    document.getElementById('heroRows').textContent  = meta.rowCount;
+    document.getElementById('heroGross').textContent = fmtPHP(meta.grossSales);
+    document.getElementById('heroTax').textContent   = fmtPHP(meta.outputTax);
+    document.getElementById('contentSub').textContent = `${meta.rowCount} entries · Gross: ${fmtPHP(meta.grossSales)}`;
+  } else {
+    document.getElementById('heroMonthSub').textContent = 'No data saved for this period yet. Click "Open in VAT Tracker" to start.';
+    document.getElementById('heroStatusBadge').className = 'status-badge status-empty';
+    document.getElementById('heroStatusBadge').innerHTML = '<i class="fas fa-circle" style="font-size:7px"></i> Empty';
+    document.getElementById('heroRows').textContent  = '0';
+    document.getElementById('heroGross').textContent = '₱0';
+    document.getElementById('heroTax').textContent   = '₱0';
+    document.getElementById('contentSub').textContent = 'No entries yet for this period.';
+  }
+
+  wrap.style.display = '';
+}
+
+async function renderRecordsGrid() {
+  const grid = document.getElementById('recordsGrid');
+  const searchQ = document.getElementById('searchInput').value.toLowerCase();
+
+  // Collect all months with data
+  let records = [];
+  const storedYears = await getAllStoredYears();
+  const yearsToShow = showAllYears ? storedYears : [selectedYear];
+
+  for (const yr of yearsToShow) {
+    const metas = await getAllMonthMetaForYear(yr);
+    for (let i = 0; i < 12; i++) {
+      const m = i + 1;
+      const meta = metas[i];
+      if (meta && meta.rowCount > 0) {
+        records.push({ year: yr, month: m, meta, label: `${MONTHS[i]} ${yr}` });
+      }
+    }
+  }
+
+  // Search filter
+  if (searchQ) {
+    records = records.filter(r =>
+      r.label.toLowerCase().includes(searchQ) ||
+      String(r.year).includes(searchQ) ||
+      (r.meta.companyName||'').toLowerCase().includes(searchQ)
+    );
+  }
+
+  // Sort
+  records.sort((a, b) => newestFirst
+    ? (b.year * 100 + b.month) - (a.year * 100 + a.month)
+    : (a.year * 100 + a.month) - (b.year * 100 + b.month)
+  );
+
+  if (!records.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1">
+      <div class="empty-state">
+        <i class="fas fa-calendar-xmark"></i>
+        <h3>No records found</h3>
+        <p>${searchQ ? 'No months match your search.' : 'Open a month in the VAT Tracker to start recording data.'}</p>
+      </div>
+    </div>`;
+    return;
+  }
+
+  // New entry card first (only in current-year view)
+  const newCardHtml = !showAllYears && !searchQ ? `
+    <div class="record-card record-card-new" data-year="${selectedYear}" data-month="${selectedMonth}" data-card-type="new">
+      <i class="fas fa-plus"></i>
+      <span>Open ${MONTHS[selectedMonth-1]} ${selectedYear}</span>
+    </div>` : '';
+
+  grid.innerHTML = newCardHtml + records.map(r => {
+    const isSelected = r.year === selectedYear && r.month === selectedMonth;
+    let cls = 'record-card has-data-card';
+    if (isSelected) cls += ' selected-card';
+
+    // REMOVED the onclick attribute from the div
+    return `<div class="${cls}" data-year="${r.year}" data-month="${r.month}" data-card-type="data">
+      <div class="record-card-actions">
+        <button class="rc-action-btn open-btn" data-year="${r.year}" data-month="${r.month}" data-action="open" title="Open in Tracker"><i class="fas fa-external-link-alt"></i></button>
+        <button class="rc-action-btn delete-btn" data-year="${r.year}" data-month="${r.month}" data-action="delete" title="Delete record"><i class="fas fa-trash"></i></button>
+      </div>
+      <div class="record-card-month">${MONTHS[r.month-1]}</div>
+      <div class="record-card-year">${r.year}</div>
+      <div class="record-card-rows"><i class="fas fa-list"></i> ${r.meta.rowCount} entr${r.meta.rowCount===1?'y':'ies'}</div>
+      <div class="record-card-gross">${fmtPHP(r.meta.grossSales)}</div>
+      <div class="record-card-date">Modified: ${fmtDate(r.meta.lastModified)}</div>
+    </div>`;
+  }).join('');
+
+  // Remove old event listener to avoid duplicates
+  if (grid._clickHandler) {
+    grid.removeEventListener('click', grid._clickHandler);
+  }
+  if (grid._dblClickHandler) {
+    grid.removeEventListener('dblclick', grid._dblClickHandler);
+  }
+
+  // SINGLE CLICK HANDLER - for card selection and buttons
+  grid._clickHandler = (e) => {
+    // Check if a button was clicked
+    const btn = e.target.closest('.rc-action-btn');
+    if (btn) {
+      e.stopPropagation();
+      const year = parseInt(btn.dataset.year);
+      const month = parseInt(btn.dataset.month);
+      const action = btn.dataset.action;
+      
+      console.log('🔍 [DEBUG] Button clicked:', { action, year, month });
+      
+      if (action === 'open') {
+        triggerOpenOverlay(year, month);
+      } else if (action === 'delete') {
+        confirmDelete(year, month);
+      }
+      return;
+    }
+    
+    // Check if a card (not button) was clicked
+    const card = e.target.closest('.record-card');
+    if (!card) return;
+    
+    const cardType = card.dataset.cardType;
+    const year = parseInt(card.dataset.year);
+    const month = parseInt(card.dataset.month);
+    
+    if (cardType === 'new') {
+      // New card - open the selected month
+      triggerOpenOverlay(year, month);
+    } else if (cardType === 'data') {
+      // Data card - select it
+      selectCard(year, month);
+    }
+  };
+  
+  // DOUBLE CLICK HANDLER - for opening tracker directly
+  grid._dblClickHandler = (e) => {
+    // Don't trigger on button clicks
+    if (e.target.closest('.rc-action-btn')) return;
+    
+    const card = e.target.closest('.record-card');
+    if (!card) return;
+    
+    const cardType = card.dataset.cardType;
+    const year = parseInt(card.dataset.year);
+    const month = parseInt(card.dataset.month);
+    
+    if (cardType === 'data') {
+      openMonthInTrackerDirect(year, month);
+    }
+  };
+  
+  grid.addEventListener('click', grid._clickHandler);
+  grid.addEventListener('dblclick', grid._dblClickHandler);
+}
+
+async function renderYearStats() {
+  const metas = (await getAllMonthMetaForYear(selectedYear)).filter(Boolean);
+  const activeMonths = metas.length;
+  const totalEntries = metas.reduce((s, m) => s + (m.rowCount || 0), 0);
+  const totalGross   = metas.reduce((s, m) => s + (m.grossSales || 0), 0);
+  const totalNet     = metas.reduce((s, m) => s + (m.netSales || 0), 0);
+  const totalTax     = metas.reduce((s, m) => s + (m.outputTax || 0), 0);
+
+  document.getElementById('qsActiveMonths').textContent  = `${activeMonths} / 12`;
+  document.getElementById('qsTotalEntries').textContent  = totalEntries;
+  document.getElementById('qsGross').textContent         = fmtPHP(totalGross);
+  document.getElementById('qsNet').textContent           = fmtPHP(totalNet);
+  document.getElementById('qsTax').textContent           = fmtPHP(totalTax);
+  document.getElementById('yearDisplay').textContent     = selectedYear;
+}
+
+/**
+ * Force refresh all month meta data for a given year from the API,
+ * bypassing localStorage cache.
+ */
+let _pendingRequests = new Map();
+let _lastRefreshTime = 0;
+let _refreshDebounceTimer = null;
+
+// Improved refreshYearFromAPI with deduplication
+async function refreshYearFromAPI(year) {
+  if (!USE_API || !authToken) return false;
+  
+  // Create a unique key for this request
+  const requestKey = `refresh_${year}_${APP_ROLE}`;
+  
+  // If there's already a pending request for this year, return its promise
+  if (_pendingRequests.has(requestKey)) {
+    console.log(`Polling: Request for ${year} already in progress, skipping duplicate`);
+    return _pendingRequests.get(requestKey);
+  }
+  
+  // Throttle: don't allow more than 1 request per 2 seconds
+  const now = Date.now();
+  if (now - _lastRefreshTime < 2000) {
+    console.log(`Polling: Throttling refresh for ${year} (${now - _lastRefreshTime}ms since last)`);
+    return false;
+  }
+  _lastRefreshTime = now;
+  
+  const promise = (async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(`${API_BASE}/monthly-records?year=${year}&role=${APP_ROLE}`, {
+        headers: { 
+          'Authorization': `Bearer ${authToken}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        },
+        cache: 'no-store',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        const records = await response.json();
+        // Update localStorage with fresh data
+        for (const rec of records) {
+          if (rec.year === year && rec.month) {
+            // Skip re-writing meta if the data key was just deleted locally
+            // (protects against the API race where DELETE hasn't committed yet)
+            const dataKey = makeStorageKey(rec.year, rec.month);
+            if (!localStorage.getItem(dataKey) && !_metaRequestCache.has(`meta_${year}_${APP_ROLE}`)) {
+              // Data key missing and cache is cold — this record was likely just deleted
+              // Check if meta key exists; if not, don't re-create it from stale API data
+              const existingMeta = localStorage.getItem(makeMetaKey(rec.year, rec.month));
+              if (!existingMeta) { continue; }
+            }
+            const metaKey = makeMetaKey(rec.year, rec.month);
+            const meta = rec.meta || {
+              year: rec.year, month: rec.month,
+              rowCount: (rec.table_data || []).length,
+              grossSales: (rec.table_data || []).reduce((s, r) => s + (parseFloat(r.grossSales) || 0), 0),
+              netSales: (rec.table_data || []).reduce((s, r) => s + ((parseFloat(r.grossSales) || 0) / 1.12), 0),
+              outputTax: (rec.table_data || []).reduce((s, r) => s + ((parseFloat(r.grossSales) || 0) / 1.12 * 0.12), 0),
+              lastModified: rec.saved_at || '',
+              companyName: (rec.company_info || {}).companyName || '',
+            };
+            localStorage.setItem(metaKey, JSON.stringify(meta));
+          }
+        }
+        console.log(`Polling: Refreshed ${year} from API`);
+        return true;
+      }
+    } catch(e) {
+      if (e.name === 'AbortError') {
+        console.warn(`Polling: Timeout refreshing ${year} from API`);
+      } else if (e.message === 'Failed to fetch') {
+        console.warn(`Polling: Connection refused - backend may be offline`);
+        USE_API = false;
+      } else {
+        console.warn('Polling: Failed to refresh from API:', e);
+      }
+    } finally {
+      // Remove from pending requests after completion
+      _pendingRequests.delete(requestKey);
+    }
+    return false;
+  })();
+  
+  _pendingRequests.set(requestKey, promise);
+  return promise;
+}
+let _isUpdating = false;
+let _pendingUpdate = null;
+
+async function updateAll() {
+  // Prevent multiple simultaneous updates
+  if (_isUpdating) {
+    console.log('Update already in progress, queuing...');
+    _pendingUpdate = true;
+    return;
+  }
+  
+  _isUpdating = true;
+  
+  try {
+    document.getElementById('openSelectedBtn').disabled = false;
+    await Promise.all([
+      renderMonthGrid(),
+      renderTimeline(),
+      renderHero(),
+      renderRecordsGrid(),
+      renderYearStats(),
+    ]);
+  } finally {
+    _isUpdating = false;
+    
+    // If there was a pending update while we were updating, run it now
+    if (_pendingUpdate) {
+      _pendingUpdate = false;
+      console.log('Running queued update');
+      setTimeout(() => updateAll(), 100);
+    }
+  }
+}
+
+
+/* ============================================================
+   OPEN OVERLAY
+============================================================ */
+async function triggerOpenOverlay(year, month) {
+  const metas = await getAllMonthMetaForYear(year);
+  const meta  = metas[month - 1];
+  document.getElementById('overlayTitle').textContent   = `Open ${MONTHS[month-1]} ${year}`;
+  document.getElementById('overlayPeriod').textContent  = `${MONTHS[month-1]} ${year}`;
+  document.getElementById('overlayEntries').textContent = meta ? `${meta.rowCount} entries` : 'No data yet (new)';
+  document.getElementById('overlayKey').textContent     = makeStorageKey(year, month);
+  document.getElementById('overlayGoBtn').onclick       = () => { closeOpenOverlay(); openMonthInTracker(year, month); };
+  document.getElementById('openOverlay').classList.add('show');
+}
+function closeOpenOverlay() { document.getElementById('openOverlay').classList.remove('show'); }
+
+/* ============================================================
+   CONFIRM / DELETE - SINGLE CLEAN WORKING VERSION
+============================================================ */
+let _pendingDelete = null;
+
+function closeConfirm() {
+  const modal = document.getElementById('confirmModal');
+  if (modal) modal.classList.remove('show');
+  _pendingDelete = null;
+}
+
+// Make closeConfirm globally accessible
+window.closeConfirm = closeConfirm;
+
+async function confirmDelete(year, month) {
+  console.log('🗑️ confirmDelete called for:', year, month);
+  
+  // Store pending delete info
+  _pendingDelete = { year, month };
+  
+  // Update modal body text
+  const modalBody = document.getElementById('confirmModalBody');
+  if (modalBody) {
+    modalBody.innerHTML = `Delete all data for <strong>${MONTHS[month-1]} ${year}</strong>? This cannot be undone.`;
+  }
+  
+  // Show modal
+  const modal = document.getElementById('confirmModal');
+  if (!modal) return;
+  modal.classList.add('show');
+  
+  // Remove existing listeners by cloning and replacing
+  const oldConfirmBtn = document.getElementById('confirmOkBtn');
+  if (!oldConfirmBtn) return;
+  
+  const newConfirmBtn = oldConfirmBtn.cloneNode(true);
+  oldConfirmBtn.parentNode.replaceChild(newConfirmBtn, oldConfirmBtn);
+  
+  // Set new click handler
+  newConfirmBtn.onclick = async function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!_pendingDelete) {
+      closeConfirm();
+      return;
+    }
+    
+    const yr = _pendingDelete.year;
+    const mo = _pendingDelete.month;
+    
+    // Close modal immediately
+    closeConfirm();
+    
+    // Show deleting toast
+    showToast(`Deleting ${MONTHS[mo-1]} ${yr}...`, 'info');
+    
+    try {
+      // Delete from localStorage
+      const storageKey = makeStorageKey(yr, mo);
+      const metaKey = makeMetaKey(yr, mo);
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(metaKey);
+      console.log('🗑️ Removed:', storageKey);
+      
+      // Delete from API if online
+      if (USE_API && authToken) {
+        try {
+          await fetch(`${API_BASE}/monthly-records/${yr}/${String(mo).padStart(2,'0')}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+        } catch(e) {
+          console.warn('API delete failed:', e);
+        }
+      }
+      
+      // Clear all caches
+      _metaRequestCache.clear();
+      if (typeof _pendingRequests !== 'undefined') _pendingRequests.clear();
+
+      // Re-wipe meta key after API call — refreshYearFromAPI may have raced
+      // and re-written it from stale server data before the DELETE committed
+      localStorage.removeItem(makeMetaKey(yr, mo));
+      localStorage.removeItem(makeStorageKey(yr, mo));
+      _metaRequestCache.clear();
+      
+      showToast(`Deleted ${MONTHS[mo-1]} ${yr}`, 'success');
+      
+      // If deleted month was selected, reset to current month
+      if (selectedYear === yr && selectedMonth === mo) {
+        selectedMonth = new Date().getMonth() + 1;
+      }
+
+      // Brief pause so the API delete has time to commit before we re-fetch
+      await new Promise(r => setTimeout(r, 350));
+      
+      // Force full refresh
+      await updateAll();
+      
+    } catch (err) {
+      console.error('Delete error:', err);
+      showToast(`Error deleting ${MONTHS[mo-1]} ${yr}`, 'error');
+    }
+    
+    _pendingDelete = null;
+  };
+}
+
+// Modal backdrop click to close
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('confirmModal');
+  if (modal && modal.classList.contains('show') && e.target === modal) {
+    closeConfirm();
+  }
+});
+
+/* ============================================================
+   SELECT CARD
+============================================================ */
+function selectCard(year, month) {
+  selectedYear  = year;
+  selectedMonth = month;
+  updateAll();
+}
+
+/* ============================================================
+   SELECT CARD
+============================================================ */
+function selectCard(year, month) {
+  selectedYear  = year;
+  selectedMonth = month;
+  updateAll();
+}
+
+/* ============================================================
+   EXPORT YEAR SUMMARY
+============================================================ */
+async function exportYearSummary() {
+  const metas = (await getAllMonthMetaForYear(selectedYear)).filter(Boolean);
+  if (!metas.length) { showToast('No data to export for ' + selectedYear, 'warning'); return; }
+
+  const rows = metas.map(m =>
+    `${MONTHS[m.month-1]}\t${m.rowCount}\t${m.grossSales.toFixed(2)}\t${m.netSales.toFixed(2)}\t${m.outputTax.toFixed(2)}\t${m.companyName||''}\t${m.lastModified}`
+  ).join('\n');
+  const header = 'Month\tEntries\tGross Sales\tNet Sales\tOutput Tax\tCompany\tLast Modified\n';
+  const blob = new Blob([header + rows], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `VAT_Year_Summary_${selectedYear}.txt`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`Exported ${metas.length} months for ${selectedYear}`, 'success');
+}
+
+function exportMonthData(year, month) {
+  const key = makeStorageKey(year, month);
+  const raw = localStorage.getItem(key);
+  if (!raw) { showToast('No data to export', 'warning'); return; }
+  const blob = new Blob([raw], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `VAT_${MONTHS[month-1]}_${year}.vat`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`Exported ${MONTHS[month-1]} ${year}`, 'success');
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function showToast(msg, type='info') {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2800);
+}
+
+/* ============================================================
+   INTEGRATION BRIDGE
+   When returning from vatable_sales.html, read session data
+   and save it back to the monthly slot.
+============================================================ */
+async function checkReturnFromTracker() {
+  const key  = sessionStorage.getItem('VAT_MONTHLY_CONTEXT_KEY');
+  const yr   = sessionStorage.getItem('VAT_MONTHLY_CONTEXT_YEAR');
+  const mo   = sessionStorage.getItem('VAT_MONTHLY_CONTEXT_MONTH');
+  const role = sessionStorage.getItem('VAT_MONTHLY_CONTEXT_ROLE');
+
+  if (!key || !yr || !mo) {
+    // Even without a context key, sync any data vatable_sales.html
+    // may have written directly to localStorage (e.g. autosave on another tab)
+    syncAllLocalMeta();
+    return;
+  }
+  if (role !== APP_ROLE) return;
+
+  // Sync all local meta first — this covers the data written to the monthly key
+  syncAllLocalMeta();
+
+  // Also explicitly save via the API path if online (to push to DB / other computers)
+  const rawSession = localStorage.getItem(key);
+  if (rawSession) {
+    try {
+      const session = JSON.parse(rawSession);
+      const tableData = session.tableData || (Array.isArray(session) ? session : null);
+      if (tableData) {
+        await saveMonthData(parseInt(yr), parseInt(mo), {
+          tableData,
+          companyInfo: session.companyInfo || {}
+        });
+        showToast(`Saved data for ${MONTHS[parseInt(mo)-1]} ${yr}`, 'success');
+      }
+    } catch(e) {
+      console.error('Failed to parse session data:', e);
+    }
+  }
+
+  // Clear context
+  sessionStorage.removeItem('VAT_MONTHLY_CONTEXT_KEY');
+  sessionStorage.removeItem('VAT_MONTHLY_CONTEXT_YEAR');
+  sessionStorage.removeItem('VAT_MONTHLY_CONTEXT_MONTH');
+  sessionStorage.removeItem('VAT_MONTHLY_CONTEXT_LABEL');
+
+  // Set the selected period to what was just edited
+  selectedYear  = parseInt(yr);
+  selectedMonth = parseInt(mo);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+
+let pollingInterval = null;
+let _isPolling = false;
+
+function startPolling() {
+  if (pollingInterval) clearInterval(pollingInterval);
+  
+  pollingInterval = setInterval(async () => {
+    // Only poll if API is online, tab is visible, and not already polling
+    if (USE_API && authToken && document.visibilityState === 'visible' && !_isPolling) {
+      _isPolling = true;
+      try {
+        console.log('Polling: Refreshing data...');
+        await refreshYearFromAPI(selectedYear);
+        // Only re-render if we're not in the middle of an update
+        if (!_isUpdating) {
+          await renderRecordsGrid();
+          await renderMonthGrid();
+        }
+      } catch(e) {
+        console.warn('Polling error:', e);
+      } finally {
+        _isPolling = false;
+      }
+    }
+  }, 30000); // 30 seconds
+}
+
+function stopPolling() {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkBackend();
+  await syncVatToMonthly();
+  await checkReturnFromTracker();
+
+  /* ── Identity badges ─────────────────────────────────────────
+     Rules (strict, no cross-contamination):
+
+     Sub-Admin/monthly_record.html (own page, _saReadOnly=false):
+       → ONLY show SA badge.  Clear any stale VAT_TRACKER_VIEWING_CLIENT
+         that may linger from a previous client-view navigation.
+
+     Sub-Admin/monthly_record.html (client-view, _saReadOnly=true):
+       → Show SA badge › Client badge.
+
+     Client/monthly_record.html:
+       → ONLY show Client badge.
+  ────────────────────────────────────────────────────────────── */
+  (function() {
+    let vatSession = null;
+    try { vatSession = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null'); } catch(e) {}
+    const loggedInUser = vatSession?.username || '';
+
+    const strip   = document.getElementById('identityStrip');
+    const saBadge = document.getElementById('subAdminBadge');
+    const saLabel = document.getElementById('subAdminBadgeLabel');
+    const clBadge = document.getElementById('clientBadge');
+    const clLabel = document.getElementById('clientBadgeLabel');
+    const sep     = document.getElementById('identitySep');
+
+    if (APP_ROLE === 'SubAdmin') {
+      if (_saReadOnly && _saClientName) {
+        // Sub-Admin viewing a client's monthly records (read-only mode)
+        const saName = loggedInUser;
+        if (saName) { saLabel.textContent = saName; saBadge.classList.remove('hidden'); }
+        clLabel.textContent = _saClientName;
+        clBadge.classList.remove('hidden');
+        if (saName) sep.classList.remove('hidden');
+        strip.style.display = 'flex';
+      } else {
+        // Sub-Admin on their OWN monthly records.
+        // Clear any stale client-view keys so they don't contaminate this view.
+        sessionStorage.removeItem('VAT_TRACKER_VIEWING_CLIENT');
+        sessionStorage.removeItem('VAT_TRACKER_READONLY');
+        sessionStorage.removeItem('VAT_TRACKER_READONLY_USER');
+
+        const saName = loggedInUser;
+        if (saName) {
+          saLabel.textContent = saName;
+          saBadge.classList.remove('hidden');
+          strip.style.display = 'flex';
+        }
+      }
+
+    } else if (APP_ROLE === 'Client') {
+      // Client's own monthly records — show ONLY the client badge.
+      const clName = loggedInUser;
+      if (clName) {
+        clLabel.textContent = clName;
+        clBadge.classList.remove('hidden');
+        strip.style.display = 'flex';
+      }
+    }
+  })();
+
+  // ── Start real-time SSE sync (only when API is online)
+  // Wait a moment for the token to be fully available
+  setTimeout(() => {
+    if (USE_API && authToken) {
+      console.log('Starting SSE connection...');
+      connectSSE();
+    } else {
+      console.log('SSE not started - API not ready yet, will retry');
+      // Retry after 2 seconds
+      setTimeout(() => {
+        if (USE_API && authToken) {
+          connectSSE();
+        } else {
+          console.warn('SSE could not be established - API unavailable');
+        }
+      }, 2000);
+    }
+  }, 500);
+  // Re-connect SSE whenever the tab becomes visible again
+  // (browsers close EventSource connections when the tab is backgrounded)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && USE_API && !_sseSource) {
+      connectSSE();
+    }
+  });
+
+  // ── Year navigation
+  document.getElementById('yearPrevBtn').addEventListener('click', () => {
+    selectedYear--; updateAll();
+  });
+  document.getElementById('yearNextBtn').addEventListener('click', () => {
+    selectedYear++; updateAll();
+  });
+  document.getElementById('yearTodayBtn').addEventListener('click', () => {
+    selectedYear  = new Date().getFullYear();
+    selectedMonth = new Date().getMonth() + 1;
+    updateAll();
+  });
+
+  // ── Header buttons
+  document.getElementById('openSelectedBtn').addEventListener('click', () => {
+    triggerOpenOverlay(selectedYear, selectedMonth);
+  });
+  document.getElementById('exportYearBtn').addEventListener('click', exportYearSummary);
+
+  // ── Hero buttons
+  document.getElementById('heroOpenBtn').addEventListener('click', () => {
+    triggerOpenOverlay(selectedYear, selectedMonth);
+  });
+  document.getElementById('heroExportBtn').addEventListener('click', () => {
+    exportMonthData(selectedYear, selectedMonth);
+  });
+
+  // ── Sort / View All
+  document.getElementById('sortBtn').addEventListener('click', function() {
+    newestFirst = !newestFirst;
+    this.innerHTML = `<i class="fas fa-sort"></i> ${newestFirst ? 'Newest First' : 'Oldest First'}`;
+    renderRecordsGrid();
+  });
+  document.getElementById('viewAllYearsBtn').addEventListener('click', function() {
+    showAllYears = !showAllYears;
+    this.innerHTML = `<i class="fas fa-layer-group"></i> ${showAllYears ? 'Current Year' : 'All Years'}`;
+    renderRecordsGrid();
+  });
+
+  // ── Search
+  document.getElementById('searchInput').addEventListener('input', () => renderRecordsGrid());
+
+  // ── Close overlays on backdrop click
+  document.getElementById('openOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeOpenOverlay();
+  });
+  document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirm();
+  });
+
+  // ── Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeOpenOverlay(); closeConfirm(); }
+  });
+
+  // ── Sync any raw session data vatable_sales.html wrote to localStorage
+  //    before this page opened (meta keys may be missing or stale)
+  syncAllLocalMeta();
+
+  // ── Listen for same-browser live writes from vatable_sales.html
+  //    (fires when another tab in the same browser writes to localStorage)
+  window.addEventListener('storage', (e) => {
+    if (!e.key) return;
+    const prefix = `VAT_MONTHLY_${APP_USER_ID}_${APP_ROLE}_`;
+    const metaPrefix = `VAT_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`;
+    // Only react to data keys, not meta keys (avoid infinite loop)
+    if (!e.key.startsWith(prefix) || e.key.startsWith(metaPrefix)) return;
+    const changed = syncAllLocalMeta();
+    if (changed) {
+      renderMonthGrid();
+      renderTimeline();
+      renderYearStats();
+      renderRecordsGrid();
+      // Refresh hero if the updated month is currently selected
+      const suffix = e.key.slice(prefix.length).split('_');
+      if (suffix.length === 2) {
+        const yr = parseInt(suffix[0]), mo = parseInt(suffix[1]);
+        if (yr === selectedYear && mo === selectedMonth) renderHero();
+      }
+    }
+  });
+
+  // ── Initial render
+  updateAll();
+  startPolling();
+
+  // ── Full refresh when navigating back (bfcache restore included)
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted || performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
+      updateAll();
+      if (USE_API && !_sseSource) connectSSE();
+    }
+  });
+});
+
+/* ============================================================
+   REAL-TIME SYNC — Server-Sent Events
+============================================================ */
+let _sseSource = null;
+let _sseRetryTimer = null;
+let _lastSseUpdate = 0;
+let _sseUpdateTimer = null;
+
+async function processSseUpdate(dataStr) {
+  try {
+    const data = JSON.parse(dataStr);
+    
+    // Only refresh if we're not already updating
+    if (_isUpdating) {
+      console.log('SSE: Update deferred - UI is already updating');
+      return;
+    }
+    
+    // Clear cache for this year to force fresh fetch
+    const cacheKey = `meta_${data.year}_${APP_ROLE}`;
+    if (typeof _metaRequestCache !== 'undefined') {
+      _metaRequestCache.delete(cacheKey);
+    }
+    
+    // Refresh the current view if the update affects current year
+    if (data.year === selectedYear) {
+      if (typeof refreshYearFromAPI === 'function') await refreshYearFromAPI(selectedYear);
+      if (typeof renderMonthGrid === 'function') await renderMonthGrid();
+      if (typeof renderTimeline === 'function') await renderTimeline();
+      if (typeof renderRecordsGrid === 'function') await renderRecordsGrid();
+      if (typeof renderYearStats === 'function') await renderYearStats();
+      
+      // Also refresh hero if the updated month is selected
+      if (data.year === selectedYear && data.month === selectedMonth && typeof renderHero === 'function') {
+        await renderHero();
+      }
+    } else if (data.year) {
+      // If it's a different year, just update the year selector availability
+      if (typeof renderYearStats === 'function') await renderYearStats();
+    }
+    if (typeof showToast === 'function') {
+      showToast(`Updated: ${MONTHS[data.month-1]} ${data.year} (${data.rowCount} entries)`, 'success');
+    }
+  } catch(err) {
+    console.error('SSE: Failed to process update', err);
+  }
+}
+
+function connectSSE() {
+  if (!USE_API) {
+    console.log('SSE: API not available, skipping');
+    return;
+  }
+  
+  if (!authToken) {
+    console.log('SSE: No auth token yet, will retry');
+    setTimeout(() => connectSSE(), 2000);
+    return;
+  }
+  
+  if (_sseSource) {
+    try {
+      _sseSource.close();
+    } catch(e) {}
+    _sseSource = null;
+  }
+  
+  // Use the authToken directly (it should be the JWT string)
+  const url = `${API_BASE}/monthly-records/stream?token=${encodeURIComponent(authToken)}`;
+  console.log('SSE: Connecting to', url);
+  _sseSource = new EventSource(url);
+  
+  _sseSource.addEventListener('connected', () => {
+    console.log('SSE: Connected successfully');
+    const pill = document.getElementById('backendPill');
+    const text = document.getElementById('backendPillText');
+    if (pill) { pill.className = 'backend-pill online'; }
+    if (text) { text.textContent = 'Live Sync'; }
+  });
+
+  // Add the update event listener
+  _sseSource.addEventListener('update', async (e) => {
+    console.log('SSE: Received update', e.data);
+    
+    // Debounce SSE updates - don't process more than one per second
+    const now = Date.now();
+    if (now - _lastSseUpdate < 1000) {
+      console.log('SSE: Debouncing rapid update');
+      if (_sseUpdateTimer) clearTimeout(_sseUpdateTimer);
+      _sseUpdateTimer = setTimeout(async () => {
+        _sseUpdateTimer = null;
+        await processSseUpdate(e.data);
+      }, 1000);
+      return;
+    }
+    _lastSseUpdate = now;
+    
+    await processSseUpdate(e.data);
+  });
+
+  _sseSource.onerror = (err) => {
+    console.error('SSE: Connection error', err);
+    if (_sseSource) {
+      try {
+        _sseSource.close();
+      } catch(e) {}
+      _sseSource = null;
+    }
+    // Retry after 5 seconds
+    setTimeout(() => connectSSE(), 5000);
+  };
+}
+
+// Add cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+  if (_sseSource) {
+    _sseSource.close();
+    _sseSource = null;
+  }
+  if (_sseUpdateTimer) {
+    clearTimeout(_sseUpdateTimer);
+    _sseUpdateTimer = null;
+  }
+  if (typeof _refreshDebounceTimer !== 'undefined' && _refreshDebounceTimer) {
+    clearTimeout(_refreshDebounceTimer);
+    _refreshDebounceTimer = null;
+  }
+});
+
+/* ============================================================
+   INJECT INTEGRATION SNIPPET INTO vatable_sales.html (runtime patch)
+   This adds a "Save to Monthly" button and auto-save hook.
+   The actual hook runs inside vatable_sales.html by reading
+   sessionStorage before/after navigation.
+   ──────────────────────────────────────────────────────────
+   The design is non-destructive: vatable_sales.html does not
+   need to be modified. On load, it checks sessionStorage for
+   VAT_MONTHLY_CONTEXT_KEY. If present, it pre-populates the
+   session table from that key instead of VAT_SESSION_TABLE_*.
+   A MutationObserver or beforeunload event syncs back.
+   ──────────────────────────────────────────────────────────
+   The "bridge" below generates a self-contained script tag
+   that can optionally be appended to vatable_sales.html.
+   For now, we handle it via sessionStorage handshake only.
+============================================================ */
+</script>
+
+<!-- TAURI INTEGRATION NOTE:
+  When running inside Tauri, window.__TAURI__ is defined.
+  The monthly record system uses:
+    - localStorage  : primary data store (works offline)
+    - FastAPI /api/monthly-records : SQLite-backed persistence (when online)
+  
+  FastAPI endpoint contract expected:
+    POST   /api/monthly-records          → { year, month, data, meta }
+    GET    /api/monthly-records/:year/:mm → { data, meta }
+    DELETE /api/monthly-records/:year/:mm
+    GET    /api/monthly-records (list all for current user)
+-->
+</body>
+</html>

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monthly Purchase Returns Records — MGAA System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Rose / red palette — distinct from VAT blue, CAPEX teal, Taxes amber */
+  --rt-50:  #FFF1F2; --rt-100: #FFE4E6; --rt-200: #FECDD3;
+  --rt-300: #FDA4AF; --rt-400: #FB7185; --rt-500: #F43F5E;
+  --rt-600: #E11D48; --rt-700: #BE123C; --rt-800: #9F1239; --rt-900: #881337;
+  --gray-50:  #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB; --gray-400: #9CA3AF; --gray-500: #6B7280;
+  --gray-600: #4B5563; --gray-700: #374151; --gray-800: #1F2937; --gray-900: #111827;
+  --green-400: #4ADE80; --green-500: #22C55E; --green-700: #15803D;
+  --amber-400: #FBBF24;
+  --red-50: #FEF2F2; --red-400: #F87171; --red-500: #EF4444;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow:    0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.05);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,.12), 0 8px 16px rgba(0,0,0,.06);
+  --font: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --tr: 0.22s cubic-bezier(.4,0,.2,1);
+  --topbar-h: 56px;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--font); background: var(--gray-100); color: var(--gray-800); display: flex; flex-direction: column; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--rt-300); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rt-500); }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: var(--topbar-h); background: var(--rt-900);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px;
+  flex-shrink: 0; box-shadow: var(--shadow-md); z-index: 100;
+}
+.topbar-logo { width: 36px; height: 36px; background: var(--rt-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; flex-shrink: 0; }
+.topbar-brand { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: white; flex: 1; }
+.topbar-brand span { color: var(--rt-300); }
+.topbar-sub { font-size: 11px; color: var(--rt-300); font-weight: 400; display: block; margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.topbar-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; padding: 6px 13px; font-size: 12px; color: white; cursor: pointer; transition: var(--tr); font-family: var(--font); text-decoration: none; white-space: nowrap; }
+.topbar-btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.3); }
+.topbar-btn i { font-size: 11px; opacity: .85; }
+
+/* ── Identity badges ── */
+.identity-strip { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.id-badge { display: flex; align-items: center; gap: 6px; border-radius: 20px; padding: 5px 13px; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.id-badge i { font-size: 11px; flex-shrink: 0; }
+.id-badge-subadmin { background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.45); color: #c4b5fd; }
+.id-badge-client   { background: rgba(34,197,94,.18);  border: 1px solid rgba(34,197,94,.4);  color: #86efac; }
+.id-badge-sep { font-size: 11px; color: rgba(255,255,255,.3); flex-shrink: 0; }
+
+/* ─── LAYOUT ─── */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ─── LEFT PANEL ─── */
+.left-panel {
+  width: 300px; background: white; border-right: 1px solid var(--gray-200);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.left-panel-header {
+  padding: 16px 20px 14px; border-bottom: 1px solid var(--gray-100);
+  background: var(--rt-50);
+}
+.left-panel-header h3 {
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+  color: var(--rt-800); text-transform: uppercase; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 8px;
+}
+.left-panel-header h3 i { color: var(--rt-600); }
+.left-panel-body { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─── YEAR NAVIGATOR ─── */
+.year-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--rt-900); color: white; border-radius: 10px; padding: 10px 14px;
+}
+.year-display { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.year-sub { font-size: 10px; color: var(--rt-300); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+.year-btns { display: flex; gap: 6px; }
+.year-nav-btn {
+  width: 30px; height: 30px; background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2); border-radius: 6px;
+  color: white; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; transition: var(--tr);
+}
+.year-nav-btn:hover { background: rgba(255,255,255,.25); }
+
+/* ─── MONTH GRID ─── */
+.month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.month-btn {
+  padding: 10px 6px; border: 1.5px solid var(--gray-100); border-radius: 8px;
+  background: white; cursor: pointer; text-align: center; transition: var(--tr);
+  font-family: var(--font); position: relative; overflow: hidden;
+}
+.month-btn:hover { border-color: var(--rt-300); background: var(--rt-50); transform: translateY(-1px); box-shadow: var(--shadow); }
+.month-btn.selected { border-color: var(--rt-500); background: var(--rt-600); color: white; box-shadow: var(--shadow-md); }
+.month-btn.current-month { border-color: var(--green-400); }
+.month-btn.has-data::after {
+  content: ''; position: absolute; top: 6px; right: 6px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green-500);
+}
+.month-btn.selected.has-data::after { background: rgba(255,255,255,.9); }
+.month-btn-name { font-size: 12px; font-weight: 600; color: inherit; }
+.month-btn.selected .month-btn-name { color: white; }
+.month-btn-count { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+.month-btn.selected .month-btn-count { color: rgba(255,255,255,.7); }
+
+/* ─── QUICK STATS ─── */
+.quick-stats { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px 14px; }
+.qs-title { font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.qs-title i { color: var(--rt-500); }
+.qs-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; }
+.qs-label { color: var(--gray-500); }
+.qs-value { font-weight: 700; color: var(--gray-800); font-family: monospace; }
+.qs-divider { height: 1px; background: var(--gray-200); margin: 8px 0; }
+
+/* ─── SEARCH ─── */
+.search-box { position: relative; }
+.search-box input {
+  width: 100%; padding: 8px 10px 8px 32px; border: 1.5px solid var(--gray-200);
+  border-radius: 7px; font-family: var(--font); font-size: 12px; color: var(--gray-800);
+  transition: var(--tr); background: var(--gray-50);
+}
+.search-box input:focus { outline: none; border-color: var(--rt-400); box-shadow: 0 0 0 3px rgba(244,63,94,.12); background: white; }
+.search-box i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 11px; pointer-events: none; }
+
+/* ─── MAIN ─── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+.content-header {
+  background: white; border-bottom: 1px solid var(--gray-200);
+  padding: 14px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm);
+}
+.content-header-left h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--rt-900); }
+.content-header-left p { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; transition: var(--tr); border: 1px solid transparent; white-space: nowrap; text-decoration: none; }
+.btn i { font-size: 11px; }
+.btn-primary { background: var(--rt-600); color: white; border-color: var(--rt-600); }
+.btn-primary:hover { background: var(--rt-700); box-shadow: var(--shadow); }
+.btn-secondary { background: white; color: var(--gray-700); border-color: var(--gray-200); }
+.btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.btn-danger-soft { background: var(--red-50); color: var(--red-500); border-color: #FECACA; }
+.btn-danger-soft:hover { background: #FECACA; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.content-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* ─── HERO ─── */
+.month-hero {
+  background: linear-gradient(135deg, var(--rt-900) 0%, var(--rt-700) 100%);
+  border-radius: 14px; padding: 28px 32px; position: relative; overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+.month-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.month-hero-orb {
+  position: absolute; border-radius: 50%; filter: blur(50px); opacity: .2;
+  width: 280px; height: 280px; background: var(--rt-300); right: -80px; top: -80px;
+  animation: orbDrift 12s ease-in-out infinite;
+}
+@keyframes orbDrift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,20px)} }
+.month-hero-content { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.month-hero-badge { font-size: 10px; font-weight: 700; color: var(--rt-300); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.month-hero-title { font-family: var(--font-display); font-size: 2.4rem; font-weight: 800; color: white; line-height: 1; letter-spacing: -1px; margin-bottom: 6px; }
+.month-hero-sub { font-size: 13px; color: rgba(255,255,255,.6); }
+.month-hero-stats { display: flex; gap: 24px; }
+.hero-stat { text-align: right; }
+.hero-stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: white; }
+.hero-stat-label { font-size: 10px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .8px; margin-top: 2px; }
+.month-hero-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hero-open-btn {
+  background: white; color: var(--rt-800); border: none; border-radius: 9px;
+  padding: 11px 24px; font-family: var(--font-display); font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 8px;
+  letter-spacing: -.2px; box-shadow: 0 4px 16px rgba(0,0,0,.2);
+}
+.hero-open-btn:hover { background: var(--rt-50); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.hero-open-btn i { color: var(--rt-600); }
+.hero-export-btn {
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+  color: white; border-radius: 9px; padding: 10px 18px;
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 7px;
+}
+.hero-export-btn:hover { background: rgba(255,255,255,.22); }
+
+/* ─── STATUS BADGES ─── */
+.status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+.status-active { background: rgba(34,197,94,.15); color: #86efac; border: 1px solid rgba(34,197,94,.25); }
+.status-empty  { background: rgba(255,255,255,.1); color: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.15); }
+
+/* ─── SECTION TITLE ─── */
+.section-title { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+.section-title i { color: var(--rt-500); }
+
+/* ─── RECORDS GRID ─── */
+.records-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.record-card {
+  background: white; border: 1.5px solid var(--gray-200); border-radius: 11px;
+  padding: 16px; cursor: pointer; transition: var(--tr); position: relative; overflow: hidden;
+}
+.record-card:hover { border-color: var(--rt-300); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.record-card.selected-card { border-color: var(--rt-500); box-shadow: 0 0 0 3px rgba(244,63,94,.15); }
+.record-card.has-data-card { border-left: 4px solid var(--green-500); }
+.record-card-month { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--rt-900); margin-bottom: 4px; }
+.record-card-year  { font-size: 11px; color: var(--gray-400); font-weight: 500; }
+.record-card-rows  { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gray-600); margin-top: 10px; }
+.record-card-rows i { color: var(--rt-500); font-size: 11px; }
+.record-card-gross { font-size: 13px; font-weight: 700; color: var(--gray-800); font-family: monospace; margin-top: 4px; }
+.record-card-date  { font-size: 10px; color: var(--gray-400); margin-top: 6px; }
+.record-card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 4px; opacity: 0; transition: var(--tr); }
+.record-card:hover .record-card-actions { opacity: 1; }
+.rc-action-btn { background: white; border: 1px solid var(--gray-200); border-radius: 5px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--gray-500); transition: var(--tr); }
+.rc-action-btn:hover { background: var(--red-50); border-color: #FECACA; color: var(--red-500); }
+.rc-action-btn.open-btn:hover { background: var(--rt-50); border-color: var(--rt-200); color: var(--rt-600); }
+.record-card-new { border-style: dashed; border-color: var(--rt-200); background: var(--rt-50); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px; }
+.record-card-new i { font-size: 20px; color: var(--rt-300); margin-bottom: 6px; }
+.record-card-new span { font-size: 12px; color: var(--rt-600); font-weight: 500; }
+
+/* ─── TIMELINE ─── */
+.timeline-row { display: flex; gap: 4px; align-items: stretch; overflow-x: auto; padding-bottom: 4px; }
+.timeline-month {
+  flex-shrink: 0; width: 56px; border-radius: 8px; padding: 8px 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: var(--tr); border: 1.5px solid var(--gray-200); background: white;
+}
+.timeline-month:hover { border-color: var(--rt-400); transform: translateY(-2px); box-shadow: var(--shadow); }
+.timeline-month.tm-selected { border-color: var(--rt-500); background: var(--rt-600); }
+.timeline-month.tm-has-data { border-bottom: 3px solid var(--green-500); }
+.timeline-month.tm-selected.tm-has-data { border-bottom-color: rgba(255,255,255,.6); }
+.tm-abbr { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); }
+.timeline-month.tm-selected .tm-abbr { color: rgba(255,255,255,.7); }
+.tm-bar { width: 6px; border-radius: 3px; background: var(--gray-200); min-height: 20px; max-height: 50px; transition: var(--tr); }
+.timeline-month.tm-has-data .tm-bar { background: var(--green-400); }
+.timeline-month.tm-selected .tm-bar { background: rgba(255,255,255,.3); }
+.timeline-month.tm-selected.tm-has-data .tm-bar { background: rgba(255,255,255,.7); }
+.tm-label { font-size: 9px; color: var(--gray-400); text-align: center; }
+.timeline-month.tm-selected .tm-label { color: rgba(255,255,255,.6); }
+
+/* ─── BACKEND PILL ─── */
+.backend-pill { display: flex; align-items: center; gap: 5px; font-size: 10px; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,.15); }
+.backend-pill.online   { background: rgba(34,197,94,.15);  color: #86efac; }
+.backend-pill.offline  { background: rgba(239,68,68,.15);  color: #fca5a5; }
+.backend-pill.checking { background: rgba(251,191,36,.15); color: #fde68a; }
+.bp-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.online  .bp-dot { background: #22c55e; animation: bpulse 2s infinite; }
+.offline .bp-dot { background: #ef4444; }
+.checking .bp-dot { background: #fbbf24; animation: bpulse 1s infinite; }
+@keyframes bpulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+/* ─── EMPTY STATE ─── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+.empty-state i { font-size: 3rem; display: block; margin-bottom: 14px; opacity: .3; }
+.empty-state h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--gray-500); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; bottom: 20px; right: 20px; background: white; border: 1px solid var(--gray-200); border-left: 4px solid var(--rt-500); border-radius: 8px; padding: 10px 16px; font-size: 13px; color: var(--gray-700); box-shadow: var(--shadow-lg); z-index: 9999; animation: toastIn .2s ease; pointer-events: none; }
+.toast.success { border-left-color: var(--green-500); }
+.toast.error   { border-left-color: var(--red-500); }
+.toast.warning { border-left-color: var(--amber-400); }
+@keyframes toastIn { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+.toast.out { opacity: 0; transform: translateY(8px); transition: .25s; }
+
+/* ─── MODAL ─── */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 9000; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.modal-backdrop.show { opacity: 1; pointer-events: all; }
+.modal { background: white; border-radius: 14px; width: 90%; max-width: 400px; box-shadow: var(--shadow-xl); transform: translateY(20px) scale(.97); transition: transform .2s; overflow: hidden; }
+.modal-backdrop.show .modal { transform: translateY(0) scale(1); }
+.modal-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--gray-100); }
+.modal-header h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--rt-900); display: flex; align-items: center; gap: 8px; }
+.modal-body   { padding: 16px 20px; font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.modal-footer { padding: 14px 20px; border-top: 1px solid var(--gray-100); display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ─── OPEN OVERLAY ─── */
+.open-overlay { position: fixed; inset: 0; background: rgba(14,30,70,.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 8000; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.open-overlay.show { opacity: 1; pointer-events: all; }
+.open-card { background: white; border-radius: 18px; padding: 32px; max-width: 420px; width: 90%; box-shadow: var(--shadow-xl); transform: scale(.9); transition: transform .3s cubic-bezier(.34,1.56,.64,1); text-align: center; }
+.open-overlay.show .open-card { transform: scale(1); }
+.open-icon { width: 72px; height: 72px; background: var(--rt-50); border: 2px solid var(--rt-200); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--rt-600); margin: 0 auto 16px; }
+.open-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: var(--rt-900); margin-bottom: 6px; }
+.open-sub { font-size: 13px; color: var(--gray-500); margin-bottom: 22px; line-height: 1.5; }
+.open-meta { background: var(--rt-50); border: 1px solid var(--rt-100); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; text-align: left; }
+.open-meta-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.open-meta-label { color: var(--gray-500); font-weight: 500; }
+.open-meta-value { color: var(--rt-800); font-weight: 700; font-family: monospace; }
+.open-actions { display: flex; gap: 10px; justify-content: center; }
+.open-cancel-btn { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); border-radius: 9px; padding: 10px 20px; font-family: var(--font); font-size: 13px; cursor: pointer; transition: var(--tr); }
+.open-cancel-btn:hover { background: var(--gray-50); }
+.open-go-btn { background: var(--rt-600); color: white; border: none; border-radius: 9px; padding: 10px 28px; font-family: var(--font-display); font-size: 14px; font-weight: 800; cursor: pointer; transition: var(--tr); display: flex; align-items: center; gap: 8px; }
+.open-go-btn:hover { background: var(--rt-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* ─── FILE TYPE BADGE ─── */
+.rt-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--rt-50); border: 1px solid var(--rt-200); color: var(--rt-700); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.rt-badge i { font-size: 10px; }
+
+/* ─── FOOTER ─── */
+.footer { background: var(--rt-900); color: var(--rt-300); text-align: center; padding: 10px 20px; font-size: 11px; flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  .left-panel { width: 260px; }
+  .month-hero-title { font-size: 1.8rem; }
+  .records-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+}
+@media (max-width: 700px) { .left-panel { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo"><i class="fas fa-undo-alt"></i></div>
+  <div style="flex:1">
+    <div class="topbar-brand">Monthly Purchase <span>Returns Records</span></div>
+    <span class="topbar-sub">MGAA Purchase Returns Tracking System v1.0</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="backend-pill checking" id="backendPill"><div class="bp-dot"></div><span id="backendPillText">Connecting…</span></div>
+    <!-- Identity strip: role-specific badges -->
+    <div class="identity-strip" id="identityStrip" style="display:none">
+      <div class="id-badge id-badge-subadmin hidden" id="subAdminBadge"><i class="fas fa-user-shield"></i><span id="subAdminBadgeLabel">—</span></div>
+      <span class="id-badge-sep hidden" id="identitySep">›</span>
+      <div class="id-badge id-badge-client hidden" id="clientBadge"><i class="fas fa-user"></i><span id="clientBadgeLabel">—</span></div>
+    </div>
+    <a href="../index.html" class="topbar-btn"><i class="fas fa-home"></i> Portal</a>
+    <a href="purchase_returns.html" class="topbar-btn"><i class="fas fa-table-list"></i> Current Tracker</a>
+    <a href="Graphical_Analysis.html" class="topbar-btn"><i class="fas fa-chart-line"></i> Graphical Analysis</a>
+    <a href="index2.html" class="topbar-btn"><i class="fas fa-gauge"></i> Dashboard</a>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-panel-header">
+    <h3><i class="fas fa-sliders"></i> Controls</h3>
+  </div>
+  <div class="left-panel-body">
+
+    <!-- Year Navigator -->
+    <div class="year-nav">
+      <div>
+        <div class="year-display" id="yearDisplay">2026</div>
+        <div class="year-sub">Fiscal Year</div>
+      </div>
+      <div class="year-btns">
+        <button class="year-nav-btn" id="yearPrevBtn"  title="Previous year"><i class="fas fa-chevron-left"></i></button>
+        <button class="year-nav-btn" id="yearTodayBtn" title="Current year"><i class="fas fa-crosshairs"></i></button>
+        <button class="year-nav-btn" id="yearNextBtn"  title="Next year"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Month Grid -->
+    <div class="month-grid" id="monthGrid"></div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="qs-title"><i class="fas fa-chart-bar"></i> Year Summary</div>
+      <div class="qs-row"><span class="qs-label">Months with data</span><span class="qs-value" id="qsActiveMonths">—</span></div>
+      <div class="qs-row"><span class="qs-label">Total entries</span><span class="qs-value" id="qsTotalEntries">—</span></div>
+      <div class="qs-divider"></div>
+      <div class="qs-row"><span class="qs-label">Gross Returns (YTD)</span><span class="qs-value" id="qsGross">—</span></div>
+      <div class="qs-row"><span class="qs-label">Net Returns (YTD)</span><span class="qs-value" id="qsNet">—</span></div>
+      <div class="qs-row"><span class="qs-label">Input Tax Return (YTD)</span><span class="qs-value" id="qsTax">—</span></div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search month or year…">
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="content-header">
+    <div class="content-header-left">
+      <h2 id="contentTitle">Monthly Purchase Returns Records</h2>
+      <p id="contentSub">Select a month to view or open its Purchase Returns Tracker</p>
+    </div>
+    <div class="header-actions">
+      <span class="rt-badge"><i class="fas fa-file-code"></i> .rpurch files</span>
+      <button class="btn btn-secondary" id="exportYearBtn"><i class="fas fa-download"></i> Export Year</button>
+      <button class="btn btn-primary"   id="openSelectedBtn" disabled><i class="fas fa-external-link-alt"></i> Open Selected</button>
+    </div>
+  </div>
+
+  <div class="content-body">
+
+    <!-- Month Hero -->
+    <div id="monthHeroWrap" style="display:none">
+      <div class="month-hero">
+        <div class="month-hero-orb"></div>
+        <div class="month-hero-content">
+          <div class="month-hero-left">
+            <div class="month-hero-badge"><i class="fas fa-calendar-check"></i> Selected Period</div>
+            <div class="month-hero-title" id="heroMonthTitle">—</div>
+            <div class="month-hero-sub"   id="heroMonthSub">No data yet for this period</div>
+            <div style="margin-top:12px">
+              <span class="status-badge" id="heroStatusBadge">
+                <i class="fas fa-circle" style="font-size:7px"></i> <span>Empty</span>
+              </span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-end">
+            <div class="month-hero-stats">
+              <div class="hero-stat"><div class="hero-stat-value" id="heroRows">0</div><div class="hero-stat-label">Entries</div></div>
+              <div class="hero-stat"><div class="hero-stat-value" id="heroGross">₱0</div><div class="hero-stat-label">Gross Returns</div></div>
+              <div class="hero-stat"><div class="hero-stat-value" id="heroTax">₱0</div><div class="hero-stat-label">Input Tax</div></div>
+            </div>
+            <div class="month-hero-actions">
+              <button class="hero-export-btn" id="heroExportBtn"><i class="fas fa-file-export"></i> Export Month</button>
+              <button class="hero-open-btn"   id="heroOpenBtn">
+                <i class="fas fa-external-link-alt"></i> Open in Returns Tracker
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div>
+      <div class="section-title" style="margin-bottom:10px">
+        <i class="fas fa-chart-gantt"></i> Year Timeline — <span id="timelineYear">2026</span>
+      </div>
+      <div class="timeline-row" id="timelineRow"></div>
+    </div>
+
+    <!-- Records Grid -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="section-title"><i class="fas fa-folder-open"></i> All Monthly Records</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-secondary" id="viewAllYearsBtn"><i class="fas fa-layer-group"></i> All Years</button>
+          <button class="btn btn-sm btn-secondary" id="sortBtn"><i class="fas fa-sort"></i> Newest First</button>
+        </div>
+      </div>
+      <div class="records-grid" id="recordsGrid"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">© 2026 MGAA Purchase Returns Monthly Records Organizer &nbsp;·&nbsp; Professional Purchase Returns Tracking System</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header"><h3><i class="fas fa-exclamation-triangle" style="color:var(--red-500)"></i> Confirm Action</h3></div>
+    <div class="modal-body"   id="confirmModalBody">Are you sure?</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary"   onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger-soft" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- OPEN OVERLAY -->
+<div class="open-overlay" id="openOverlay">
+  <div class="open-card">
+    <div class="open-icon"><i class="fas fa-folder-open"></i></div>
+    <div class="open-title" id="overlayTitle">Open Returns Tracker</div>
+    <div class="open-sub">You are about to open the Purchase Returns Tracker for this period. Existing data for this month will be loaded automatically.</div>
+    <div class="open-meta">
+      <div class="open-meta-row"><span class="open-meta-label">Period</span><span class="open-meta-value" id="overlayPeriod">—</span></div>
+      <div class="open-meta-row"><span class="open-meta-label">Entries</span><span class="open-meta-value" id="overlayEntries">—</span></div>
+      <div class="open-meta-row"><span class="open-meta-label">Storage Key</span><span class="open-meta-value" id="overlayKey" style="font-size:10px">—</span></div>
+    </div>
+    <div class="open-actions">
+      <button class="open-cancel-btn" onclick="closeOpenOverlay()"><i class="fas fa-times"></i> Cancel</button>
+      <button class="open-go-btn" id="overlayGoBtn"><i class="fas fa-external-link-alt"></i> Open Tracker</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG & CONSTANTS
+============================================================ */
+const MONTHS      = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const API_BASE = (() => {
+  if (window.RETURNS_API_BASE) return window.RETURNS_API_BASE;
+  if (window.__TAURI__) return 'http://localhost:9999/api';
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? `${window.location.protocol}//${window.location.hostname}:9999/api`
+    : '/api';
+})();
+
+let USE_API   = false;
+let authToken = null;
+
+const APP_ROLE = (function(){
+  const path = window.location.pathname;
+  if (path.includes('/Client/'))    return 'Client';
+  if (path.includes('/Sub-Admin/')) return 'SubAdmin';
+  return 'Main';
+})();
+
+/* ============================================================
+   CLIENT ID DETECTION — same pattern as monthly_taxes.html
+============================================================ */
+const APP_USER_ID = (function(){
+  // For Client role, use the actual client ID from VAT_SESSION
+  if (APP_ROLE === 'Client') {
+    try {
+      const s = sessionStorage.getItem('VAT_SESSION');
+      if (s) {
+        const p = JSON.parse(s);
+        if (p.id && p.id !== 'anon') {
+          console.log('[monthly_returns] Using client ID from session:', p.id);
+          return p.id;
+        }
+        if (p.username && p.username !== 'anon') {
+          console.log('[monthly_returns] Using client username as ID:', p.username);
+          return p.username;
+        }
+      }
+    } catch(e) {}
+    
+    // Fallback for Client: use a persistent ID unique to this client
+    const CLIENT_PERSISTENT_KEY = `MONTHLY_RETURNS_CLIENT_ID`;
+    let persistentId = localStorage.getItem(CLIENT_PERSISTENT_KEY);
+    if (!persistentId) {
+      persistentId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+      localStorage.setItem(CLIENT_PERSISTENT_KEY, persistentId);
+      console.log('[monthly_returns] Generated new client persistent ID:', persistentId);
+    }
+    return persistentId;
+  }
+  
+  // For SubAdmin role: use their own ID
+  try {
+    const s = sessionStorage.getItem('VAT_SESSION');
+    if (s) {
+      const p = JSON.parse(s);
+      if (p.id) return p.id;
+    }
+  } catch(e) {}
+  
+  return 'anon';
+})();
+
+/* ─── Storage key helpers — NOW include client ID ─── */
+function makeStorageKey(year, month) {
+  const key = `RETURNS_MONTHLY_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2, '0')}`;
+  console.log('[monthly_returns] makeStorageKey:', key);
+  return key;
+}
+
+function makeMetaKey(year, month) {
+  const key = `RETURNS_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2, '0')}`;
+  console.log('[monthly_returns] makeMetaKey:', key);
+  return key;
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+let selectedYear  = new Date().getFullYear();
+let selectedMonth = new Date().getMonth() + 1;
+let newestFirst   = true;
+let showAllYears  = false;
+
+/* ============================================================
+   BACKEND HEALTH
+============================================================ */
+async function checkBackend() {
+  const pill = document.getElementById('backendPill');
+  const text = document.getElementById('backendPillText');
+  try {
+    const r = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      USE_API = true;
+      pill.className = 'backend-pill online';
+      text.textContent = 'API Online';
+      const s = sessionStorage.getItem('RETURNS_SESSION');
+      if (s) { try { authToken = JSON.parse(s).token || null; } catch(e) {} }
+      return;
+    }
+  } catch (_) {}
+  USE_API = false;
+  pill.className = 'backend-pill offline';
+  text.textContent = 'Local Mode';
+}
+
+/* ============================================================
+   DATA LAYER
+   tableData row shape (from purchase_returns.html getTableData):
+     { returnDate, returnNumber, originalInvoice, returnMode,
+       grossReturns, remarks }
+   netReturns & inputTax are auto-calculated (grossReturns/1.12, ×0.12)
+   so they are NOT stored per row — we re-derive them for meta.
+============================================================ */
+function calcMeta(year, month, dataObj) {
+  const rows = Array.isArray(dataObj.tableData) ? dataObj.tableData : [];
+  let grossReturns = 0, netReturns = 0, inputTax = 0;
+  rows.forEach(r => {
+    const g = parseFloat(r.grossReturns) || 0;
+    grossReturns += g;
+    netReturns   += g / 1.12;
+    inputTax     += (g / 1.12) * 0.12;
+  });
+  return {
+    year, month,
+    rowCount:     rows.length,
+    grossReturns,
+    netReturns,
+    inputTax,
+    lastModified: new Date().toISOString(),
+    companyName:  dataObj.companyInfo?.name || '',
+    reportDate:   dataObj.companyInfo?.date || '',
+  };
+}
+
+async function saveMonthData(year, month, dataObj) {
+  const meta = calcMeta(year, month, dataObj);
+  localStorage.setItem(makeStorageKey(year, month), JSON.stringify(dataObj));
+  localStorage.setItem(makeMetaKey(year, month),    JSON.stringify(meta));
+  if (USE_API && authToken) {
+    try {
+      await fetch(`${API_BASE}/returns-monthly-records`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        body: JSON.stringify({ year, month, data: dataObj, meta }),
+      });
+    } catch (_) {}
+  }
+  return meta;
+}
+
+async function loadMonthData(year, month) {
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(
+        `${API_BASE}/returns-monthly-records/${year}/${String(month).padStart(2, '0')}`,
+        { headers: { 'Authorization': `Bearer ${authToken}` } }
+      );
+      if (r.ok) {
+        const d = await r.json();
+        localStorage.setItem(makeStorageKey(year, month), JSON.stringify(d.data));
+        localStorage.setItem(makeMetaKey(year, month),    JSON.stringify(d.meta));
+        return { data: d.data, meta: d.meta };
+      }
+    } catch (_) {}
+  }
+  const raw     = localStorage.getItem(makeStorageKey(year, month));
+  const metaRaw = localStorage.getItem(makeMetaKey(year, month));
+  if (!raw) return null;
+  try { return { data: JSON.parse(raw), meta: metaRaw ? JSON.parse(metaRaw) : null }; }
+  catch (e) { return null; }
+}
+
+async function deleteMonthData(year, month) {
+  localStorage.removeItem(makeStorageKey(year, month));
+  localStorage.removeItem(makeMetaKey(year, month));
+  if (USE_API && authToken) {
+    try {
+      await fetch(
+        `${API_BASE}/returns-monthly-records/${year}/${String(month).padStart(2, '0')}`,
+        { method: 'DELETE', headers: { 'Authorization': `Bearer ${authToken}` } }
+      );
+    } catch (_) {}
+  }
+}
+
+function getAllMonthMetaForYear(year) {
+  const result = [];
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(makeMetaKey(year, m));
+    result.push(raw ? (() => { try { return JSON.parse(raw); } catch(e) { return null; } })() : null);
+  }
+  return result;
+}
+
+function getAllStoredYears() {
+  const years = new Set();
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    const m = k && k.match(new RegExp(`RETURNS_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_(\\d{4})_`));
+    if (m) years.add(parseInt(m[1]));
+  }
+  return Array.from(years).sort((a, b) => b - a);
+}
+
+/* ─── Helpers ─── */
+function fmtPHP(n) {
+  return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+  catch (e) { return iso; }
+}
+
+/* ============================================================
+   PURCHASE RETURNS TRACKER INTEGRATION
+   sessionStorage handshake keys set before navigating to
+   purchase_returns.html:
+     RETURNS_MONTHLY_CONTEXT_KEY
+     RETURNS_MONTHLY_CONTEXT_YEAR
+     RETURNS_MONTHLY_CONTEXT_MONTH
+     RETURNS_MONTHLY_CONTEXT_ROLE
+     RETURNS_MONTHLY_CONTEXT_LABEL
+
+   purchase_returns.html bridge snippet (add to end of its
+   DOMContentLoaded handler):
+
+     // ── Monthly Returns bridge ──
+     const _retCtxKey = sessionStorage.getItem('RETURNS_MONTHLY_CONTEXT_KEY');
+     if (_retCtxKey) {
+       const _saved = localStorage.getItem(_retCtxKey);
+       if (_saved) {
+         try {
+           const _d = JSON.parse(_saved);
+           if (_d.tableData) {
+             document.getElementById('tableBody').innerHTML = '';
+             _d.tableData.forEach(rd => addRow(rd));
+             if (_d.companyInfo) setCompanyData(_d.companyInfo);
+             currentPage = 1; renderCurrentPage(); updateAllStats();
+           }
+         } catch(e) {}
+       }
+       window.addEventListener('beforeunload', () => {
+         localStorage.setItem(_retCtxKey,
+           JSON.stringify({ tableData: getTableData(), companyInfo: getCompanyData() }));
+       });
+     }
+============================================================ */
+function openMonthInTracker(year, month) {
+  // IMPORTANT: Use the actual client ID from APP_USER_ID
+  const clientId = APP_USER_ID;
+  const contextKey = `RETURNS_MONTHLY_${clientId}_${APP_ROLE}_${year}_${String(month).padStart(2, '0')}`;
+  
+  sessionStorage.setItem('RETURNS_MONTHLY_CONTEXT_KEY', contextKey);
+  sessionStorage.setItem('RETURNS_MONTHLY_CONTEXT_YEAR', String(year));
+  sessionStorage.setItem('RETURNS_MONTHLY_CONTEXT_MONTH', String(month));
+  sessionStorage.setItem('RETURNS_MONTHLY_CONTEXT_ROLE', APP_ROLE);
+  sessionStorage.setItem('RETURNS_MONTHLY_CONTEXT_CLIENT_ID', clientId);
+  
+  let label = `${MONTHS[month - 1]} ${year}`;
+  if (APP_ROLE === 'Client') {
+    try {
+      const sess = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null');
+      const clientName = sess?.username || '';
+      if (clientName) label += ` — ${clientName}`;
+    } catch(e) {}
+  }
+  sessionStorage.setItem('RETURNS_MONTHLY_CONTEXT_LABEL', label);
+  window.location.href = 'purchase_returns.html';
+}
+
+/* ============================================================
+   RETURN-FROM-TRACKER BRIDGE
+============================================================ */
+function checkReturnFromTracker() {
+  const key  = sessionStorage.getItem('RETURNS_MONTHLY_CONTEXT_KEY');
+  const yr   = sessionStorage.getItem('RETURNS_MONTHLY_CONTEXT_YEAR');
+  const mo   = sessionStorage.getItem('RETURNS_MONTHLY_CONTEXT_MONTH');
+  const role = sessionStorage.getItem('RETURNS_MONTHLY_CONTEXT_ROLE');
+
+  if (!key || !yr || !mo) return;
+  if (role !== APP_ROLE)  return;
+
+  const rawSession = localStorage.getItem(key);
+  if (rawSession) {
+    try {
+      const session = JSON.parse(rawSession);
+      if (session && session.tableData) {
+        saveMonthData(parseInt(yr), parseInt(mo), {
+          tableData:   session.tableData,
+          companyInfo: session.companyInfo || {},
+        });
+        showToast(`Saved data for ${MONTHS[parseInt(mo) - 1]} ${yr}`, 'success');
+      }
+    } catch (e) {
+      console.error('Failed to parse returns session data:', e);
+    }
+  }
+
+  sessionStorage.removeItem('RETURNS_MONTHLY_CONTEXT_KEY');
+  sessionStorage.removeItem('RETURNS_MONTHLY_CONTEXT_YEAR');
+  sessionStorage.removeItem('RETURNS_MONTHLY_CONTEXT_MONTH');
+  sessionStorage.removeItem('RETURNS_MONTHLY_CONTEXT_LABEL');
+
+  selectedYear  = parseInt(yr);
+  selectedMonth = parseInt(mo);
+}
+
+/* ============================================================
+   RENDER — MONTH GRID
+============================================================ */
+function renderMonthGrid() {
+  const now  = new Date();
+  const curY = now.getFullYear(), curM = now.getMonth() + 1;
+  const metas = getAllMonthMetaForYear(selectedYear);
+  const grid  = document.getElementById('monthGrid');
+
+  grid.innerHTML = MONTHS.map((name, i) => {
+    const m = i + 1, meta = metas[i];
+    const isSel = m === selectedMonth, isCur = selectedYear === curY && m === curM, hasData = !!meta;
+    let cls = 'month-btn';
+    if (isSel) cls += ' selected';
+    if (isCur) cls += ' current-month';
+    if (hasData) cls += ' has-data';
+    const count = hasData ? `${meta.rowCount} entr${meta.rowCount === 1 ? 'y' : 'ies'}` : 'Empty';
+    return `<button class="${cls}" data-month="${m}" title="${name} ${selectedYear}${isCur ? ' (Current)' : ''}">
+      <div class="month-btn-name">${name.slice(0, 3)}</div>
+      <div class="month-btn-count">${count}</div>
+    </button>`;
+  }).join('');
+
+  grid.querySelectorAll('.month-btn').forEach(btn =>
+    btn.addEventListener('click', () => { selectedMonth = parseInt(btn.dataset.month); updateAll(); })
+  );
+}
+
+/* ─── TIMELINE ─── */
+function renderTimeline() {
+  const metas    = getAllMonthMetaForYear(selectedYear);
+  const maxGross = Math.max(...metas.map(m => m ? m.grossReturns : 0), 1);
+  const row      = document.getElementById('timelineRow');
+  document.getElementById('timelineYear').textContent = selectedYear;
+
+  row.innerHTML = MONTHS_ABBR.map((abbr, i) => {
+    const m = i + 1, meta = metas[i];
+    const isSel = m === selectedMonth, hasData = !!meta;
+    const barH  = hasData ? Math.max(10, Math.round((meta.grossReturns / maxGross) * 50)) : 6;
+    let cls = 'timeline-month' + (isSel ? ' tm-selected' : '') + (hasData ? ' tm-has-data' : '');
+    const label = hasData ? fmtPHP(meta.grossReturns).replace('₱', '').split('.')[0] : '';
+    return `<div class="${cls}" data-month="${m}" title="${MONTHS[i]} ${selectedYear}">
+      <div class="tm-abbr">${abbr}</div>
+      <div class="tm-bar" style="height:${barH}px"></div>
+      <div class="tm-label">${label}</div>
+    </div>`;
+  }).join('');
+
+  row.querySelectorAll('.timeline-month').forEach(el =>
+    el.addEventListener('click', () => { selectedMonth = parseInt(el.dataset.month); updateAll(); })
+  );
+}
+
+/* ─── HERO ─── */
+function renderHero() {
+  const metas = getAllMonthMetaForYear(selectedYear);
+  const meta  = metas[selectedMonth - 1];
+  const label = `${MONTHS[selectedMonth - 1]} ${selectedYear}`;
+
+  document.getElementById('heroMonthTitle').textContent = label;
+  document.getElementById('contentTitle').textContent   = label;
+
+  if (meta) {
+    document.getElementById('heroMonthSub').textContent     = `Company: ${meta.companyName || '—'} · Last modified: ${fmtDate(meta.lastModified)}`;
+    document.getElementById('heroStatusBadge').className    = 'status-badge status-active';
+    document.getElementById('heroStatusBadge').innerHTML    = '<i class="fas fa-circle" style="font-size:7px"></i> Has Data';
+    document.getElementById('heroRows').textContent         = meta.rowCount;
+    document.getElementById('heroGross').textContent        = fmtPHP(meta.grossReturns);
+    document.getElementById('heroTax').textContent          = fmtPHP(meta.inputTax);
+    document.getElementById('contentSub').textContent       = `${meta.rowCount} entries · Gross Returns: ${fmtPHP(meta.grossReturns)}`;
+  } else {
+    document.getElementById('heroMonthSub').textContent     = 'No data saved for this period yet. Click "Open in Returns Tracker" to start.';
+    document.getElementById('heroStatusBadge').className    = 'status-badge status-empty';
+    document.getElementById('heroStatusBadge').innerHTML    = '<i class="fas fa-circle" style="font-size:7px"></i> Empty';
+    document.getElementById('heroRows').textContent         = '0';
+    document.getElementById('heroGross').textContent        = '₱0';
+    document.getElementById('heroTax').textContent          = '₱0';
+    document.getElementById('contentSub').textContent       = 'No entries yet for this period.';
+  }
+  document.getElementById('monthHeroWrap').style.display = '';
+}
+
+/* ─── RECORDS GRID ─── */
+function renderRecordsGrid() {
+  const grid    = document.getElementById('recordsGrid');
+  const searchQ = document.getElementById('searchInput').value.toLowerCase();
+  let records   = [];
+
+  const yearsToShow = showAllYears ? getAllStoredYears() : [selectedYear];
+  for (const yr of yearsToShow) {
+    const metas = getAllMonthMetaForYear(yr);
+    for (let i = 0; i < 12; i++) {
+      const meta = metas[i];
+      if (meta) records.push({ year: yr, month: i + 1, meta, label: `${MONTHS[i]} ${yr}` });
+    }
+  }
+
+  if (searchQ) {
+    records = records.filter(r =>
+      r.label.toLowerCase().includes(searchQ) ||
+      String(r.year).includes(searchQ) ||
+      (r.meta.companyName || '').toLowerCase().includes(searchQ)
+    );
+  }
+
+  records.sort((a, b) => newestFirst
+    ? (b.year * 100 + b.month) - (a.year * 100 + a.month)
+    : (a.year * 100 + a.month) - (b.year * 100 + b.month)
+  );
+
+  if (!records.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1">
+      <div class="empty-state">
+        <i class="fas fa-calendar-xmark"></i>
+        <h3>No records found</h3>
+        <p>${searchQ ? 'No months match your search.' : 'Open a month in the Returns Tracker to start recording data.'}</p>
+      </div>
+    </div>`;
+    return;
+  }
+
+  const newCardHtml = !showAllYears && !searchQ
+    ? `<div class="record-card record-card-new" onclick="triggerOpenOverlay(${selectedYear},${selectedMonth})">
+         <i class="fas fa-plus"></i>
+         <span>Open ${MONTHS[selectedMonth - 1]} ${selectedYear}</span>
+       </div>` : '';
+
+  grid.innerHTML = newCardHtml + records.map(r => {
+    const isSel = r.year === selectedYear && r.month === selectedMonth;
+    const cls   = `record-card has-data-card${isSel ? ' selected-card' : ''}`;
+    return `<div class="${cls}" onclick="selectCard(${r.year},${r.month})">
+      <div class="record-card-actions">
+        <button class="rc-action-btn open-btn" title="Open in Returns Tracker"
+          onclick="event.stopPropagation();triggerOpenOverlay(${r.year},${r.month})"><i class="fas fa-external-link-alt"></i></button>
+        <button class="rc-action-btn" title="Delete record"
+          onclick="event.stopPropagation();confirmDelete(${r.year},${r.month})"><i class="fas fa-trash"></i></button>
+      </div>
+      <div class="record-card-month">${MONTHS[r.month - 1]}</div>
+      <div class="record-card-year">${r.year}</div>
+      <div class="record-card-rows"><i class="fas fa-list"></i> ${r.meta.rowCount} entr${r.meta.rowCount === 1 ? 'y' : 'ies'}</div>
+      <div class="record-card-gross">${fmtPHP(r.meta.grossReturns)}</div>
+      <div class="record-card-date">Modified: ${fmtDate(r.meta.lastModified)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── YEAR STATS ─── */
+function renderYearStats() {
+  const metas = getAllMonthMetaForYear(selectedYear).filter(Boolean);
+  document.getElementById('qsActiveMonths').textContent = `${metas.length} / 12`;
+  document.getElementById('qsTotalEntries').textContent = metas.reduce((s, m) => s + (m.rowCount || 0), 0);
+  document.getElementById('qsGross').textContent        = fmtPHP(metas.reduce((s, m) => s + (m.grossReturns || 0), 0));
+  document.getElementById('qsNet').textContent          = fmtPHP(metas.reduce((s, m) => s + (m.netReturns   || 0), 0));
+  document.getElementById('qsTax').textContent          = fmtPHP(metas.reduce((s, m) => s + (m.inputTax     || 0), 0));
+  document.getElementById('yearDisplay').textContent    = selectedYear;
+}
+
+function updateAll() {
+  document.getElementById('openSelectedBtn').disabled = false;
+  renderMonthGrid();
+  renderTimeline();
+  renderHero();
+  renderRecordsGrid();
+  renderYearStats();
+}
+
+/* ============================================================
+   OPEN OVERLAY
+============================================================ */
+function triggerOpenOverlay(year, month) {
+  const meta = getAllMonthMetaForYear(year)[month - 1];
+  document.getElementById('overlayTitle').textContent   = `Open ${MONTHS[month - 1]} ${year}`;
+  document.getElementById('overlayPeriod').textContent  = `${MONTHS[month - 1]} ${year}`;
+  document.getElementById('overlayEntries').textContent = meta ? `${meta.rowCount} entries` : 'No data yet (new)';
+  document.getElementById('overlayKey').textContent     = makeStorageKey(year, month);
+  document.getElementById('overlayGoBtn').onclick       = () => { closeOpenOverlay(); openMonthInTracker(year, month); };
+  document.getElementById('openOverlay').classList.add('show');
+}
+function closeOpenOverlay() { document.getElementById('openOverlay').classList.remove('show'); }
+
+/* ============================================================
+   CONFIRM / DELETE
+============================================================ */
+function confirmDelete(year, month) {
+  document.getElementById('confirmModalBody').innerHTML =
+    `Delete all Purchase Returns data for <strong>${MONTHS[month - 1]} ${year}</strong>? This cannot be undone.`;
+  document.getElementById('confirmOkBtn').onclick = async () => {
+    await deleteMonthData(year, month);
+    closeConfirm();
+    showToast(`Deleted ${MONTHS[month - 1]} ${year}`, 'success');
+    updateAll();
+  };
+  document.getElementById('confirmModal').classList.add('show');
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('show'); }
+
+function selectCard(year, month) { selectedYear = year; selectedMonth = month; updateAll(); }
+
+/* ============================================================
+   EXPORT
+============================================================ */
+function exportYearSummary() {
+  const metas = getAllMonthMetaForYear(selectedYear).filter(Boolean);
+  if (!metas.length) { showToast('No data to export for ' + selectedYear, 'warning'); return; }
+  const header = 'Month\tEntries\tGross Returns\tNet Returns\tInput Tax Return\tCompany\tLast Modified\n';
+  const rows   = metas.map(m =>
+    `${MONTHS[m.month - 1]}\t${m.rowCount}\t${(m.grossReturns || 0).toFixed(2)}\t${(m.netReturns || 0).toFixed(2)}\t${(m.inputTax || 0).toFixed(2)}\t${m.companyName || ''}\t${m.lastModified}`
+  ).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Purchase_Returns_Year_Summary_${selectedYear}.txt`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`Exported ${metas.length} months for ${selectedYear}`, 'success');
+}
+
+function exportMonthData(year, month) {
+  const raw = localStorage.getItem(makeStorageKey(year, month));
+  if (!raw) { showToast('No data to export', 'warning'); return; }
+  const blob = new Blob([raw], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Purchase_Returns_${MONTHS[month - 1]}_${year}.rpurch`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`Exported ${MONTHS[month - 1]} ${year}`, 'success');
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function showToast(msg, type = 'info') {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2800);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkBackend();
+
+  /* ── Identity badges ─────────────────────────────────────────
+     Rules (strict, no cross-contamination):
+
+     Sub-Admin/monthly_returns.html (own page, RETURNS_TRACKER_READONLY absent):
+       → ONLY show SA badge. Clear any stale VAT_TRACKER_VIEWING_CLIENT
+         that may linger from a previous client-view navigation.
+
+     Sub-Admin/monthly_returns.html (client-view, RETURNS_TRACKER_READONLY=1):
+       → Show SA badge › Client badge: "associate1 › client1"
+
+     Client/monthly_returns.html:
+       → ONLY show Client badge.
+  ────────────────────────────────────────────────────────────── */
+  (function() {
+    const _saReadOnly   = sessionStorage.getItem('RETURNS_TRACKER_READONLY') === '1';
+    const _saClientName = sessionStorage.getItem('VAT_TRACKER_VIEWING_CLIENT') || '';
+
+    let vatSession = null;
+    try { vatSession = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null'); } catch(e) {}
+    const loggedInUser = vatSession?.username || '';
+
+    const strip   = document.getElementById('identityStrip');
+    const saBadge = document.getElementById('subAdminBadge');
+    const saLabel = document.getElementById('subAdminBadgeLabel');
+    const clBadge = document.getElementById('clientBadge');
+    const clLabel = document.getElementById('clientBadgeLabel');
+    const sep     = document.getElementById('identitySep');
+
+    if (APP_ROLE === 'SubAdmin') {
+      if (_saReadOnly && _saClientName) {
+        // Sub-Admin viewing a client's monthly purchase returns (read-only mode)
+        const saName = loggedInUser;
+        if (saName) { saLabel.textContent = saName; saBadge.classList.remove('hidden'); }
+        clLabel.textContent = _saClientName;
+        clBadge.classList.remove('hidden');
+        if (saName) sep.classList.remove('hidden');
+        strip.style.display = 'flex';
+      } else {
+        // Sub-Admin on their OWN monthly purchase returns.
+        // Clear any stale client-view keys so they don't contaminate this view.
+        sessionStorage.removeItem('VAT_TRACKER_VIEWING_CLIENT');
+        sessionStorage.removeItem('RETURNS_TRACKER_READONLY');
+        const saName = loggedInUser;
+        if (saName) {
+          saLabel.textContent = saName;
+          saBadge.classList.remove('hidden');
+          strip.style.display = 'flex';
+        }
+      }
+
+    } else if (APP_ROLE === 'Client') {
+      // Client's own monthly purchase returns — show ONLY the client badge.
+      const clName = loggedInUser;
+      if (clName) {
+        clLabel.textContent = clName;
+        clBadge.classList.remove('hidden');
+        strip.style.display = 'flex';
+      }
+    }
+  })();
+
+  checkReturnFromTracker();
+
+  document.getElementById('yearPrevBtn').addEventListener('click',  () => { selectedYear--;  updateAll(); });
+  document.getElementById('yearNextBtn').addEventListener('click',  () => { selectedYear++;  updateAll(); });
+  document.getElementById('yearTodayBtn').addEventListener('click', () => {
+    selectedYear  = new Date().getFullYear();
+    selectedMonth = new Date().getMonth() + 1;
+    updateAll();
+  });
+
+  document.getElementById('openSelectedBtn').addEventListener('click', () => triggerOpenOverlay(selectedYear, selectedMonth));
+  document.getElementById('exportYearBtn').addEventListener('click',   exportYearSummary);
+  document.getElementById('heroOpenBtn').addEventListener('click',     () => triggerOpenOverlay(selectedYear, selectedMonth));
+  document.getElementById('heroExportBtn').addEventListener('click',   () => exportMonthData(selectedYear, selectedMonth));
+
+  document.getElementById('sortBtn').addEventListener('click', function () {
+    newestFirst = !newestFirst;
+    this.innerHTML = `<i class="fas fa-sort"></i> ${newestFirst ? 'Newest First' : 'Oldest First'}`;
+    renderRecordsGrid();
+  });
+
+  document.getElementById('viewAllYearsBtn').addEventListener('click', function () {
+    showAllYears = !showAllYears;
+    this.innerHTML = `<i class="fas fa-layer-group"></i> ${showAllYears ? 'Current Year' : 'All Years'}`;
+    renderRecordsGrid();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', () => renderRecordsGrid());
+
+  document.getElementById('openOverlay').addEventListener('click',  e => { if (e.target === document.getElementById('openOverlay'))  closeOpenOverlay(); });
+  document.getElementById('confirmModal').addEventListener('click', e => { if (e.target === document.getElementById('confirmModal')) closeConfirm(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeOpenOverlay(); closeConfirm(); } });
+
+  updateAll();
+});
+</script>
+
+<!--
+  PURCHASE RETURNS INTEGRATION NOTE
+  ===================================
+  Storage keys (localStorage):
+    RETURNS_MONTHLY_Main_YYYY_MM       → { tableData, companyInfo }
+    RETURNS_MONTHLY_META_Main_YYYY_MM  → meta object
+
+  sessionStorage handshake set by monthly_returns.html:
+    RETURNS_MONTHLY_CONTEXT_KEY    — per-month localStorage key
+    RETURNS_MONTHLY_CONTEXT_YEAR   — year (string)
+    RETURNS_MONTHLY_CONTEXT_MONTH  — month 1–12 (string)
+    RETURNS_MONTHLY_CONTEXT_ROLE   — role string
+    RETURNS_MONTHLY_CONTEXT_LABEL  — e.g. "January 2026"
+
+  tableData row shape:
+    { returnDate, returnNumber, originalInvoice, returnMode,
+      grossReturns, remarks }
+  (netReturns & inputTax are auto-calculated inside purchase_returns.html)
+
+  Add the bridge snippet (see openMonthInTracker JSDoc above) to the
+  end of purchase_returns.html's DOMContentLoaded to enable
+  auto-load/save per month.
+-->
+</body>
+</html>

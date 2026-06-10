@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graphical Analysis — MGAA System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-50:  #EFF6FF; --blue-100: #DBEAFE; --blue-200: #BFDBFE;
+  --blue-300: #93C5FD; --blue-400: #60A5FA; --blue-500: #3B82F6;
+  --blue-600: #2563EB; --blue-700: #1D4ED8; --blue-800: #1E40AF;
+  --blue-900: #1E3A8A; --blue-950: #172554;
+  --gray-50: #F9FAFB;  --gray-100: #F3F4F6; --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB; --gray-400: #9CA3AF; --gray-500: #6B7280;
+  --gray-600: #4B5563; --gray-700: #374151; --gray-800: #1F2937;
+  --gray-900: #111827;
+  --green-50: #F0FDF4; --green-400: #4ADE80; --green-500: #22C55E; --green-700: #15803D;
+  --amber-50: #FFFBEB; --amber-400: #FBBF24; --amber-600: #D97706;
+  --red-50: #FEF2F2; --red-400: #F87171; --red-500: #EF4444;
+  --orange-500: #F97316; --orange-700: #C2410C;
+  --teal-500: #14B8A6; --teal-700: #0F766E;
+  --purple-500: #8B5CF6; --purple-700: #6D28D9;
+  --indigo-500: #6366F1; --indigo-700: #4338CA;
+  --rose-500: #F43F5E;   --rose-700: #BE123C;
+  --lime-500: #84CC16;   --lime-700: #4D7C0F;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow:    0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.05);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,.12), 0 8px 16px rgba(0,0,0,.06);
+  --font: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --tr: 0.22s cubic-bezier(.4,0,.2,1);
+  --topbar-h: 56px;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--font); background: var(--gray-100); color: var(--gray-800); display: flex; flex-direction: column; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--blue-300); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-500); }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: var(--topbar-h); background: var(--blue-900);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px;
+  flex-shrink: 0; box-shadow: var(--shadow-md); z-index: 100;
+}
+.topbar-logo { width: 36px; height: 36px; background: var(--purple-500); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; flex-shrink: 0; }
+.topbar-brand { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: white; flex: 1; }
+.topbar-brand span { color: var(--blue-300); }
+.topbar-sub { font-size: 11px; color: var(--blue-300); font-weight: 400; display: block; margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.topbar-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; padding: 6px 13px; font-size: 12px; color: white; cursor: pointer; transition: var(--tr); font-family: var(--font); text-decoration: none; }
+.topbar-btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.3); }
+.topbar-btn i { font-size: 11px; opacity: .85; }
+
+/* ── Identity badges ── */
+.identity-strip { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.id-badge { display: flex; align-items: center; gap: 6px; border-radius: 20px; padding: 5px 13px; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.id-badge i { font-size: 11px; flex-shrink: 0; }
+.id-badge-subadmin { background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.45); color: #c4b5fd; }
+.id-badge-client   { background: rgba(34,197,94,.18);  border: 1px solid rgba(34,197,94,.4);  color: #86efac; }
+.id-badge-sep { font-size: 11px; color: rgba(255,255,255,.3); flex-shrink: 0; }
+
+/* ─── LAYOUT ─── */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ─── LEFT PANEL ─── */
+.left-panel {
+  width: 280px; background: white; border-right: 1px solid var(--gray-200);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.left-panel-header {
+  padding: 16px 20px 14px; border-bottom: 1px solid var(--gray-100);
+  background: linear-gradient(135deg, #EDE9FE 0%, #F5F3FF 100%);
+}
+.left-panel-header h3 {
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+  color: var(--purple-700); text-transform: uppercase; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 8px;
+}
+.left-panel-header h3 i { color: var(--purple-500); }
+.left-panel-body { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─── YEAR NAVIGATOR ─── */
+.year-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--blue-900); color: white; border-radius: 10px; padding: 10px 14px;
+}
+.year-display { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.year-sub { font-size: 10px; color: var(--blue-300); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+.year-btns { display: flex; gap: 6px; }
+.year-nav-btn {
+  width: 30px; height: 30px; background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2); border-radius: 6px;
+  color: white; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; transition: var(--tr);
+}
+.year-nav-btn:hover { background: rgba(255,255,255,.25); }
+
+/* ─── DATA SOURCE TOGGLES ─── */
+.source-section { }
+.source-title { font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.source-title i { color: var(--purple-500); }
+.source-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; background: var(--gray-50); border: 1.5px solid var(--gray-200);
+  border-radius: 8px; cursor: pointer; transition: var(--tr); margin-bottom: 6px;
+}
+.source-toggle:last-child { margin-bottom: 0; }
+.source-toggle:hover { border-color: var(--purple-500); background: #FAF5FF; }
+.source-toggle.active { border-color: var(--purple-500); background: #F5F3FF; }
+.source-toggle-left { display: flex; align-items: center; gap: 10px; }
+.source-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.source-dot.sales { background: var(--blue-600); }
+.source-dot.purchases { background: var(--orange-500); }
+.source-dot.expenses { background: var(--teal-500); }
+.source-dot.npurch { background: var(--indigo-500); }
+.source-dot.nexp { background: var(--rose-500); }
+.source-dot.capex { background: var(--lime-500); }
+.source-dot.taxes { background: var(--amber-600); }
+.source-dot.returns { background: var(--red-500); }
+.source-name { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+.source-sub  { font-size: 10px; color: var(--gray-400); margin-top: 1px; }
+.source-check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent; transition: var(--tr); flex-shrink: 0; }
+.source-toggle.active .source-check { background: var(--purple-500); border-color: var(--purple-500); color: white; }
+
+/* ─── CHART TYPE TABS ─── */
+.tab-section { }
+.tab-bar { display: flex; flex-direction: column; gap: 5px; }
+.chart-type-btn {
+  display: flex; align-items: center; gap: 9px; padding: 9px 12px;
+  border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: var(--tr); border: 1.5px solid var(--gray-200);
+  background: white; color: var(--gray-600); font-family: var(--font);
+  text-align: left; width: 100%;
+}
+.chart-type-btn:hover { border-color: var(--purple-500); color: var(--purple-700); background: #FAF5FF; }
+.chart-type-btn.active { background: var(--purple-500); color: white; border-color: var(--purple-500); box-shadow: var(--shadow-sm); }
+.chart-type-btn i { font-size: 11px; width: 14px; text-align: center; }
+.chart-type-btn .btn-sub { font-size: 10px; font-weight: 400; opacity: .75; display: block; margin-top: 1px; }
+
+/* ─── QUICK STATS ─── */
+.quick-stats { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px 14px; }
+.qs-title { font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.qs-title i { color: var(--purple-500); }
+.qs-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 12px; }
+.qs-label { color: var(--gray-500); display: flex; align-items: center; gap: 5px; }
+.qs-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.qs-value { font-weight: 700; color: var(--gray-800); font-family: monospace; font-size: 11px; }
+.qs-divider { height: 1px; background: var(--gray-200); margin: 8px 0; }
+
+/* ─── MAIN ─── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+.content-header {
+  background: white; border-bottom: 1px solid var(--gray-200);
+  padding: 14px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow-sm);
+}
+.content-header-left h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--blue-900); }
+.content-header-left p { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; transition: var(--tr); border: 1px solid transparent; white-space: nowrap; text-decoration: none; }
+.btn i { font-size: 11px; }
+.btn-primary { background: var(--blue-600); color: white; border-color: var(--blue-600); }
+.btn-primary:hover { background: var(--blue-700); box-shadow: var(--shadow); }
+.btn-secondary { background: white; color: var(--gray-700); border-color: var(--gray-200); }
+.btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.btn-purple { background: var(--purple-500); color: white; border-color: var(--purple-500); }
+.btn-purple:hover { background: var(--purple-700); box-shadow: var(--shadow); }
+
+/* ─── CONTENT BODY ─── */
+.content-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+
+/* ─── KPI ROW ─── */
+.kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.kpi-card {
+  background: white; border: 1.5px solid var(--gray-200); border-radius: 11px;
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 3px;
+  transition: var(--tr);
+}
+.kpi-card:hover { box-shadow: var(--shadow-md); border-color: var(--gray-300); }
+.kpi-label { font-size: 10px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: .8px; display: flex; align-items: center; gap: 5px; }
+.kpi-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.kpi-value { font-family: var(--font-display); font-size: 1.05rem; font-weight: 800; color: var(--blue-800); margin-top: 2px; }
+.kpi-sub { font-size: 10px; color: var(--gray-400); }
+.kpi-blue .kpi-value { color: var(--blue-700); }
+.kpi-orange .kpi-value { color: var(--orange-700); }
+.kpi-teal .kpi-value { color: var(--teal-700); }
+.kpi-green .kpi-value { color: var(--green-700); }
+.kpi-red .kpi-value { color: var(--red-500); }
+.kpi-purple .kpi-value { color: var(--purple-700); }
+
+/* ─── CHART PANELS ─── */
+.chart-panel {
+  background: white; border: 1.5px solid var(--gray-200); border-radius: 14px;
+  overflow: hidden; box-shadow: var(--shadow);
+}
+.chart-panel-header {
+  padding: 14px 20px 12px; background: linear-gradient(135deg, #F5F3FF 0%, white 100%);
+  border-bottom: 1px solid var(--gray-100); display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.chart-panel-title { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--blue-900); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+.chart-panel-title i { color: var(--purple-500); }
+.chart-meta { font-size: 11px; color: var(--gray-400); display: flex; align-items: center; gap: 4px; }
+.chart-body { padding: 20px; }
+.chart-body.side-by-side { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px; }
+.chart-wrap { position: relative; width: 100%; }
+.chart-wrap canvas { width: 100% !important; }
+
+.sub-chart-label { font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+.sub-chart-label i { font-size: 9px; }
+
+/* ─── NO DATA STATE ─── */
+.no-data-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 20px; color: var(--gray-400); text-align: center; gap: 10px;
+}
+.no-data-state i { font-size: 2.5rem; opacity: .3; }
+.no-data-state p { font-size: 13px; }
+
+/* ─── LEGEND ROW ─── */
+.legend-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gray-600); }
+.legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* ─── BACKEND STATUS ─── */
+.backend-pill { display: flex; align-items: center; gap: 5px; font-size: 10px; padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,.15); }
+.backend-pill.online  { background: rgba(34,197,94,.15); color: #86efac; }
+.backend-pill.offline { background: rgba(239,68,68,.15); color: #fca5a5; }
+.backend-pill.checking{ background: rgba(251,191,36,.15); color: #fde68a; }
+.bp-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.online  .bp-dot { background: #22c55e; animation: bpulse 2s infinite; }
+.offline .bp-dot { background: #ef4444; }
+.checking .bp-dot { background: #fbbf24; animation: bpulse 1s infinite; }
+@keyframes bpulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; bottom: 20px; right: 20px; background: white; border: 1px solid var(--gray-200); border-left: 4px solid var(--purple-500); border-radius: 8px; padding: 10px 16px; font-size: 13px; color: var(--gray-700); box-shadow: var(--shadow-lg); z-index: 9999; animation: toastIn .2s ease; pointer-events: none; }
+.toast.success { border-left-color: var(--green-500); }
+.toast.error   { border-left-color: var(--red-500); }
+.toast.warning { border-left-color: var(--amber-400); }
+@keyframes toastIn { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+.toast.out { opacity: 0; transform: translateY(8px); transition: .25s; }
+
+/* ─── FOOTER ─── */
+.footer { background: var(--blue-900); color: var(--blue-300); text-align: center; padding: 10px 20px; font-size: 11px; flex-shrink: 0; }
+
+@media (max-width: 1100px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px) { .left-panel { width: 240px; } .chart-body.side-by-side { grid-template-columns: 1fr; } }
+@media (max-width: 700px) { .left-panel { display: none; } .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo"><i class="fas fa-chart-line"></i></div>
+  <div style="flex:1">
+    <div class="topbar-brand">Graphical <span>Analysis</span></div>
+    <span class="topbar-sub">MGAA VAT Tracking System v2.0</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="backend-pill checking" id="backendPill"><div class="bp-dot"></div><span id="backendPillText">Connecting…</span></div>
+    <div class="identity-strip" id="identityStrip" style="display:none">
+      <div class="id-badge id-badge-subadmin hidden" id="subAdminBadge"><i class="fas fa-user-shield"></i><span id="subAdminBadgeLabel">—</span></div>
+      <span class="id-badge-sep hidden" id="identitySep">›</span>
+      <div class="id-badge id-badge-client hidden" id="clientBadge"><i class="fas fa-user"></i><span id="clientBadgeLabel">—</span></div>
+    </div>
+    <a href="../index.html" class="topbar-btn"><i class="fas fa-home"></i> Portal</a>
+    <a href="monthly_record.html" class="topbar-btn"><i class="fas fa-chart-gantt"></i> Sales Records</a>
+    <a href="monthly_purchases.html" class="topbar-btn"><i class="fas fa-shopping-cart"></i> Purchases</a>
+    <a href="monthly_expenses.html" class="topbar-btn"><i class="fas fa-receipt"></i> Expenses</a>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-panel-header">
+    <h3><i class="fas fa-sliders"></i> Controls</h3>
+  </div>
+  <div class="left-panel-body">
+
+    <!-- Year Navigator -->
+    <div class="year-nav">
+      <div>
+        <div class="year-display" id="yearDisplay">2026</div>
+        <div class="year-sub">Fiscal Year</div>
+      </div>
+      <div class="year-btns">
+        <button class="year-nav-btn" id="yearPrevBtn" title="Previous year"><i class="fas fa-chevron-left"></i></button>
+        <button class="year-nav-btn" id="yearTodayBtn" title="Current year"><i class="fas fa-crosshairs"></i></button>
+        <button class="year-nav-btn" id="yearNextBtn" title="Next year"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="source-section">
+      <div class="source-title"><i class="fas fa-database"></i> Data Sources</div>
+      <div class="source-toggle active" id="toggleSales" data-source="sales">
+        <div class="source-toggle-left">
+          <div class="source-dot sales"></div>
+          <div>
+            <div class="source-name">VAT Sales</div>
+            <div class="source-sub">.vat files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="source-toggle active" id="togglePurchases" data-source="purchases">
+        <div class="source-toggle-left">
+          <div class="source-dot purchases"></div>
+          <div>
+            <div class="source-name">Purchases</div>
+            <div class="source-sub">.purch files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="source-toggle active" id="toggleExpenses" data-source="expenses">
+        <div class="source-toggle-left">
+          <div class="source-dot expenses"></div>
+          <div>
+            <div class="source-name">VAT Expenses</div>
+            <div class="source-sub">.exp files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="source-toggle active" id="toggleNpurch" data-source="npurch">
+        <div class="source-toggle-left">
+          <div class="source-dot npurch"></div>
+          <div>
+            <div class="source-name">Non-VAT Purchases</div>
+            <div class="source-sub">.npurch files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="source-toggle active" id="toggleNexp" data-source="nexp">
+        <div class="source-toggle-left">
+          <div class="source-dot nexp"></div>
+          <div>
+            <div class="source-name">Non-VAT Expenses</div>
+            <div class="source-sub">.nexp files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="source-toggle active" id="toggleCapex" data-source="capex">
+        <div class="source-toggle-left">
+          <div class="source-dot capex"></div>
+          <div>
+            <div class="source-name">CAPEX</div>
+            <div class="source-sub">.capex files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="source-toggle active" id="toggleTaxes" data-source="taxes">
+        <div class="source-toggle-left">
+          <div class="source-dot taxes"></div>
+          <div>
+            <div class="source-name">Taxes &amp; Licenses</div>
+            <div class="source-sub">.taxes files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="source-toggle active" id="toggleReturns" data-source="returns">
+        <div class="source-toggle-left">
+          <div class="source-dot returns"></div>
+          <div>
+            <div class="source-name">Purchase Returns</div>
+            <div class="source-sub">.rpurch files</div>
+          </div>
+        </div>
+        <div class="source-check"><i class="fas fa-check"></i></div>
+      </div>
+    </div>
+
+    <!-- Chart Type -->
+    <div class="tab-section">
+      <div class="source-title"><i class="fas fa-chart-bar"></i> Chart Type</div>
+      <div class="tab-bar">
+        <button class="chart-type-btn active" data-chart="overview">
+          <i class="fas fa-chart-bar"></i>
+          <div><span>Monthly Overview</span><span class="btn-sub">Grouped bar — all sources</span></div>
+        </button>
+        <button class="chart-type-btn" data-chart="netposition">
+          <i class="fas fa-scale-balanced"></i>
+          <div><span>Net VAT Position</span><span class="btn-sub">Output vs Input tax</span></div>
+        </button>
+        <button class="chart-type-btn" data-chart="breakdown">
+          <i class="fas fa-chart-pie"></i>
+          <div><span>Breakdown</span><span class="btn-sub">Share & tax rates</span></div>
+        </button>
+        <button class="chart-type-btn" data-chart="trend">
+          <i class="fas fa-chart-line"></i>
+          <div><span>Trend</span><span class="btn-sub">Month-over-month</span></div>
+        </button>
+        <button class="chart-type-btn" data-chart="cashflow">
+          <i class="fas fa-money-bill-trend-up"></i>
+          <div><span>Cash Flow</span><span class="btn-sub">Sales vs outflows</span></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Summary -->
+    <div class="quick-stats">
+      <div class="qs-title"><i class="fas fa-sigma"></i> YTD Summary</div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--blue-600)"></span> VAT Sales</span>
+        <span class="qs-value" id="qsSales">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--orange-500)"></span> VAT Purchases</span>
+        <span class="qs-value" id="qsPurch">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--teal-500)"></span> VAT Expenses</span>
+        <span class="qs-value" id="qsExp">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--indigo-500)"></span> Non-VAT Purch</span>
+        <span class="qs-value" id="qsNpurch">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--rose-500)"></span> Non-VAT Exp</span>
+        <span class="qs-value" id="qsNexp">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--lime-500)"></span> CAPEX</span>
+        <span class="qs-value" id="qsCapex">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--amber-600)"></span> Taxes &amp; Licenses</span>
+        <span class="qs-value" id="qsTaxes">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label"><span class="qs-dot" style="background:var(--red-500)"></span> Purchase Returns</span>
+        <span class="qs-value" id="qsReturns">—</span>
+      </div>
+      <div class="qs-divider"></div>
+      <div class="qs-row">
+        <span class="qs-label">Output Tax</span>
+        <span class="qs-value" id="qsOutputTax">—</span>
+      </div>
+      <div class="qs-row">
+        <span class="qs-label">Input Tax (net of returns)</span>
+        <span class="qs-value" id="qsInputTax">—</span>
+      </div>
+      <div class="qs-divider"></div>
+      <div class="qs-row">
+        <span class="qs-label" style="font-weight:700;color:var(--gray-700)">Net VAT Due</span>
+        <span class="qs-value" id="qsNetVat" style="color:var(--purple-700)">—</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="content-header">
+    <div class="content-header-left">
+      <h2 id="contentTitle">Graphical Analysis — <span id="headerYear">2026</span></h2>
+      <p id="contentSub">Visual overview across VAT Sales, Purchases, and Expenses</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="refreshBtn"><i class="fas fa-rotate-right"></i> Refresh</button>
+      <button class="btn btn-purple" id="exportBtn"><i class="fas fa-download"></i> Export PNG</button>
+    </div>
+  </div>
+
+  <div class="content-body" id="contentBody">
+
+    <!-- KPI Row -->
+    <div class="kpi-row" id="kpiRow">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label"><span class="kpi-dot" style="background:var(--blue-600)"></span> Peak Sales Month</div>
+        <div class="kpi-value" id="kpiPeakSales">—</div>
+        <div class="kpi-sub" id="kpiPeakSalesSub">No data</div>
+      </div>
+      <div class="kpi-card kpi-orange">
+        <div class="kpi-label"><span class="kpi-dot" style="background:var(--orange-500)"></span> Peak Purchases</div>
+        <div class="kpi-value" id="kpiPeakPurch">—</div>
+        <div class="kpi-sub" id="kpiPeakPurchSub">No data</div>
+      </div>
+      <div class="kpi-card kpi-teal">
+        <div class="kpi-label"><span class="kpi-dot" style="background:var(--teal-500)"></span> Peak Expenses</div>
+        <div class="kpi-value" id="kpiPeakExp">—</div>
+        <div class="kpi-sub" id="kpiPeakExpSub">No data</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label"><span class="kpi-dot" style="background:var(--green-500)"></span> Output Tax (YTD)</div>
+        <div class="kpi-value" id="kpiOutputTax">—</div>
+        <div class="kpi-sub" id="kpiOutputTaxSub">effective rate</div>
+      </div>
+      <div class="kpi-card kpi-orange">
+        <div class="kpi-label"><span class="kpi-dot" style="background:var(--amber-400)"></span> Input Tax (YTD)</div>
+        <div class="kpi-value" id="kpiInputTax">—</div>
+        <div class="kpi-sub" id="kpiInputTaxSub">creditable</div>
+      </div>
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-label"><span class="kpi-dot" style="background:var(--purple-500)"></span> Net VAT Due</div>
+        <div class="kpi-value" id="kpiNetVat">—</div>
+        <div class="kpi-sub" id="kpiNetVatSub">Output − Input</div>
+      </div>
+    </div>
+
+    <!-- Chart Panel -->
+    <div class="chart-panel" id="chartPanel">
+      <div class="chart-panel-header">
+        <div class="chart-panel-title" id="chartPanelTitle"><i class="fas fa-chart-bar"></i> Monthly Overview</div>
+        <div class="chart-meta" id="chartMeta">Fiscal Year <span id="chartYearLabel">2026</span></div>
+      </div>
+      <div id="chartPanelBody">
+        <!-- dynamically filled -->
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">© 2026 MGAA Graphical Analysis &nbsp;·&nbsp; VAT Sales · VAT Purchases · VAT Expenses · Non-VAT Purchases · Non-VAT Expenses · CAPEX · Taxes &amp; Licenses · Purchase Returns</div>
+
+<script>
+/* ============================================================
+   CONSTANTS
+============================================================ */
+const MONTHS      = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const API_BASE = (() => {
+  if (window.VAT_API_BASE) return window.VAT_API_BASE;
+  if (window.__TAURI__) return 'http://localhost:8000/api';
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? `${window.location.protocol}//${window.location.hostname}:8000/api`
+    : '/api';
+})();
+
+let USE_API = false;
+let authToken = null;
+
+const APP_ROLE = (function(){
+  const path = window.location.pathname;
+  if (path.includes('/Client/')) return 'Client';
+  if (path.includes('/Sub-Admin/')) return 'SubAdmin';
+  return 'Main';
+})();
+
+const APP_USER_ID = (function(){
+  try {
+    const s = sessionStorage.getItem('VAT_SESSION');
+    if (s) {
+      const p = JSON.parse(s);
+      return p.id || p.sub || p.user_id || p.username || 'anon';
+    }
+  } catch(e) {}
+  return 'anon';
+})();
+
+/* ============================================================
+   STORAGE KEY HELPERS — mirrors each sibling file exactly
+============================================================ */
+// VAT Sales:          VAT_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function salesMetaKey(year, month) {
+  return `VAT_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+// VAT Purchases:      PURCH_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function purchMetaKey(year, month) {
+  return `PURCH_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+// VAT Expenses:       EXP_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function expMetaKey(year, month) {
+  return `EXP_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+// Non-VAT Purchases:  NPURCH_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function npurchMetaKey(year, month) {
+  return `NPURCH_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+// Non-VAT Expenses:   NEXP_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function nexpMetaKey(year, month) {
+  return `NEXP_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+// CAPEX:              CAPEX_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function capexMetaKey(year, month) {
+  return `CAPEX_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+// Taxes & Licenses:   TAXES_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function taxesMetaKey(year, month) {
+  return `TAXES_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+// Purchase Returns:   RETURNS_MONTHLY_META_<uid>_<role>_<year>_<MM>
+function returnsMetaKey(year, month) {
+  return `RETURNS_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_${year}_${String(month).padStart(2,'0')}`;
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+let selectedYear = new Date().getFullYear();
+let activeChart  = 'overview';
+let sourcesOn    = { sales: true, purchases: true, expenses: true, npurch: true, nexp: true, capex: true, taxes: true, returns: true };
+
+/* ============================================================
+   BACKEND HEALTH
+============================================================ */
+async function checkBackend() {
+  const pill = document.getElementById('backendPill');
+  const text = document.getElementById('backendPillText');
+  try {
+    const r = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      USE_API = true;
+      pill.className = 'backend-pill online'; text.textContent = 'API Online';
+      const session = sessionStorage.getItem('VAT_SESSION');
+      if (session) { try { const p = JSON.parse(session); authToken = p.token || p.access_token || p._token || null; } catch(e){} }
+      return;
+    }
+  } catch(_) {}
+  USE_API = false;
+  pill.className = 'backend-pill offline'; text.textContent = 'Local Mode';
+}
+
+/* ============================================================
+   DATA FETCHERS
+   Each returns a 12-element array (index = month-1), null = no data.
+   Priority: localStorage first (mirrors sibling pages), API fallback.
+============================================================ */
+async function fetchSalesMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(salesMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-records?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+async function fetchPurchMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(purchMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-purchases?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+async function fetchExpMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(expMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-expenses?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+async function fetchNpurchMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(npurchMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-npurch?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+async function fetchNexpMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(nexpMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-nexp?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+async function fetchCapexMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(capexMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-capex?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+async function fetchTaxesMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(taxesMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-taxes?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+async function fetchReturnsMetas(year) {
+  const result = Array(12).fill(null);
+  for (let m = 1; m <= 12; m++) {
+    const raw = localStorage.getItem(returnsMetaKey(year, m));
+    if (raw) { try { result[m-1] = JSON.parse(raw); } catch(e) {} }
+  }
+  const hasLocal = result.some(v => v !== null);
+  if (hasLocal) return result;
+  if (USE_API && authToken) {
+    try {
+      const r = await fetch(`${API_BASE}/monthly-returns?year=${year}&role=${APP_ROLE}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (r.ok) {
+        const list = await r.json();
+        (list.records || list).forEach(rec => {
+          const mi = parseInt(rec.month);
+          if (mi >= 1 && mi <= 12) result[mi-1] = rec.meta || rec;
+        });
+      }
+    } catch(_) {}
+  }
+  return result;
+}
+
+/* ============================================================
+   NUMBER HELPERS
+============================================================ */
+function fmtPHP(v) {
+  if (v == null || isNaN(v)) return '₱0.00';
+  return '₱' + Number(v).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtK(v) {
+  if (!v) return '₱0';
+  if (Math.abs(v) >= 1e6) return '₱' + (v/1e6).toFixed(1) + 'M';
+  if (Math.abs(v) >= 1e3) return '₱' + (v/1e3).toFixed(0) + 'K';
+  return '₱' + v.toFixed(0);
+}
+
+// Safe field readers — each source stores different field names
+// monthly_record.html    meta: grossSales, netSales, outputTax
+// monthly_purchases.html meta: grossPurch, netPurch, inputTax, withholding
+// monthly_expenses.html  meta: grossAmount, netExpenses, inputTax, withholdingTax
+// monthly_npurch.html    meta: grossPurch, withholdingAmt, grossMinusWT  (NO inputTax — non-VAT)
+// monthly_nexp.html      meta: grossAmount, withholdingTax, netPayable   (NO inputTax — non-VAT)
+// monthly_capex.html     meta: totalGross, netPurchases, inputTax, withholdingTax
+function salesGross(m)     { return m ? parseFloat(m.grossSales   || m.grossAmount || 0) : 0; }
+function salesOutputTax(m) { return m ? parseFloat(m.outputTax    || 0) : 0; }
+function purchGross(m)     { return m ? parseFloat(m.grossPurch   || m.grossAmount || m.grossPurchases || m.totalAmount || 0) : 0; }
+function purchInputTax(m)  { return m ? parseFloat(m.inputTax     || m.vatAmount || 0) : 0; }
+function expGross(m)       { return m ? parseFloat(m.grossAmount  || m.totalExpenses || 0) : 0; }
+function expInputTax(m)    { return m ? parseFloat(m.inputTax     || m.vatAmount || 0) : 0; }
+// Non-VAT — gross only, no input tax field
+function npurchGross(m)    { return m ? parseFloat(m.grossPurch   || m.grossAmount || 0) : 0; }
+function nexpGross(m)      { return m ? parseFloat(m.grossAmount  || 0) : 0; }
+// CAPEX — has both gross and input tax
+function capexGross(m)     { return m ? parseFloat(m.totalGross   || m.grossAmount || 0) : 0; }
+function capexInputTax(m)  { return m ? parseFloat(m.inputTax     || 0) : 0; }
+// Taxes & Licenses: totalAmount = all tax payments; sub-fields: totalVAT, totalIT, totalLicenses
+function taxesTotal(m)     { return m ? parseFloat(m.totalAmount  || 0) : 0; }
+function taxesVAT(m)       { return m ? parseFloat(m.totalVAT     || 0) : 0; }
+function taxesIT(m)        { return m ? parseFloat(m.totalIT      || 0) : 0; }
+function taxesLicenses(m)  { return m ? parseFloat(m.totalLicenses|| 0) : 0; }
+// Purchase Returns: grossReturns is the debit memo gross; inputTax is the creditable VAT recovered
+function returnsGross(m)   { return m ? parseFloat(m.grossReturns || 0) : 0; }
+function returnsInputTax(m){ return m ? parseFloat(m.inputTax     || 0) : 0; }
+
+/* ============================================================
+   CHART REGISTRY — destroy before re-creating
+============================================================ */
+const _charts = {};
+function destroyAll() {
+  Object.keys(_charts).forEach(k => { if (_charts[k]) { _charts[k].destroy(); delete _charts[k]; } });
+}
+
+/* ============================================================
+   SHARED CHART THEME
+============================================================ */
+const C = {
+  BLUE:    '#2563EB', BLUELT:  'rgba(37,99,235,0.12)',
+  ORANGE:  '#F97316', ORANGELT:'rgba(249,115,22,0.12)',
+  TEAL:    '#14B8A6', TEALLT:  'rgba(20,184,166,0.12)',
+  AMBER:   '#F59E0B', AMBERLT: 'rgba(245,158,11,0.12)',
+  GREEN:   '#22C55E', GREENLT: 'rgba(34,197,94,0.12)',
+  RED:     '#EF4444', REDLT:   'rgba(239,68,68,0.12)',
+  PURPLE:  '#8B5CF6', PURPLELT:'rgba(139,92,246,0.12)',
+  INDIGO:  '#6366F1', INDIGOLT:'rgba(99,102,241,0.12)',
+  ROSE:    '#F43F5E', ROSELT:  'rgba(244,63,94,0.12)',
+  LIME:    '#84CC16', LIMELT:  'rgba(132,204,22,0.12)',
+  AMBER2:  '#D97706', AMBER2LT:'rgba(217,119,6,0.12)',
+  RED2:    '#EF4444', RED2LT:  'rgba(239,68,68,0.12)',
+  GRAY:    'rgba(0,0,0,.05)',
+};
+const TICK = { color:'#9CA3AF', font: { size: 10, family: "'DM Sans', sans-serif" } };
+const GRID = { color: C.GRAY };
+const LEGEND_OPTS = { position: 'top', labels: { font: { size: 11, family: "'DM Sans',sans-serif" }, color: '#374151', boxWidth: 12, padding: 16 } };
+
+/* ============================================================
+   RENDER — main entry point
+============================================================ */
+let _isRendering = false;
+
+async function renderAll() {
+  if (_isRendering) return;
+  _isRendering = true;
+
+  try {
+    document.getElementById('yearDisplay').textContent  = selectedYear;
+    document.getElementById('headerYear').textContent   = selectedYear;
+    document.getElementById('chartYearLabel').textContent = selectedYear;
+
+    const [salesMetas, purchMetas, expMetas, npurchMetas, nexpMetas, capexMetas, taxesMetas, returnsMetas] = await Promise.all([
+      fetchSalesMetas(selectedYear),
+      fetchPurchMetas(selectedYear),
+      fetchExpMetas(selectedYear),
+      fetchNpurchMetas(selectedYear),
+      fetchNexpMetas(selectedYear),
+      fetchCapexMetas(selectedYear),
+      fetchTaxesMetas(selectedYear),
+      fetchReturnsMetas(selectedYear),
+    ]);
+
+    updateKPIs(salesMetas, purchMetas, expMetas, npurchMetas, nexpMetas, capexMetas, taxesMetas, returnsMetas);
+    updateSidebar(salesMetas, purchMetas, expMetas, npurchMetas, nexpMetas, capexMetas, taxesMetas, returnsMetas);
+    renderActiveChart(salesMetas, purchMetas, expMetas, npurchMetas, nexpMetas, capexMetas, taxesMetas, returnsMetas);
+  } finally {
+    _isRendering = false;
+  }
+}
+
+/* ─── KPI Row ─────────────────────────────────────────── */
+function updateKPIs(S, P, E, NP, NX, CX, TX, RT) {
+  const salesFilled = S.map((m,i) => m ? {...m, idx:i} : null).filter(Boolean);
+
+  const ytdSalesGross     = S.reduce((a,m)  => a + salesGross(m),     0);
+  const ytdOutputTax      = S.reduce((a,m)  => a + salesOutputTax(m), 0);
+  const ytdPurchInputTax  = P.reduce((a,m)  => a + purchInputTax(m),  0);
+  const ytdExpInputTax    = E.reduce((a,m)  => a + expInputTax(m),    0);
+  const ytdCapexInputTax  = CX.reduce((a,m) => a + capexInputTax(m),  0);
+  const ytdReturnsInputTax= RT.reduce((a,m) => a + returnsInputTax(m),0);
+  // Purchase returns recover input tax → subtract from gross input
+  const totalInputTax     = ytdPurchInputTax + ytdExpInputTax + ytdCapexInputTax - ytdReturnsInputTax;
+  const netVat            = ytdOutputTax - totalInputTax;
+
+  // Peak Sales
+  if (salesFilled.length) {
+    const peak = salesFilled.reduce((a,b) => salesGross(b) > salesGross(a) ? b : a);
+    document.getElementById('kpiPeakSales').textContent    = MONTHS_ABBR[peak.idx] + ' ' + selectedYear;
+    document.getElementById('kpiPeakSalesSub').textContent = fmtPHP(salesGross(peak));
+  } else {
+    document.getElementById('kpiPeakSales').textContent    = '—';
+    document.getElementById('kpiPeakSalesSub').textContent = 'No data';
+  }
+
+  // Peak Purchases (VAT + Non-VAT combined)
+  const allPurchFilled = P.map((m,i) => {
+    const g = purchGross(m) + npurchGross(NP[i]);
+    return g > 0 ? { idx: i, g } : null;
+  }).filter(Boolean);
+  if (allPurchFilled.length) {
+    const peak = allPurchFilled.reduce((a,b) => b.g > a.g ? b : a);
+    document.getElementById('kpiPeakPurch').textContent    = MONTHS_ABBR[peak.idx] + ' ' + selectedYear;
+    document.getElementById('kpiPeakPurchSub').textContent = fmtPHP(peak.g);
+  } else {
+    document.getElementById('kpiPeakPurch').textContent    = '—';
+    document.getElementById('kpiPeakPurchSub').textContent = 'No data';
+  }
+
+  // Peak Expenses (VAT + Non-VAT + CAPEX + Taxes combined)
+  const allExpFilled = E.map((m,i) => {
+    const g = expGross(m) + nexpGross(NX[i]) + capexGross(CX[i]) + taxesTotal(TX[i]);
+    return g > 0 ? { idx: i, g } : null;
+  }).filter(Boolean);
+  if (allExpFilled.length) {
+    const peak = allExpFilled.reduce((a,b) => b.g > a.g ? b : a);
+    document.getElementById('kpiPeakExp').textContent    = MONTHS_ABBR[peak.idx] + ' ' + selectedYear;
+    document.getElementById('kpiPeakExpSub').textContent = fmtPHP(peak.g);
+  } else {
+    document.getElementById('kpiPeakExp').textContent    = '—';
+    document.getElementById('kpiPeakExpSub').textContent = 'No data';
+  }
+
+  // Output Tax
+  const effRate = ytdSalesGross > 0 ? ((ytdOutputTax/ytdSalesGross)*100).toFixed(2)+'%' : '—';
+  document.getElementById('kpiOutputTax').textContent    = fmtPHP(ytdOutputTax);
+  document.getElementById('kpiOutputTaxSub').textContent = `${effRate} effective rate`;
+
+  // Input Tax (net of purchase returns)
+  document.getElementById('kpiInputTax').textContent    = fmtPHP(totalInputTax);
+  document.getElementById('kpiInputTaxSub').textContent = `Purch+Exp+CAPEX ${fmtK(ytdPurchInputTax+ytdExpInputTax+ytdCapexInputTax)} − Returns ${fmtK(ytdReturnsInputTax)}`;
+
+  // Net VAT Due
+  document.getElementById('kpiNetVat').textContent    = fmtPHP(netVat);
+  document.getElementById('kpiNetVatSub').textContent = netVat >= 0 ? 'Amount payable' : 'Credit balance';
+  const netEl = document.getElementById('kpiNetVat');
+  netEl.style.color = netVat >= 0 ? 'var(--red-500)' : 'var(--green-700)';
+}
+
+/* ─── Sidebar summary ─────────────────────────────────── */
+function updateSidebar(S, P, E, NP, NX, CX, TX, RT) {
+  const ytdS  = S.reduce((a,m)  => a + salesGross(m),     0);
+  const ytdP  = P.reduce((a,m)  => a + purchGross(m),     0);
+  const ytdE  = E.reduce((a,m)  => a + expGross(m),       0);
+  const ytdNP = NP.reduce((a,m) => a + npurchGross(m),    0);
+  const ytdNX = NX.reduce((a,m) => a + nexpGross(m),      0);
+  const ytdCX = CX.reduce((a,m) => a + capexGross(m),     0);
+  const ytdTX = TX.reduce((a,m) => a + taxesTotal(m),     0);
+  const ytdRT = RT.reduce((a,m) => a + returnsGross(m),   0);
+  const outT  = S.reduce((a,m)  => a + salesOutputTax(m), 0);
+  const inT   = P.reduce((a,m)  => a + purchInputTax(m),  0)
+              + E.reduce((a,m)  => a + expInputTax(m),    0)
+              + CX.reduce((a,m) => a + capexInputTax(m),  0)
+              - RT.reduce((a,m) => a + returnsInputTax(m),0);
+
+  document.getElementById('qsSales').textContent     = fmtK(ytdS);
+  document.getElementById('qsPurch').textContent     = fmtK(ytdP);
+  document.getElementById('qsExp').textContent       = fmtK(ytdE);
+  document.getElementById('qsNpurch').textContent    = fmtK(ytdNP);
+  document.getElementById('qsNexp').textContent      = fmtK(ytdNX);
+  document.getElementById('qsCapex').textContent     = fmtK(ytdCX);
+  document.getElementById('qsTaxes').textContent     = fmtK(ytdTX);
+  document.getElementById('qsReturns').textContent   = fmtK(ytdRT);
+  document.getElementById('qsOutputTax').textContent = fmtK(outT);
+  document.getElementById('qsInputTax').textContent  = fmtK(inT);
+  const net = outT - inT;
+  const qsEl = document.getElementById('qsNetVat');
+  qsEl.textContent  = fmtK(net);
+  qsEl.style.color  = net >= 0 ? 'var(--red-500)' : 'var(--green-700)';
+}
+
+/* ─── CHART DISPATCH ──────────────────────────────────── */
+function renderActiveChart(S, P, E, NP, NX, CX, TX, RT) {
+  destroyAll();
+  const body = document.getElementById('chartPanelBody');
+  body.innerHTML = '';
+
+  const titles = {
+    overview:   'Monthly Overview — Gross Amounts (All Sources)',
+    netposition:'Net VAT Position — Output vs Input Tax (net of Returns)',
+    breakdown:  'YTD Breakdown — Share & Tax Rates',
+    trend:      'Trend — Month-over-Month',
+    cashflow:   'Cash Flow — Sales vs Total Outflows',
+  };
+  document.getElementById('chartPanelTitle').innerHTML =
+    `<i class="fas fa-chart-bar"></i> ${titles[activeChart] || 'Chart'}`;
+
+  switch (activeChart) {
+    case 'overview':    renderOverview(body, S, P, E, NP, NX, CX, TX, RT); break;
+    case 'netposition': renderNetPosition(body, S, P, E, NP, NX, CX, TX, RT); break;
+    case 'breakdown':   renderBreakdown(body, S, P, E, NP, NX, CX, TX, RT); break;
+    case 'trend':       renderTrend(body, S, P, E, NP, NX, CX, TX, RT); break;
+    case 'cashflow':    renderCashFlow(body, S, P, E, NP, NX, CX, TX, RT); break;
+    default:            renderOverview(body, S, P, E, NP, NX, CX, TX, RT);
+  }
+}
+
+/* ─── OVERVIEW: grouped bar (all 8 sources) ─ */
+function renderOverview(body, S, P, E, NP, NX, CX, TX, RT) {
+  body.innerHTML = `<div class="chart-body"><div class="chart-wrap" style="height:300px"><canvas id="cOverview"></canvas></div></div>`;
+
+  const datasets = [];
+  if (sourcesOn.sales)     datasets.push({ label:'VAT Sales',           data: S.map(m  => +(salesGross(m).toFixed(2))),   backgroundColor: C.BLUE,   borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.purchases) datasets.push({ label:'VAT Purchases',       data: P.map(m  => +(purchGross(m).toFixed(2))),   backgroundColor: C.ORANGE, borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.expenses)  datasets.push({ label:'VAT Expenses',        data: E.map(m  => +(expGross(m).toFixed(2))),     backgroundColor: C.TEAL,   borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.npurch)    datasets.push({ label:'Non-VAT Purchases',   data: NP.map(m => +(npurchGross(m).toFixed(2))),  backgroundColor: C.INDIGO, borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.nexp)      datasets.push({ label:'Non-VAT Expenses',    data: NX.map(m => +(nexpGross(m).toFixed(2))),    backgroundColor: C.ROSE,   borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.capex)     datasets.push({ label:'CAPEX',               data: CX.map(m => +(capexGross(m).toFixed(2))),   backgroundColor: C.LIME,   borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.taxes)     datasets.push({ label:'Taxes & Licenses',    data: TX.map(m => +(taxesTotal(m).toFixed(2))),   backgroundColor: C.AMBER2, borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.returns)   datasets.push({ label:'Purchase Returns',    data: RT.map(m => +(returnsGross(m).toFixed(2))), backgroundColor: C.RED2,   borderRadius: 3, borderSkipped: false });
+
+  if (!datasets.length) { body.innerHTML = noData(); return; }
+
+  _charts['overview'] = new Chart(document.getElementById('cOverview'), {
+    type: 'bar',
+    data: { labels: MONTHS_ABBR, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: LEGEND_OPTS,
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtPHP(ctx.parsed.y)}` } }
+      },
+      scales: {
+        x: { ticks: TICK, grid: { display: false } },
+        y: { ticks: { ...TICK, callback: v => fmtK(v) }, grid: GRID }
+      },
+      animation: { duration: 500, easing: 'easeOutQuart' }
+    }
+  });
+}
+
+/* ─── NET VAT POSITION ─────────────────────────────────── */
+function renderNetPosition(body, S, P, E, NP, NX, CX, TX, RT) {
+  body.innerHTML = `<div class="chart-body"><div class="chart-wrap" style="height:280px"><canvas id="cNetPos"></canvas></div></div>`;
+
+  const outputData = S.map(m => +(salesOutputTax(m).toFixed(2)));
+  // Input tax: VAT Purch + VAT Exp + CAPEX − Purchase Returns (non-VAT sources have no input tax)
+  const inputData  = S.map((_,i) => +((
+    purchInputTax(P[i]) + expInputTax(E[i]) + capexInputTax(CX[i]) - returnsInputTax(RT[i])
+  ).toFixed(2)));
+  const netData    = outputData.map((o, i) => +(o - inputData[i]).toFixed(2));
+
+  _charts['netpos'] = new Chart(document.getElementById('cNetPos'), {
+    type: 'bar',
+    data: {
+      labels: MONTHS_ABBR,
+      datasets: [
+        { label: 'Output Tax', data: outputData, backgroundColor: C.GREEN,  borderRadius: 4, borderSkipped: false, order: 2 },
+        { label: 'Input Tax',  data: inputData,  backgroundColor: C.AMBER,  borderRadius: 4, borderSkipped: false, order: 2 },
+        { label: 'Net VAT Due', data: netData,   type: 'line', borderColor: C.PURPLE, backgroundColor: C.PURPLELT,
+          fill: false, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: C.PURPLE, borderWidth: 2, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: LEGEND_OPTS,
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtPHP(ctx.parsed.y)}` } }
+      },
+      scales: {
+        x: { ticks: TICK, grid: { display: false } },
+        y: { ticks: { ...TICK, callback: v => fmtK(v) }, grid: GRID }
+      },
+      animation: { duration: 500, easing: 'easeOutQuart' }
+    }
+  });
+}
+
+/* ─── BREAKDOWN: doughnut + tax rate bars ─────────────── */
+function renderBreakdown(body, S, P, E, NP, NX, CX, TX, RT) {
+  body.innerHTML = `
+    <div class="chart-body side-by-side">
+      <div>
+        <div class="sub-chart-label"><i class="fas fa-chart-pie"></i> YTD Amount Distribution</div>
+        <div class="chart-wrap" style="height:240px"><canvas id="cPie"></canvas></div>
+      </div>
+      <div>
+        <div class="sub-chart-label"><i class="fas fa-percent"></i> Effective Tax Rates per Month (%) — VAT sources only</div>
+        <div class="chart-wrap" style="height:240px"><canvas id="cTaxRate"></canvas></div>
+      </div>
+    </div>`;
+
+  const ytdS  = S.reduce((a,m)  => a + salesGross(m),  0);
+  const ytdP  = P.reduce((a,m)  => a + purchGross(m),  0);
+  const ytdE  = E.reduce((a,m)  => a + expGross(m),    0);
+  const ytdNP = NP.reduce((a,m) => a + npurchGross(m), 0);
+  const ytdNX = NX.reduce((a,m) => a + nexpGross(m),   0);
+  const ytdCX = CX.reduce((a,m) => a + capexGross(m),  0);
+  const ytdTX = TX.reduce((a,m) => a + taxesTotal(m),  0);
+  const ytdRT = RT.reduce((a,m) => a + returnsGross(m),0);
+
+  const pieLabels = [], pieData = [], pieColors = [];
+  if (sourcesOn.sales     && ytdS)  { pieLabels.push('VAT Sales');         pieData.push(+ytdS.toFixed(2));  pieColors.push(C.BLUE);   }
+  if (sourcesOn.purchases && ytdP)  { pieLabels.push('VAT Purchases');     pieData.push(+ytdP.toFixed(2));  pieColors.push(C.ORANGE); }
+  if (sourcesOn.expenses  && ytdE)  { pieLabels.push('VAT Expenses');      pieData.push(+ytdE.toFixed(2));  pieColors.push(C.TEAL);   }
+  if (sourcesOn.npurch    && ytdNP) { pieLabels.push('Non-VAT Purchases'); pieData.push(+ytdNP.toFixed(2)); pieColors.push(C.INDIGO); }
+  if (sourcesOn.nexp      && ytdNX) { pieLabels.push('Non-VAT Expenses');  pieData.push(+ytdNX.toFixed(2)); pieColors.push(C.ROSE);   }
+  if (sourcesOn.capex     && ytdCX) { pieLabels.push('CAPEX');             pieData.push(+ytdCX.toFixed(2)); pieColors.push(C.LIME);   }
+  if (sourcesOn.taxes     && ytdTX) { pieLabels.push('Taxes & Licenses');  pieData.push(+ytdTX.toFixed(2)); pieColors.push(C.AMBER2); }
+  if (sourcesOn.returns   && ytdRT) { pieLabels.push('Purchase Returns');  pieData.push(+ytdRT.toFixed(2)); pieColors.push(C.RED2);   }
+
+  if (pieData.length) {
+    _charts['pie'] = new Chart(document.getElementById('cPie'), {
+      type: 'doughnut',
+      data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: pieColors, borderColor: '#fff', borderWidth: 3, hoverOffset: 8 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '62%',
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 10, family: "'DM Sans',sans-serif" }, color: '#374151', boxWidth: 10, padding: 10 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmtPHP(ctx.parsed)}` } }
+        },
+        animation: { duration: 600, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  // Tax rate per month — VAT sources + CAPEX; Returns shown as recovery %; non-VAT excluded
+  const salesRate   = S.map(m  => m  && salesGross(m)   > 0 ? +((salesOutputTax(m)  / salesGross(m))  *100).toFixed(2) : 0);
+  const purchRate   = P.map(m  => m  && purchGross(m)   > 0 ? +((purchInputTax(m)   / purchGross(m))  *100).toFixed(2) : 0);
+  const expRate     = E.map(m  => m  && expGross(m)     > 0 ? +((expInputTax(m)     / expGross(m))    *100).toFixed(2) : 0);
+  const capexRate   = CX.map(m => m  && capexGross(m)   > 0 ? +((capexInputTax(m)   / capexGross(m))  *100).toFixed(2) : 0);
+  const returnsRate = RT.map(m => m  && returnsGross(m) > 0 ? +((returnsInputTax(m) / returnsGross(m))*100).toFixed(2) : 0);
+
+  const trDatasets = [];
+  if (sourcesOn.sales)     trDatasets.push({ label: 'Output Tax %',      data: salesRate,   backgroundColor: C.BLUE,   borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.purchases) trDatasets.push({ label: 'Purch Input %',     data: purchRate,   backgroundColor: C.ORANGE, borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.expenses)  trDatasets.push({ label: 'Exp Input %',       data: expRate,     backgroundColor: C.TEAL,   borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.capex)     trDatasets.push({ label: 'CAPEX Input %',     data: capexRate,   backgroundColor: C.LIME,   borderRadius: 3, borderSkipped: false });
+  if (sourcesOn.returns)   trDatasets.push({ label: 'Returns Recovery %',data: returnsRate, backgroundColor: C.RED2,   borderRadius: 3, borderSkipped: false });
+
+  if (trDatasets.length) {
+    _charts['taxrate'] = new Chart(document.getElementById('cTaxRate'), {
+      type: 'bar',
+      data: { labels: MONTHS_ABBR, datasets: trDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: LEGEND_OPTS,
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%` } }
+        },
+        scales: {
+          x: { ticks: TICK, grid: { display: false } },
+          y: { ticks: { ...TICK, callback: v => v + '%' }, grid: GRID, suggestedMax: 15 }
+        },
+        animation: { duration: 500, easing: 'easeOutQuart' }
+      }
+    });
+  }
+}
+
+/* ─── TREND: MoM line chart ───────────────────────────── */
+function renderTrend(body, S, P, E, NP, NX, CX, TX, RT) {
+  body.innerHTML = `<div class="chart-body"><div class="chart-wrap" style="height:300px"><canvas id="cTrend"></canvas></div></div>`;
+
+  const sGross  = S.map(m  => salesGross(m)  || null);
+  const pGross  = P.map(m  => purchGross(m)  || null);
+  const eGross  = E.map(m  => expGross(m)    || null);
+  const npGross = NP.map(m => npurchGross(m) || null);
+  const nxGross = NX.map(m => nexpGross(m)   || null);
+  const cxGross = CX.map(m => capexGross(m)  || null);
+  const txGross = TX.map(m => taxesTotal(m)  || null);
+  const rtGross = RT.map(m => returnsGross(m)|| null);
+
+  const datasets = [];
+  if (sourcesOn.sales)     datasets.push({ label: 'VAT Sales',         data: sGross,  borderColor: C.BLUE,   backgroundColor: C.BLUELT,   fill: true, tension: 0.4, pointBackgroundColor: C.BLUE,   pointRadius: 4, pointHoverRadius: 6 });
+  if (sourcesOn.purchases) datasets.push({ label: 'VAT Purchases',     data: pGross,  borderColor: C.ORANGE, backgroundColor: C.ORANGELT, fill: true, tension: 0.4, pointBackgroundColor: C.ORANGE, pointRadius: 4, pointHoverRadius: 6 });
+  if (sourcesOn.expenses)  datasets.push({ label: 'VAT Expenses',      data: eGross,  borderColor: C.TEAL,   backgroundColor: C.TEALLT,   fill: true, tension: 0.4, pointBackgroundColor: C.TEAL,   pointRadius: 4, pointHoverRadius: 6 });
+  if (sourcesOn.npurch)    datasets.push({ label: 'Non-VAT Purchases', data: npGross, borderColor: C.INDIGO, backgroundColor: C.INDIGOLT, fill: true, tension: 0.4, pointBackgroundColor: C.INDIGO, pointRadius: 4, pointHoverRadius: 6 });
+  if (sourcesOn.nexp)      datasets.push({ label: 'Non-VAT Expenses',  data: nxGross, borderColor: C.ROSE,   backgroundColor: C.ROSELT,   fill: true, tension: 0.4, pointBackgroundColor: C.ROSE,   pointRadius: 4, pointHoverRadius: 6 });
+  if (sourcesOn.capex)     datasets.push({ label: 'CAPEX',             data: cxGross, borderColor: C.LIME,   backgroundColor: C.LIMELT,   fill: true, tension: 0.4, pointBackgroundColor: C.LIME,   pointRadius: 4, pointHoverRadius: 6 });
+  if (sourcesOn.taxes)     datasets.push({ label: 'Taxes & Licenses',  data: txGross, borderColor: C.AMBER2, backgroundColor: C.AMBER2LT, fill: true, tension: 0.4, pointBackgroundColor: C.AMBER2, pointRadius: 4, pointHoverRadius: 6 });
+  if (sourcesOn.returns)   datasets.push({ label: 'Purchase Returns',  data: rtGross, borderColor: C.RED2,   backgroundColor: C.RED2LT,   fill: true, tension: 0.4, pointBackgroundColor: C.RED2,   pointRadius: 4, pointHoverRadius: 6 });
+
+  if (!datasets.length) { body.innerHTML = noData(); return; }
+
+  _charts['trend'] = new Chart(document.getElementById('cTrend'), {
+    type: 'line',
+    data: { labels: MONTHS_ABBR, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: LEGEND_OPTS,
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y != null ? fmtPHP(ctx.parsed.y) : 'N/A'}` } }
+      },
+      scales: {
+        x: { ticks: TICK, grid: { display: false } },
+        y: { ticks: { ...TICK, callback: v => fmtK(v) }, grid: GRID }
+      },
+      animation: { duration: 600, easing: 'easeOutQuart' }
+    }
+  });
+}
+
+/* ─── CASH FLOW: Sales vs All Outflows ─────────────────── */
+function renderCashFlow(body, S, P, E, NP, NX, CX, TX, RT) {
+  body.innerHTML = `<div class="chart-body"><div class="chart-wrap" style="height:300px"><canvas id="cCash"></canvas></div></div>`;
+
+  const inflows  = S.map(m => +(salesGross(m).toFixed(2)));
+  // All outflows: VAT Purch + VAT Exp + Non-VAT Purch + Non-VAT Exp + CAPEX + Taxes − Purchase Returns
+  const outflows = P.map((m,i) => +((
+    purchGross(m) + expGross(E[i]) + npurchGross(NP[i]) + nexpGross(NX[i]) +
+    capexGross(CX[i]) + taxesTotal(TX[i]) - returnsGross(RT[i])
+  ).toFixed(2)));
+  const netFlow  = inflows.map((v, i) => +(v - outflows[i]).toFixed(2));
+
+  _charts['cashflow'] = new Chart(document.getElementById('cCash'), {
+    type: 'bar',
+    data: {
+      labels: MONTHS_ABBR,
+      datasets: [
+        { label: 'VAT Sales (In)',        data: inflows,  backgroundColor: C.BLUE,   borderRadius: 4, borderSkipped: false, order: 2 },
+        { label: 'Net Outflows (Out)',    data: outflows, backgroundColor: C.ORANGE, borderRadius: 4, borderSkipped: false, order: 2 },
+        { label: 'Net Cash Position',     data: netFlow,  type: 'line', borderColor: C.PURPLE,
+          backgroundColor: C.PURPLELT, fill: false, tension: 0.4,
+          pointBackgroundColor: netFlow.map(v => v >= 0 ? C.GREEN : C.RED),
+          pointRadius: 5, pointHoverRadius: 7, borderWidth: 2, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: LEGEND_OPTS,
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtPHP(ctx.parsed.y)}` } }
+      },
+      scales: {
+        x: { ticks: TICK, grid: { display: false } },
+        y: { ticks: { ...TICK, callback: v => fmtK(v) }, grid: GRID }
+      },
+      animation: { duration: 500, easing: 'easeOutQuart' }
+    }
+  });
+}
+
+/* ─── No data placeholder ─────────────────────────────── */
+function noData() {
+  return `<div class="no-data-state"><i class="fas fa-chart-bar"></i><p>No data available for ${selectedYear}.<br>Enable a data source or add records first.</p></div>`;
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function showToast(msg, type='info') {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2600);
+}
+
+/* ============================================================
+   IDENTITY BADGES
+============================================================ */
+function initIdentityBadges() {
+  let vatSession = null;
+  try { vatSession = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null'); } catch(e) {}
+  const loggedInUser = vatSession?.username || '';
+
+  const strip   = document.getElementById('identityStrip');
+  const saBadge = document.getElementById('subAdminBadge');
+  const saLabel = document.getElementById('subAdminBadgeLabel');
+  const clBadge = document.getElementById('clientBadge');
+  const clLabel = document.getElementById('clientBadgeLabel');
+  const sep     = document.getElementById('identitySep');
+
+  if (APP_ROLE === 'SubAdmin') {
+    if (loggedInUser) { saLabel.textContent = loggedInUser; saBadge.classList.remove('hidden'); strip.style.display = 'flex'; }
+  } else if (APP_ROLE === 'Client') {
+    if (loggedInUser) { clLabel.textContent = loggedInUser; clBadge.classList.remove('hidden'); strip.style.display = 'flex'; }
+  }
+}
+
+/* ============================================================
+   EXPORT PNG
+============================================================ */
+function exportPNG() {
+  const canvas = document.querySelector('#chartPanelBody canvas');
+  if (!canvas) { showToast('No chart to export', 'warning'); return; }
+  const a = document.createElement('a');
+  a.download = `MGAA_Analysis_${activeChart}_${selectedYear}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  showToast('Chart exported as PNG', 'success');
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkBackend();
+  initIdentityBadges();
+
+  // Year navigation
+  document.getElementById('yearPrevBtn').addEventListener('click', () => { selectedYear--; renderAll(); });
+  document.getElementById('yearNextBtn').addEventListener('click', () => { selectedYear++; renderAll(); });
+  document.getElementById('yearTodayBtn').addEventListener('click', () => { selectedYear = new Date().getFullYear(); renderAll(); });
+
+  // Source toggles
+  document.querySelectorAll('.source-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.dataset.source;
+      sourcesOn[src] = !sourcesOn[src];
+      btn.classList.toggle('active', sourcesOn[src]);
+      renderAll();
+    });
+  });
+
+  // Chart type tabs
+  document.querySelectorAll('.chart-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeChart = btn.dataset.chart;
+      renderAll();
+    });
+  });
+
+  // Header buttons
+  document.getElementById('refreshBtn').addEventListener('click', () => { renderAll(); showToast('Data refreshed', 'success'); });
+  document.getElementById('exportBtn').addEventListener('click', exportPNG);
+
+  // Live storage updates (other tabs writing new data)
+  window.addEventListener('storage', (e) => {
+    if (!e.key) return;
+    const relevantPrefixes = [
+      `VAT_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+      `PURCH_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+      `EXP_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+      `NPURCH_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+      `NEXP_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+      `CAPEX_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+      `TAXES_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+      `RETURNS_MONTHLY_META_${APP_USER_ID}_${APP_ROLE}_`,
+    ];
+    if (relevantPrefixes.some(p => e.key.startsWith(p))) renderAll();
+  });
+
+  // Initial render
+  await renderAll();
+});
+</script>
+</body>
+</html>

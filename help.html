@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help &amp; Support | MGAA VAT System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#0d1117; --ink-60:rgba(13,17,23,.6); --ink-30:rgba(13,17,23,.3); --ink-10:rgba(13,17,23,.08);
+  --surface:#fff; --surface-2:#f5f6f9; --surface-3:#eef0f7;
+  --blue-vivid:#1a47cc; --blue-mid:#2a5de8; --blue-light:#dde8ff; --blue-xlight:#f0f4ff;
+  --blue-50:#EFF6FF; --blue-100:#DBEAFE; --blue-200:#BFDBFE; --blue-300:#93C5FD;
+  --blue-700:#1D4ED8; --blue-800:#1E40AF; --blue-900:#1E3A8A; --blue-950:#172554;
+  --gray-100:#F3F4F6; --gray-200:#E5E7EB; --gray-400:#9CA3AF; --gray-500:#6B7280;
+  --gray-600:#4B5563; --gray-700:#374151; --gray-800:#1F2937;
+  --green-50:#F0FDF4; --green-100:#DCFCE7; --green-500:#22C55E; --green-700:#15803D;
+  --red-50:#FEF2F2; --red-100:#FEE2E2; --red-700:#B91C1C;
+  --amber-50:#FFFBEB; --amber-100:#FEF3C7; --amber-700:#B45309;
+  --teal:#0d8a6e; --teal-light:#d4f3eb;
+  --nav-h:64px;
+  --font:'DM Sans',system-ui,sans-serif;
+  --font-display:'Syne',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.08),0 4px 6px rgba(0,0,0,.05);
+  --tr:0.2s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--surface-2);color:var(--ink);min-height:100vh;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--gray-100);}
+::-webkit-scrollbar-thumb{background:var(--blue-300);border-radius:99px;}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:200;height:var(--nav-h);background:rgba(255,255,255,.92);backdrop-filter:blur(18px) saturate(180%);border-bottom:1px solid var(--ink-10);box-shadow:0 2px 20px rgba(13,17,23,.06);}
+.topbar-inner{max-width:1140px;margin:0 auto;padding:0 28px;height:100%;display:flex;align-items:center;gap:14px;}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue-vivid),var(--blue-mid));display:flex;align-items:center;justify-content:center;color:white;font-size:15px;}
+.brand-name{font-family:var(--font-display);font-size:.93rem;font-weight:700;color:var(--ink);}
+.brand-tag{font-size:.62rem;font-weight:600;color:var(--blue-vivid);background:var(--blue-xlight);padding:2px 8px;border-radius:30px;margin-left:4px;}
+.topbar-spacer{flex:1;}
+.topbar-link{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:30px;font-size:.8rem;font-weight:500;color:var(--ink-60);text-decoration:none;border:1px solid var(--gray-200);background:white;transition:var(--tr);}
+.topbar-link:hover{background:var(--surface-2);color:var(--ink);}
+.topbar-link i{font-size:.75rem;}
+.search-bar{display:flex;align-items:center;gap:0;background:white;border:1.5px solid var(--gray-200);border-radius:30px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+.search-bar:focus-within{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(42,93,232,.1);}
+.search-bar i{padding:0 12px;color:var(--gray-400);font-size:.8rem;flex-shrink:0;}
+.search-bar input{border:none;outline:none;padding:8px 14px 8px 0;font-family:var(--font);font-size:.82rem;color:var(--ink);width:220px;background:transparent;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(130deg,#0d1f5c 0%,#1a3ba0 55%,#1555c2 100%);padding:52px 40px 44px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 72% 42%,rgba(100,160,255,.2),transparent 62%);pointer-events:none;}
+.hero-dots{position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
+.hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.1);pointer-events:none;}
+.hero-ring-1{width:320px;height:320px;top:-100px;right:-60px;}
+.hero-ring-2{width:180px;height:180px;top:10px;right:160px;}
+.hero-inner{position:relative;z-index:2;max-width:780px;}
+.hero-eyebrow{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:13px;}
+.hero-title{font-family:var(--font-display);font-size:2.4rem;font-weight:800;color:white;letter-spacing:-.025em;line-height:1.1;margin-bottom:13px;}
+.hero-title span{color:#93c5fd;}
+.hero-sub{font-size:.9rem;color:rgba(255,255,255,.65);max-width:500px;line-height:1.65;margin-bottom:26px;}
+.hero-search{display:flex;align-items:center;gap:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:30px;overflow:hidden;max-width:460px;backdrop-filter:blur(8px);}
+.hero-search i{padding:0 14px;color:rgba(255,255,255,.6);font-size:.85rem;flex-shrink:0;}
+.hero-search input{flex:1;border:none;outline:none;background:transparent;padding:11px 14px 11px 0;font-family:var(--font);font-size:.88rem;color:white;}
+.hero-search input::placeholder{color:rgba(255,255,255,.45);}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;}
+.hero-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:5px 13px;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.88);cursor:pointer;transition:var(--tr);}
+.hero-pill:hover{background:rgba(255,255,255,.22);}
+.hero-pill i{font-size:.62rem;color:#93c5fd;}
+
+/* ── LAYOUT ── */
+.layout{max-width:1140px;margin:0 auto;padding:36px 28px 80px;display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start;}
+@media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar-nav{display:none;}}
+
+/* ── SIDEBAR NAV ── */
+.sidebar-nav{position:sticky;top:calc(var(--nav-h) + 18px);background:white;border:1px solid var(--gray-200);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.sidebar-nav-head{padding:14px 18px;background:var(--blue-950);color:rgba(255,255,255,.7);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+.sidebar-nav-list{list-style:none;padding:8px 0;}
+.sidebar-nav-item a{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:.8rem;color:var(--gray-700);text-decoration:none;transition:var(--tr);}
+.sidebar-nav-item a:hover{background:var(--blue-50);color:var(--blue-700);}
+.sidebar-nav-item a.active{background:var(--blue-50);color:var(--blue-700);font-weight:600;border-left:3px solid var(--blue-700);}
+.sidebar-nav-item a i{width:15px;text-align:center;font-size:.75rem;color:var(--gray-400);}
+.sidebar-nav-item a:hover i,.sidebar-nav-item a.active i{color:var(--blue-500);}
+.sidebar-divider{height:1px;background:var(--gray-100);margin:6px 0;}
+
+/* ── CONTENT ── */
+.content{}
+
+/* ── SECTION ── */
+.help-section{margin-bottom:32px;scroll-margin-top:calc(var(--nav-h) + 24px);}
+.section-heading{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.section-heading i{font-size:1rem;color:var(--blue-vivid);}
+.section-sub{font-size:.83rem;color:var(--gray-500);margin-bottom:20px;line-height:1.55;}
+
+/* ── CARDS ── */
+.card{background:white;border:1px solid var(--gray-200);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:16px;}
+.card-head{padding:14px 20px 12px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;}
+.card-head-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ci-blue{background:var(--blue-50);color:var(--blue-700);}
+.ci-green{background:var(--green-50);color:var(--green-700);}
+.ci-amber{background:var(--amber-50);color:var(--amber-700);}
+.ci-red{background:var(--red-50);color:var(--red-700);}
+.card-head-title{font-family:var(--font-display);font-size:.88rem;font-weight:700;color:var(--ink);}
+.card-head-sub{font-size:.7rem;color:var(--gray-500);margin-top:1px;}
+.card-body{padding:18px 20px;}
+
+/* ── QUICK LINKS GRID ── */
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+@media(max-width:640px){.quick-grid{grid-template-columns:repeat(2,1fr);}}
+.quick-link-card{display:flex;flex-direction:column;align-items:center;gap:9px;padding:18px 14px;background:white;border:1px solid var(--gray-200);border-radius:14px;text-decoration:none;color:inherit;box-shadow:var(--shadow-sm);transition:var(--tr);text-align:center;}
+.quick-link-card:hover{border-color:var(--blue-300);box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.qlc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.qlc-label{font-size:.78rem;font-weight:600;color:var(--ink);}
+.qlc-sub{font-size:.68rem;color:var(--gray-500);}
+
+/* ── TOPIC GRID ── */
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:600px){.topic-grid{grid-template-columns:1fr;}}
+.topic-card{display:flex;gap:13px;padding:14px 16px;background:var(--surface-2);border:1px solid var(--gray-100);border-radius:12px;cursor:pointer;transition:var(--tr);}
+.topic-card:hover{background:var(--blue-50);border-color:var(--blue-100);}
+.topic-icon{width:34px;height:34px;border-radius:9px;background:var(--blue-50);color:var(--blue-700);display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0;}
+.topic-card:hover .topic-icon{background:var(--blue-100);}
+.topic-body h4{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.topic-body p{font-size:.72rem;color:var(--gray-600);line-height:1.45;}
+
+/* ── TIP BOX ── */
+.tip-box{display:flex;align-items:flex-start;gap:13px;padding:15px 18px;border-radius:12px;margin-bottom:16px;}
+.tip-box.blue{background:var(--blue-50);border:1px solid var(--blue-100);}
+.tip-box.green{background:var(--green-50);border:1px solid var(--green-100);}
+.tip-box.amber{background:var(--amber-50);border:1px solid var(--amber-100);}
+.tip-box.red{background:var(--red-50);border:1px solid var(--red-100);}
+.tip-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.tip-box.blue .tip-icon{background:var(--blue-100);color:var(--blue-700);}
+.tip-box.green .tip-icon{background:var(--green-100);color:var(--green-700);}
+.tip-box.amber .tip-icon{background:var(--amber-100);color:var(--amber-700);}
+.tip-box.red .tip-icon{background:var(--red-100);color:var(--red-700);}
+.tip-body h4{font-size:.83rem;font-weight:700;margin-bottom:3px;}
+.tip-box.blue .tip-body h4{color:var(--blue-800);}
+.tip-box.green .tip-body h4{color:var(--green-700);}
+.tip-box.amber .tip-body h4{color:var(--amber-700);}
+.tip-box.red .tip-body h4{color:var(--red-700);}
+.tip-body p{font-size:.78rem;line-height:1.55;}
+.tip-box.blue .tip-body p{color:var(--blue-700);}
+.tip-box.green .tip-body p{color:var(--green-700);}
+.tip-box.amber .tip-body p{color:var(--amber-700);}
+.tip-box.red .tip-body p{color:var(--red-700);}
+
+/* ── FAQ ── */
+.faq-item{background:white;border:1px solid var(--gray-200);border-radius:12px;overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow-sm);}
+.faq-q{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;transition:background var(--tr);user-select:none;}
+.faq-q:hover{background:var(--blue-50);}
+.faq-q-icon{width:26px;height:26px;border-radius:7px;background:var(--blue-50);color:var(--blue-700);display:flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0;transition:var(--tr);}
+.faq-item.open .faq-q-icon{background:var(--blue-700);color:white;}
+.faq-q h4{flex:1;font-size:.85rem;font-weight:600;color:var(--ink);}
+.faq-arrow{color:var(--gray-400);font-size:.68rem;transition:transform .25s;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--blue-600);}
+.faq-a{display:none;padding:0 18px 14px 56px;font-size:.8rem;color:var(--gray-600);line-height:1.65;border-top:1px solid var(--gray-100);}
+.faq-a.show{display:block;animation:fadeSlide .2s ease;}
+.faq-a strong{color:var(--blue-700);}
+.faq-a code{background:var(--gray-100);font-family:var(--font-mono);font-size:.73rem;padding:1px 5px;border-radius:4px;}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STEPS ── */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--gray-100);}
+.step:last-child{border-bottom:none;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--blue-900);color:white;font-family:var(--font-display);font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-body h4{font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.step-body p{font-size:.78rem;color:var(--gray-600);line-height:1.55;}
+.step-body code{background:var(--gray-100);font-family:var(--font-mono);font-size:.72rem;padding:1px 5px;border-radius:4px;color:var(--blue-700);}
+
+/* ── SHORTCUTS TABLE ── */
+.kb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;}
+.kb-item{display:flex;align-items:center;gap:11px;padding:10px 13px;background:white;border:1px solid var(--gray-200);border-radius:9px;}
+.kb-key{background:var(--gray-900);color:white;font-family:var(--font-mono);font-size:.68rem;font-weight:600;padding:3px 8px;border-radius:5px;box-shadow:0 2px 0 rgba(0,0,0,.4);white-space:nowrap;flex-shrink:0;min-width:52px;text-align:center;}
+.kb-desc{font-size:.75rem;color:var(--gray-700);line-height:1.3;}
+
+/* ── CONTACT CARD ── */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:560px){.contact-grid{grid-template-columns:1fr;}}
+.contact-card{display:flex;gap:13px;padding:16px 18px;background:white;border:1px solid var(--gray-200);border-radius:14px;box-shadow:var(--shadow-sm);text-decoration:none;color:inherit;transition:var(--tr);}
+.contact-card:hover{border-color:var(--blue-300);box-shadow:var(--shadow-md);}
+.contact-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.contact-body h4{font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.contact-body p{font-size:.75rem;color:var(--gray-500);line-height:1.4;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.badge-blue{background:var(--blue-100);color:var(--blue-800);}
+.badge-green{background:var(--green-100);color:var(--green-700);}
+.badge-amber{background:var(--amber-100);color:var(--amber-700);}
+
+/* ── SCROLL TOP ── */
+#scrollTop{position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;background:var(--blue-700);color:white;border:none;cursor:pointer;box-shadow:var(--shadow-lg);font-size:.82rem;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(10px);transition:var(--tr);z-index:500;}
+#scrollTop.show{opacity:1;transform:translateY(0);}
+#scrollTop:hover{background:var(--blue-800);}
+
+/* ── FOOTER ── */
+.footer{background:var(--blue-950);color:var(--blue-300);text-align:center;padding:28px;}
+.footer-links{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
+.footer-links a{color:var(--blue-400);text-decoration:none;font-size:.78rem;font-weight:500;transition:var(--tr);}
+.footer-links a:hover{color:white;}
+
+/* search highlight */
+.search-highlight{background:#fef08a;border-radius:2px;}
+
+@media print{.topbar,.sidebar-nav,#scrollTop,.footer{display:none;}.layout{grid-template-columns:1fr;padding:0;}}
+@media(max-width:600px){.topbar-inner{padding:0 14px;}.hero{padding:32px 18px 30px;}.hero-title{font-size:1.8rem;}.layout{padding:20px 14px 60px;}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index2.html">
+      <div class="brand-mark"><i class="fas fa-file-invoice-dollar"></i></div>
+      <span class="brand-name">MGAA<span class="brand-tag">VAT System</span></span>
+    </a>
+    <div class="topbar-spacer"></div>
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="topSearch" placeholder="Search help topics&hellip;" oninput="doSearch(this.value)">
+    </div>
+    <a href="quick_guide.html" class="topbar-link"><i class="fas fa-compass"></i> Quick Guide</a>
+    <a href="index2.html" class="topbar-link"><i class="fas fa-home"></i> Dashboard</a>
+    <button onclick="window.print()" class="topbar-link" style="cursor:pointer"><i class="fas fa-print"></i> Print</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-dots"></div>
+  <div class="hero-ring hero-ring-1"></div>
+  <div class="hero-ring hero-ring-2"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">MGAA VAT Tracking System &mdash; v2.0</div>
+    <div class="hero-title">Help &amp; <span>Support</span></div>
+    <div class="hero-sub">Find answers, step-by-step guides, keyboard shortcuts, and contact options. Everything you need to use the system confidently.</div>
+    <div class="hero-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="heroSearch" placeholder="Search help topics&hellip;" oninput="doSearch(this.value)">
+    </div>
+    <div class="hero-pills">
+      <span class="hero-pill" onclick="jumpTo('getting-started')"><i class="fas fa-rocket"></i> Getting Started</span>
+      <span class="hero-pill" onclick="jumpTo('modules-help')"><i class="fas fa-th"></i> Modules</span>
+      <span class="hero-pill" onclick="jumpTo('vat-formulas')"><i class="fas fa-calculator"></i> VAT Formulas</span>
+      <span class="hero-pill" onclick="jumpTo('shortcuts')"><i class="fas fa-keyboard"></i> Shortcuts</span>
+      <span class="hero-pill" onclick="jumpTo('faq')"><i class="fas fa-question-circle"></i> FAQ</span>
+      <span class="hero-pill" onclick="jumpTo('contact')"><i class="fas fa-headset"></i> Contact</span>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR NAV -->
+  <aside class="sidebar-nav">
+    <div class="sidebar-nav-head">Help Topics</div>
+    <ul class="sidebar-nav-list">
+      <li class="sidebar-nav-item"><a href="#getting-started" class="active"><i class="fas fa-rocket"></i> Getting Started</a></li>
+      <li class="sidebar-nav-item"><a href="#modules-help"><i class="fas fa-th"></i> Module Guides</a></li>
+      <li class="sidebar-nav-item"><a href="#vat-formulas"><i class="fas fa-calculator"></i> VAT Formulas</a></li>
+      <li class="sidebar-nav-item"><a href="#data-management"><i class="fas fa-database"></i> Data Management</a></li>
+      <li class="sidebar-nav-item"><a href="#shortcuts"><i class="fas fa-keyboard"></i> Keyboard Shortcuts</a></li>
+      <li class="sidebar-nav-item"><a href="#troubleshooting"><i class="fas fa-wrench"></i> Troubleshooting</a></li>
+      <li class="sidebar-nav-item"><a href="#faq"><i class="fas fa-question-circle"></i> FAQ</a></li>
+      <li class="sidebar-nav-item"><a href="#contact"><i class="fas fa-headset"></i> Contact &amp; Support</a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <ul class="sidebar-nav-list">
+      <li class="sidebar-nav-item"><a href="quick_guide.html"><i class="fas fa-compass"></i> Quick Guide</a></li>
+      <li class="sidebar-nav-item"><a href="tax_calculator.html"><i class="fas fa-calculator"></i> Tax Calculator</a></li>
+      <li class="sidebar-nav-item"><a href="tax_facts.html"><i class="fas fa-book-open"></i> Tax Facts</a></li>
+      <li class="sidebar-nav-item"><a href="index2.html"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- QUICK LINKS -->
+    <div class="quick-grid" style="margin-bottom:32px">
+      <a href="#getting-started" class="quick-link-card"><div class="qlc-icon ci-blue"><i class="fas fa-rocket"></i></div><div class="qlc-label">Getting Started</div><div class="qlc-sub">Setup in 3 steps</div></a>
+      <a href="#modules-help" class="quick-link-card"><div class="qlc-icon ci-green"><i class="fas fa-th"></i></div><div class="qlc-label">Module Guides</div><div class="qlc-sub">All 10 modules</div></a>
+      <a href="#vat-formulas" class="quick-link-card"><div class="qlc-icon ci-amber"><i class="fas fa-percentage"></i></div><div class="qlc-label">VAT Formulas</div><div class="qlc-sub">BIR computation rules</div></a>
+      <a href="#shortcuts" class="quick-link-card"><div class="qlc-icon ci-blue"><i class="fas fa-keyboard"></i></div><div class="qlc-label">Shortcuts</div><div class="qlc-sub">Work faster</div></a>
+      <a href="#troubleshooting" class="quick-link-card"><div class="qlc-icon ci-red"><i class="fas fa-wrench"></i></div><div class="qlc-label">Troubleshooting</div><div class="qlc-sub">Fix common issues</div></a>
+      <a href="#contact" class="quick-link-card"><div class="qlc-icon ci-green"><i class="fas fa-headset"></i></div><div class="qlc-label">Contact Support</div><div class="qlc-sub">Get in touch</div></a>
+    </div>
+
+    <!-- ══ GETTING STARTED ══ -->
+    <div class="help-section" id="getting-started">
+      <div class="section-heading"><i class="fas fa-rocket"></i> Getting Started</div>
+      <div class="section-sub">New to the system? Follow these steps to be up and running in minutes.</div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-list-ol"></i></div><div><div class="card-head-title">Initial Setup &mdash; 3 Steps</div></div></div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Enter Company Information</h4><p>Go to <strong>Company Information</strong> from the Dashboard. Fill in Company Name, TIN (<code>000-000-000-000</code>), Business Address, Line of Business, and Authorized Employee. This is required before you can export to Excel. Data auto-saves to browser localStorage.</p></div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Choose a Tracking Module</h4><p>Select any module from the Dashboard &mdash; <strong>VAT Sales</strong>, <strong>VAT Purchases</strong>, <strong>VAT Expenses</strong>, and more. Click <strong>Add New Row</strong> (or press <code>Ctrl+N</code>) to start entering transactions. All VAT formulas calculate automatically as you type the gross amount.</p></div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Save &amp; Export</h4><p>Press <code>Ctrl+S</code> to save your work as a local file (.vat, .purch, .exp, etc.). When ready, press <code>Ctrl+E</code> to export a formatted, BIR-ready Excel report with your company header, transaction table, and VAT summary.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box blue">
+        <div class="tip-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="tip-body"><h4>100% Offline &mdash; Your Data Never Leaves Your Device</h4><p>The MGAA VAT System stores all data locally in your browser or in files you save. No data is ever transmitted to any server. The system works completely offline after the initial page load.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-green"><i class="fas fa-map-signs"></i></div><div><div class="card-head-title">Explore Key Areas</div></div></div>
+        <div class="card-body">
+          <div class="topic-grid">
+            <div class="topic-card" onclick="jumpTo('modules-help')"><div class="topic-icon"><i class="fas fa-th"></i></div><div class="topic-body"><h4>10 Tracking Modules</h4><p>Sales, Purchases, Expenses, CAPEX, Taxes &amp; Licenses, and more.</p></div></div>
+            <div class="topic-card" onclick="jumpTo('vat-formulas')"><div class="topic-icon"><i class="fas fa-calculator"></i></div><div class="topic-body"><h4>VAT Computation Rules</h4><p>How Net, Output Tax, Input Tax, and Withholding are calculated.</p></div></div>
+            <div class="topic-card" onclick="jumpTo('data-management')"><div class="topic-icon"><i class="fas fa-database"></i></div><div class="topic-body"><h4>Saving &amp; Loading Data</h4><p>File formats, how to reload, and localStorage sync explained.</p></div></div>
+            <div class="topic-card" onclick="jumpTo('shortcuts')"><div class="topic-icon"><i class="fas fa-keyboard"></i></div><div class="topic-body"><h4>Keyboard Shortcuts</h4><p>Speed up data entry with Ctrl+S, Ctrl+E, Ctrl+N, and more.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MODULE GUIDES ══ -->
+    <div class="help-section" id="modules-help">
+      <div class="section-heading"><i class="fas fa-th"></i> Module Guides</div>
+      <div class="section-sub">A brief overview of each module and what it does. For deeper guides, visit the <a href="quick_guide.html" style="color:var(--blue-vivid);font-weight:600">Quick Guide</a>.</div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-building"></i></div><div><div class="card-head-title">Company Information</div><div class="card-head-sub">Required before exporting</div></div></div>
+        <div class="card-body">
+          <p style="font-size:.82rem;color:var(--gray-600);line-height:1.6;margin-bottom:12px">Store your business name, TIN, address, line of business, authorized employee, and report date. This information appears on every Excel export header and syncs to the VAT Sales right panel automatically.</p>
+          <div class="tip-box amber" style="margin-bottom:0"><div class="tip-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="tip-body"><h4>Required Fields</h4><p>Company Name &middot; TIN &middot; Address &middot; Line of Business &middot; Authorized Employee. Excel export will be blocked until all five are filled.</p></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-book-open"></i></div><div><div class="card-head-title">Journal Entry</div><div class="card-head-sub">General ledger consolidator</div></div></div>
+        <div class="card-body">
+          <p style="font-size:.82rem;color:var(--gray-600);line-height:1.6;margin-bottom:10px">Loads your saved transaction files (.vat, .purch, .exp, .taxes, .capex) and automatically generates a complete General Journal with Debit and Credit entries. Editable fields allow manual adjustments; totals update in real time. Use <strong>Print Journal</strong> for a formatted printout.</p>
+          <div class="tip-box blue" style="margin-bottom:0"><div class="tip-icon"><i class="fas fa-info-circle"></i></div><div class="tip-body"><h4>Supported Formats</h4><p>.vat &middot; .purch &middot; .npurch &middot; .rpurch &middot; .exp &middot; .nexp &middot; .taxes &middot; .capex</p></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-file-invoice-dollar"></i></div><div><div class="card-head-title">VAT Sales / Purchases / Expenses</div><div class="card-head-sub">Core VAT tracking modules</div></div></div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step"><div class="step-num"><i class="fas fa-check" style="font-size:.6rem"></i></div><div class="step-body"><h4>Enter gross (VAT-inclusive) amounts</h4><p>Net and Output/Input Tax are computed automatically: <code>Net = Gross &divide; 1.12</code>, <code>Tax = Net &times; 0.12</code>.</p></div></div>
+            <div class="step"><div class="step-num"><i class="fas fa-check" style="font-size:.6rem"></i></div><div class="step-body"><h4>Select withholding tax rate</h4><p>Choose from common BIR rates (0%, 1%, 2%, 5%, 10%, 15%) depending on the nature of transaction. Withholding = <code>Net &times; Rate</code>.</p></div></div>
+            <div class="step"><div class="step-num"><i class="fas fa-check" style="font-size:.6rem"></i></div><div class="step-body"><h4>TIN auto-fill</h4><p>Type a previously used TIN and the system auto-fills the customer/supplier name and address. All TINs are stored in the TIN Library.</p></div></div>
+            <div class="step"><div class="step-num"><i class="fas fa-check" style="font-size:.6rem"></i></div><div class="step-body"><h4>Save and Export</h4><p><code>Ctrl+S</code> saves a .vat/.purch/.exp file. <code>Ctrl+E</code> generates a formatted Excel report with company header, transaction table, customer/supplier summary, and distribution charts.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon" style="background:var(--gray-100);color:var(--gray-600)"><i class="fas fa-shopping-basket"></i></div><div><div class="card-head-title">Non-VAT Purchases &amp; Expenses</div><div class="card-head-sub">VAT-exempt transactions</div></div></div>
+        <div class="card-body"><p style="font-size:.82rem;color:var(--gray-600);line-height:1.6">Used for purchases and expenses from VAT-exempt suppliers or on zero-rated items. Transactions are recorded at gross value without VAT extraction. Saves as <code>.npurch</code> and <code>.nexp</code> files respectively. Can be loaded into the Journal Entry consolidator.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-amber"><i class="fas fa-building"></i></div><div><div class="card-head-title">Capital Expenditures (CAPEX)</div><div class="card-head-sub">Asset acquisition tracking</div></div></div>
+        <div class="card-body"><p style="font-size:.82rem;color:var(--gray-600);line-height:1.6">Track vatable and non-vatable asset acquisitions. Vatable assets: <code>Net = Gross &divide; 1.12</code>; non-vatable assets use gross value directly. Input tax on capital goods (ITCG) is tracked separately. Saves as <code>.capex</code> files.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-green"><i class="fas fa-gavel"></i></div><div><div class="card-head-title">Taxes &amp; Licenses</div><div class="card-head-sub">Government payments and fees</div></div></div>
+        <div class="card-body"><p style="font-size:.82rem;color:var(--gray-600);line-height:1.6">Record BIR annual registration fees (&#8369;500), documentary stamp tax, permit fees, and other government dues. Each entry supports Cash or Charge payment mode. Saves as <code>.taxes</code> files for audit trail and journal consolidation.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-red"><i class="fas fa-undo-alt"></i></div><div><div class="card-head-title">Purchase Returns</div><div class="card-head-sub">Returns with VAT reversal</div></div></div>
+        <div class="card-body"><p style="font-size:.82rem;color:var(--gray-600);line-height:1.6">Track goods returned to suppliers. The system automatically calculates the VAT adjustment: <code>Net Return = Gross &divide; 1.12</code>. This ensures proper input tax credit reversal in your journal. Saves as <code>.rpurch</code> files.</p></div>
+      </div>
+    </div>
+
+    <!-- ══ VAT FORMULAS ══ -->
+    <div class="help-section" id="vat-formulas">
+      <div class="section-heading"><i class="fas fa-calculator"></i> VAT Formulas &amp; Rates</div>
+      <div class="section-sub">Standard BIR computation methods used across all VAT-registered modules. Enter the gross amount &mdash; everything else is automatic.</div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-divide"></i></div><div><div class="card-head-title">Net Amount (VAT Extraction)</div></div></div>
+        <div class="card-body">
+          <p style="font-size:.82rem;color:var(--gray-600);margin-bottom:10px">Enter the <strong>gross (VAT-inclusive) amount</strong> from the invoice. The system extracts the net amount automatically.</p>
+          <div style="background:var(--gray-900);color:#93c5fd;font-family:var(--font-mono);font-size:.78rem;padding:12px 16px;border-radius:10px;line-height:1.8">
+            Net&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= Gross &divide; 1.12<br>
+            <span style="color:#6b7280">// Example:</span><br>
+            Net&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span style="color:#4ade80">&#8369;11,200.00</span> &divide; 1.12 = <span style="color:#4ade80">&#8369;10,000.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-percentage"></i></div><div><div class="card-head-title">Output Tax / Input Tax (12% VAT)</div></div></div>
+        <div class="card-body">
+          <p style="font-size:.82rem;color:var(--gray-600);margin-bottom:10px">VAT is computed on the extracted net amount at the standard <strong>12% BIR rate</strong>.</p>
+          <div style="background:var(--gray-900);color:#93c5fd;font-family:var(--font-mono);font-size:.78rem;padding:12px 16px;border-radius:10px;line-height:1.8">
+            Output Tax = Net &times; 0.12<br>
+            <span style="color:#6b7280">// Example:</span><br>
+            Output Tax = <span style="color:#4ade80">&#8369;10,000.00</span> &times; 0.12 = <span style="color:#4ade80">&#8369;1,200.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><div class="card-head-icon ci-amber"><i class="fas fa-hand-holding-usd"></i></div><div><div class="card-head-title">Expanded Withholding Tax (EWT)</div></div></div>
+        <div class="card-body">
+          <p style="font-size:.82rem;color:var(--gray-600);margin-bottom:10px">EWT is deducted by the payor on the <strong>net amount</strong> at the BIR-prescribed rate for the transaction type.</p>
+          <div style="background:var(--gray-900);color:#93c5fd;font-family:var(--font-mono);font-size:.78rem;padding:12px 16px;border-radius:10px;line-height:1.8;margin-bottom:12px">
+            EWT = Net &times; Rate<br>
+            <span style="color:#6b7280">// Example (2% services):</span><br>
+            EWT = <span style="color:#4ade80">&#8369;10,000.00</span> &times; 0.02 = <span style="color:#4ade80">&#8369;200.00</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:.75rem">
+            <div style="padding:9px 12px;background:var(--blue-50);border-radius:8px;border:1px solid var(--blue-100)"><strong style="color:var(--blue-800)">1%</strong><span style="color:var(--blue-700);display:block">Goods / Supplies</span></div>
+            <div style="padding:9px 12px;background:var(--blue-50);border-radius:8px;border:1px solid var(--blue-100)"><strong style="color:var(--blue-800)">2%</strong><span style="color:var(--blue-700);display:block">Services</span></div>
+            <div style="padding:9px 12px;background:var(--amber-50);border-radius:8px;border:1px solid var(--amber-100)"><strong style="color:var(--amber-700)">5%</strong><span style="color:var(--amber-700);display:block">Rental (real &amp; personal property)</span></div>
+            <div style="padding:9px 12px;background:var(--amber-50);border-radius:8px;border:1px solid var(--amber-100)"><strong style="color:var(--amber-700)">10&ndash;15%</strong><span style="color:var(--amber-700);display:block">Professionals (doctors, CPAs, lawyers)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box green">
+        <div class="tip-icon"><i class="fas fa-info-circle"></i></div>
+        <div class="tip-body"><h4>VAT Registration Threshold</h4><p>Businesses with gross annual sales or receipts exceeding <strong>&#8369;3,000,000</strong> are required to register as VAT taxpayers under the TRAIN Law. Below this threshold, the 3% Percentage Tax applies instead.</p></div>
+      </div>
+    </div>
+
+    <!-- ══ DATA MANAGEMENT ══ -->
+    <div class="help-section" id="data-management">
+      <div class="section-heading"><i class="fas fa-database"></i> Data Management</div>
+      <div class="section-sub">How to save, load, and manage your transaction files and company data.</div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-file-code"></i></div><div><div class="card-head-title">File Formats</div><div class="card-head-sub">JSON-based files per module</div></div></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;font-size:.78rem">
+            <div style="padding:9px 12px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:9px"><code style="color:var(--blue-700);font-size:.75rem">.vat</code><span style="color:var(--gray-600);display:block;margin-top:2px">VAT Sales</span></div>
+            <div style="padding:9px 12px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:9px"><code style="color:var(--blue-700);font-size:.75rem">.purch</code><span style="color:var(--gray-600);display:block;margin-top:2px">VAT Purchases</span></div>
+            <div style="padding:9px 12px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:9px"><code style="color:var(--blue-700);font-size:.75rem">.exp</code><span style="color:var(--gray-600);display:block;margin-top:2px">VAT Expenses</span></div>
+            <div style="padding:9px 12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:9px"><code style="color:var(--gray-600);font-size:.75rem">.npurch</code><span style="color:var(--gray-600);display:block;margin-top:2px">Non-VAT Purchases</span></div>
+            <div style="padding:9px 12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:9px"><code style="color:var(--gray-600);font-size:.75rem">.nexp</code><span style="color:var(--gray-600);display:block;margin-top:2px">Non-VAT Expenses</span></div>
+            <div style="padding:9px 12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:9px"><code style="color:var(--gray-600);font-size:.75rem">.rpurch</code><span style="color:var(--gray-600);display:block;margin-top:2px">Purchase Returns</span></div>
+            <div style="padding:9px 12px;background:var(--amber-50);border:1px solid var(--amber-100);border-radius:9px"><code style="color:var(--amber-700);font-size:.75rem">.capex</code><span style="color:var(--gray-600);display:block;margin-top:2px">Capital Expenditures</span></div>
+            <div style="padding:9px 12px;background:var(--green-50);border:1px solid var(--green-100);border-radius:9px"><code style="color:var(--green-700);font-size:.75rem">.taxes</code><span style="color:var(--gray-600);display:block;margin-top:2px">Taxes &amp; Licenses</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-green"><i class="fas fa-sync-alt"></i></div><div><div class="card-head-title">localStorage Auto-Save</div></div></div>
+        <div class="card-body">
+          <p style="font-size:.82rem;color:var(--gray-600);line-height:1.6;margin-bottom:12px">In addition to file saves, the system automatically persists data in your browser&rsquo;s localStorage after every change. This means your data is preserved even if you accidentally close the tab &mdash; just reopen the module and it will restore automatically.</p>
+          <div class="tip-box amber" style="margin-bottom:0"><div class="tip-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="tip-body"><h4>Clearing Browser Data</h4><p>Clearing your browser&rsquo;s cache or site data will erase localStorage. Always save a .vat/.purch/.exp file before clearing your browser. Company info and TIN library are also stored in localStorage.</p></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-id-card"></i></div><div><div class="card-head-title">TIN Library</div><div class="card-head-sub">Central customer &amp; supplier registry</div></div></div>
+        <div class="card-body"><p style="font-size:.82rem;color:var(--gray-600);line-height:1.6">The TIN Library stores all customer and supplier TINs, names, and addresses from your transaction data. When you enter a TIN in any module, the system auto-fills the name and address from the library. Access the TIN Library from the Dashboard nav or the <a href="tin_library.html" style="color:var(--blue-vivid);font-weight:600">TIN Library</a> link.</p></div>
+      </div>
+    </div>
+
+    <!-- ══ SHORTCUTS ══ -->
+    <div class="help-section" id="shortcuts">
+      <div class="section-heading"><i class="fas fa-keyboard"></i> Keyboard Shortcuts</div>
+      <div class="section-sub">Use these shortcuts in any tracking module to speed up data entry and navigation.</div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-file-alt"></i></div><div><div class="card-head-title">File Operations</div></div></div>
+        <div class="card-body">
+          <div class="kb-grid">
+            <div class="kb-item"><span class="kb-key">Ctrl+S</span><span class="kb-desc">Save data to file</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+O</span><span class="kb-desc">Load data from file</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+E</span><span class="kb-desc">Export to Excel</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+P</span><span class="kb-desc">Print report / Journal</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-table"></i></div><div><div class="card-head-title">Table Navigation &amp; Editing</div></div></div>
+        <div class="card-body">
+          <div class="kb-grid">
+            <div class="kb-item"><span class="kb-key">Tab</span><span class="kb-desc">Move to next field</span></div>
+            <div class="kb-item"><span class="kb-key">&uarr; &darr; &larr; &rarr;</span><span class="kb-desc">Navigate between cells</span></div>
+            <div class="kb-item"><span class="kb-key">Enter</span><span class="kb-desc">Confirm &amp; move to next row</span></div>
+            <div class="kb-item"><span class="kb-key">Delete</span><span class="kb-desc">Delete selected cell(s)</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+N</span><span class="kb-desc">Add new row</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+C</span><span class="kb-desc">Copy selected cells</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+V</span><span class="kb-desc">Paste to selected cells</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+M</span><span class="kb-desc">Toggle Selection Mode</span></div>
+            <div class="kb-item"><span class="kb-key">Esc</span><span class="kb-desc">Clear selection / Exit mode</span></div>
+            <div class="kb-item"><span class="kb-key">Ctrl+=</span><span class="kb-desc">Zoom in</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-blue"><i class="fas fa-expand"></i></div><div><div class="card-head-title">View &amp; Display</div></div></div>
+        <div class="card-body">
+          <div class="kb-grid">
+            <div class="kb-item"><span class="kb-key">Ctrl+Shift+F</span><span class="kb-desc">Toggle Table Focus Mode</span></div>
+            <div class="kb-item"><span class="kb-key">F1</span><span class="kb-desc">Open Quick Guide</span></div>
+          </div>
+          <div class="tip-box blue" style="margin-top:12px;margin-bottom:0"><div class="tip-icon"><i class="fas fa-expand-arrows-alt"></i></div><div class="tip-body"><h4>Table Focus Mode</h4><p>Ctrl+Shift+F hides the sidebar, header, and all control panels to give the table maximum screen space. Press again to restore the full interface. Ideal for data entry on small screens.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TROUBLESHOOTING ══ -->
+    <div class="help-section" id="troubleshooting">
+      <div class="section-heading"><i class="fas fa-wrench"></i> Troubleshooting</div>
+      <div class="section-sub">Solutions to common issues. If your problem isn&rsquo;t listed here, check the FAQ or contact support.</div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-red"><i class="fas fa-times-circle"></i></div><div><div class="card-head-title">Export to Excel is blocked</div></div></div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Fill all required company fields</h4><p>Go to <strong>Company Information</strong> and ensure all five fields are filled: Company Name, TIN, Address, Line of Business, and Authorized Employee.</p></div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Click Save &amp; Sync</h4><p>After filling the fields, click <strong>Save &amp; Sync</strong> in Company Information. Then return to the module and try exporting again.</p></div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Check for data in the table</h4><p>The export requires at least one data row in the table. Add a row with a gross amount entered.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-red"><i class="fas fa-database"></i></div><div><div class="card-head-title">Data disappeared after closing the browser</div></div></div>
+        <div class="card-body">
+          <p style="font-size:.82rem;color:var(--gray-600);line-height:1.6;margin-bottom:12px">localStorage can be cleared by browser updates, private/incognito mode, or manual cache clearing. To prevent data loss:</p>
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Always save a file before closing</h4><p>Press <code>Ctrl+S</code> after each session to download a .vat/.purch/.exp file to your computer. Files are the permanent backup.</p></div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Do not use Incognito / Private mode</h4><p>Incognito mode clears localStorage when the window closes. Use a regular browser window for the system.</p></div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Reload from file</h4><p>Press <code>Ctrl+O</code> to load a previously saved file and restore your data.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-red"><i class="fas fa-id-card"></i></div><div><div class="card-head-title">TIN auto-fill is not working</div></div></div>
+        <div class="card-body"><p style="font-size:.82rem;color:var(--gray-600);line-height:1.6">TIN auto-fill pulls from the TIN Library stored in localStorage. If it&rsquo;s not filling: (1) make sure the TIN was previously saved by entering and saving at least one transaction with that TIN, (2) check that you&rsquo;re typing the TIN in the correct format <code>000-000-000-000</code>, and (3) open the <a href="tin_library.html" style="color:var(--blue-vivid);font-weight:600">TIN Library</a> to verify the entry exists.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon ci-amber"><i class="fas fa-calculator"></i></div><div><div class="card-head-title">VAT amounts look incorrect</div></div></div>
+        <div class="card-body"><p style="font-size:.82rem;color:var(--gray-600);line-height:1.6;margin-bottom:10px">The system always assumes the amount you enter is <strong>VAT-inclusive (gross)</strong>. Make sure you are entering the total invoice amount including VAT, not the net amount. If you enter the net amount by mistake, the output tax will be over-calculated.</p>
+        <div style="background:var(--gray-900);color:#93c5fd;font-family:var(--font-mono);font-size:.75rem;padding:10px 14px;border-radius:8px;line-height:1.7">
+          <span style="color:#6b7280">// Correct: enter VAT-inclusive (gross)</span><br>
+          Gross = <span style="color:#4ade80">&#8369;11,200</span> &rarr; Net = <span style="color:#4ade80">&#8369;10,000</span>, Tax = <span style="color:#4ade80">&#8369;1,200</span><br>
+          <span style="color:#6b7280">// Wrong: entering net as gross</span><br>
+          Gross = <span style="color:#f87171">&#8369;10,000</span> &rarr; Net = <span style="color:#f87171">&#8369;8,929</span>, Tax = <span style="color:#f87171">&#8369;1,071</span>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- ══ FAQ ══ -->
+    <div class="help-section" id="faq">
+      <div class="section-heading"><i class="fas fa-question-circle"></i> Frequently Asked Questions</div>
+      <div class="section-sub">Quick answers to common questions.</div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-save"></i></div><h4>How do I save my work?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Press <strong>Ctrl+S</strong> at any time, or click <strong>Save Data to File</strong> in the sidebar. This downloads a file with the correct extension for the module you&rsquo;re in (.vat, .purch, .exp, etc.). Files are JSON and can be reloaded with <code>Ctrl+O</code>.</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-building"></i></div><h4>Where do I set up my company details?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Go to <strong>Company Information</strong> from the Dashboard. Fill in all fields and click <strong>Save &amp; Sync</strong>. The data syncs to the VAT Sales right sidebar and all Excel export report headers automatically. Without these details, Excel export will be disabled.</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-check-double"></i></div><h4>How do I edit multiple rows at once?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Press <strong>Ctrl+M</strong> to enter Selection Mode. Then click and drag across the cells you want to select. Use Ctrl+C to copy, Ctrl+V to paste values, or Delete to clear the selected range. Press Escape to exit Selection Mode.</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-id-card"></i></div><h4>What TIN format should I use?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Use the format <strong>000-000-000-000</strong> (12 digits with dashes). The system auto-formats as you type. Digits 1&ndash;9 are the unique tax number; digits 10&ndash;12 are the branch code (000 for the main office).</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-book-open"></i></div><h4>How do I generate a General Journal?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Open the <strong>Journal Entry</strong> module. Load your saved transaction files by clicking the load buttons for each section (Sales, Purchases, Expenses, etc.). The system automatically consolidates all entries into a balanced General Journal with proper Debits and Credits. Click <strong>Print Journal</strong> to print or save as PDF.</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-sync-alt"></i></div><h4>Why doesn&rsquo;t my company info appear in VAT Sales?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Make sure you clicked <strong>Save &amp; Sync</strong> in the Company Information page. Then open or refresh <strong>VAT Sales</strong> &mdash; the system reads company info from localStorage on every page load. If it still doesn&rsquo;t appear, try pressing <strong>Ctrl+Shift+R</strong> (hard reload) in the VAT Sales page.</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-wifi"></i></div><h4>Does the system work without internet?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Yes. After the initial page load (which loads fonts and icons from Google/CDN), the system works completely offline. All calculations, data entry, saving, and exporting happen entirely in your browser with no server communication.</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-icon"><i class="fas fa-search-plus"></i></div><h4>The table is too small at high zoom &mdash; what can I do?</h4><i class="fas fa-chevron-down faq-arrow"></i></div><div class="faq-a">Press <strong>Ctrl+Shift+F</strong> to enter Table Focus Mode. This hides all panels except the table, giving it maximum screen width. Press again to restore the full interface. The system also adapts automatically at 150%, 175%, and 200% zoom levels by compacting the UI.</div></div>
+    </div>
+
+    <!-- ══ CONTACT ══ -->
+    <div class="help-section" id="contact">
+      <div class="section-heading"><i class="fas fa-headset"></i> Contact &amp; Support</div>
+      <div class="section-sub">Need more help? Reach out through any of the channels below.</div>
+
+      <div class="contact-grid" style="margin-bottom:20px">
+        <a href="mailto:support@mgaa-vat.com?subject=MGAA%20VAT%20System%20Support" class="contact-card">
+          <div class="contact-icon ci-blue"><i class="fas fa-envelope"></i></div>
+          <div class="contact-body"><h4>Email Support</h4><p>support@mgaa-vat.com<br>Response within 1 business day</p></div>
+        </a>
+        <a href="quick_guide.html" class="contact-card">
+          <div class="contact-icon ci-green"><i class="fas fa-compass"></i></div>
+          <div class="contact-body"><h4>Quick Guide</h4><p>Full module guides, shortcuts, formulas, and FAQs</p></div>
+        </a>
+        <a href="tax_calculator.html" class="contact-card">
+          <div class="contact-icon ci-amber"><i class="fas fa-calculator"></i></div>
+          <div class="contact-body"><h4>Tax Calculator</h4><p>BIR TRAIN Law rates, EWT, SSS/PhilHealth/Pag-IBIG</p></div>
+        </a>
+        <a href="tax_facts.html" class="contact-card">
+          <div class="contact-icon ci-blue"><i class="fas fa-book-open"></i></div>
+          <div class="contact-body"><h4>Tax Facts</h4><p>BIR reference rates, deadlines, and regulations</p></div>
+        </a>
+      </div>
+
+      <div class="tip-box green">
+        <div class="tip-icon"><i class="fas fa-lightbulb"></i></div>
+        <div class="tip-body"><h4>Before Contacting Support</h4><p>Check the <a href="quick_guide.html" style="color:var(--green-700);font-weight:600">Quick Guide</a> and the Troubleshooting section above &mdash; most issues are resolved there. When emailing support, include your browser name/version, a description of the issue, and the module you were using.</p></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div style="font-size:.75rem">MGAA VAT Tracking System v2.0 &nbsp;&middot;&nbsp; Help &amp; Support &nbsp;&middot;&nbsp; All data stored locally</div>
+  <div class="footer-links">
+    <a href="index2.html"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="quick_guide.html"><i class="fas fa-compass"></i> Quick Guide</a>
+    <a href="tax_calculator.html"><i class="fas fa-calculator"></i> Tax Calculator</a>
+    <a href="vatable_sales.html"><i class="fas fa-file-invoice-dollar"></i> VAT Sales</a>
+    <a href="mailto:support@mgaa-vat.com?subject=MGAA%20VAT%20System%20Support"><i class="fas fa-envelope"></i> Email Support</a>
+    <a href="#" onclick="window.print();return false"><i class="fas fa-print"></i> Print</a>
+  </div>
+</div>
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+'use strict';
+
+/* ── FAQ ── */
+function toggleFAQ(q) {
+  const item=q.closest('.faq-item'), ans=q.nextElementSibling, isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i=>{i.classList.remove('open');i.querySelector('.faq-a').classList.remove('show');});
+  if(!isOpen){item.classList.add('open');ans.classList.add('show');}
+}
+
+/* ── JUMP TO SECTION ── */
+function jumpTo(id) {
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── SCROLL TOP ── */
+window.addEventListener('scroll',()=>{
+  document.getElementById('scrollTop').classList.toggle('show', window.scrollY>300);
+  // active sidebar link
+  const sections=document.querySelectorAll('.help-section');
+  let current='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-90)current=s.id;});
+  document.querySelectorAll('.sidebar-nav-item a').forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('href')==='#'+current);
+  });
+},{passive:true});
+
+/* ── SEARCH ── */
+function doSearch(q) {
+  // sync both inputs
+  document.getElementById('topSearch').value=q;
+  document.getElementById('heroSearch').value=q;
+  const term=q.trim().toLowerCase();
+  // remove old highlights
+  document.querySelectorAll('.search-highlight').forEach(el=>{
+    const parent=el.parentNode;
+    parent.replaceChild(document.createTextNode(el.textContent),el);
+    parent.normalize();
+  });
+  if(!term) return;
+  // highlight in content
+  const walker=document.createTreeWalker(document.querySelector('.content'),NodeFilter.SHOW_TEXT,null,false);
+  const matches=[];
+  let node;
+  while((node=walker.nextNode())){
+    if(node.nodeValue.toLowerCase().includes(term)) matches.push(node);
+  }
+  matches.forEach(node=>{
+    const idx=node.nodeValue.toLowerCase().indexOf(term);
+    if(idx<0)return;
+    const before=document.createTextNode(node.nodeValue.substring(0,idx));
+    const mark=document.createElement('mark');
+    mark.className='search-highlight';
+    mark.textContent=node.nodeValue.substring(idx,idx+term.length);
+    const after=document.createTextNode(node.nodeValue.substring(idx+term.length));
+    node.parentNode.insertBefore(before,node);
+    node.parentNode.insertBefore(mark,node);
+    node.parentNode.insertBefore(after,node);
+    node.parentNode.removeChild(node);
+  });
+  if(matches.length>0){
+    const first=document.querySelector('.search-highlight');
+    if(first) first.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+}
+document.getElementById('topSearch').addEventListener('input',e=>doSearch(e.target.value));
+document.getElementById('heroSearch').addEventListener('input',e=>doSearch(e.target.value));
+// clear search on Escape
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){doSearch('');document.getElementById('topSearch').value='';document.getElementById('heroSearch').value='';}});
+</script>
+</body>
+</html>

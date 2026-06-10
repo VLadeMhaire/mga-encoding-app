@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Information | MGAA System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue-50:#EFF6FF; --blue-100:#DBEAFE; --blue-200:#BFDBFE; --blue-300:#93C5FD;
+  --blue-400:#60A5FA; --blue-500:#3B82F6; --blue-600:#2563EB; --blue-700:#1D4ED8;
+  --blue-800:#1E40AF; --blue-900:#1E3A8A;
+  --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB; --gray-300:#D1D5DB;
+  --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-600:#4B5563; --gray-700:#374151;
+  --gray-800:#1F2937; --gray-900:#111827;
+  --green-50:#F0FDF4; --green-100:#DCFCE7; --green-500:#22C55E; --green-700:#15803D;
+  --red-50:#FEF2F2; --red-500:#EF4444; --red-700:#B91C1C;
+  --amber-50:#FFFBEB; --amber-500:#F59E0B; --amber-700:#B45309;
+  --teal:#0d8a6e; --teal-light:#d4f3eb;
+  --nav-h:64px;
+  --font:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Consolas',monospace;
+  --font-display:'Syne',sans-serif;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.08),0 4px 6px rgba(0,0,0,.05);
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --tr:0.22s cubic-bezier(.4,0,.2,1);
+}
+html, body { min-height:100%; background:#f5f6f9; color:var(--gray-900); font-family:var(--font); line-height:1.55; }
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--gray-100)} ::-webkit-scrollbar-thumb{background:var(--blue-300);border-radius:99px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:900;height:var(--nav-h);background:rgba(255,255,255,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(0,0,0,.07);box-shadow:0 2px 20px rgba(0,0,0,.05);}
+.nav-inner{max-width:1080px;margin:0 auto;padding:0 28px;height:100%;display:flex;align-items:center;gap:14px;}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1a47cc,#2a5de8);display:flex;align-items:center;justify-content:center;color:white;font-size:15px;}
+.brand-name{font-family:var(--font-display);font-size:.93rem;font-weight:700;color:var(--gray-900);}
+.brand-tag{font-size:.62rem;font-weight:600;color:#1a47cc;background:#dde8ff;padding:2px 7px;border-radius:20px;margin-left:4px;}
+.nav-spacer{flex:1;}
+.saved-pill{display:inline-flex;align-items:center;gap:6px;background:var(--green-50);border:1px solid var(--green-100);color:var(--green-700);padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;opacity:0;transform:scale(.9);transition:opacity .3s,transform .3s;pointer-events:none;}
+.saved-pill.show{opacity:1;transform:scale(1);}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:30px;font-size:.8rem;font-weight:500;color:var(--gray-600);text-decoration:none;border:1px solid var(--gray-200);background:white;transition:background var(--tr),color var(--tr);}
+.nav-link:hover{background:var(--gray-50);color:var(--gray-900);}
+.nav-link i{font-size:.75rem;}
+
+/* ── Identity badges (light nav theme) ── */
+.identity-strip{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.id-badge{display:flex;align-items:center;gap:6px;border-radius:20px;padding:4px 12px;font-size:.75rem;font-weight:600;white-space:nowrap;flex-shrink:0}
+.id-badge i{font-size:.7rem;flex-shrink:0}
+.id-badge-subadmin{background:#ede9fe;border:1px solid #c4b5fd;color:#6d28d9}
+.id-badge-client{background:#dcfce7;border:1px solid #86efac;color:#15803d}
+.id-badge-sep{font-size:.75rem;color:var(--gray-400);flex-shrink:0}
+
+/* PAGE */
+.page{max-width:1080px;margin:0 auto;padding:36px 28px 80px;}
+
+/* HERO */
+.hero{border-radius:22px;padding:34px 40px;margin-bottom:36px;position:relative;overflow:hidden;background:linear-gradient(130deg,#0d1f5c 0%,#1a3ba0 55%,#1555c2 100%);box-shadow:0 20px 60px -12px rgba(26,71,204,.35);}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(100,160,255,.18),transparent 65%);pointer-events:none;}
+.hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.1);pointer-events:none;}
+.hero-ring-1{width:280px;height:280px;top:-80px;right:-40px;}
+.hero-ring-2{width:150px;height:150px;top:10px;right:130px;}
+.hero-content{position:relative;z-index:2;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.hero-icon{width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:24px;color:white;flex-shrink:0;}
+.hero-text{flex:1;}
+.hero-eyebrow{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:5px;}
+.hero-title{font-family:var(--font-display);font-size:1.7rem;font-weight:800;color:white;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;}
+.hero-title span{color:#93c5fd;}
+.hero-sub{font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.5;}
+.sync-pill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:7px 16px;font-size:.75rem;font-weight:600;color:rgba(255,255,255,.9);white-space:nowrap;flex-shrink:0;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s ease-in-out infinite;}
+.sync-dot.idle{background:var(--blue-300);animation:none;}
+.sync-dot.saving{background:#fbbf24;animation:pulse .8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start;}
+@media(max-width:800px){.layout{grid-template-columns:1fr;}}
+
+/* CARD */
+.card{background:white;border-radius:18px;border:1px solid rgba(0,0,0,.07);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:20px;}
+.card-head{padding:16px 22px 13px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;}
+.card-head-icon{width:34px;height:34px;border-radius:9px;background:var(--blue-50);color:var(--blue-700);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.card-head-title{font-family:var(--font-display);font-size:.9rem;font-weight:700;color:var(--gray-900);}
+.card-head-sub{font-size:.72rem;color:var(--gray-500);margin-top:1px;}
+.card-body{padding:22px;}
+
+/* FIELDS */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px;}
+.row.full{grid-template-columns:1fr;}
+@media(max-width:580px){.row{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);display:flex;align-items:center;gap:4px;}
+.field label .req{color:#1a47cc;}
+.field input{padding:9px 13px;border:1.5px solid var(--gray-200);border-radius:9px;font-family:var(--font);font-size:.88rem;color:var(--gray-900);background:white;transition:border-color .2s,box-shadow .2s;}
+.field input:focus{outline:none;border-color:#2a5de8;box-shadow:0 0 0 3px rgba(42,93,232,.1);}
+.field input.mono{font-family:var(--font-mono);letter-spacing:.5px;}
+.field-hint{font-size:.68rem;color:var(--gray-400);margin-top:1px;}
+.date-wrap{display:flex;gap:7px;}
+.date-wrap input{flex:1;}
+.cal-btn{width:40px;height:40px;flex-shrink:0;background:var(--blue-50);color:var(--blue-700);border:1.5px solid var(--blue-100);border-radius:9px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .18s,border-color .18s;}
+.cal-btn:hover{background:var(--blue-100);border-color:var(--blue-300);}
+
+/* ACTIONS */
+.actions{display:flex;gap:9px;margin-top:22px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:30px;font-family:var(--font);font-size:.83rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;white-space:nowrap;}
+.btn i{font-size:.75rem;}
+.btn-primary{background:#1a47cc;color:white;}
+.btn-primary:hover{background:#1240b8;transform:translateY(-1px);box-shadow:0 6px 18px rgba(26,71,204,.3);}
+.btn-secondary{background:white;color:var(--gray-700);border:1.5px solid var(--gray-200);}
+.btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-300);}
+.btn-success{background:var(--teal-light);color:var(--teal);border:1.5px solid #a7f3d0;}
+.btn-success:hover{background:#a7f3d0;}
+.btn-danger{background:var(--red-50);color:var(--red-700);border:1.5px solid #fecaca;}
+.btn-danger:hover{background:#fecaca;}
+
+/* SIDEBAR STICKY */
+.sidebar{position:sticky;top:calc(var(--nav-h) + 18px);}
+
+/* PREVIEW */
+.preview-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:6px;}
+.preview-val{font-size:.85rem;font-weight:500;color:var(--gray-900);padding:6px 11px;background:var(--gray-50);border-radius:7px;min-height:34px;word-break:break-word;line-height:1.4;margin-bottom:12px;}
+.preview-val.mono{font-family:var(--font-mono);color:#1a47cc;font-size:.78rem;}
+.preview-val.empty{color:var(--gray-400);font-style:italic;font-size:.78rem;}
+.preview-divider{height:1px;background:var(--gray-100);margin:14px 0;}
+
+/* TARGETS */
+.target-list{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:10px;}
+.target-item{display:flex;align-items:center;gap:7px;font-size:.72rem;color:var(--gray-600);padding:6px 9px;background:var(--gray-50);border-radius:7px;}
+.target-item i{color:var(--green-500);font-size:.65rem;}
+.target-key{font-family:var(--font-mono);font-size:.63rem;color:#1a47cc;margin-left:auto;background:var(--blue-50);padding:2px 5px;border-radius:4px;white-space:nowrap;}
+.sync-note{display:flex;align-items:flex-start;gap:7px;font-size:.72rem;color:var(--gray-500);padding:9px 12px;background:var(--blue-50);border-radius:9px;margin-top:10px;line-height:1.45;}
+.sync-note i{color:var(--blue-500);margin-top:1px;flex-shrink:0;}
+.sync-note strong{color:var(--blue-700);}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:white;border:1px solid var(--gray-200);border-left:4px solid var(--blue-500);border-radius:10px;padding:11px 16px;font-size:.83rem;color:var(--gray-700);box-shadow:var(--shadow-lg);z-index:9999;max-width:320px;display:flex;align-items:center;gap:9px;animation:toastIn .25s var(--ease-out);}
+.toast.success{border-left-color:var(--green-500);}
+.toast.error{border-left-color:var(--red-500);}
+.toast.warning{border-left-color:var(--amber-500);}
+.toast i{font-size:.95rem;flex-shrink:0;}
+.toast.success i{color:var(--green-500);}
+.toast.error i{color:var(--red-500);}
+.toast.warning i{color:var(--amber-500);}
+@keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast.fade-out{opacity:0;transform:translateY(10px);transition:.3s;}
+
+/* DATE PICKER */
+.dp-overlay{position:fixed;inset:0;z-index:9000;background:transparent;}
+.dp-popup{position:fixed;z-index:9001;background:white;border:1px solid var(--gray-200);border-radius:14px;box-shadow:var(--shadow-lg);overflow:hidden;width:272px;animation:popIn .15s ease;}
+@keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.dp-hd{background:var(--blue-900);color:white;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;}
+.dp-my{font-size:13px;font-weight:700;flex:1;text-align:center;}
+.dp-nav{background:rgba(255,255,255,.15);border:none;color:white;width:27px;height:27px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s;}
+.dp-nav:hover{background:rgba(255,255,255,.3);}
+.dp-wk{display:grid;grid-template-columns:repeat(7,1fr);background:var(--blue-50);border-bottom:1px solid var(--gray-100);}
+.dp-wk span{text-align:center;padding:6px 0;font-size:9px;font-weight:700;color:var(--blue-700);text-transform:uppercase;}
+.dp-days{display:grid;grid-template-columns:repeat(7,1fr);padding:5px 7px 9px;gap:2px;}
+.dp-day{text-align:center;padding:6px 2px;font-size:11px;border-radius:6px;cursor:pointer;border:none;background:none;color:var(--gray-700);font-family:var(--font);transition:background .1s,color .1s;line-height:1;}
+.dp-day:hover{background:var(--blue-100);color:var(--blue-800);}
+.dp-day.today{font-weight:700;color:var(--blue-600);}
+.dp-day.selected{background:var(--blue-600);color:white;font-weight:700;}
+.dp-day.other-month{color:var(--gray-300);}
+.dp-foot{border-top:1px solid var(--gray-100);padding:7px 9px;display:flex;gap:5px;justify-content:flex-end;}
+.dp-foot button{font-size:11px;padding:5px 11px;border-radius:6px;cursor:pointer;font-family:var(--font);border:1px solid var(--gray-200);background:white;color:var(--gray-600);transition:var(--tr);}
+.dp-foot button:hover{background:var(--gray-50);}
+.dp-today{background:var(--blue-600)!important;color:white!important;border-color:var(--blue-600)!important;}
+
+@media(max-width:580px){
+  .nav-inner{padding:0 14px;}
+  .page{padding:20px 14px 60px;}
+  .hero{padding:22px 20px;border-radius:16px;}
+  .hero-title{font-size:1.35rem;}
+  .card-body{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index2.html">
+      <div class="brand-mark"><i class="fas fa-file-invoice-dollar"></i></div>
+      <span class="brand-name">MGAA<span class="brand-tag">VAT System</span></span>
+    </a>
+    <div class="nav-spacer"></div>
+    <span class="saved-pill" id="savedPill"><i class="fas fa-check-circle"></i> Saved</span>
+    <!-- Identity strip: role-specific badges -->
+    <div class="identity-strip" id="identityStrip" style="display:none">
+      <div class="id-badge id-badge-subadmin hidden" id="subAdminBadge"><i class="fas fa-user-shield"></i><span id="subAdminBadgeLabel">—</span></div>
+      <span class="id-badge-sep hidden" id="identitySep">›</span>
+      <div class="id-badge id-badge-client hidden" id="clientBadge"><i class="fas fa-user"></i><span id="clientBadgeLabel">—</span></div>
+    </div>
+    <a href="index2.html" class="nav-link" style="margin-left:10px"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="vatable_sales.html" class="nav-link"><i class="fas fa-file-invoice-dollar"></i> VAT Sales</a>
+    <a href="vatable_purchases.html" class="nav-link"><i class="fas fa-shopping-cart"></i> VAT Purchases</a>
+    <a href="vatable_expenses.html" class="nav-link"><i class="fas fa-receipt"></i> VAT Expenses</a>
+    <a href="non_vat_purchases.html" class="nav-link"><i class="fas fa-shopping-bag"></i> Non-VAT Purchases</a>
+    <a href="non_vat_expenses.html" class="nav-link"><i class="fas fa-file-alt"></i> Non-VAT Expenses</a>
+    <a href="capex.html" class="nav-link"><i class="fas fa-tools"></i> CAPEX</a>
+    <a href="taxes_licenses.html" class="nav-link"><i class="fas fa-landmark"></i> Taxes &amp; Licenses</a>
+    <a href="purchase_returns.html" class="nav-link"><i class="fas fa-undo-alt"></i> Purchase Returns</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-ring hero-ring-1"></div>
+    <div class="hero-ring hero-ring-2"></div>
+    <div class="hero-content">
+      <div class="hero-icon"><i class="fas fa-building"></i></div>
+      <div class="hero-text">
+        <div class="hero-eyebrow">MGAA VAT System</div>
+        <div class="hero-title">Company <span>Information</span></div>
+        <div class="hero-sub">Manage business details. Saved data loads automatically into all VAT and Non-VAT modules, CAPEX, Taxes &amp; Licenses, and Purchase Returns.</div>
+      </div>
+      <div class="sync-pill">
+        <div class="sync-dot idle" id="syncDot"></div>
+        <span id="syncText">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- MAIN FORM -->
+    <div>
+      <!-- Business Identity -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon"><i class="fas fa-id-badge"></i></div>
+          <div>
+            <div class="card-head-title">Business Identity</div>
+            <div class="card-head-sub">Core registration details used on VAT reports</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="field">
+              <label>Company Name <span class="req">*</span></label>
+              <input type="text" id="companyName" placeholder="e.g., MGAA Accounting Firm" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label>TIN Number <span class="req">*</span></label>
+              <input type="text" id="companyTIN" class="mono" placeholder="000-000-000-000" maxlength="15">
+              <span class="field-hint">12-digit BIR Tax Identification Number</span>
+            </div>
+          </div>
+          <div class="row full">
+            <div class="field">
+              <label>Business Address <span class="req">*</span></label>
+              <input type="text" id="companyAddress" placeholder="Street, City, Province, ZIP">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Line of Business <span class="req">*</span></label>
+              <input type="text" id="lineOfBusiness" placeholder="e.g., Accounting Services">
+            </div>
+            <div class="field">
+              <label>Telephone</label>
+              <input type="tel" id="telephone" placeholder="(032) 000-0000">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Email Address</label>
+              <input type="email" id="email" placeholder="company@email.com">
+            </div>
+            <div class="field">
+              <label>Authorized Employee <span class="req">*</span></label>
+              <input type="text" id="authorizedEmployee" placeholder="Full name of signatory">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Period -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon"><i class="fas fa-calendar-alt"></i></div>
+          <div>
+            <div class="card-head-title">Report Period</div>
+            <div class="card-head-sub">Period end date applied to VAT reports</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row full">
+            <div class="field">
+              <label>Report Date</label>
+              <div class="date-wrap">
+                <input type="text" id="reportDate" class="mono" placeholder="MM/DD/YYYY" maxlength="10">
+                <button type="button" class="cal-btn" id="calBtn" title="Pick a date"><i class="fas fa-calendar-alt"></i></button>
+              </div>
+              <span class="field-hint">Format: MM/DD/YYYY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Save & Sync</button>
+        <button class="btn btn-success" id="openVatBtn"><i class="fas fa-file-invoice-dollar"></i> Open VAT Sales</button>
+        <button class="btn btn-success" id="openPurchBtn"><i class="fas fa-shopping-cart"></i> Open VAT Purchases</button>
+        <button class="btn btn-success" id="openExpBtn"><i class="fas fa-receipt"></i> Open VAT Expenses</button>
+        <button class="btn btn-success" id="openNPurchBtn"><i class="fas fa-shopping-bag"></i> Open Non-VAT Purchases</button>
+        <button class="btn btn-success" id="openNExpBtn"><i class="fas fa-file-alt"></i> Open Non-VAT Expenses</button>
+        <button class="btn btn-success" id="openCapexBtn"><i class="fas fa-tools"></i> Open CAPEX</button>
+        <button class="btn btn-success" id="openTaxesBtn"><i class="fas fa-landmark"></i> Open Taxes &amp; Licenses</button>
+        <button class="btn btn-success" id="openReturnsBtn"><i class="fas fa-undo-alt"></i> Open Purchase Returns</button>
+        <button class="btn btn-secondary" id="reloadBtn"><i class="fas fa-undo"></i> Reload Saved</button>
+        <button class="btn btn-danger" id="clearBtn"><i class="fas fa-eraser"></i> Clear All</button>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- Live Preview -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon"><i class="fas fa-eye"></i></div>
+          <div>
+            <div class="card-head-title">Live Preview</div>
+            <div class="card-head-sub">As it appears in VAT Sales</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding:14px 18px">
+          <div class="preview-label">Company Name</div>
+          <div class="preview-val" id="pv-companyName"><em style="opacity:.4">—</em></div>
+          <div class="preview-label">TIN Number</div>
+          <div class="preview-val mono" id="pv-companyTIN"><em style="opacity:.4;font-style:italic">—</em></div>
+          <div class="preview-divider"></div>
+          <div class="preview-label">Address</div>
+          <div class="preview-val" id="pv-companyAddress"><em style="opacity:.4">—</em></div>
+          <div class="preview-label">Line of Business</div>
+          <div class="preview-val" id="pv-lineOfBusiness"><em style="opacity:.4">—</em></div>
+          <div class="preview-divider"></div>
+          <div class="preview-label">Telephone</div>
+          <div class="preview-val" id="pv-telephone"><em style="opacity:.4">—</em></div>
+          <div class="preview-label">Email</div>
+          <div class="preview-val" id="pv-email"><em style="opacity:.4">—</em></div>
+          <div class="preview-label">Authorized Employee</div>
+          <div class="preview-val" id="pv-authorizedEmployee"><em style="opacity:.4">—</em></div>
+          <div class="preview-label">Report Date</div>
+          <div class="preview-val mono" id="pv-reportDate"><em style="opacity:.4;font-style:italic">—</em></div>
+        </div>
+      </div>
+
+      <!-- Sync Info -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon" style="background:var(--teal-light);color:var(--teal)"><i class="fas fa-sync-alt"></i></div>
+          <div>
+            <div class="card-head-title">Sync Targets</div>
+            <div class="card-head-sub">Keys written on Save</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding:12px 15px">
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:6px">VAT Sales</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> VAT Sales Main <span class="target-key">vatCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> VAT Sales Client <span class="target-key">vatCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> VAT Sales SubAdmin <span class="target-key">vatCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">VAT Purchases</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Purchases Main <span class="target-key">purchCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Purchases Client <span class="target-key">purchCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Purchases SubAdmin <span class="target-key">purchCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">VAT Expenses</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Expenses Main <span class="target-key">expCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Expenses Client <span class="target-key">expCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Expenses SubAdmin <span class="target-key">expCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Non-VAT Purchases</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Purch. Main <span class="target-key">npurchCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Purch. Client <span class="target-key">npurchCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Purch. SubAdmin <span class="target-key">npurchCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Non-VAT Expenses</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Exp. Main <span class="target-key">nvatExpCompanyInfo</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Exp. Client <span class="target-key">nvatExpCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Non-VAT Exp. SubAdmin <span class="target-key">nvatExpCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">CAPEX</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> CAPEX Main <span class="target-key">capexCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> CAPEX Client <span class="target-key">capexCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> CAPEX SubAdmin <span class="target-key">capexCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Taxes &amp; Licenses</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Taxes Main <span class="target-key">taxesCompanyInfo_Main</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Taxes Client <span class="target-key">taxesCompanyInfo_Client</span></li>
+            <li class="target-item"><i class="fas fa-check-circle"></i> Taxes SubAdmin <span class="target-key">taxesCompanyInfo_SubAdmin</span></li>
+          </ul>
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin:10px 0 6px">Purchase Returns</div>
+          <ul class="target-list">
+            <li class="target-item"><i class="fas fa-check-circle"></i> Purchase Returns <span class="target-key">purchaseReturnsCompanyInfo</span></li>
+          </ul>
+          <div class="sync-note">
+            <i class="fas fa-info-circle"></i>
+            <span>Open any module after saving — all eight read from these keys on every page load.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* =====================================================
+   Per-account user ID — ensures client1 and client2
+   never share the same localStorage key even though
+   they have the same APP_ROLE ('Client').
+===================================================== */
+const APP_USER_ID = (function(){
+  try {
+    const s = sessionStorage.getItem('VAT_SESSION');
+    if (s) {
+      const p = JSON.parse(s);
+      return p.id || p.sub || p.user_id || p.username || 'anon';
+    }
+  } catch(e) {}
+  return 'anon';
+})();
+
+/* =====================================================
+   STORAGE KEYS — scoped per APP_USER_ID so each client
+   account's company info is fully isolated.
+   All tracker pages read the same scoped keys because
+   they also derive their company key from getActiveCompanyKey()
+   which is keyed to the same VAT_SESSION user.
+   reportDate is stored as YYYY-MM-DD, displayed MM/DD/YYYY
+===================================================== */
+const u = APP_USER_ID;
+const COMPANY_KEYS = [
+  // VAT Sales
+  `vatCompanyInfo_${u}_Main`,
+  `vatCompanyInfo_${u}_Client`,
+  `vatCompanyInfo_${u}_SubAdmin`,
+  // VAT Purchases
+  `purchCompanyInfo_${u}_Main`,
+  `purchCompanyInfo_${u}_Client`,
+  `purchCompanyInfo_${u}_SubAdmin`,
+  // VAT Expenses
+  `expCompanyInfo_${u}_Main`,
+  `expCompanyInfo_${u}_Client`,
+  `expCompanyInfo_${u}_SubAdmin`,
+  // Non-VAT Purchases
+  `npurchCompanyInfo_${u}_Main`,
+  `npurchCompanyInfo_${u}_Client`,
+  `npurchCompanyInfo_${u}_SubAdmin`,
+  // Non-VAT Expenses
+  `nvatExpCompanyInfo_${u}`,
+  `nvatExpCompanyInfo_${u}_Client`,
+  `nvatExpCompanyInfo_${u}_SubAdmin`,
+  // CAPEX
+  `capexCompanyInfo_${u}_Main`,
+  `capexCompanyInfo_${u}_Client`,
+  `capexCompanyInfo_${u}_SubAdmin`,
+  // Taxes & Licenses
+  `taxesCompanyInfo_${u}_Main`,
+  `taxesCompanyInfo_${u}_Client`,
+  `taxesCompanyInfo_${u}_SubAdmin`,
+  // Purchase Returns
+  `purchaseReturnsCompanyInfo_${u}`
+];
+
+// These IDs match EXACTLY the getElementById() calls in vatable_sales.html
+const FIELD_IDS = [
+  'companyName',
+  'companyTIN',
+  'companyAddress',
+  'lineOfBusiness',
+  'telephone',
+  'reportDate',        // stored YYYY-MM-DD, input MM/DD/YYYY
+  'authorizedEmployee',
+  'email'
+];
+
+/* ── Date helpers (identical logic to vatable_sales.html) ── */
+function displayToStorage(s) {
+  if (!s) return '';
+  const p = s.split('/');
+  return p.length === 3 ? `${p[2]}-${p[0]}-${p[1]}` : s;
+}
+function storageToDisplay(s) {
+  if (!s) return '';
+  const p = s.split('-');
+  return p.length === 3 ? `${p[1]}/${p[2]}/${p[0]}` : s;
+}
+function isValidDisplay(s) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);
+  if (!m) return false;
+  const d = new Date(+m[3], +m[1]-1, +m[2]);
+  return d.getFullYear()===+m[3] && d.getMonth()===+m[1]-1 && d.getDate()===+m[2];
+}
+function autoFmtDate(inp) {
+  let v = inp.value.replace(/\D/g,'');
+  if (v.length > 2 && v.length <= 4) v = v.slice(0,2)+'/'+v.slice(2);
+  else if (v.length > 4) v = v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4,8);
+  inp.value = v;
+}
+function fmtTIN(inp) {
+  let v = inp.value.replace(/\D/g,'').slice(0,12);
+  const parts = [v.slice(0,3),v.slice(3,6),v.slice(6,9),v.slice(9,12)].filter(Boolean);
+  inp.value = parts.join('-');
+}
+
+/* ── Read from localStorage ── */
+function loadSaved() {
+  // All known company info keys across all modules
+  const allKeys = [
+    `vatCompanyInfo_${u}_Main`,    `vatCompanyInfo_${u}_Client`,    `vatCompanyInfo_${u}_SubAdmin`,
+    `purchCompanyInfo_${u}_Main`,  `purchCompanyInfo_${u}_Client`,  `purchCompanyInfo_${u}_SubAdmin`,
+    `expCompanyInfo_${u}_Main`,    `expCompanyInfo_${u}_Client`,    `expCompanyInfo_${u}_SubAdmin`,
+    `npurchCompanyInfo_${u}_Main`, `npurchCompanyInfo_${u}_Client`, `npurchCompanyInfo_${u}_SubAdmin`,
+    `nvatExpCompanyInfo_${u}`,     `nvatExpCompanyInfo_${u}_Client`,`nvatExpCompanyInfo_${u}_SubAdmin`,
+    `capexCompanyInfo_${u}_Main`,  `capexCompanyInfo_${u}_Client`,  `capexCompanyInfo_${u}_SubAdmin`,
+    `taxesCompanyInfo_${u}_Main`,  `taxesCompanyInfo_${u}_Client`,  `taxesCompanyInfo_${u}_SubAdmin`,
+    `purchaseReturnsCompanyInfo_${u}`
+  ];
+  for (const k of allKeys) {
+    const raw = localStorage.getItem(k);
+    if (!raw) continue;
+    try {
+      const d = JSON.parse(raw);
+      if (!d || typeof d !== 'object') continue;
+      // Full-ID format (most modules): has companyName field
+      if ('companyName' in d) return d;
+      // Short-key format (capex): has 'name' field — normalise to full-ID format
+      if ('name' in d) {
+        return {
+          companyName: d.name || '', companyTIN: d.tin || '',
+          companyAddress: d.address || '', lineOfBusiness: d.business || '',
+          telephone: d.telephone || '', reportDate: d.date || '',
+          authorizedEmployee: d.employee || '', email: d.email || ''
+        };
+      }
+    } catch(e) {}
+  }
+  return null;
+}
+
+/* ── Apply data object to form inputs ── */
+function applyToForm(data) {
+  if (!data) return;
+  FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || data[id] === undefined) return;
+    el.value = (id === 'reportDate' && data[id])
+      ? storageToDisplay(data[id])
+      : (data[id] || '');
+  });
+  updatePreview();
+}
+
+/* ── Build data object from form (storage format) ── */
+function buildData() {
+  const d = {};
+  FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    d[id] = (id === 'reportDate' && el.value)
+      ? displayToStorage(el.value)
+      : el.value;
+  });
+  return d;
+}
+
+/* ── Write to all company keys ── */
+function writeData(data) {
+  // Full-ID format (used by most modules): {companyName, companyTIN, ...}
+  const fullJson = JSON.stringify(data);
+
+  // Short-key format used by capex.html: {name, tin, address, business, telephone, date, employee, email}
+  const shortData = {
+    name: data.companyName || '',
+    tin:  data.companyTIN  || '',
+    address:  data.companyAddress  || '',
+    business: data.lineOfBusiness  || '',
+    telephone: data.telephone      || '',
+    date:     data.reportDate      || '',
+    employee: data.authorizedEmployee || '',
+    email:    data.email           || ''
+  };
+  const shortJson = JSON.stringify(shortData);
+
+  // purchase_returns.html stores reportDate as YYYY-MM-DD (native <input type="date">)
+  // data.reportDate is already in storage format (YYYY-MM-DD) so it's compatible as-is.
+
+  const CAPEX_KEYS = new Set([
+    `capexCompanyInfo_${u}_Main`, `capexCompanyInfo_${u}_Client`, `capexCompanyInfo_${u}_SubAdmin`
+  ]);
+
+  COMPANY_KEYS.forEach(k => {
+    localStorage.setItem(k, CAPEX_KEYS.has(k) ? shortJson : fullJson);
+  });
+}
+
+/* ── Live preview ── */
+function updatePreview() {
+  const map = {
+    companyName:'pv-companyName', companyTIN:'pv-companyTIN',
+    companyAddress:'pv-companyAddress', lineOfBusiness:'pv-lineOfBusiness',
+    telephone:'pv-telephone', email:'pv-email',
+    authorizedEmployee:'pv-authorizedEmployee', reportDate:'pv-reportDate'
+  };
+  Object.entries(map).forEach(([id, pvId]) => {
+    const inp = document.getElementById(id);
+    const pv  = document.getElementById(pvId);
+    if (!inp || !pv) return;
+    const v = inp.value.trim();
+    pv.innerHTML = v ? esc(v) : '<em style="opacity:.4">—</em>';
+  });
+}
+
+function esc(s) {
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+
+/* ── Sync status ── */
+function setSyncStatus(state, text) {
+  document.getElementById('syncDot').className = 'sync-dot ' + state;
+  document.getElementById('syncText').textContent = text;
+}
+
+/* ── Toast ── */
+function toast(msg, type='info') {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const icons = {success:'fa-check-circle', error:'fa-times-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle'};
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<i class="fas ${icons[type]||'fa-info-circle'}"></i> ${esc(msg)}`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 2800);
+}
+
+/* ── API helpers ── */
+function getApiBase() {
+  if (window.VAT_API_BASE) return window.VAT_API_BASE;
+  if (window.__TAURI__) return 'http://localhost:8000/api';
+  return (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? `${window.location.protocol}//${window.location.hostname}:8000/api`
+    : '/api';
+}
+function getApiToken() {
+  try { const s = JSON.parse(sessionStorage.getItem('VAT_SESSION')); return s._token || s.token || null; } catch(e) { return null; }
+}
+function apiHeaders() {
+  const t = getApiToken();
+  const h = { 'Content-Type': 'application/json' };
+  if (t) h['Authorization'] = 'Bearer ' + t;
+  return h;
+}
+async function checkApiAvailable() {
+  try {
+    const r = await fetch(getApiBase().replace('/api','') + '/health', { signal: AbortSignal.timeout(2000) });
+    return r.ok;
+  } catch(_) { return false; }
+}
+async function apiSaveCompanyInfo(data) {
+  const token = getApiToken();
+  if (!token) return;
+  try {
+    await fetch(getApiBase() + '/company-info', {
+      method: 'POST', headers: apiHeaders(),
+      body: JSON.stringify({ data })
+    });
+  } catch(_) {}
+}
+async function apiLoadCompanyInfo() {
+  const token = getApiToken();
+  if (!token) return null;
+  try {
+    const r = await fetch(getApiBase() + '/company-info', { headers: apiHeaders() });
+    if (r.ok) { const d = await r.json(); return (d.data && Object.keys(d.data).length) ? d.data : null; }
+  } catch(_) {}
+  return null;
+}
+
+/* ── Save ── */
+function save() {
+  const data = buildData();
+  const required = ['companyName','companyTIN','companyAddress','lineOfBusiness','authorizedEmployee'];
+  const missing = required.find(id => !data[id] || !data[id].trim());
+  if (missing) {
+    toast('Please fill in all required (*) fields', 'warning');
+    document.getElementById(missing)?.focus();
+    return false;
+  }
+  setSyncStatus('saving', 'Saving…');
+  try {
+    writeData(data);
+    // Also push to API so other computers sync immediately
+    apiSaveCompanyInfo(data).catch(() => {});
+    setSyncStatus('idle', 'Synced ✓');
+    setTimeout(() => setSyncStatus('idle', 'Ready'), 3000);
+    const pill = document.getElementById('savedPill');
+    pill.classList.add('show');
+    setTimeout(() => pill.classList.remove('show'), 2500);
+    toast('Company info saved — all modules synced (VAT Sales/Purchases/Expenses, Non-VAT Purchases/Expenses, CAPEX, Taxes & Licenses, Purchase Returns)', 'success');
+    return true;
+  } catch(e) {
+    setSyncStatus('idle', 'Error');
+    toast('Save failed: ' + e.message, 'error');
+    return false;
+  }
+}
+
+/* ── Date Picker ── */
+let dp = { year:0, month:0 };
+function openPicker(anchor) {
+  closePicker();
+  const inp = document.getElementById('reportDate');
+  let d = new Date();
+  if (inp.value && isValidDisplay(inp.value)) {
+    const p = inp.value.split('/');
+    d = new Date(+p[2], +p[0]-1, +p[1]);
+  }
+  dp.year = d.getFullYear(); dp.month = d.getMonth();
+  const ov = document.createElement('div');
+  ov.className = 'dp-overlay'; ov.id = 'dpOv';
+  ov.onclick = closePicker;
+  document.body.appendChild(ov);
+  const pop = document.createElement('div');
+  pop.className = 'dp-popup'; pop.id = 'dpPop';
+  pop.onclick = e => e.stopPropagation();
+  document.body.appendChild(pop);
+  renderPicker();
+  positionPicker(anchor);
+}
+function positionPicker(anchor) {
+  const pop = document.getElementById('dpPop'); if (!pop || !anchor) return;
+  const r = anchor.getBoundingClientRect(), vpH = innerHeight, vpW = innerWidth;
+  let top = r.bottom + 5, left = r.right - 272;
+  if (top + 310 > vpH - 8) top = r.top - 316;
+  if (left < 6) left = 6;
+  if (left + 272 > vpW - 6) left = vpW - 278;
+  pop.style.top = top + 'px'; pop.style.left = left + 'px';
+}
+function closePicker() {
+  document.getElementById('dpOv')?.remove();
+  document.getElementById('dpPop')?.remove();
+}
+function renderPicker() {
+  const pop = document.getElementById('dpPop'); if (!pop) return;
+  const {year, month} = dp;
+  const MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const WD = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const today = new Date();
+  const inp = document.getElementById('reportDate');
+  let sd=null, sm=null, sy=null;
+  if (inp.value && isValidDisplay(inp.value)) { const p=inp.value.split('/'); sm=+p[0]-1; sd=+p[1]; sy=+p[2]; }
+  const fd = new Date(year,month,1).getDay(), dim = new Date(year,month+1,0).getDate(), dip = new Date(year,month,0).getDate();
+  let html = '';
+  for (let i=fd-1; i>=0; i--) html += `<button class="dp-day other-month" data-y="${year}" data-m="${month-1}" data-d="${dip-i}">${dip-i}</button>`;
+  for (let d=1; d<=dim; d++) {
+    let c = 'dp-day';
+    if (d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear()) c += ' today';
+    if (sd===d&&sm===month&&sy===year) c += ' selected';
+    html += `<button class="${c}" data-y="${year}" data-m="${month}" data-d="${d}">${d}</button>`;
+  }
+  const rem = (fd+dim)%7===0?0:7-(fd+dim)%7;
+  for (let d=1; d<=rem; d++) html += `<button class="dp-day other-month" data-y="${year}" data-m="${month+1}" data-d="${d}">${d}</button>`;
+  pop.innerHTML = `
+    <div class="dp-hd">
+      <button class="dp-nav" id="dpPrev"><i class="fas fa-chevron-left"></i></button>
+      <span class="dp-my">${MN[month]} ${year}</span>
+      <button class="dp-nav" id="dpNext"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="dp-wk">${WD.map(d=>`<span>${d}</span>`).join('')}</div>
+    <div class="dp-days">${html}</div>
+    <div class="dp-foot">
+      <button class="dp-today" id="dpToday">Today</button>
+      <button id="dpCancel">Cancel</button>
+    </div>`;
+  pop.querySelector('#dpPrev').onclick = () => { dp.month--; if(dp.month<0){dp.month=11;dp.year--;} renderPicker(); };
+  pop.querySelector('#dpNext').onclick = () => { dp.month++; if(dp.month>11){dp.month=0;dp.year++;} renderPicker(); };
+  pop.querySelector('#dpToday').onclick = () => { const t=new Date(); dp.year=t.getFullYear(); dp.month=t.getMonth(); pickDate(t.getFullYear(),t.getMonth(),t.getDate()); };
+  pop.querySelector('#dpCancel').onclick = closePicker;
+  pop.querySelectorAll('.dp-day').forEach(btn => btn.onclick = () => {
+    let y=+btn.dataset.y, m=+btn.dataset.m, d=+btn.dataset.d;
+    if(m<0){m=11;y--;} if(m>11){m=0;y++;}
+    pickDate(y,m,d);
+  });
+}
+function pickDate(y,m,d) {
+  const inp = document.getElementById('reportDate');
+  inp.value = String(m+1).padStart(2,'0')+'/'+String(d).padStart(2,'0')+'/'+y;
+  updatePreview();
+  closePicker();
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', async () => {
+
+  /* ── Identity badges ─────────────────────────────────────────
+     Rules (strict, no cross-contamination):
+
+     Sub-Admin/company_information.html (own page):
+       → ONLY show SA badge (purple). Show username from VAT_SESSION.
+         Clear any stale VAT_TRACKER_VIEWING_CLIENT that may linger.
+
+     Sub-Admin/company_information.html (client-view, READONLY=1):
+       → Show SA badge › Client badge: "associate1 › client1"
+
+     Client/company_information.html:
+       → ONLY show Client badge (green).
+
+     No monthly context here — badges are name-only (no month prefix).
+  ────────────────────────────────────────────────────────────── */
+  (function() {
+    // Derive role from path (same pattern as all other trackers)
+    const _path = window.location.pathname;
+    const _role = _path.includes('/Client/') ? 'Client'
+                : _path.includes('/Sub-Admin/') ? 'SubAdmin'
+                : 'Main';
+
+    const _saReadOnly   = sessionStorage.getItem('COMPANY_INFO_READONLY') === '1';
+    const _saClientName = sessionStorage.getItem('VAT_TRACKER_VIEWING_CLIENT') || '';
+
+    let vatSession = null;
+    try { vatSession = JSON.parse(sessionStorage.getItem('VAT_SESSION') || 'null'); } catch(e) {}
+    const loggedInUser = vatSession?.username || '';
+
+    const strip   = document.getElementById('identityStrip');
+    const saBadge = document.getElementById('subAdminBadge');
+    const saLabel = document.getElementById('subAdminBadgeLabel');
+    const clBadge = document.getElementById('clientBadge');
+    const clLabel = document.getElementById('clientBadgeLabel');
+    const sep     = document.getElementById('identitySep');
+
+    if (_role === 'SubAdmin') {
+      if (_saReadOnly && _saClientName) {
+        // Sub-Admin viewing a client's company information (read-only mode)
+        const saName = loggedInUser;
+        if (saName) { saLabel.textContent = saName; saBadge.classList.remove('hidden'); }
+        clLabel.textContent = _saClientName;
+        clBadge.classList.remove('hidden');
+        if (saName) sep.classList.remove('hidden');
+        strip.style.display = 'flex';
+      } else {
+        // Sub-Admin on their OWN company information.
+        // Clear any stale client-view keys so they don't contaminate this view.
+        sessionStorage.removeItem('VAT_TRACKER_VIEWING_CLIENT');
+        sessionStorage.removeItem('COMPANY_INFO_READONLY');
+        const saName = loggedInUser;
+        if (saName) {
+          saLabel.textContent = saName;
+          saBadge.classList.remove('hidden');
+          strip.style.display = 'flex';
+        }
+      }
+
+    } else if (_role === 'Client') {
+      // Client's own company information — show ONLY the client badge.
+      const clName = loggedInUser;
+      if (clName) {
+        clLabel.textContent = clName;
+        clBadge.classList.remove('hidden');
+        strip.style.display = 'flex';
+      }
+    }
+  })();
+
+  // 1. Load from localStorage immediately so the form isn't blank
+  const local = loadSaved();
+  if (local) { applyToForm(local); setSyncStatus('idle', 'Loaded ✓'); }
+
+  // 2. Try to pull fresher data from API (other computer may have saved more recently)
+  const apiData = await apiLoadCompanyInfo();
+  if (apiData && Object.keys(apiData).length) {
+    applyToForm(apiData);
+    writeData(apiData);  // keep localStorage in sync with API
+    setSyncStatus('idle', 'Synced ✓');
+    setTimeout(() => setSyncStatus('idle', 'Ready'), 2000);
+  } else if (local) {
+    setSyncStatus('idle', 'Ready');
+  }
+
+  // Live preview on all inputs
+  FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updatePreview);
+  });
+
+  // TIN formatting
+  document.getElementById('companyTIN').addEventListener('input', function() { fmtTIN(this); updatePreview(); });
+
+  // Date auto-format
+  document.getElementById('reportDate').addEventListener('input', function() { autoFmtDate(this); updatePreview(); });
+
+  // Calendar button
+  document.getElementById('calBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (document.getElementById('dpPop')) { closePicker(); return; }
+    openPicker(this);
+  });
+
+  // Save
+  document.getElementById('saveBtn').addEventListener('click', save);
+
+  // Open VAT Sales (save first)
+  document.getElementById('openVatBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'vatable_sales.html'; }, 500);
+  });
+
+  // Open VAT Purchases (save first)
+  document.getElementById('openPurchBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'vatable_purchases.html'; }, 500);
+  });
+
+  // Open VAT Expenses (save first)
+  document.getElementById('openExpBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'vatable_expenses.html'; }, 500);
+  });
+
+  // Open Non-VAT Purchases (save first)
+  document.getElementById('openNPurchBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'non_vat_purchases.html'; }, 500);
+  });
+
+  // Open Non-VAT Expenses (save first)
+  document.getElementById('openNExpBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'non_vat_expenses.html'; }, 500);
+  });
+
+  // Open CAPEX (save first)
+  document.getElementById('openCapexBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'capex.html'; }, 500);
+  });
+
+  // Open Taxes & Licenses (save first)
+  document.getElementById('openTaxesBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'taxes_licenses.html'; }, 500);
+  });
+
+  // Open Purchase Returns (save first)
+  document.getElementById('openReturnsBtn').addEventListener('click', () => {
+    if (save()) setTimeout(() => { location.href = 'purchase_returns.html'; }, 500);
+  });
+
+  // Reload
+  document.getElementById('reloadBtn').addEventListener('click', () => {
+    const d = loadSaved();
+    if (d) { applyToForm(d); toast('Reloaded from saved data', 'success'); }
+    else toast('No saved data found', 'warning');
+  });
+
+  // Clear
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if (!confirm('Clear all company information from all VAT modules?')) return;
+    FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    COMPANY_KEYS.forEach(k => localStorage.removeItem(k));
+    updatePreview();
+    toast('Company info cleared', 'success');
+  });
+
+  // Ctrl+S
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); save(); }
+  });
+});
+</script>
+</body>
+</html>
