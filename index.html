@@ -775,6 +775,201 @@
             .hero h1 br { display: inline; }
             .hero h1 span { margin-left: 0; }
         }
+
+        /* ═══════════════════════════════════════════════════════════
+           BEVEL FINISH — raised edges on buttons, cards & panels
+           (top-left light edge + bottom-right shade, plus soft drop)
+           ═══════════════════════════════════════════════════════════ */
+        :root {
+            --bevel-hi: rgba(255,255,255,0.95);
+            --bevel-lo: rgba(13,17,23,0.10);
+        }
+
+        /* Nav pill container: inset (recessed) tray */
+        .nav-links {
+            background: linear-gradient(180deg, #eceef4 0%, #f7f8fb 100%);
+            box-shadow:
+                inset 0 2px 4px rgba(13,17,23,0.10),
+                inset 0 -1px 0 rgba(255,255,255,0.9);
+        }
+        /* Nav links: raised on hover, pressed-in look when active */
+        .nav-link:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #f1f3f8 100%);
+            box-shadow:
+                inset 0 1px 0 var(--bevel-hi),
+                inset 0 -2px 0 rgba(13,17,23,0.07),
+                0 2px 5px rgba(13,17,23,0.10);
+        }
+        .nav-link.active {
+            background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+            box-shadow:
+                inset 0 1px 0 #fff,
+                inset 0 -2px 0 rgba(26,71,204,0.18),
+                inset 1px 0 0 rgba(255,255,255,0.8),
+                inset -1px 0 0 rgba(26,71,204,0.08),
+                0 3px 8px -2px rgba(26,71,204,0.25);
+        }
+
+        /* TIN Library button: glossy dark bevel */
+        .tin-btn {
+            background: linear-gradient(180deg, #2b3647 0%, #0d1117 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.28),
+                inset 0 -2px 0 rgba(0,0,0,0.55),
+                0 4px 10px -2px rgba(13,17,23,0.4);
+        }
+        .tin-btn:hover {
+            background: linear-gradient(180deg, #36445a 0%, #131a24 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.35),
+                inset 0 -2px 0 rgba(0,0,0,0.55),
+                0 7px 14px -3px rgba(13,17,23,0.45);
+        }
+        .tin-btn:active { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+
+        /* Brand logo tile */
+        .brand-mark {
+            box-shadow:
+                inset 0 1px 0 #fff,
+                inset 0 -2px 0 rgba(13,17,23,0.08),
+                0 3px 8px -2px rgba(13,17,23,0.18);
+        }
+        .brand-words em {
+            box-shadow: inset 0 1px 0 #fff, inset 0 -1px 0 rgba(26,71,204,0.18);
+        }
+
+        /* View All Modules button */
+        .modules-trigger-btn {
+            background: linear-gradient(180deg, #ffffff 0%, #eaf0ff 100%);
+            border: 1px solid rgba(26,71,204,0.18);
+            box-shadow:
+                inset 0 1px 0 #fff,
+                inset 0 -3px 0 rgba(26,71,204,0.14),
+                0 5px 12px -4px rgba(26,71,204,0.3);
+        }
+        .modules-trigger-btn:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #dde8ff 100%);
+            box-shadow:
+                inset 0 1px 0 #fff,
+                inset 0 -3px 0 rgba(26,71,204,0.18),
+                0 9px 16px -5px rgba(26,71,204,0.38);
+        }
+        .modules-trigger-btn:active {
+            transform: translateY(1px);
+            box-shadow: inset 0 3px 6px rgba(26,71,204,0.25);
+        }
+
+        /* Section tag chip */
+        .section-tag {
+            background: linear-gradient(180deg, #e4f8f1 0%, #c9efe2 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.9),
+                inset 0 -2px 0 rgba(13,138,110,0.18),
+                0 2px 5px -1px rgba(13,138,110,0.2);
+        }
+
+        /* Hero — beveled slab */
+        .hero {
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.22),
+                inset 2px 0 0 rgba(255,255,255,0.08),
+                inset 0 -4px 0 rgba(0,0,0,0.28),
+                inset -2px 0 0 rgba(0,0,0,0.12),
+                0 18px 40px -12px rgba(26,71,204,0.45);
+        }
+        .hero-eyebrow {
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.07) 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.35),
+                inset 0 -2px 0 rgba(0,0,0,0.18);
+        }
+        /* Stats panel: raised glass tile */
+        .hero-stats {
+            background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.05) 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.38),
+                inset 0 -3px 0 rgba(0,0,0,0.22),
+                0 8px 18px -6px rgba(0,0,0,0.35);
+        }
+
+        /* Cards — raised tiles */
+        .card {
+            box-shadow:
+                inset 0 2px 0 var(--bevel-hi),
+                inset 2px 0 0 rgba(255,255,255,0.7),
+                inset 0 -3px 0 var(--bevel-lo),
+                inset -2px 0 0 rgba(13,17,23,0.04),
+                0 6px 14px -6px rgba(13,17,23,0.16);
+        }
+        .card:hover {
+            box-shadow:
+                inset 0 2px 0 #fff,
+                inset 2px 0 0 rgba(255,255,255,0.8),
+                inset 0 -3px 0 rgba(13,17,23,0.13),
+                inset -2px 0 0 rgba(13,17,23,0.06),
+                0 16px 28px -8px rgba(13,17,23,0.22);
+        }
+        .card:active { transform: translateY(0); }
+
+        /* Card icons: domed, glossy bevel */
+        .card-icon {
+            background-image: linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 55%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.95),
+                inset 0 -3px 0 rgba(13,17,23,0.12),
+                0 3px 6px -2px rgba(13,17,23,0.22);
+        }
+        .theme-company .card-icon {
+            background-image: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #7c3aed 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.45),
+                inset 0 -3px 0 rgba(30,20,110,0.45),
+                0 4px 10px -2px rgba(99,102,241,0.6);
+        }
+
+        /* Badges: small embossed pills */
+        .badge {
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.75),
+                inset 0 -2px 0 rgba(13,17,23,0.12);
+        }
+        .theme-company .badge {
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.4),
+                inset 0 -2px 0 rgba(20,10,90,0.4),
+                0 2px 8px rgba(99,102,241,0.35);
+        }
+
+        /* Company card: keep glow pulse but add bevel under it */
+        @keyframes companyGlowPulse {
+            0%, 100% {
+                box-shadow:
+                    inset 0 2px 0 rgba(255,255,255,0.95),
+                    inset 0 -3px 0 rgba(79,70,229,0.2),
+                    0 6px 18px -4px rgba(99,102,241,0.3), 0 0 0 0 rgba(99,102,241,0);
+            }
+            50% {
+                box-shadow:
+                    inset 0 2px 0 rgba(255,255,255,0.95),
+                    inset 0 -3px 0 rgba(79,70,229,0.25),
+                    0 10px 26px -4px rgba(99,102,241,0.45), 0 0 0 5px rgba(99,102,241,0.06);
+            }
+        }
+        .theme-company:hover {
+            box-shadow:
+                inset 0 2px 0 #fff,
+                inset 0 -3px 0 rgba(79,70,229,0.28),
+                0 18px 34px -8px rgba(99,102,241,0.4),
+                0 0 0 3px rgba(99,102,241,0.08);
+        }
+
+        /* Identity badges + footer */
+        .id-badge {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(13,17,23,0.1);
+        }
+        .nav { box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 10px rgba(13,17,23,0.06); }
+        .nav.elevated { box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 4px 22px rgba(13,17,23,0.1); }
+        .footer { box-shadow: inset 0 2px 0 #fff, 0 -2px 10px rgba(13,17,23,0.04); }
     </style>
 </head>
 <body>
